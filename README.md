@@ -1,4 +1,5 @@
 # CsGrafeq
+## Description
 A WinForm control that supports implicit function drawing
 
 CsGrafeq is a powerful drawing application for drawing implicit functions with 2 variables.
@@ -9,7 +10,7 @@ CsGrafeq is partially based on Reliable Two-Dimensional Graphing Methods for Mat
 
 CsGrafeq uses Microsoft.WindowsAPICodePack.DirectX to render images on the screen, so it can be easily replaced with Sharpdx.
 
-#Example
+## Example
 
 y=x y=x^3 y=e^x y=sin(x)
 
@@ -18,3 +19,8 @@ y=x y=x^3 y=e^x y=sin(x)
 x/sin(x)+y/sin(y)=x*y/sin(x*y)
 
 ![image](https://github.com/jyswjjgdwtdtj/CsGrafeq/blob/main/ExampleImage/2.bmp)
+
+## Feature
+1. Zoom in and out of the coordinate axis with the mouse
+2. Compile the formula to speed up computation
+3. The only dependency is Microsoft.WindowsAPICodePack.DirectX.dll
