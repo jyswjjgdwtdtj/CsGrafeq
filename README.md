@@ -8,7 +8,7 @@ It's an alternative to Grafeq.
 
 CsGrafeq is partially based on Reliable Two-Dimensional Graphing Methods for Mathematical Formulae with Two Free Variables by Jeff Tupper of University of Toronto, SIGGRAPH 2001.
 
-CsGrafeq uses Microsoft.WindowsAPICodePack.DirectX to render images on the screen, so it can be easily replaced with Sharpdx.
+CsGrafeq uses GDI+ to render images on the screen, so there is no need to get any dependency.
 
 ## Example
 
@@ -22,5 +22,5 @@ x/sin(x)+y/sin(y)=x*y/sin(x*y)
 
 ## Feature
 1. Zoom in and out of the coordinate axis with the mouse
-2. Compile the formula to speed up computation
-3. The only dependency is Microsoft.WindowsAPICodePack.DirectX.dll
+2. Compile the string form formula to speed up computation
+3. No dependency
