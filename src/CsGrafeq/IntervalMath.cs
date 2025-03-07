@@ -1,0 +1,365 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Serialization.Formatters;
+using System.Text;
+using System.Threading.Tasks;
+using static System.Math;
+using static System.Double;
+
+namespace CsGrafeq
+{
+    public static class IntervalMath
+    {
+        static IntervalMath() { }
+        private static Interval EmptyInterval=new Interval(NaN) { Def=(false,false),Cont=false};
+        #region 四则运算
+        public static Interval Add(Interval a, Interval b)
+        {
+            return (a.isEmpty()||b.isEmpty())?EmptyInterval:new Interval(a.Min + b.Min, a.Max + b.Max) { Def=And(a.Def,b.Def),Cont=a.Cont&&b.Cont};
+        }
+        public static Interval Subtract(Interval a,Interval b)
+        {
+            return Add(a, Neg(b));
+        }
+        public static Interval Multiply(Interval i1,Interval i2)
+        {
+            if(i1.isEmpty()||i2.isEmpty())
+                return EmptyInterval;
+            double[] ds = MinMaxForDouble(i1.Min * i2.Min, i1.Min * i2.Max, i1.Max * i2.Min, i1.Max * i2.Max);
+            return new Interval(ds[0], ds[1]) { Def = And(i1.Def, i2.Def), Cont = i1.Cont && i2.Cont };
+        }
+        public static Interval Divide(Interval m,Interval i)
+        {
+            //1/i1
+            //a/b=a*(1/b)=a*(b=>1/x)
+            if (i.isEmpty()||m.isEmpty())
+            {
+                return EmptyInterval;
+            }
+            if (i.ContainsEqual(0))
+            {
+                return new Interval(NegativeInfinity, PositiveInfinity) { Def = And(i.Def, m.Def), Cont = i.Cont && m.Cont };
+            }
+            else
+            {
+                Interval i1=new Interval(1/i.Min, 1/i.Max);
+                return Multiply(m, i1);
+            }
+        }
+        public static Interval Neg(Interval a)
+        {
+            return new Interval(-a.Max, -a.Min) { Def = a.Def, Cont = a.Cont };
+        }
+        #endregion
+        #region 比较运算
+        public static (bool, bool) Equal(Interval i1, Interval i2)
+        {
+            (bool,bool) def=And(i1.Def, i2.Def);
+            if (!def.Item2)
+                return def;
+            if (i2.Max < i1.Min || i2.Min > i1.Max)
+                return (false, false);
+            //if(i2.Max==i1.Max&&i2.Min==i1.Min)
+            //    return def;
+            return (false,def.Item2);
+        }
+        public static (bool, bool) Greater(Interval i1, Interval i2)
+        {
+            (bool, bool) def = And(i1.Def, i2.Def);
+            if (i1.isEmpty() || i2.isEmpty())
+                return (false, false);
+            if (i1.Min > i2.Max)
+            {
+                if ((!i1.Def.Item1) || (!i2.Def.Item1))
+                {
+                    return (false, true);
+                }
+                if ((!i1.Cont) || (!i2.Cont))
+                {
+                    return (false, true);
+                }
+                return (true, true);
+            }
+            if (i1.Max < i2.Min)
+                return (false, false);
+            return (false, true);
+        }
+        public static (bool, bool) Less(Interval i1, Interval i2)
+        {
+            return Greater(i2, i1);
+        }
+        #endregion
+        #region 数学函数
+        public static Interval Sgn(Interval i)
+        {
+            if (i.isEmpty())
+                return EmptyInterval;
+            i.Min = Sign(i.Min);
+            i.Max = Sign(i.Max);
+            i.Cont&=(i.Min==i.Max);
+            return i;
+        }
+        public static Interval Median(Interval i1, Interval i2, Interval i3)
+        {
+            if(i1.isEmpty()||i2.isEmpty()||i3.isEmpty())
+                return EmptyInterval;
+            Interval i = new Interval() {Def=And(And(i1.Def,i2.Def),i3.Def),Cont=i1.Cont&&i2.Cont&&i3.Cont };
+            double[] arr = new double[3] { i1.Min, i2.Min, i3.Min };
+            Array.Sort<double>(arr);
+            i.Min = arr[1];
+            arr = new double[3] { i1.Max, i2.Max, i3.Max };
+            Array.Sort<double>(arr);
+            i.Max = arr[1];
+            return i;
+        }
+        public static Interval Exp(Interval i)
+        {
+            if (i.isEmpty())
+                return EmptyInterval;
+            i.Min = Math.Pow(E, i.Min);
+            i.Max= Math.Pow(E, i.Max);
+            return i;
+        }
+        public static Interval Ln(Interval i)
+        {
+            if (i.isEmpty())
+                return EmptyInterval;
+            if(i.Max<=0)
+                return EmptyInterval;
+            if (i.Min > 0)
+            {
+                i.Min=Math.Log(i.Min);
+                i.Max=Math.Log(i.Max);
+                return i;
+            }
+            i.Min = Double.NegativeInfinity;
+            i.Max = Math.Log(i.Max);
+            i.Def = (false, true);
+            return i;
+        }
+        public static Interval Lg(Interval i)
+        {
+            if (i.isEmpty())
+                return EmptyInterval;
+            if (i.Max <= 0)
+                return EmptyInterval;
+            if (i.Min > 0)
+            {
+                i.Min = Log10(i.Min);
+                i.Max = Log10(i.Max);
+                return i;
+            }
+            i.Min = Double.NegativeInfinity;
+            i.Max = Log10(i.Max);
+            i.Def = (false, true);
+            return i;
+        }
+        public static Interval Log(Interval i1,Interval i2)
+        {
+            return Divide(Ln(i1) , Ln(i2));
+        }
+        public static Interval Pow(Interval i1,Interval i2)
+        {
+            return Exp(Multiply(Ln(i1),i2));
+        }
+        public static Interval Sqrt(Interval i)
+        {
+            if (i.isEmpty())
+                return i;
+            if (i.Max < 0)
+                return EmptyInterval;
+            if (i.Min >= 0)
+            {
+                i.Min=Math.Sqrt(i.Min);
+                i.Max=Math.Sqrt(i.Max);
+                return i;
+            }
+            i.Min = 0;
+            i.Max = Math.Sqrt(i.Max);
+            i.Def = (false, true);
+            return i;
+        }
+        public static Interval Root(Interval i, Interval i2)
+        {
+            if (i2.Min != i2.Max)
+            {
+                throw new Exception("指数不为变量");
+            }
+            if (i.isEmpty())
+            {
+                return i;
+            }
+            double num = i2.Max;
+            if ((int)(num) == num && (int)(num / 2) != num / 2)
+            {
+                return new Interval(Math.Pow(i.Min, 1 / num), Math.Pow(i.Max, 1 / num));
+            }
+            else
+            {
+                if (i.Max < 0)
+                {
+                    return EmptyInterval;
+                }
+                else if (i.Contains(0))
+                {
+                    i = new Interval(0, Math.Pow(i.Max, 1 / num));
+                    i.Def = (false, true);
+                    return i;
+                }
+                else
+                {
+                    return new Interval(Math.Pow(i.Min, 1 / num), Math.Pow(i.Max, 1 / num));
+                }
+            }
+        }
+        public static Interval Min(Interval i1, Interval i2)
+        {
+            return new Interval(Math.Min(i1.Min, i2.Min), Math.Min(i1.Max, i2.Max)) { Def = And(i1.Def, i2.Def), Cont = i1.Cont & i2.Cont };
+        }
+        public static Interval Max(Interval i1, Interval i2)
+        {
+            return new Interval(Math.Max(i1.Min, i2.Min), Math.Max(i1.Max, i2.Max)) { Def = And(i1.Def, i2.Def), Cont = i1.Cont & i2.Cont };
+        }
+        #endregion
+        #region 三角函数
+        public static Interval Sin(Interval i)
+        {
+            if (i.isEmpty())
+            {
+                return i;
+            }
+            double a = i.Min;
+            double b = i.Max;
+            Interval minmax = new Interval();
+            if (Floor((a / PI - 0.5) / 2) < Floor((b / PI - 0.5) / 2))
+            {
+                minmax.Max = 1;
+                i.Max = 1;
+            }
+            if (Floor((a / PI + 0.5) / 2) < Floor((b / PI + 0.5) / 2))
+            {
+                minmax.Min = 1;
+                i.Min = -1;
+            }
+            if (minmax.Min == 0)
+            {
+                i.Min = Math.Min(Math.Sin(a), Math.Sin(b));
+            }
+            if (minmax.Max == 0)
+            {
+                i.Max = Math.Max(Math.Sin(a), Math.Sin(b));
+            }
+            return i;
+        }
+        public static Interval Cos(Interval i)
+        {
+            i.Min += PI / 2;
+            i.Max += PI / 2;
+            return Sin(i);
+        }
+        public static Interval Tan(Interval i)
+        {
+            if (i.isEmpty())
+            {
+                return EmptyInterval;
+            }
+            double l = Floor((i.Max + PI / 2) / PI);
+            double r = Floor((i.Min + PI / 2) / PI);
+            if (l - r == 1)
+            {
+                return new Interval(NegativeInfinity, PositiveInfinity) { Def=i.Def,Cont=false};
+            }
+            else if (l - r == 0)
+            {
+                i.Min=Math.Tan(i.Min);
+                i.Max=Math.Tan(i.Max);
+                return i;
+            }
+            else
+            {
+                return new Interval(NegativeInfinity,PositiveInfinity) { Def = i.Def, Cont = false };
+            }
+        }
+        public static Interval ArcTan(Interval i)
+        {
+            if(i.isEmpty())
+                return EmptyInterval;
+            i.Min = Math.Atan(i.Min);
+            i.Max = Math.Atan(i.Max);
+            return i;
+        }
+        public static Interval ArcSin(Interval i)
+        {
+            if (i.isEmpty())
+                return EmptyInterval;
+            if (i.Max < -1 || i.Min > 1)
+                return EmptyInterval;
+            if (i.Min < -1 || i.Max > 1)
+                i.Def = (false, true);
+            i.Min = Math.Asin(Math.Max(i.Min, -1));
+            i.Min = Math.Asin(Math.Min(i.Max, 1));
+            return i;
+        }
+        public static Interval ArcCos(Interval i)
+        {
+            if (i.isEmpty())
+                return EmptyInterval;
+            if (i.Max < -1 || i.Min > 1)
+                return EmptyInterval;
+            if (i.Min < -1 || i.Max > 1)
+                i.Def = (false, true);
+            double max = i.Max;
+            i.Max = Math.Acos(Math.Max(i.Min, -1));
+            i.Min = Math.Asin(Math.Min(max, 1));
+            return i;
+        }
+        public static Interval Sinh(Interval i)
+        {
+            if (i.isEmpty())
+                return EmptyInterval;
+            i.Min = Math.Sinh(i.Min);
+            i.Min = Math.Sinh(i.Max);
+            return i;
+        }
+        public static Interval Cosh(Interval i)
+        {
+            if (i.isEmpty())
+                return EmptyInterval;
+            if (i.ContainsEqual(0))
+            {
+                double max = Math.Max(i.Max,-i.Min);
+                i.Min = 1;
+                i.Max=Math.Cosh(max);
+                return i;
+            }
+            return new Interval(Math.Cosh(i.Min), Math.Cosh(i.Max)) { Def = i.Def, Cont = i.Cont };
+        }
+        public static Interval Tanh(Interval i)
+        {
+            if (i.isEmpty())
+                return EmptyInterval;
+            i.Min = Math.Tanh(i.Min);
+            i.Min = Math.Tanh(i.Max);
+            return i;
+        }
+        #endregion
+        #region 其他计算
+        private static (bool,bool) And((bool,bool) a,(bool,bool) b)
+        {
+            return (a.Item1 && b.Item1, a.Item2 && b.Item2);
+        }
+        private static double[] MinMaxForDouble(double n1,params double[] ns)
+        {
+            double minnum = n1;
+            double maxnum = n1;
+            foreach (var n in ns)
+            {
+                minnum = Math.Min(minnum, n);
+                maxnum = Math.Max(maxnum, n);
+            }
+            return new double[] { minnum, maxnum };
+        }
+        #endregion
+    }
+}
