@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -49,19 +49,37 @@ namespace CsGrafeq
         public ImplicitFunction(string expression)
         {
             _Expression = expression;
-            (ImpFunction,NumberFunction) = ExpressionComplier.Complie(expression);
+            (ImpFunction, NumberFunction) = ExpressionComplier.Complie(expression);
             ExpressionRecord = ExpressionComplier.Record;
             color = GetRandomColor();
             if (!expression.Contains("="))
             {
                 color = Color.FromArgb(120, color);
-                Type=expression.Contains("<")?ExpressionType.Less:ExpressionType.Greater;
+                Type = expression.Contains("<") ? ExpressionType.Less : ExpressionType.Greater;
             }
             else
             {
                 Type = ExpressionType.Equal;
             }
         }
+        public ImplicitFunction(ExpressionCompared ec)
+        {
+            _Expression = String.Empty;
+            (ImpFunction, NumberFunction) = ExpressionComplier.Complie(ec);
+            ExpressionRecord = ExpressionComplier.Record;
+            color = GetRandomColor();
+            ExpressionComplier.Element ele = ec.Elements[ec.Elements.Count - 1];
+            if (ele.NameOrValue!="Equal")
+            {
+                color = Color.FromArgb(120, color);
+                Type = ele.NameOrValue=="Less" ? ExpressionType.Less : ExpressionType.Greater;
+            }
+            else
+            {
+                Type = ExpressionType.Equal;
+            }
+        }
+
         public enum ExpressionType
         {
             Equal,Less,Greater
