@@ -27,14 +27,14 @@ x/sin(x)+y/sin(y)=x*y/sin(x*y)
 
 ## Usage
 Add expression to CsGrafeq control by 
-`
+```
 yourCsGrafeq.AddExpression("x+1<Log(y)-sin(x)/x")
 
 //Or
 using static CsGrafeq.ExpressionBuilder
 //......
 youtCsGrafeq.AddExpression(x+1<Lof(y)-Sin(x)/x)
-`
+```
 The case of functions in string expression is not distinguished, while variables are distinguished.
 
 
