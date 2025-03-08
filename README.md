@@ -24,3 +24,18 @@ x/sin(x)+y/sin(y)=x*y/sin(x*y)
 1. Zoom in and out of the coordinate axis with the mouse
 2. Compile the string form formula to speed up computation
 3. No dependency
+
+## Usage
+Add expression to CsGrafeq control by 
+`
+yourCsGrafeq.AddExpression("x+1<Log(y)-sin(x)/x")
+
+//Or
+using static CsGrafeq.ExpressionBuilder
+//......
+youtCsGrafeq.AddExpression(x+1<Lof(y)-Sin(x)/x)
+`
+The case of functions in string expression is not distinguished, while variables are distinguished.
+
+
+
