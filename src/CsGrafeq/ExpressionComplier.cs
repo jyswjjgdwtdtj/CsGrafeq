@@ -5,10 +5,7 @@ using System.Reflection.Emit;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using static System.Math;
 using System.Windows.Forms;
-using System.Runtime.CompilerServices;
 
 namespace CsGrafeq
 {
@@ -18,24 +15,46 @@ namespace CsGrafeq
         {
             DynamicMethod imp = new DynamicMethod("ImpFunction", typeof((bool, bool)), new Type[] { typeof(Interval), typeof(Interval) });
             ILGenerator il = imp.GetILGenerator();
-            EmitExpression(il, GetToken(Expression), FunctionType.Implicit);
+            EmitTokens(il, GetTokens(Expression), FunctionType.Interval);
             il.Emit(OpCodes.Ret);
-            ImpFunctionResultCompared ic = (ImpFunctionResultCompared)imp.CreateDelegate(typeof(ImpFunctionResultCompared));
-            
+            IntervalImpFunctionDelegate ic = (IntervalImpFunctionDelegate)imp.CreateDelegate(typeof(IntervalImpFunctionDelegate));
+
+            DynamicMethod isfunc = new DynamicMethod("ImpFunction", typeof((bool, bool)), new Type[] { typeof(IntervalSet), typeof(IntervalSet) });
+            ILGenerator ilis = isfunc.GetILGenerator();
+            EmitTokens(ilis, GetTokens(Expression), FunctionType.IntervalSet);
+            ilis.Emit(OpCodes.Ret);
+            IntervalSetImpFunctionDelegate isc = (IntervalSetImpFunctionDelegate)isfunc.CreateDelegate(typeof(IntervalSetImpFunctionDelegate));
             DynamicMethod num = new DynamicMethod("NumberFunction", typeof(int), new Type[] { typeof(double), typeof(double) });
             ILGenerator ilnum = num.GetILGenerator();
-            EmitExpression(ilnum, GetToken(Expression), FunctionType.Number);
+            EmitTokens(ilnum, GetTokens(Expression), FunctionType.Number);
             ilnum.Emit(OpCodes.Ret);
-            NumberFunctionResultCompared nc = (NumberFunctionResultCompared)num.CreateDelegate(typeof(NumberFunctionResultCompared));
-            return new CompileResult {ImpFunctionResultCompared=ic,NumberFunctionResultCompared=nc};
+            NumberImpFunctionDelegate nc = (NumberImpFunctionDelegate)num.CreateDelegate(typeof(NumberImpFunctionDelegate));
+            ic.Invoke(new Interval(0),new Interval(1));
+            isc.Invoke(new IntervalSet(0), new IntervalSet(1));
+            nc.Invoke(1, 2);
+            return new CompileResult { IntervalImpFunctionDelegate = ic, NumberImpFunctionDelegate = nc ,IntervalSetImpFunctionDelegate=isc};
         }
-        public static bool TryComplie(string Expression,out ImpFunctionResultCompared func,out string errorlog)
+        public static CompileResult Complie(ExpressionCompared ec)
+        {
+            DynamicMethod imp = new DynamicMethod("ImpFunction", typeof((bool, bool)), new Type[] { typeof(Interval), typeof(Interval) });
+            ILGenerator il = imp.GetILGenerator();
+            EmitElements(il, ec.Elements.ToArray(), FunctionType.Interval);
+            il.Emit(OpCodes.Ret);
+            IntervalImpFunctionDelegate ic = (IntervalImpFunctionDelegate)imp.CreateDelegate(typeof(IntervalImpFunctionDelegate));
+            DynamicMethod num = new DynamicMethod("NumberFunction", typeof(int), new Type[] { typeof(double), typeof(double) });
+            ILGenerator ilnum = num.GetILGenerator();
+            EmitElements(ilnum, ec.Elements.ToArray(), FunctionType.Number);
+            ilnum.Emit(OpCodes.Ret);
+            NumberImpFunctionDelegate nc = (NumberImpFunctionDelegate)num.CreateDelegate(typeof(NumberImpFunctionDelegate));
+            return new CompileResult { IntervalImpFunctionDelegate = ic, NumberImpFunctionDelegate = nc };
+        }
+        public static bool TryComplie(string Expression, out IntervalImpFunctionDelegate func, out string errorlog)
         {
             Element[] elements;
             func = null;
             try
             {
-                elements = ParseExpression(GetToken(Expression));
+                elements = ParseTokens(GetTokens(Expression));
             }
             catch (Exception ex)
             {
@@ -46,7 +65,7 @@ namespace CsGrafeq
             ILGenerator il = dm.GetILGenerator();
             try
             {
-                EmitTokens(il, elements,FunctionType.Implicit);
+                EmitElements(il, elements, FunctionType.Interval);
             }
             catch (Exception ex)
             {
@@ -54,8 +73,8 @@ namespace CsGrafeq
                 return false;
             }
             il.Emit(OpCodes.Ret);
-            func=(ImpFunctionResultCompared)dm.CreateDelegate(typeof(ImpFunctionResultCompared));
-            errorlog=null;
+            func = (IntervalImpFunctionDelegate)dm.CreateDelegate(typeof(IntervalImpFunctionDelegate));
+            errorlog = null;
             return true;
         }
         private static readonly Regex letter = new Regex("[a-zA-Z]");
@@ -65,6 +84,7 @@ namespace CsGrafeq
         private static readonly Regex numberOrpoint = new Regex("[0-9.]");
         private static readonly Regex spaceOrtab = new Regex(@"([ ]|\t)");
         private static readonly MethodInfoHelper mih = new MethodInfoHelper(typeof(IntervalMath));
+        private static readonly MethodInfoHelper mihis = new MethodInfoHelper(typeof(IntervalSetMath));
         private static readonly MethodInfoHelper mihn = new MethodInfoHelper(typeof(NumberMath));
         private static readonly StringBuilder sb = new StringBuilder();
         private static int stacklength = 0;
@@ -75,7 +95,7 @@ namespace CsGrafeq
         static ExpressionComplier()
         {
         }
-        private static Element[] ParseExpression(Token[] Tokens)
+        private static Element[] ParseTokens(Token[] Tokens)
         {
             Stack<OperatorType> op = new Stack<OperatorType>();
             Stack<Element> exp = new Stack<Element>();
@@ -88,8 +108,8 @@ namespace CsGrafeq
                 switch (GetTokenLevel(Tokens[loc]))
                 {
                     case -3://var|func
-                        if (Previous==ElementType.Number|| Previous == ElementType.Variable||Previous == ElementType.Function)
-                            throw new Exception("缺少运算符:" + Tokens[loc - 1] + "与" + Tokens[loc]+"之间");
+                        if (Previous == ElementType.Number || Previous == ElementType.Variable || Previous == ElementType.Function)
+                            throw new Exception("缺少运算符:" + Tokens[loc - 1] + "与" + Tokens[loc] + "之间");
                         string Tokenname = Tokens[loc].NameOrValue;
                         if (mih.Contains(Tokenname.ToLower()))
                         {//函数
@@ -110,7 +130,7 @@ namespace CsGrafeq
                                     if (bc == 0 && Tokens[loc].type == TokenType.Comma)
                                     {
                                         dimcount++;
-                                        foreach (var i in ParseExpression(ts.ToArray()))
+                                        foreach (var i in ParseTokens(ts.ToArray()))
                                             exp.Push(i);
                                         ts.Clear();
                                         loc++;
@@ -119,7 +139,7 @@ namespace CsGrafeq
                                     if (bc == 0 && Tokens[loc].type == TokenType.RightBracket)
                                     {
                                         dimcount++;
-                                        foreach (var i in ParseExpression(ts.ToArray()))
+                                        foreach (var i in ParseTokens(ts.ToArray()))
                                             exp.Push(i);
                                         loc++;
                                         break;
@@ -142,7 +162,7 @@ namespace CsGrafeq
                         }
                         else
                         {
-                            throw new Exception("未知变量:"+Tokens[loc].NameOrValue);
+                            throw new Exception("未知变量:" + Tokens[loc].NameOrValue);
                         }
                         break;
                     case -4://num
@@ -158,24 +178,24 @@ namespace CsGrafeq
                             if (Previous == ElementType.Number || Previous == ElementType.Variable)
                                 throw new Exception("缺少运算符:" + Tokens[loc - 1] + "与" + Tokens[loc] + "之间");
                             op.Push(OperatorType.LeftBracket);
-                            Previous=ElementType.Operator;
+                            Previous = ElementType.Operator;
                         }
                         else if (Tokens[loc].type == TokenType.RightBracket)
                         {
                             if (Previous == ElementType.Function || Previous == ElementType.Operator)
                                 throw new Exception("缺少运算符:" + Tokens[loc - 1] + "与" + Tokens[loc] + "之间");
-                            Previous=ElementType.Variable;
+                            Previous = ElementType.Variable;
                             MoveOperatorTo(op, exp, OperatorType.LeftBracket);
                         }
                         loc++;
                         break;
                     default:
-                        if (Previous==ElementType.Operator && Tokens[loc].type == TokenType.Subtract)
+                        if (Previous == ElementType.Operator && Tokens[loc].type == TokenType.Subtract)
                         {
                             Tokens[loc].type = TokenType.Neg; goto jt;
                         }
                         if (Previous == ElementType.Function || Previous == ElementType.Operator)
-                            throw new Exception("缺少运算符:" + Tokens[loc - 1] + "与" + Tokens[loc] + "之间"+Previous.ToString());
+                            throw new Exception("缺少运算符:" + Tokens[loc - 1] + "与" + Tokens[loc] + "之间" + Previous.ToString());
                         jt:
                         Previous = ElementType.Operator;
                         JudgeOperator(op, exp, Tokens[loc].ToOper());
@@ -189,25 +209,34 @@ namespace CsGrafeq
             }
             return exp.Reverse().ToArray();
         }
-        private static void EmitToken(ILGenerator IL, Element ele,FunctionType functionType)
+        private static void EmitElement(ILGenerator IL, Element ele, FunctionType functionType)
         {
             //if (stacklength < 0)
-                //throw new Exception("运算符或函数参数数量错误");
+            //throw new Exception("运算符或函数参数数量错误");
             switch (ele.type)
             {
                 case ElementType.Number:
                     double d = Double.Parse(ele.NameOrValue);
                     IL.Emit(OpCodes.Ldc_R8, d);
-                    if (functionType == FunctionType.Implicit)
+                    if (functionType == FunctionType.Interval)
                         IL.Emit(OpCodes.Newobj, typeof(Interval).GetConstructor(new Type[] { typeof(double) }));
-                    sb.AppendLine("load number:"+d);
+                    else if (functionType == FunctionType.IntervalSet)
+                        IL.Emit(OpCodes.Newobj, typeof(IntervalSet).GetConstructor(new Type[] { typeof(double) }));
+                    sb.AppendLine("load number:" + d);
                     stacklength++;
                     break;
                 case ElementType.Operator:
                     {
-                        if (functionType == FunctionType.Implicit)
+                        if (functionType == FunctionType.Interval)
                         {
                             MethodInfo mf = mih.GetMethod(ele.NameOrValue);
+                            //MessageBox.Show("Test");
+                            IL.Emit(OpCodes.Call, mf);
+                            stacklength -= mf.GetParameters().Length;
+                        }
+                        else if (functionType == FunctionType.IntervalSet)
+                        {
+                            MethodInfo mf = mihis.GetMethod(ele.NameOrValue);
                             IL.Emit(OpCodes.Call, mf);
                             stacklength -= mf.GetParameters().Length;
                         }
@@ -230,7 +259,7 @@ namespace CsGrafeq
                                 stacklength -= mf.GetParameters().Length; ;
                             }
                             else
-                               throw new Exception();
+                                throw new Exception("未知函数");
                         }
                         sb.AppendLine("call oper:" + ele.NameOrValue);
                         stacklength++;
@@ -242,19 +271,21 @@ namespace CsGrafeq
                     else if (ele.NameOrValue == "y")
                     { IL.Emit(OpCodes.Ldarg_1); sb.AppendLine("load arg:y"); }
                     else if (ele.NameOrValue == "e")
-                    { 
-                        IL.Emit(OpCodes.Ldc_R8,Math.E); 
-                        if(functionType==FunctionType.Implicit)
+                    {
+                        IL.Emit(OpCodes.Ldc_R8, Math.E);
+                        if (functionType == FunctionType.Interval)
                             IL.Emit(OpCodes.Newobj, typeof(Interval).GetConstructor(new Type[] { typeof(double) }));
-                        sb.AppendLine("load const:e"); 
+                        if (functionType == FunctionType.IntervalSet)
+                            IL.Emit(OpCodes.Newobj, typeof(IntervalSet).GetConstructor(new Type[] { typeof(double) }));
+                        sb.AppendLine("load const:e");
                     }
                     else
-                        throw new Exception("变量不允许:"+ele.NameOrValue);
+                        throw new Exception("变量不允许:" + ele.NameOrValue);
                     stacklength++;
                     break;
                 case ElementType.Function:
                     {
-                        if (functionType == FunctionType.Implicit)
+                        if (functionType == FunctionType.Interval)
                         {
                             MethodInfo mf = mih.GetMethod(ele.NameOrValue, ele.arg);
                             if (mf == null)
@@ -265,17 +296,28 @@ namespace CsGrafeq
                             IL.Emit(OpCodes.Call, mf);
                             stacklength -= mf.GetParameters().Length;
                         }
+                        else if (functionType == FunctionType.IntervalSet)
+                        {
+                            MethodInfo mf = mihis.GetMethod(ele.NameOrValue, ele.arg);
+                            if (mf == null)
+                                if (mihis.Contains(ele.NameOrValue))
+                                    throw new Exception("函数参数数量错误");
+                                else
+                                    throw new Exception("函数不存在");
+                            IL.Emit(OpCodes.Call, mf);
+                            stacklength -= mf.GetParameters().Length;
+                        }
                         else
                         {
                             if (NumberMath.ToMathDic.ContainsKey(ele.NameOrValue.ToLower()))
                             {
-                                IL.Emit(OpCodes.Call, typeof(Math).GetMethod(NumberMath.ToMathDic[ele.NameOrValue.ToLower()],GetTypeArray(typeof(double),ele.arg)));
+                                IL.Emit(OpCodes.Call, typeof(Math).GetMethod(NumberMath.ToMathDic[ele.NameOrValue.ToLower()], GetTypeArray(typeof(double), ele.arg)));
                                 stacklength -= 2;
                             }
                             else if (mihn.Contains(ele.NameOrValue))
                             {
-                                MethodInfo mf = mihn.GetMethod(ele.NameOrValue,ele.arg);
-                                if(mf==null)
+                                MethodInfo mf = mihn.GetMethod(ele.NameOrValue, ele.arg);
+                                if (mf == null)
                                     if (mihn.Contains(ele.NameOrValue))
                                         throw new Exception("函数参数数量错误");
                                     else
@@ -284,7 +326,7 @@ namespace CsGrafeq
                                 stacklength -= mf.GetParameters().Length; ;
                             }
                             else
-                                throw new Exception();
+                                throw new Exception("未知函数");
                         }
                         sb.AppendLine("call func:" + ele.NameOrValue.ToLower());
                         stacklength++;
@@ -315,27 +357,27 @@ namespace CsGrafeq
                     }*/
                     break;
                 default:
-                    throw new Exception();
+                    throw new Exception("未知Element");
             }
         }
-        private static void EmitTokens(ILGenerator IL, Element[] eles,FunctionType functionType)
+        private static void EmitElements(ILGenerator IL, Element[] eles, FunctionType functionType)
         {
             stacklength = 0;
             sb.Clear();
             foreach (var i in eles)
             {
-                EmitToken(IL, i,functionType);
+                EmitElement(IL, i, functionType);
             }
             //if (stacklength != 1)
-                //throw new Exception("缺少运算符或函数"+stacklength);
+            //throw new Exception("缺少运算符或函数"+stacklength);
         }
-        private static void EmitExpression(ILGenerator IL, Token[] Tokens,FunctionType functionType)
+        private static void EmitTokens(ILGenerator IL, Token[] Tokens, FunctionType functionType)
         {
-            EmitTokens(IL, ParseExpression(Tokens),functionType);
+            EmitElements(IL, ParseTokens(Tokens), functionType);
         }
-        private static Token[] GetToken(string script)//词法分析器
+        private static Token[] GetTokens(string script)//词法分析器
         {
-            bool compareoperatorexists=false;
+            bool compareoperatorexists = false;
             script += '#';
             int loc = 0;
             List<Token> Tokens = new List<Token>();
@@ -411,7 +453,7 @@ namespace CsGrafeq
                         case ',':
                             t.type = TokenType.Comma; break;
                         default:
-                            throw new Exception();
+                            throw new Exception("未知符号");
                     }
                     loc++;
                 }
@@ -426,7 +468,7 @@ namespace CsGrafeq
                 }
                 Tokens.Add(t);
             }
-            if(!compareoperatorexists)
+            if (!compareoperatorexists)
                 throw new Exception("需要比较运算符");
             return Tokens.ToArray();
         }
@@ -504,52 +546,52 @@ namespace CsGrafeq
         }
         public enum FunctionType
         {
-            Implicit,Number
+            Interval,IntervalSet, Number
         }
         #region 枚举/类型
         public enum ElementType
-    {
-        Variable, Number, Function, BasicOperator, Operator,
-    }
+        {
+            Variable, Number, Function, BasicOperator, Operator,
+        }
         public enum OperatorType
-    {
-        Add, Subtract, Multiply, Divide, Pow, Mod,
-        LeftBracket, RightBracket, Start, Neg,
-        Equal, Less, Greater
+        {
+            Add, Subtract, Multiply, Divide, Pow, Mod,
+            LeftBracket, RightBracket, Start, Neg,
+            Equal, Less, Greater
         }
         public struct Element
-    {
-        public ElementType type;
-        public string NameOrValue;
-        public int arg;
-        public Element(ElementType type, string nameOrValue, int arg)
         {
-            this.type = type;
-            this.NameOrValue = nameOrValue;
-            this.arg = arg;
+            public ElementType type;
+            public string NameOrValue;
+            public int arg;
+            public Element(ElementType type, string nameOrValue, int arg)
+            {
+                this.type = type;
+                this.NameOrValue = nameOrValue;
+                this.arg = arg;
+            }
+            public override string ToString()
+            {
+                return type.ToString() + " " + NameOrValue + " " + arg;
+            }
         }
-        public override string ToString()
-        {
-            return type.ToString() + " " + NameOrValue + " " + arg;
-        }
-    }
         private enum TokenType
-    {
-        Add, Subtract, Multiply, Divide, Pow, Mod,
-        LeftBracket, RightBracket, Start, Neg,
-        Equal, Less, Greater,
-        VariableOrFunction,Number,Comma,
-        Err_UnDefined
-    }
-        private struct Token
-    {
-        public TokenType type;
-        public string NameOrValue;
-        public override string ToString()
         {
-            return type.ToString() + " " + NameOrValue;
+            Add, Subtract, Multiply, Divide, Pow, Mod,
+            LeftBracket, RightBracket, Start, Neg,
+            Equal, Less, Greater,
+            VariableOrFunction, Number, Comma,
+            Err_UnDefined
         }
-    }
+        private struct Token
+        {
+            public TokenType type;
+            public string NameOrValue;
+            public override string ToString()
+            {
+                return type.ToString() + " " + NameOrValue;
+            }
+        }
         #endregion
         #region 其他函数
         private static Element ToElement(this OperatorType t)
@@ -573,15 +615,16 @@ namespace CsGrafeq
         {
             public MethodInfoHelper(Type type)
             {
-                mis = type.GetMethods(BindingFlags.Public|BindingFlags.Static);
+                mis = type.GetMethods(BindingFlags.Public | BindingFlags.Static);
             }
             private readonly MethodInfo[] mis;
             public bool Contains(string name)
             {
-                name=name.ToLower();
+                name = name.ToLower();
                 foreach (MethodInfo mi in mis)
                 {
-                    if(mi.Name.ToLower() == name) return true;
+                    if (mi.Name.ToLower() == name) 
+                        return true;
                 }
                 return false;
             }
@@ -590,27 +633,31 @@ namespace CsGrafeq
                 name = name.ToLower();
                 foreach (MethodInfo mi in mis)
                 {
-                    if (mi.Name.ToLower() == name) return mi;
+                    if (mi.Name.ToLower() == name) 
+                        return mi;
                 }
                 return null;
             }
-            public MethodInfo GetMethod(string name,int argcount)
+            public MethodInfo GetMethod(string name, int argcount)
             {
+                name = name.ToLower();
                 foreach (MethodInfo mi in mis)
                 {
-                    if (mi.Name.ToLower() == name&&mi.GetParameters().Length==argcount) return mi;
+                    if (mi.Name.ToLower() == name && mi.GetParameters().Length == argcount) return mi;
                 }
                 return null;
             }
         }
         internal struct CompileResult
-        { 
-            public ImpFunctionResultCompared ImpFunctionResultCompared;
-            public NumberFunctionResultCompared NumberFunctionResultCompared;
-            public void Deconstruct(out ImpFunctionResultCompared impfunc, out NumberFunctionResultCompared numfunc)
+        {
+            public IntervalImpFunctionDelegate IntervalImpFunctionDelegate;
+            public IntervalSetImpFunctionDelegate IntervalSetImpFunctionDelegate;
+            public NumberImpFunctionDelegate NumberImpFunctionDelegate;
+            public void Deconstruct(out IntervalImpFunctionDelegate impfunc, out IntervalSetImpFunctionDelegate isfunc, out NumberImpFunctionDelegate numfunc)
             {
-                impfunc = ImpFunctionResultCompared;
-                numfunc = NumberFunctionResultCompared;
+                impfunc = IntervalImpFunctionDelegate;
+                numfunc = NumberImpFunctionDelegate;
+                isfunc = IntervalSetImpFunctionDelegate;
             }
         }
         #endregion

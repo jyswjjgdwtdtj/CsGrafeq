@@ -31,6 +31,10 @@ namespace CsGrafeq
         {
             return Min <= num && num <= Max;
         }
+        public bool Exists()
+        {
+            return Double.IsNaN(Min);
+        }
         public override string ToString()
         {
             return "[" + Min + "," + Max + "]";

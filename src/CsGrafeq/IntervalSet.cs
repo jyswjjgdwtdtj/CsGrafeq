@@ -8,21 +8,36 @@ namespace CsGrafeq
 {
     public struct IntervalSet
     {
-        public IntervalBase IB1;
-        public IntervalBase IB2;
+        public IntervalBase[] Intervals;
         public (bool, bool) Def;
         public bool Cont;
         //IB2为可空 空则标识为MinMax均为nan
-        //IB1较小
-        public IntervalSet(double num){
-            IB1 = new IntervalBase(num);
-            IB2 = new IntervalBase(double.NaN);
+        //IB1小于IB2
+        public IntervalSet(double num)
+        {
+            Intervals=new IntervalBase[1]{new IntervalBase(num) };
             Def = (true, true);
             Cont = true;
         }
-        public double Min()
+        public IntervalSet(double num1,double num2)
         {
-            return Def.Item2 ? IB1.Min : double.NaN;
+            Intervals = new IntervalBase[1] { new IntervalBase(num1,num2) };
+            Def = (true, true);
+            Cont = true;
+        }
+        public IntervalSet(IntervalBase[] ibs,(bool,bool) def,bool cont)
+        {
+            Intervals = ibs;
+            Def = def;
+            Cont = cont;
+        }
+        public double GetMax()
+        {
+            return Intervals[Intervals.Length-1].Max;
+        }
+        public double GetMin()
+        {
+            return Intervals[0].Max;
         }
     }
 }

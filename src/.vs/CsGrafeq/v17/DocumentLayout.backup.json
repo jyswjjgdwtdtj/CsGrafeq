@@ -1,0 +1,186 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|c:\\users\\liboyuan\\documents\\github\\csgrafeq\\src\\csgrafeq\\intervalsetmath.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|solutionrelative:csgrafeq\\intervalsetmath.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\csgrafeq\\intervalmath.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|solutionrelative:csgrafeq\\intervalmath.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\csgrafeq\\functiondisplayer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|solutionrelative:csgrafeq\\functiondisplayer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\csgrafeq\\numbermath.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|solutionrelative:csgrafeq\\numbermath.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\csgrafeq\\implicitfunction.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|solutionrelative:csgrafeq\\implicitfunction.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\csgrafeq\\functiondisplayer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|solutionrelative:csgrafeq\\functiondisplayer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\csgrafeq\\expressioncomplier.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|solutionrelative:csgrafeq\\expressioncomplier.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\csgrafeq\\axisdisplayer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|solutionrelative:csgrafeq\\axisdisplayer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\csgrafeq\\axisdisplayer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|solutionrelative:csgrafeq\\axisdisplayer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\csgrafeq\\expressionbuilder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|solutionrelative:csgrafeq\\expressionbuilder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 5,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "NumberMath.cs",
+              "DocumentMoniker": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\CsGrafeq\\NumberMath.cs",
+              "RelativeDocumentMoniker": "CsGrafeq\\NumberMath.cs",
+              "ToolTip": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\CsGrafeq\\NumberMath.cs",
+              "RelativeToolTip": "CsGrafeq\\NumberMath.cs",
+              "ViewState": "AgIAACMAAAAAAAAAAAAAwDQAAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-17T14:20:21.993Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "ImplicitFunction.cs",
+              "DocumentMoniker": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\CsGrafeq\\ImplicitFunction.cs",
+              "RelativeDocumentMoniker": "CsGrafeq\\ImplicitFunction.cs",
+              "ToolTip": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\CsGrafeq\\ImplicitFunction.cs",
+              "RelativeToolTip": "CsGrafeq\\ImplicitFunction.cs",
+              "ViewState": "AgIAABsAAAAAAAAAAAAIwFcAAAAQAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-16T14:34:40.675Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "IntervalMath.cs",
+              "DocumentMoniker": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\CsGrafeq\\IntervalMath.cs",
+              "RelativeDocumentMoniker": "CsGrafeq\\IntervalMath.cs",
+              "ToolTip": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\CsGrafeq\\IntervalMath.cs",
+              "RelativeToolTip": "CsGrafeq\\IntervalMath.cs",
+              "ViewState": "AgIAACIBAAAAAAAAAAAUwCQAAAB+AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-15T08:40:37.957Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "FunctionDisplayer.cs",
+              "DocumentMoniker": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\CsGrafeq\\FunctionDisplayer.cs",
+              "RelativeDocumentMoniker": "CsGrafeq\\FunctionDisplayer.cs",
+              "ToolTip": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\CsGrafeq\\FunctionDisplayer.cs",
+              "RelativeToolTip": "CsGrafeq\\FunctionDisplayer.cs",
+              "ViewState": "AgIAAFIAAAAAAAAAAAAYwBMAAAB1AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-09T12:33:07.712Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "IntervalSetMath.cs",
+              "DocumentMoniker": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\CsGrafeq\\IntervalSetMath.cs",
+              "RelativeDocumentMoniker": "CsGrafeq\\IntervalSetMath.cs",
+              "ToolTip": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\CsGrafeq\\IntervalSetMath.cs",
+              "RelativeToolTip": "CsGrafeq\\IntervalSetMath.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAGIAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-09T12:33:18.306Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "FunctionDisplayer.cs [\u8BBE\u8BA1]",
+              "DocumentMoniker": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\CsGrafeq\\FunctionDisplayer.cs",
+              "RelativeDocumentMoniker": "CsGrafeq\\FunctionDisplayer.cs",
+              "ToolTip": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\CsGrafeq\\FunctionDisplayer.cs [\u8BBE\u8BA1]",
+              "RelativeToolTip": "CsGrafeq\\FunctionDisplayer.cs [\u8BBE\u8BA1]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-17T14:15:49.712Z",
+              "EditorCaption": " [\u8BBE\u8BA1]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "AxisDisplayer.cs",
+              "DocumentMoniker": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\CsGrafeq\\AxisDisplayer.cs",
+              "RelativeDocumentMoniker": "CsGrafeq\\AxisDisplayer.cs",
+              "ToolTip": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\CsGrafeq\\AxisDisplayer.cs",
+              "RelativeToolTip": "CsGrafeq\\AxisDisplayer.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAGQBAAAMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-16T14:33:15.52Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "ExpressionComplier.cs",
+              "DocumentMoniker": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\CsGrafeq\\ExpressionComplier.cs",
+              "RelativeDocumentMoniker": "CsGrafeq\\ExpressionComplier.cs",
+              "ToolTip": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\CsGrafeq\\ExpressionComplier.cs",
+              "RelativeToolTip": "CsGrafeq\\ExpressionComplier.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-09T12:32:40.553Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "AxisDisplayer.cs [\u8BBE\u8BA1]",
+              "DocumentMoniker": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\CsGrafeq\\AxisDisplayer.cs",
+              "RelativeDocumentMoniker": "CsGrafeq\\AxisDisplayer.cs",
+              "ToolTip": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\CsGrafeq\\AxisDisplayer.cs [\u8BBE\u8BA1]",
+              "RelativeToolTip": "CsGrafeq\\AxisDisplayer.cs [\u8BBE\u8BA1]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-09T12:32:24.314Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "ExpressionBuilder.cs",
+              "DocumentMoniker": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\CsGrafeq\\ExpressionBuilder.cs",
+              "RelativeDocumentMoniker": "CsGrafeq\\ExpressionBuilder.cs",
+              "ToolTip": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\CsGrafeq\\ExpressionBuilder.cs",
+              "RelativeToolTip": "CsGrafeq\\ExpressionBuilder.cs",
+              "ViewState": "AgIAAIEAAAAAAAAAAAA+wI0AAABHAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-15T10:09:30.414Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

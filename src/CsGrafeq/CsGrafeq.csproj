@@ -49,6 +49,7 @@
     <Compile Include="AxisDisplayer.Designer.cs">
       <DependentUpon>AxisDisplayer.cs</DependentUpon>
     </Compile>
+    <Compile Include="ExpressionBuilder.cs" />
     <Compile Include="ExpressionComplier.cs" />
     <Compile Include="FunctionDisplayer.cs">
       <SubType>UserControl</SubType>

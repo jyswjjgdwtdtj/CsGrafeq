@@ -336,6 +336,7 @@ namespace CsGrafeq
             };
             Render(TargetGraphics);
         }
+
         protected override void OnSizeChanged(EventArgs e)
         {
             base.OnSizeChanged(e);
@@ -346,6 +347,12 @@ namespace CsGrafeq
 
         protected override void OnPaint(PaintEventArgs e)
         {
+            base.OnPaint(e);
+            /*if (!loaded)
+            {
+                FunctionDisplayer FD = new FunctionDisplayer();
+                this.Controls.Add(FD);
+            }*/
             loaded = true;
             Render(TargetGraphics);
         }
@@ -384,6 +391,7 @@ namespace CsGrafeq
             return base.ProcessDialogKey(keyData);
         }
         #endregion
+
     }
     #region ExtendedMethods
     public static class ExMethods

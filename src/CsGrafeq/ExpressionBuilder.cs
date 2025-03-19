@@ -62,7 +62,7 @@ namespace CsGrafeq
             Expression newexp= new Expression();
             newexp.Elements.AddRange(exp1.Elements);
             newexp.Elements.AddRange(exp2.Elements);
-            newexp.Elements.Add(new Element(ElementType.Function, "Add", 2));
+            newexp.Elements.Add(new Element(ElementType.Operator, "Add", 2));
             return newexp;
         }
         public static Expression Subtract(Expression exp1, Expression exp2)
@@ -70,7 +70,7 @@ namespace CsGrafeq
             Expression newexp = new Expression();
             newexp.Elements.AddRange(exp1.Elements);
             newexp.Elements.AddRange(exp2.Elements);
-            newexp.Elements.Add(new Element(ElementType.Function, "Subtract", 2));
+            newexp.Elements.Add(new Element(ElementType.Operator, "Subtract", 2));
             return newexp;
         }
         public static Expression Multiply(Expression exp1, Expression exp2)
@@ -78,7 +78,7 @@ namespace CsGrafeq
             Expression newexp = new Expression();
             newexp.Elements.AddRange(exp1.Elements);
             newexp.Elements.AddRange(exp2.Elements);
-            newexp.Elements.Add(new Element(ElementType.Function, "Multiply", 2));
+            newexp.Elements.Add(new Element(ElementType.Operator, "Multiply", 2));
             return newexp;
         }
         public static Expression Divide(Expression exp1, Expression exp2)
@@ -86,7 +86,7 @@ namespace CsGrafeq
             Expression newexp = new Expression();
             newexp.Elements.AddRange(exp1.Elements);
             newexp.Elements.AddRange(exp2.Elements);
-            newexp.Elements.Add(new Element(ElementType.Function, "Divide", 2));
+            newexp.Elements.Add(new Element(ElementType.Operator, "Divide", 2));
             return newexp;
         }
         public static Expression Pow(Expression exp1, Expression exp2)
@@ -94,7 +94,7 @@ namespace CsGrafeq
             Expression newexp = new Expression();
             newexp.Elements.AddRange(exp1.Elements);
             newexp.Elements.AddRange(exp2.Elements);
-            newexp.Elements.Add(new Element(ElementType.Function, "Pow", 2));
+            newexp.Elements.Add(new Element(ElementType.Operator, "Pow", 2));
             return newexp;
         }
         public static Expression Sgn(Expression exp1)
@@ -173,6 +173,48 @@ namespace CsGrafeq
             newexp.Elements.Add(new Element(ElementType.Function, "Max", 2));
             return newexp;
         }
+        public static Expression Sin(Expression exp1)
+        {
+            Expression newexp = new Expression();
+            newexp.Elements.AddRange(exp1.Elements);
+            newexp.Elements.Add(new Element(ElementType.Function, "Sin", 1));
+            return newexp;
+        }
+        public static Expression Cos(Expression exp1)
+        {
+            Expression newexp = new Expression();
+            newexp.Elements.AddRange(exp1.Elements);
+            newexp.Elements.Add(new Element(ElementType.Function, "Cos", 1));
+            return newexp;
+        }
+        public static Expression Tan(Expression exp1)
+        {
+            Expression newexp = new Expression();
+            newexp.Elements.AddRange(exp1.Elements);
+            newexp.Elements.Add(new Element(ElementType.Function, "Tan", 1));
+            return newexp;
+        }
+        public static Expression Arcsin(Expression exp1)
+        {
+            Expression newexp = new Expression();
+            newexp.Elements.AddRange(exp1.Elements);
+            newexp.Elements.Add(new Element(ElementType.Function, "Arcsin", 1));
+            return newexp;
+        }
+        public static Expression Arccos(Expression exp1)
+        {
+            Expression newexp = new Expression();
+            newexp.Elements.AddRange(exp1.Elements);
+            newexp.Elements.Add(new Element(ElementType.Function, "Arccos", 1));
+            return newexp;
+        }
+        public static Expression Arctan(Expression exp1)
+        {
+            Expression newexp = new Expression();
+            newexp.Elements.AddRange(exp1.Elements);
+            newexp.Elements.Add(new Element(ElementType.Function, "Arctan", 1));
+            return newexp;
+        }
     }
     public class Expression
     {
@@ -230,6 +272,10 @@ namespace CsGrafeq
     public class ExpressionCompared
     {
         internal List<Element> Elements = new List<Element>();
+        public static implicit operator ImplicitFunction(ExpressionCompared ec)
+        {
+            return new ImplicitFunction(ec);
+        }
     }
 
 }

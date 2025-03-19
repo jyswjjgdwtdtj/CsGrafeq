@@ -25,9 +25,9 @@ namespace CsGrafeq
             { "cos","Cos" },
             { "pow","Pow" },
             { "exp","Exp" },
-            { "ln","log"  },
-            { "lg","log10"},
-            { "log","log" },
+            { "ln","Log"  },
+            { "lg","Log10"},
+            { "log","Log" },
             {"sqrt","Sqrt"},
             {"arctan","Atan"},
             {"arcsin","Asin"},
@@ -47,6 +47,10 @@ namespace CsGrafeq
             double[] arr = new double[3] { n1,n2,n3 };
             Array.Sort(arr);
             return arr[1];
+        }
+        public static double Cot(double n)
+        {
+            return Math.Tan(Math.PI/2-n);
         }
         public static double Sgn(double n1)
         {

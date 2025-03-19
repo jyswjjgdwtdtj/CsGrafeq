@@ -26,8 +26,18 @@ namespace CsGrafeq
         {
             if(i1.isEmpty()||i2.isEmpty())
                 return EmptyInterval;
-            double[] ds = MinMaxForDouble(i1.Min * i2.Min, i1.Min * i2.Max, i1.Max * i2.Min, i1.Max * i2.Max);
-            return new Interval(ds[0], ds[1]) { Def = And(i1.Def, i2.Def), Cont = i1.Cont && i2.Cont };
+            if (i1.Min > 0 && i2.Min > 0)
+            {
+                i1.Min *= i2.Min;
+                i1.Max *= i2.Max;
+                return i1;
+            }
+            if (i1.Max < 0 && i2.Max < 0)
+            {
+                return new Interval(i1.Max * i2.Max, i1.Min * i2.Min) { Def = And(i1.Def, i2.Def), Cont = i1.Cont && i2.Cont };
+            }
+            (double,double) ds =GetMinMax4(i1.Min * i2.Min, i1.Min * i2.Max, i1.Max * i2.Min, i1.Max * i2.Max);
+            return new Interval(ds.Item1, ds.Item2) { Def = And(i1.Def, i2.Def), Cont = i1.Cont && i2.Cont };
         }
         public static Interval Divide(Interval m,Interval i)
         {
@@ -184,7 +194,7 @@ namespace CsGrafeq
         {
             if (i2.Min != i2.Max)
             {
-                throw new Exception("指数不为变量");
+                return EmptyInterval;
             }
             if (i.isEmpty())
             {
@@ -281,6 +291,10 @@ namespace CsGrafeq
                 return new Interval(NegativeInfinity,PositiveInfinity) { Def = i.Def, Cont = false };
             }
         }
+        public static Interval Cot(Interval i)
+        {
+            return Tan(Subtract(new Interval(PI/2),i));
+        }
         public static Interval ArcTan(Interval i)
         {
             if(i.isEmpty())
@@ -311,7 +325,7 @@ namespace CsGrafeq
                 i.Def = (false, true);
             double max = i.Max;
             i.Max = Math.Acos(Math.Max(i.Min, -1));
-            i.Min = Math.Asin(Math.Min(max, 1));
+            i.Min = Math.Acos(Math.Min(max, 1));
             return i;
         }
         public static Interval Sinh(Interval i)
@@ -349,16 +363,24 @@ namespace CsGrafeq
         {
             return (a.Item1 && b.Item1, a.Item2 && b.Item2);
         }
-        private static double[] MinMaxForDouble(double n1,params double[] ns)
+        private static (double, double) GetMinMax4(double n1, double n2, double n3, double n4)
         {
             double minnum = n1;
             double maxnum = n1;
-            foreach (var n in ns)
-            {
-                minnum = Math.Min(minnum, n);
-                maxnum = Math.Max(maxnum, n);
-            }
-            return new double[] { minnum, maxnum };
+            minnum = minnum < n2 ? minnum : n2;
+            maxnum = maxnum > n2 ? maxnum : n2;
+            minnum = minnum < n3 ? minnum : n3;
+            maxnum = maxnum > n3 ? maxnum : n3;
+            minnum = minnum < n4 ? minnum : n4;
+            maxnum = maxnum > n4 ? maxnum : n4;
+            //若出现NaN 则应当使用以下代码
+            /*minnum = Math.Min(minnum, n2);
+            maxnum = Math.Max(maxnum, n2);
+            minnum = Math.Min(minnum, n3);
+            maxnum = Math.Max(maxnum, n3);
+            minnum = Math.Min(minnum, n4);
+            maxnum = Math.Max(maxnum, n4);*/
+            return (minnum, maxnum);
         }
         #endregion
     }

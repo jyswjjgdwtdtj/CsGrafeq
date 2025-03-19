@@ -10,14 +10,28 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static CsGrafeq.ExtendedMethods;
+using static CsGrafeq.ExpressionBuilder;
+using static CsGrafeq.ImplicitFunction;
 
 namespace CsGrafeq
 {
     public class FunctionDisplayer : AxisDisplayer
     {
-        private readonly List<ImplicitFunction> ImpFuncs = new List<ImplicitFunction>() {  };
+        private readonly List<ImplicitFunction> ImpFuncs = new List<ImplicitFunction>();
         private int _Quality = 0;
-        private Bitmap Bitmap;
+        public enum MovingRenderModeFlag
+        {
+            RenderAll,
+            RenderEdge
+        }
+        /// <summary>
+        /// 当移动坐标系时是否重新渲染全部的函数图像
+        /// </summary>
+        public MovingRenderModeFlag MovingRenderMode { get; set; }
+        /// <summary>
+        /// 函数绘制精度
+        /// </summary>
+        /// <value>只能为0-4的整数</value>
         public int Quality
         {
             get
@@ -30,8 +44,10 @@ namespace CsGrafeq
                 Render(TargetGraphics);
             }
         }
+        private Bitmap Bitmap;
         public FunctionDisplayer() : base()
         {
+            MovingRenderMode= MovingRenderModeFlag.RenderAll;
             Bitmap = new Bitmap(Width, Height);
             WheelingTimer.Tick += (s, e) =>
             {
@@ -46,31 +62,66 @@ namespace CsGrafeq
             };
             WheelingTimer.Start();
         }
-        public void AddExpression(string expression)
+        /// <summary>
+        /// 添加函数
+        /// </summary>
+        /// <param name="expression">要添加的函数表达式</param>
+        public ImplicitFunction AddExpression(string expression)
         {
             try
             {
-                ImpFuncs.Add(new ImplicitFunction(expression));
+                ImplicitFunction imf = new ImplicitFunction(expression);
+                ImpFuncs.Add(imf);
                 Render(TargetGraphics);
+                return imf;
             }
             catch
             {
                 throw;
             }
         }
-        public void RemoveExpression(string expression)
+        /// <summary>
+        /// 添加函数
+        /// </summary>
+        /// <param name="ec">要添加的函数表达式 用ExpressionBuilder类生成</param>
+        public ImplicitFunction AddExpression(ExpressionCompared ec)
         {
+            try
+            {
+                ImplicitFunction imf = new ImplicitFunction(ec);
+                ImpFuncs.Add(imf);
+                Render(TargetGraphics);
+                return imf;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+        /// <summary>
+        /// 移除函数
+        /// </summary>
+        /// <param name="expression">要移除的函数表达式</param>
+        /// <returns>移除是否成功</returns>
+        public bool RemoveExpression(string expression)
+        {
+            if (expression == "")
+                return false;
             for (int i = 0; i < ImpFuncs.Count; i++)
             {
                 if (ImpFuncs[i].Expression == expression)
                 {
                     ImpFuncs.RemoveAt(i);
-                    return;
+                    return true;
                 }
             }
-            throw new Exception("算式不存在");
+            return false;
         }
 
+        /// <summary>
+        /// 绘制
+        /// </summary>
+        /// <param name="rt">指定的绘制对象</param>
         protected override void Render(Graphics rt)
         {
             if ((!loaded) || (!Visible))
@@ -85,6 +136,12 @@ namespace CsGrafeq
             RenderAxisNumber(graphics,ClientRectangle);
             buf.Render();
         }
+
+        /// <summary>
+        /// 绘制函数
+        /// </summary>
+        /// <param name="rt">指定的绘制对象</param>
+        /// <param name="r">绘制区域</param>
         private void RenderImpFuncs(Graphics rt,Rectangle r)
         {
             foreach (ImplicitFunction func in ImpFuncs)
@@ -92,6 +149,13 @@ namespace CsGrafeq
                 RenderImpFunc(rt, func, r);
             }
         }
+
+        /// <summary>
+        /// 绘制单个函数
+        /// </summary>
+        /// <param name="rt">指定的绘制对象</param>
+        /// <param name="f">要绘制的函数</param>
+        /// <param name="targetrect">绘制区域</param>
         private void RenderImpFunc(Graphics rt, ImplicitFunction f, Rectangle targetrect)
         {
             double ratio = Math.Pow(2, _Quality);
@@ -109,7 +173,11 @@ namespace CsGrafeq
             {
                 Rectangle[] rs = RectToCalc.ToArray();
                 RectToCalc = new ConcurrentBag<Rectangle>();
-                Action<int> atn = (idx) => RenderRect(rt, f, rs[idx], RectToCalc, RectToRender, brush, func,ratio);
+                Action<int> atn;
+                if(f.Mode == ImplicitFunction.DrawingMode.Interval)
+                    atn=(idx) => RenderRectInterval(rt, f, rs[idx], RectToCalc, RectToRender, brush, func,ratio);
+                else
+                    atn= (idx) => RenderRectIntervalSet(rt, f, rs[idx], RectToCalc, RectToRender, brush, func, ratio);
                 for (int i = 0; i < rs.Length; i += 100)
                 {
                     RectToRender = new ConcurrentBag<RectangleF>();
@@ -120,7 +188,15 @@ namespace CsGrafeq
                 }
             } while (RectToCalc.Count != 0);
         }
-        private void RenderRect(Graphics rt, ImplicitFunction f, Rectangle r, ConcurrentBag<Rectangle> RectToCalc, ConcurrentBag<RectangleF> RectToRender, SolidBrush brush, Func<int, int, int, int, bool> func, double ratio)
+        /// <summary>
+        /// 绘制单个函数
+        /// </summary>
+        /// <param name="rt">指定的绘制对象</param>
+        /// <param name="f">要绘制的函数</param>
+        /// <param name="r">绘制区域</param>
+        /// <param name="RectToCalc">要继续细化绘制的区域</param>
+        /// <param name="RectToRender">要绘制的区域</param>
+        private void RenderRectInterval(Graphics rt, ImplicitFunction f, Rectangle r, ConcurrentBag<Rectangle> RectToCalc, ConcurrentBag<RectangleF> RectToRender, SolidBrush brush, Func<int, int, int, int, bool> func, double ratio)
         {
             if (r.Height == 0 || r.Width == 0)
                 return;
@@ -131,7 +207,7 @@ namespace CsGrafeq
                 xtimes = 1;
             int dx = (int)Math.Ceiling(((double)r.Width) / xtimes);
             int dy = (int)Math.Ceiling(((double)r.Height) / ytimes);
-            NumberFunctionResultCompared nf = f.NumberFunction;
+            NumberImpFunctionDelegate nf = f.NumberFunction;
             for (int i = r.Left; i < r.Right; i += dx)
             {
                 double di = i;
@@ -140,7 +216,7 @@ namespace CsGrafeq
                 {
                     double dj = j;
                     Interval yi = new Interval(PixelToMathY(j / ratio), PixelToMathY((j + dy) / ratio));
-                    (bool first, bool second) result = f.ImpFunction.Invoke(xi, yi);
+                    (bool first, bool second) result = f.IntervalImpFunction.Invoke(xi, yi);
 
                     if (result == (true, true))
                     {
@@ -172,6 +248,72 @@ namespace CsGrafeq
                 }
             }
         }
+        /// <summary>
+        /// 绘制单个函数
+        /// </summary>
+        /// <param name="rt">指定的绘制对象</param>
+        /// <param name="f">要绘制的函数</param>
+        /// <param name="r">绘制区域</param>
+        /// <param name="RectToCalc">要继续细化绘制的区域</param>
+        /// <param name="RectToRender">要绘制的区域</param>
+        private void RenderRectIntervalSet(Graphics rt, ImplicitFunction f, Rectangle r, ConcurrentBag<Rectangle> RectToCalc, ConcurrentBag<RectangleF> RectToRender, SolidBrush brush, Func<int, int, int, int, bool> func, double ratio)
+        {
+            func = Ret;
+            if (r.Height == 0 || r.Width == 0)
+                return;
+            int xtimes = 2, ytimes = 2;
+            if (r.Width > r.Height)
+                ytimes = 1;
+            else if (r.Width < r.Height)
+                xtimes = 1;
+            int dx = (int)Math.Ceiling(((double)r.Width) / xtimes);
+            int dy = (int)Math.Ceiling(((double)r.Height) / ytimes);
+            double xmin, xmax, ymin, ymax;
+            NumberImpFunctionDelegate nf = f.NumberFunction;
+            for (int i = r.Left; i < r.Right; i += dx)
+            {
+                double di = i;
+                xmin = PixelToMathX((i+0.01d) / ratio);
+                xmax = PixelToMathX((i + 0.01d+ dx) / ratio);
+                IntervalSet xi = new IntervalSet(xmin,xmax );
+                for (int j = r.Top; j < r.Bottom; j += dy)
+                {
+                    double dj = j;
+                    ymin = PixelToMathY((j + 0.01d) / ratio);
+                    ymax = PixelToMathY((j +0.01d+ dy) / ratio);
+                    IntervalSet yi = new IntervalSet(ymin,ymax);
+                    (bool first, bool second) result = f.IntervalSetImpFunction.Invoke(xi, yi);
+
+                    if (result == (true, true))
+                    {
+                        if (func(
+                            nf.Invoke(xmin,ymin ),
+                            nf.Invoke(xmax, ymin),
+                            nf.Invoke(xmax, ymax),
+                            nf.Invoke(xmin, ymax)
+                        ))
+                            RectToRender.Add(CreateRectFByBound((float)(di / ratio), (float)(dj / ratio), (float)Math.Min((di + dx) / ratio, r.Right), (float)Math.Min((dj + dy) / ratio, r.Bottom)));
+                    }
+                    else if (result == (false, true))
+                    {
+                        if (dx <= 1 && dx <= 1)
+                        {
+                            if (func(
+                            nf.Invoke(xmin, ymin),
+                            nf.Invoke(xmax, ymin),
+                            nf.Invoke(xmax, ymax),
+                            nf.Invoke(xmin, ymax)
+                            ))
+                                RectToRender.Add(CreateRectFByBound((float)(di / ratio), (float)(dj / ratio), (float)Math.Min((di + dx) / ratio, r.Right), (float)Math.Min((dj + dy) / ratio, r.Bottom)));
+                        }
+                        else
+                        {
+                            RectToCalc.Add(CreateRectByBound(i, j, Math.Min(i + dx, r.Right), Math.Min(j + dy, r.Bottom)));
+                        }
+                    }
+                }
+            }
+        }
         protected override void OnMouseMove(MouseEventArgs e)
         {
             if ((!loaded) || (!Visible))
@@ -180,6 +322,11 @@ namespace CsGrafeq
             {//移动零点
                 _Zero.X = (MouseDownZeroPos.X + e.X - MouseDownPos.X);
                 _Zero.Y = (MouseDownZeroPos.Y + e.Y - MouseDownPos.Y);
+                if (MovingRenderMode == MovingRenderModeFlag.RenderAll)
+                {
+                    Render(TargetGraphics);
+                    return;
+                }
                 int width = ClientSize.Width;
                 int height = ClientSize.Height;
                 Graphics graphics = buf.Graphics;
@@ -260,6 +407,12 @@ namespace CsGrafeq
             Bitmap=new Bitmap(Width,Height);
         }
 
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            loaded = true;
+            Render(TargetGraphics);
+        }
+
         private bool Wheeling = false;
         private DateTime WheelingTime = DateTime.Now;
         private double priviousunitlength;
@@ -330,6 +483,7 @@ namespace CsGrafeq
         {
             return new RectangleF(left, top, right - left, bottom - top);
         }
+        /*
         public unsafe static double GetNextFloatNum(double num)
         {
             long a = (*(long*)(&num) + 1);
@@ -349,7 +503,7 @@ namespace CsGrafeq
         {
             int a = (*(int*)(&num) - 1);
             return *(float*)(&a);
-        }
+        }*/
         internal static bool IsAllGeOrLeThanZero(int n1, int n2, int n3, int n4)
         {
             int a = n1 + n2 + n3 + n4;
