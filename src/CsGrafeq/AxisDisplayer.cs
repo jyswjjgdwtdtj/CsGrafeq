@@ -7,7 +7,7 @@ namespace CsGrafeq
     public partial class AxisDisplayer :UserControl
     {
         protected Graphics TargetGraphics;
-        protected int width, height;
+        internal int width, height;
         protected bool loaded = false;
         protected BufferedGraphics buf;
 

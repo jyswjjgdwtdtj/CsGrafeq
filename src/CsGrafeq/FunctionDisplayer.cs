@@ -17,9 +17,9 @@ namespace CsGrafeq
 {
     public class FunctionDisplayer : AxisDisplayer
     {
-        public readonly ImplicitFunctionList ImpFuncs = new ImplicitFunctionList();
+        public readonly ImplicitFunctionList ImpFuncs;
         private const int AtoZ = 'z' - 'a' + 1;
-        private double[] _ConstantsValue = new double[AtoZ];
+        private double[] _ConstantsValue = new double[AtoZ] ;
 
         /// <summary>
         /// a-z常量值
@@ -37,10 +37,49 @@ namespace CsGrafeq
                 Array.Copy(value,_ConstantsValue,AtoZ);
             }
         }
+        private string[] AcceptedConstant = new string[] {
+            "a",
+            "b",
+            "c",
+            "d",
+            "f",
+            "g",
+            "h",
+            "i",
+            "j",
+            "k",
+            "l",
+            "m",
+            "n",
+            "o",
+            "p",
+            "q",
+            "s",
+            "u",
+            "v",
+            "w",
+            "z"};
         public void SetConstantValue(int index,double num)
         {
+            if(!AcceptedConstant.Contains(((char)(index+'a')).ToString()))
+                throw new ArgumentException(nameof(index));
             _ConstantsValue[index] = num;
-            Render(TargetGraphics);
+            Graphics ImageGraphics = Graphics.FromImage(Bitmap);
+            ImageGraphics.Clear(Color_A);
+            foreach(var i in ImpFuncs.innerList)
+            {
+                if (i.UsedConstant[index])
+                {
+                    i.BitmapGraphics.Clear(Color_A);
+                    RenderImpFunc(i.BitmapGraphics, i, ClientRectangle);
+                }
+                ImageGraphics.DrawImage(i._Bitmap,0,0);
+            }
+            buf.Graphics.Clear(Color_White);
+            RenderAxisLine(buf.Graphics,ClientRectangle);
+            buf.Graphics.DrawImage(Bitmap,0,0);
+            RenderAxisNumber(buf.Graphics, ClientRectangle);
+            buf.Render(TargetGraphics);
         }
         public double GetConstantValue(int index)
         {
@@ -71,7 +110,8 @@ namespace CsGrafeq
         private Bitmap Bitmap;
         public FunctionDisplayer() : base()
         {
-            MovingRenderMode= MovingRenderModeFlag.RenderAll;
+            ImpFuncs = new ImplicitFunctionList(this);
+            MovingRenderMode = MovingRenderModeFlag.RenderAll;
             Bitmap = new Bitmap(Width, Height);
             WheelingTimer.Tick += (s, e) =>
             {
@@ -122,7 +162,9 @@ namespace CsGrafeq
         {
             foreach (ImplicitFunction func in ImpFuncs.innerList)
             {
-                RenderImpFunc(rt, func, r);
+                func.BitmapGraphics.Clear(Color_A);
+                RenderImpFunc(func.BitmapGraphics, func, r);
+                rt.DrawImage(func._Bitmap,0,0);
             }
         }
 
@@ -194,15 +236,15 @@ namespace CsGrafeq
                 {
                     double dj = j;
                     Interval yi = new Interval(PixelToMathY(j / ratio), PixelToMathY((j + dy) / ratio));
-                    (bool first, bool second) result = f.IntervalImpFunction.Invoke(xi, yi);
+                    (bool first, bool second) result = f.IntervalImpFunction.Invoke(xi, yi,ConstantsValue);
 
                     if (result == (true, true))
                     {
                         if (func(
-                            nf.Invoke(xi.Min, yi.Min),
-                            nf.Invoke(xi.Min, yi.Max),
-                            nf.Invoke(xi.Max, yi.Max),
-                            nf.Invoke(xi.Max, yi.Min)
+                            nf.Invoke(xi.Min, yi.Min,_ConstantsValue),
+                            nf.Invoke(xi.Min, yi.Max, _ConstantsValue),
+                            nf.Invoke(xi.Max, yi.Max, _ConstantsValue),
+                            nf.Invoke(xi.Max, yi.Min, _ConstantsValue)
                         ))
                             RectToRender.Add(CreateRectFByBound((float)(di / ratio), (float)(dj / ratio), (float)Math.Min((di + dx) / ratio, r.Right), (float)Math.Min((dj + dy) / ratio, r.Bottom)));
                     }
@@ -211,10 +253,10 @@ namespace CsGrafeq
                         if (dx <= 1 && dx <= 1)
                         {
                             if (func(
-                                nf.Invoke(xi.Min, yi.Min),
-                                nf.Invoke(xi.Min, yi.Max),
-                                nf.Invoke(xi.Max, yi.Max),
-                                nf.Invoke(xi.Max, yi.Min)
+                            nf.Invoke(xi.Min, yi.Min, _ConstantsValue),
+                            nf.Invoke(xi.Min, yi.Max, _ConstantsValue),
+                            nf.Invoke(xi.Max, yi.Max, _ConstantsValue),
+                            nf.Invoke(xi.Max, yi.Min, _ConstantsValue)
                             ))
                                 RectToRender.Add(CreateRectFByBound((float)(di / ratio), (float)(dj / ratio), (float)Math.Min((di + dx) / ratio, r.Right), (float)Math.Min((dj + dy) / ratio, r.Bottom)));
                         }
@@ -259,15 +301,15 @@ namespace CsGrafeq
                     ymin = PixelToMathY((j + 0.01d) / ratio);
                     ymax = PixelToMathY((j +0.01d+ dy) / ratio);
                     IntervalSet yi = new IntervalSet(ymin,ymax);
-                    (bool first, bool second) result = f.IntervalSetImpFunction.Invoke(xi, yi);
+                    (bool first, bool second) result = f.IntervalSetImpFunction.Invoke(xi, yi, ConstantsValue);
 
                     if (result == (true, true))
                     {
                         if (func(
-                            nf.Invoke(xmin,ymin ),
-                            nf.Invoke(xmax, ymin),
-                            nf.Invoke(xmax, ymax),
-                            nf.Invoke(xmin, ymax)
+                            nf.Invoke(xmin,ymin , _ConstantsValue),
+                            nf.Invoke(xmax, ymin, _ConstantsValue),
+                            nf.Invoke(xmax, ymax, _ConstantsValue),
+                            nf.Invoke(xmin, ymax, _ConstantsValue)
                         ))
                             RectToRender.Add(CreateRectFByBound((float)(di / ratio), (float)(dj / ratio), (float)Math.Min((di + dx) / ratio, r.Right), (float)Math.Min((dj + dy) / ratio, r.Bottom)));
                     }
@@ -276,10 +318,10 @@ namespace CsGrafeq
                         if (dx <= 1 && dx <= 1)
                         {
                             if (func(
-                            nf.Invoke(xmin, ymin),
-                            nf.Invoke(xmax, ymin),
-                            nf.Invoke(xmax, ymax),
-                            nf.Invoke(xmin, ymax)
+                            nf.Invoke(xmin, ymin, _ConstantsValue),
+                            nf.Invoke(xmax, ymin, _ConstantsValue),
+                            nf.Invoke(xmax, ymax, _ConstantsValue),
+                            nf.Invoke(xmin, ymax, _ConstantsValue)
                             ))
                                 RectToRender.Add(CreateRectFByBound((float)(di / ratio), (float)(dj / ratio), (float)Math.Min((di + dx) / ratio, r.Right), (float)Math.Min((dj + dy) / ratio, r.Bottom)));
                         }
@@ -312,12 +354,18 @@ namespace CsGrafeq
                 if (Math.Abs(LastZeroPos.X - _Zero.X) > 20 || Math.Abs(LastZeroPos.Y - _Zero.Y) > 20 || e.Clicks == 142857)
                 {
                     //需修改图片
-                    Bitmap bmp = new Bitmap(Bitmap);
-                    Graphics ImageGraphics = Graphics.FromImage(Bitmap);
-                    ImageGraphics.Clear(Color_A);
-                    ImageGraphics.DrawImage(bmp, _Zero.X - LastZeroPos.X, _Zero.Y - LastZeroPos.Y);
-                    RenderMovedPlace(ImageGraphics);
-                    bmp.Dispose();
+                    Bitmap bmp;
+                    Graphics imageGraphics= Graphics.FromImage(Bitmap);
+                    imageGraphics.Clear(Color_A);
+                    foreach(var i in ImpFuncs.innerList)
+                    {
+                        bmp = new Bitmap(i._Bitmap);
+                        i.BitmapGraphics.Clear(Color_A);
+                        i.BitmapGraphics.DrawImage(bmp, _Zero.X - LastZeroPos.X, _Zero.Y - LastZeroPos.Y);
+                        RenderMovedPlace(i.BitmapGraphics);
+                        imageGraphics.DrawImage(i._Bitmap,0,0);
+                        bmp.Dispose();
+                    }
                     graphics.DrawImage(Bitmap,0,0);
                     LastZeroPos = _Zero;
                 }
@@ -332,10 +380,11 @@ namespace CsGrafeq
             return;
 
         }
-        private void RenderMovedPlace(Graphics drawtogf)
+        private void RenderMovedPlace(Graphics graphics)
         {
             foreach (var impFunc in ImpFuncs.innerList)
             {
+                Graphics drawtogf = Graphics.FromImage(impFunc._Bitmap);
                 if (_Zero.X < LastZeroPos.X)
                 {
                     RenderImpFunc(drawtogf, impFunc, CreateRectByBound((int)(width - LastZeroPos.X + _Zero.X), 0, width, height));
@@ -381,6 +430,12 @@ namespace CsGrafeq
             base.OnSizeChanged(e);
             if ((!loaded) || (!Visible))
                 return;
+            foreach(var i in ImpFuncs.innerList)
+            {
+                i._Bitmap.Dispose();
+                i.Bitmap = new Bitmap(width,height);
+            }
+            Bitmap.Dispose();
             Bitmap=new Bitmap(Width,Height);
         }
 
@@ -511,15 +566,22 @@ namespace CsGrafeq
     public class ImplicitFunctionList
     {
         internal List<ImplicitFunction> innerList=new List<ImplicitFunction>();
+        internal FunctionDisplayer fd;
+        internal ImplicitFunctionList(FunctionDisplayer fd)
+        {
+            this.fd = fd;
+        }
         public ImplicitFunction Add(ExpressionCompared ec)
         {
             ImplicitFunction impf=new ImplicitFunction(ec);
+            impf.Bitmap = new Bitmap(fd.width,fd.height);
             innerList.Add(impf);
             return impf;
         }
         public ImplicitFunction Add(string expression)
         {
             ImplicitFunction impf = new ImplicitFunction(expression);
+            impf.Bitmap = new Bitmap(fd.width, fd.height);
             innerList.Add(impf);
             return impf;
         }
@@ -531,6 +593,7 @@ namespace CsGrafeq
             {
                 if (innerList[i].Expression == expression)
                 {
+                    innerList[i].Dispose();
                     innerList.RemoveAt(i);
                     return true;
                 }
@@ -541,6 +604,7 @@ namespace CsGrafeq
         {
             if (index >= innerList.Count && index < 0)
                 return false;
+            innerList[index].Dispose();
             innerList.RemoveAt(index);
             return true;
         }

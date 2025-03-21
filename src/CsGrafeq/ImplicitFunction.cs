@@ -9,10 +9,10 @@ using System.Windows.Forms;
 
 namespace CsGrafeq
 {
-    internal delegate (bool, bool) IntervalImpFunctionDelegate(Interval i1, Interval i2);
-    internal delegate (bool, bool) IntervalSetImpFunctionDelegate(IntervalSet i1, IntervalSet i2);
-    internal delegate int NumberImpFunctionDelegate(double n1,double n2);
-    public class ImplicitFunction
+    internal delegate (bool, bool) IntervalImpFunctionDelegate(Interval i1, Interval i2, double[] constlist);
+    internal delegate (bool, bool) IntervalSetImpFunctionDelegate(IntervalSet i1, IntervalSet i2,double[] constlist);
+    internal delegate int NumberImpFunctionDelegate(double n1,double n2, double[] constlist);
+    public class ImplicitFunction:IDisposable
     {
         private static readonly Array colors = Enum.GetValues(typeof(KnownColor));
         private static readonly Random rnd = new Random();
@@ -35,6 +35,17 @@ namespace CsGrafeq
         internal IntervalImpFunctionDelegate IntervalImpFunction;
         internal NumberImpFunctionDelegate NumberFunction;
         internal IntervalSetImpFunctionDelegate IntervalSetImpFunction;
+        internal Bitmap _Bitmap;
+        internal bool[] UsedConstant = new bool['z' - 'a' + 1];
+        internal Bitmap Bitmap
+        {
+            set
+            {
+                _Bitmap = value;
+                BitmapGraphics=Graphics.FromImage(_Bitmap);
+            }
+        }
+        internal Graphics BitmapGraphics;
         private string _Expression;
         internal Color color;
         internal ExpressionType Type;
@@ -50,20 +61,20 @@ namespace CsGrafeq
         /// <summary>
         /// 获取指定x区间与y区间的计算结果
         /// </summary>
-        public (bool, bool) GetFunctionResult(Interval i1, Interval i2)
+        public (bool, bool) GetFunctionResult(Interval i1, Interval i2, double[] constlist)
         {
             if (IntervalImpFunction == null)
                 throw new Exception("函数未生成");
-            return IntervalImpFunction(i1, i2);
+            return IntervalImpFunction(i1, i2,constlist);
         }
         /// <summary>
         /// 获取指定x区间与y区间的计算结果
         /// </summary>
-        public (bool, bool) GetFunctionResult(IntervalSet i1, IntervalSet i2)
+        public (bool, bool) GetFunctionResult(IntervalSet i1, IntervalSet i2, double[] constlist)
         {
             if (IntervalImpFunction == null)
                 throw new Exception("函数未生成");
-            return IntervalSetImpFunction(i1, i2);
+            return IntervalSetImpFunction(i1, i2,constlist);
         }
         /// <summary>
         /// 表达式
@@ -75,7 +86,7 @@ namespace CsGrafeq
         internal ImplicitFunction(string expression)
         {
             _Expression = expression;
-            (IntervalImpFunction, IntervalSetImpFunction, NumberFunction) = ExpressionComplier.Complie(expression);
+            (IntervalImpFunction, IntervalSetImpFunction, NumberFunction,UsedConstant) = ExpressionComplier.Complie(expression);
             ExpressionRecord = ExpressionComplier.Record;
             color = GetRandomColor();
             if (!expression.Contains("="))
@@ -92,7 +103,7 @@ namespace CsGrafeq
         internal ImplicitFunction(ExpressionCompared ec)
         {
             _Expression = String.Empty;
-            (IntervalImpFunction, IntervalSetImpFunction, NumberFunction) = ExpressionComplier.Complie(ec);
+            (IntervalImpFunction, IntervalSetImpFunction, NumberFunction, UsedConstant) = ExpressionComplier.Complie(ec);
             ExpressionRecord = ExpressionComplier.Record;
             color = GetRandomColor();
             ExpressionComplier.Element ele = ec.Elements[ec.Elements.Count - 1];
@@ -105,6 +116,10 @@ namespace CsGrafeq
             {
                 Type = ExpressionType.Equal;
             }
+        }
+        public void Dispose()
+        {
+            _Bitmap.Dispose();
         }
     }
     public enum ExpressionType

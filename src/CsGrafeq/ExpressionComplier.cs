@@ -11,71 +11,51 @@ namespace CsGrafeq
 {
     internal static class ExpressionComplier
     {
+        private static bool[] usedconst;
         public static CompileResult Complie(string Expression)
         {
-            DynamicMethod imp = new DynamicMethod("ImpFunction", typeof((bool, bool)), new Type[] { typeof(Interval), typeof(Interval) });
+            DynamicMethod imp = new DynamicMethod("ImpFunction", typeof((bool, bool)), new Type[] { typeof(Interval), typeof(Interval), typeof(double[]) });
             ILGenerator il = imp.GetILGenerator();
+            usedconst = new bool['z' - 'a' + 1];
             EmitTokens(il, GetTokens(Expression), FunctionType.Interval);
             il.Emit(OpCodes.Ret);
             IntervalImpFunctionDelegate ic = (IntervalImpFunctionDelegate)imp.CreateDelegate(typeof(IntervalImpFunctionDelegate));
 
-            DynamicMethod isfunc = new DynamicMethod("ImpFunction", typeof((bool, bool)), new Type[] { typeof(IntervalSet), typeof(IntervalSet) });
+            DynamicMethod isfunc = new DynamicMethod("ImpFunction", typeof((bool, bool)), new Type[] { typeof(IntervalSet), typeof(IntervalSet), typeof(double[]) });
             ILGenerator ilis = isfunc.GetILGenerator();
             EmitTokens(ilis, GetTokens(Expression), FunctionType.IntervalSet);
             ilis.Emit(OpCodes.Ret);
             IntervalSetImpFunctionDelegate isc = (IntervalSetImpFunctionDelegate)isfunc.CreateDelegate(typeof(IntervalSetImpFunctionDelegate));
-            DynamicMethod num = new DynamicMethod("NumberFunction", typeof(int), new Type[] { typeof(double), typeof(double) });
+            DynamicMethod num = new DynamicMethod("NumberFunction", typeof(int), new Type[] { typeof(double), typeof(double), typeof(double[]) });
             ILGenerator ilnum = num.GetILGenerator();
             EmitTokens(ilnum, GetTokens(Expression), FunctionType.Number);
             ilnum.Emit(OpCodes.Ret);
             NumberImpFunctionDelegate nc = (NumberImpFunctionDelegate)num.CreateDelegate(typeof(NumberImpFunctionDelegate));
-            ic.Invoke(new Interval(0),new Interval(1));
-            isc.Invoke(new IntervalSet(0), new IntervalSet(1));
-            nc.Invoke(1, 2);
-            return new CompileResult { IntervalImpFunctionDelegate = ic, NumberImpFunctionDelegate = nc ,IntervalSetImpFunctionDelegate=isc};
+            ic.Invoke(new Interval(0),new Interval(1),new double['z'-'a'+1]);
+            isc.Invoke(new IntervalSet(0), new IntervalSet(1), new double['z' - 'a' + 1]);
+            nc.Invoke(1, 2, new double['z' - 'a' + 1]);
+            return new CompileResult { IntervalImpFunctionDelegate = ic, NumberImpFunctionDelegate = nc ,IntervalSetImpFunctionDelegate=isc,UsedConstant=usedconst};
         }
         public static CompileResult Complie(ExpressionCompared ec)
         {
-            DynamicMethod imp = new DynamicMethod("ImpFunction", typeof((bool, bool)), new Type[] { typeof(Interval), typeof(Interval) });
+            DynamicMethod imp = new DynamicMethod("ImpFunction", typeof((bool, bool)), new Type[] { typeof(IntervalSet), typeof(IntervalSet), typeof(double[]) });
             ILGenerator il = imp.GetILGenerator();
+            usedconst = new bool['z' - 'a' + 1];
+            EmitElements(il,ec.Elements.ToArray(), FunctionType.IntervalSet);
+            il.Emit(OpCodes.Ret);
+            IntervalSetImpFunctionDelegate ic = (IntervalSetImpFunctionDelegate)imp.CreateDelegate(typeof(IntervalSetImpFunctionDelegate));
+
+            imp = new DynamicMethod("ImpFunction", typeof((bool, bool)), new Type[] { typeof(Interval), typeof(Interval), typeof(double[]) });
+            il = imp.GetILGenerator();
             EmitElements(il, ec.Elements.ToArray(), FunctionType.Interval);
             il.Emit(OpCodes.Ret);
-            IntervalImpFunctionDelegate ic = (IntervalImpFunctionDelegate)imp.CreateDelegate(typeof(IntervalImpFunctionDelegate));
-            DynamicMethod num = new DynamicMethod("NumberFunction", typeof(int), new Type[] { typeof(double), typeof(double) });
+            IntervalImpFunctionDelegate icc = (IntervalImpFunctionDelegate)imp.CreateDelegate(typeof(IntervalImpFunctionDelegate));
+            DynamicMethod num = new DynamicMethod("NumberFunction", typeof(int), new Type[] { typeof(double), typeof(double), typeof(double[]) });
             ILGenerator ilnum = num.GetILGenerator();
             EmitElements(ilnum, ec.Elements.ToArray(), FunctionType.Number);
             ilnum.Emit(OpCodes.Ret);
             NumberImpFunctionDelegate nc = (NumberImpFunctionDelegate)num.CreateDelegate(typeof(NumberImpFunctionDelegate));
-            return new CompileResult { IntervalImpFunctionDelegate = ic, NumberImpFunctionDelegate = nc };
-        }
-        public static bool TryComplie(string Expression, out IntervalImpFunctionDelegate func, out string errorlog)
-        {
-            Element[] elements;
-            func = null;
-            try
-            {
-                elements = ParseTokens(GetTokens(Expression));
-            }
-            catch (Exception ex)
-            {
-                errorlog = ex.Message;
-                return false;
-            }
-            DynamicMethod dm = new DynamicMethod("ImpFunction", typeof((bool, bool)), new Type[] { typeof(Interval), typeof(Interval) });
-            ILGenerator il = dm.GetILGenerator();
-            try
-            {
-                EmitElements(il, elements, FunctionType.Interval);
-            }
-            catch (Exception ex)
-            {
-                errorlog = ex.Message;
-                return false;
-            }
-            il.Emit(OpCodes.Ret);
-            func = (IntervalImpFunctionDelegate)dm.CreateDelegate(typeof(IntervalImpFunctionDelegate));
-            errorlog = null;
-            return true;
+            return new CompileResult { IntervalImpFunctionDelegate = icc, NumberImpFunctionDelegate = nc,IntervalSetImpFunctionDelegate=ic,UsedConstant=usedconst };
         }
         private static readonly Regex letter = new Regex("[a-zA-Z]");
         private static readonly Regex number = new Regex("[0-9]");
@@ -266,6 +246,7 @@ namespace CsGrafeq
                     }
                     break;
                 case ElementType.Variable:
+                    ele.NameOrValue=ele.NameOrValue.ToLower();
                     if (ele.NameOrValue == "x")
                     { IL.Emit(OpCodes.Ldarg_0); sb.AppendLine("load arg:x"); }
                     else if (ele.NameOrValue == "y")
@@ -278,6 +259,32 @@ namespace CsGrafeq
                         if (functionType == FunctionType.IntervalSet)
                             IL.Emit(OpCodes.Newobj, typeof(IntervalSet).GetConstructor(new Type[] { typeof(double) }));
                         sb.AppendLine("load const:e");
+                    }else if (ele.NameOrValue == "pi")
+                    {
+                        IL.Emit(OpCodes.Ldc_R8, Math.PI);
+                        if (functionType == FunctionType.Interval)
+                            IL.Emit(OpCodes.Newobj, typeof(Interval).GetConstructor(new Type[] { typeof(double) }));
+                        if (functionType == FunctionType.IntervalSet)
+                            IL.Emit(OpCodes.Newobj, typeof(IntervalSet).GetConstructor(new Type[] { typeof(double) }));
+                        sb.AppendLine("load const:pi");
+                    }else if (ele.NameOrValue.Length == 1)
+                    {
+                        if ('a' <= ele.NameOrValue[0] && ele.NameOrValue[0] <= 'z')
+                        {
+                            IL.Emit(OpCodes.Ldarg_2);
+                            IL.Emit(OpCodes.Ldc_I4, (ele.NameOrValue[0] - 'a'));
+                            IL.Emit(OpCodes.Ldelem_R8);
+                            if (functionType == FunctionType.Interval)
+                                IL.Emit(OpCodes.Newobj, typeof(Interval).GetConstructor(new Type[] { typeof(double) }));
+                            if (functionType == FunctionType.IntervalSet)
+                            {
+                                IL.Emit(OpCodes.Newobj, typeof(IntervalSet).GetConstructor(new Type[] { typeof(double) }));
+                                usedconst[ele.NameOrValue[0] - 'a'] = true;
+                            }
+                            sb.AppendLine("load const:"+ele.NameOrValue);
+                        }
+                        else
+                            throw new Exception("变量不允许:" + ele.NameOrValue);
                     }
                     else
                         throw new Exception("变量不允许:" + ele.NameOrValue);
@@ -653,11 +660,13 @@ namespace CsGrafeq
             public IntervalImpFunctionDelegate IntervalImpFunctionDelegate;
             public IntervalSetImpFunctionDelegate IntervalSetImpFunctionDelegate;
             public NumberImpFunctionDelegate NumberImpFunctionDelegate;
-            public void Deconstruct(out IntervalImpFunctionDelegate impfunc, out IntervalSetImpFunctionDelegate isfunc, out NumberImpFunctionDelegate numfunc)
+            public bool[] UsedConstant;
+            public void Deconstruct(out IntervalImpFunctionDelegate impfunc, out IntervalSetImpFunctionDelegate isfunc, out NumberImpFunctionDelegate numfunc,out bool[] usedconstant)
             {
                 impfunc = IntervalImpFunctionDelegate;
                 numfunc = NumberImpFunctionDelegate;
                 isfunc = IntervalSetImpFunctionDelegate;
+                usedconstant = UsedConstant;
             }
         }
         #endregion
