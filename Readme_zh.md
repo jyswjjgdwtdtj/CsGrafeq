@@ -22,3 +22,15 @@ x/sin(x)+y/sin(y)=x*y/sin(x*y)
 1. 用鼠标控制以调整坐标轴大小与显示的区域
 2. 对字符串形式的函数算式进行编译以加快运行速度
 3. 没有依赖项
+
+## 用法示例
+用以下方式添加函数
+```
+yourCsGrafeq.ImpFuncs.Add("x+1<Log(y)-sin(x)/x")
+
+//或
+using static CsGrafeq.ExpressionBuilder
+//......
+youtCsGrafeq.ImpFuncs.Add(x+1<Log(y)-Sin(x)/x)
+```
+忽略字符串中的大小写
