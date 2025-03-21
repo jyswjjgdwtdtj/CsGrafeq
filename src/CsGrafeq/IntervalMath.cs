@@ -79,6 +79,8 @@ namespace CsGrafeq
             (bool, bool) def = And(i1.Def, i2.Def);
             if (i1.isEmpty() || i2.isEmpty())
                 return (false, false);
+            if (i1.Max < i2.Min)
+                return (false, false);
             if (i1.Min > i2.Max)
             {
                 if ((!i1.Def.Item1) || (!i2.Def.Item1))
@@ -91,8 +93,6 @@ namespace CsGrafeq
                 }
                 return (true, true);
             }
-            if (i1.Max < i2.Min)
-                return (false, false);
             return (false, true);
         }
         public static (bool, bool) Less(Interval i1, Interval i2)

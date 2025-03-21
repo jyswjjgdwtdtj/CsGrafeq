@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static CsGrafeq.ExtendedMethods;
+using static CsGrafeq.ExMethods;
 using static CsGrafeq.ExpressionBuilder;
 using static CsGrafeq.ImplicitFunction;
 
@@ -17,13 +17,37 @@ namespace CsGrafeq
 {
     public class FunctionDisplayer : AxisDisplayer
     {
-        private readonly List<ImplicitFunction> ImpFuncs = new List<ImplicitFunction>();
-        private int _Quality = 0;
-        public enum MovingRenderModeFlag
+        public readonly ImplicitFunctionList ImpFuncs = new ImplicitFunctionList();
+        private const int AtoZ = 'z' - 'a' + 1;
+        private double[] _ConstantsValue = new double[AtoZ];
+
+        /// <summary>
+        /// a-z常量值
+        /// </summary> 
+        public double[] ConstantsValue
         {
-            RenderAll,
-            RenderEdge
+            get {
+                double[] c = new double[AtoZ];
+                Array.Copy(_ConstantsValue,c,AtoZ);
+                return c; 
+            }
+            set {
+                if (value.Length != AtoZ)
+                    throw new ArgumentException(nameof(value));
+                Array.Copy(value,_ConstantsValue,AtoZ);
+            }
         }
+        public void SetConstantValue(int index,double num)
+        {
+            _ConstantsValue[index] = num;
+            Render(TargetGraphics);
+        }
+        public double GetConstantValue(int index)
+        {
+            return _ConstantsValue[index];
+        }
+
+        private int _Quality = 0;
         /// <summary>
         /// 当移动坐标系时是否重新渲染全部的函数图像
         /// </summary>
@@ -63,63 +87,15 @@ namespace CsGrafeq
             WheelingTimer.Start();
         }
         /// <summary>
-        /// 添加函数
+        /// 绘制
         /// </summary>
-        /// <param name="expression">要添加的函数表达式</param>
-        public ImplicitFunction AddExpression(string expression)
+        public void Render()
         {
-            try
-            {
-                ImplicitFunction imf = new ImplicitFunction(expression);
-                ImpFuncs.Add(imf);
-                Render(TargetGraphics);
-                return imf;
-            }
-            catch
-            {
-                throw;
-            }
-        }
-        /// <summary>
-        /// 添加函数
-        /// </summary>
-        /// <param name="ec">要添加的函数表达式 用ExpressionBuilder类生成</param>
-        public ImplicitFunction AddExpression(ExpressionCompared ec)
-        {
-            try
-            {
-                ImplicitFunction imf = new ImplicitFunction(ec);
-                ImpFuncs.Add(imf);
-                Render(TargetGraphics);
-                return imf;
-            }
-            catch
-            {
-                throw;
-            }
-        }
-        /// <summary>
-        /// 移除函数
-        /// </summary>
-        /// <param name="expression">要移除的函数表达式</param>
-        /// <returns>移除是否成功</returns>
-        public bool RemoveExpression(string expression)
-        {
-            if (expression == "")
-                return false;
-            for (int i = 0; i < ImpFuncs.Count; i++)
-            {
-                if (ImpFuncs[i].Expression == expression)
-                {
-                    ImpFuncs.RemoveAt(i);
-                    return true;
-                }
-            }
-            return false;
+            Render(TargetGraphics);
         }
 
         /// <summary>
-        /// 绘制
+        /// 绘制到指定Graphics
         /// </summary>
         /// <param name="rt">指定的绘制对象</param>
         protected override void Render(Graphics rt)
@@ -144,7 +120,7 @@ namespace CsGrafeq
         /// <param name="r">绘制区域</param>
         private void RenderImpFuncs(Graphics rt,Rectangle r)
         {
-            foreach (ImplicitFunction func in ImpFuncs)
+            foreach (ImplicitFunction func in ImpFuncs.innerList)
             {
                 RenderImpFunc(rt, func, r);
             }
@@ -165,16 +141,18 @@ namespace CsGrafeq
             Func<int, int, int, int, bool> func;
             switch (f.Type)
             {
-                case ImplicitFunction.ExpressionType.Equal: func = IsAllGeOrLeThanZero; break;
-                case ImplicitFunction.ExpressionType.Less: func = IsAllLeThanZero; break;
+                case ExpressionType.Equal: func = IsAllGeOrLeThanZero; break;
+                case ExpressionType.Less: func = IsAllLeThanZero; break;
                 default: func = IsAllGeThanZero; break;
             }
+            if (f.CheckPixelMode == CheckPixelMode.None)
+                func = Ret;
             do
             {
                 Rectangle[] rs = RectToCalc.ToArray();
                 RectToCalc = new ConcurrentBag<Rectangle>();
                 Action<int> atn;
-                if(f.Mode == ImplicitFunction.DrawingMode.Interval)
+                if(f.DrawingMode == DrawingMode.Interval)
                     atn=(idx) => RenderRectInterval(rt, f, rs[idx], RectToCalc, RectToRender, brush, func,ratio);
                 else
                     atn= (idx) => RenderRectIntervalSet(rt, f, rs[idx], RectToCalc, RectToRender, brush, func, ratio);
@@ -258,7 +236,6 @@ namespace CsGrafeq
         /// <param name="RectToRender">要绘制的区域</param>
         private void RenderRectIntervalSet(Graphics rt, ImplicitFunction f, Rectangle r, ConcurrentBag<Rectangle> RectToCalc, ConcurrentBag<RectangleF> RectToRender, SolidBrush brush, Func<int, int, int, int, bool> func, double ratio)
         {
-            func = Ret;
             if (r.Height == 0 || r.Width == 0)
                 return;
             int xtimes = 2, ytimes = 2;
@@ -357,7 +334,7 @@ namespace CsGrafeq
         }
         private void RenderMovedPlace(Graphics drawtogf)
         {
-            foreach (var impFunc in ImpFuncs)
+            foreach (var impFunc in ImpFuncs.innerList)
             {
                 if (_Zero.X < LastZeroPos.X)
                 {
@@ -410,6 +387,10 @@ namespace CsGrafeq
         protected override void OnPaint(PaintEventArgs e)
         {
             loaded = true;
+            if (width != ClientSize.Width||height!=ClientSize.Height||Bitmap.Width!=ClientSize.Width||Bitmap.Height!=ClientSize.Height)
+            {
+                OnSizeChanged(new EventArgs());
+            }
             Render(TargetGraphics);
         }
 
@@ -473,7 +454,12 @@ namespace CsGrafeq
             }
         }
     }
-    public static class ExtendedMethods
+    public enum MovingRenderModeFlag
+    {
+        RenderAll,
+        RenderEdge
+    }
+    internal static partial class ExMethods
     {
         public static Rectangle CreateRectByBound(int left, int top, int right, int bottom)
         {
@@ -520,6 +506,70 @@ namespace CsGrafeq
         internal static bool Ret(int n1, int n2, int n3, int n4)
         {
             return true;
+        }
+    }
+    public class ImplicitFunctionList
+    {
+        internal List<ImplicitFunction> innerList=new List<ImplicitFunction>();
+        public ImplicitFunction Add(ExpressionCompared ec)
+        {
+            ImplicitFunction impf=new ImplicitFunction(ec);
+            innerList.Add(impf);
+            return impf;
+        }
+        public ImplicitFunction Add(string expression)
+        {
+            ImplicitFunction impf = new ImplicitFunction(expression);
+            innerList.Add(impf);
+            return impf;
+        }
+        public bool Remove(string expression)
+        {
+            if (expression == "")
+                return false;
+            for (int i = 0; i < innerList.Count; i++)
+            {
+                if (innerList[i].Expression == expression)
+                {
+                    innerList.RemoveAt(i);
+                    return true;
+                }
+            }
+            return false;
+        }
+        public bool RemoveAt(int index)
+        {
+            if (index >= innerList.Count && index < 0)
+                return false;
+            innerList.RemoveAt(index);
+            return true;
+        }
+        public bool Contains(string expression)
+        {
+            if (expression == "")
+                return false;
+            for (int i = 0; i < innerList.Count; i++)
+            {
+                if (innerList[i].Expression == expression)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        public ImplicitFunction this[int index]
+        {
+            get
+            {
+                return innerList[index];
+            }
+        }
+        public int Count
+        {
+            get
+            {
+                return innerList.Count;
+            }
         }
     }
 }

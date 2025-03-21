@@ -348,6 +348,7 @@ namespace CsGrafeq
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
+            width = ClientSize.Width; height = ClientSize.Height;
             /*if (!loaded)
             {
                 FunctionDisplayer FD = new FunctionDisplayer();
@@ -394,7 +395,7 @@ namespace CsGrafeq
 
     }
     #region ExtendedMethods
-    public static class ExMethods
+    internal static partial class ExMethods
     {
         public static BufferedGraphics GetBuffer(this Graphics graphics,Rectangle r)
         {

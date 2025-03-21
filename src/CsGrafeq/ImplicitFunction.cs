@@ -42,7 +42,11 @@ namespace CsGrafeq
         /// <summary>
         /// 使用Interval或IntervalSet计算
         /// </summary>
-        public DrawingMode Mode=DrawingMode.Interval;
+        public DrawingMode DrawingMode = DrawingMode.Interval;
+        /// <summary>
+        /// 是否使用MarchingSquares检查图像
+        /// </summary>
+        public CheckPixelMode CheckPixelMode = CheckPixelMode.None;
         /// <summary>
         /// 获取指定x区间与y区间的计算结果
         /// </summary>
@@ -82,7 +86,7 @@ namespace CsGrafeq
             else
             {
                 Type = ExpressionType.Equal;
-                Mode = DrawingMode.IntervalSet;
+                DrawingMode = DrawingMode.IntervalSet;
             }
         }
         internal ImplicitFunction(ExpressionCompared ec)
@@ -102,16 +106,17 @@ namespace CsGrafeq
                 Type = ExpressionType.Equal;
             }
         }
-
-        public enum ExpressionType
-        {
-            Equal,Less,Greater
-        }
-        public enum DrawingMode
-        {
-            Interval,IntervalSet
-        }
-
     }
-
+    public enum ExpressionType
+    {
+        Equal, Less, Greater
+    }
+    public enum DrawingMode
+    {
+        Interval, IntervalSet
+    }
+    public enum CheckPixelMode
+    {
+        UseMarchingSquares,None
+    }
 }

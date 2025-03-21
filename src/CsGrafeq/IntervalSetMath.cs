@@ -278,10 +278,10 @@ namespace CsGrafeq
             i1.Intervals = ibs;
             return i1;
         }
-        /*public static IntervalSet Log(IntervalSet i1,IntervalSet i2)
+        public static IntervalSet Log(IntervalSet i1,IntervalSet i2)
         {
             return Divide(Ln(i1),Ln(i2));
-        }*/
+        }
         public static IntervalSet Pow(IntervalSet i1, IntervalSet i2)
         {
             return Exp(Multiply(Ln(i1), i2));
@@ -527,7 +527,14 @@ namespace CsGrafeq
                 }
             }
             return (false,false);
-            
+        }
+        public static (bool,bool) Greater(IntervalSet i1,IntervalSet i2)
+        {
+            return IntervalMath.Greater(new Interval(i1.GetMin(), i1.GetMax()) { Def = i1.Def, Cont = i1.Cont }, new Interval(i2.GetMin(), i2.GetMax()) { Def = i2.Def, Cont = i2.Cont });
+        }
+        public static (bool,bool) Less(IntervalSet i1,IntervalSet i2)
+        {
+            return Greater(i2,i1);
         }
         private static bool IBEqual(IntervalBase i1,IntervalBase i2)
         {
