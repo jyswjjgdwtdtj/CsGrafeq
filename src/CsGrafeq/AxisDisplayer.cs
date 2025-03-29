@@ -63,7 +63,7 @@ namespace CsGrafeq
             b0 = new Pen(Color.FromArgb(190, 190, 190));
             b1 = new Pen(Color.FromArgb(128, 128, 128));
             Pen pb =Pen_Black;
-            if (Range(0, width, _Zero.X) == _Zero.X)
+            if (RangeIn(0, width, _Zero.X) == _Zero.X)
             {
                 gb.DrawLine(
                     pb,
@@ -72,7 +72,7 @@ namespace CsGrafeq
                 );
             }
             pb = Pen_Black;
-            if (Range(0, height, _Zero.Y) == _Zero.Y)
+            if (RangeIn(0, height, _Zero.Y) == _Zero.Y)
             {
                 gb.DrawLine(
                     pb,
@@ -86,7 +86,7 @@ namespace CsGrafeq
             double addnumY = Math.Pow(10, zsY);
             decimal addnumDX = (decimal)Math.Pow(10, zsX);
             decimal addnumDY = (decimal)Math.Pow(10, zsY);
-            double p = Range(rect.Top - 3, rect.Bottom - Font.Height + 1, _Zero.Y);
+            double p = RangeIn(rect.Top - 3, rect.Bottom - Font.Height + 1, _Zero.Y);
             for (double i = Math.Min(_Zero.X - (addnumX * _UnitLength), MathToPixelX(Round(PixelToMathX(width), -zsX))); i > 0; i -= (addnumX * _UnitLength))
             {
                 decimal num = Round((decimal)PixelToMathX(i), -zsX);
@@ -138,7 +138,7 @@ namespace CsGrafeq
             double addnumY = Math.Pow(10, zsY);
             decimal addnumDX = (decimal)Math.Pow(10, zsX);
             decimal addnumDY = (decimal)Math.Pow(10, zsY);
-            double p = Range(rect.Top - 3, rect.Bottom - Font.Height + 1, _Zero.Y);
+            double p = RangeIn(rect.Top - 3, rect.Bottom - Font.Height + 1, _Zero.Y);
             float fff = 1f / 4f * Font.Height;
             for (double i = Math.Min(_Zero.X - (addnumX * _UnitLength), MathToPixelX(Round(PixelToMathX(width), -zsX))); i > 0; i -= (addnumX * _UnitLength))
             {
@@ -217,7 +217,7 @@ namespace CsGrafeq
                 return result;
             }
         }
-        public static double Range(double min, double max, double num)
+        public static double RangeIn(double min, double max, double num)
         {
             if (min > num) { return min; }
             if (max < num) { return max; }
@@ -329,7 +329,7 @@ namespace CsGrafeq
             {
                 _UnitLength /= delta;
             }
-            _UnitLength = Range(0.01, 1000000, _UnitLength);
+            _UnitLength = RangeIn(0.01, 1000000, _UnitLength);
             _Zero = new PointL() {
                 X=(long)(times_x * _UnitLength + cursor_x),
                 Y=(long)(times_y * _UnitLength + cursor_y)
@@ -349,13 +349,18 @@ namespace CsGrafeq
         {
             base.OnPaint(e);
             width = ClientSize.Width; height = ClientSize.Height;
-            /*if (!loaded)
+#if DEBUG
+            if (!loaded)
             {
                 FunctionDisplayer FD = new FunctionDisplayer();
                 this.Controls.Add(FD);
-            }*/
+                FD.Dock = DockStyle.Fill;
+            }
+            loaded = true;
+#else
             loaded = true;
             Render(TargetGraphics);
+#endif
         }
         protected override void OnKeyDown(KeyEventArgs e)
         {

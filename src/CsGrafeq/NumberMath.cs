@@ -37,6 +37,8 @@ namespace CsGrafeq
             {"tanh","Tanh"},
             {"max","Max"},
             {"min","Min"},
+            {"floor","Floor"},
+            {"ceil","Ceiling"},
         };
         public static double Neg(double n)
         {
@@ -47,6 +49,25 @@ namespace CsGrafeq
             double[] arr = new double[3] { n1,n2,n3 };
             Array.Sort(arr);
             return arr[1];
+        }
+        public static double LCM(double da, double db)
+        {
+            return da * db/GCD(da,db);
+        }
+
+        public static double GCD(double da, double db)
+        {
+            int b = (int)db;
+            int a= (int)da;
+            if (b != db || a != da)
+                throw new ArgumentException();
+            while (b != 0)
+            {
+                int tmp = a;
+                a = b;
+                b = tmp % b;
+            }
+            return a;
         }
         public static double Cot(double n)
         {

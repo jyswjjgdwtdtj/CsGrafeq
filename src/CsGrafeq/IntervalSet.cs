@@ -8,28 +8,43 @@ namespace CsGrafeq
 {
     public struct IntervalSet
     {
-        public IntervalBase[] Intervals;
+        public Range[] Intervals;
         public (bool, bool) Def;
         public bool Cont;
-        //IB2为可空 空则标识为MinMax均为nan
-        //IB1小于IB2
+        //Range2为可空 空则标识为MinMax均为nan
+        //Range1小于Range2
         public IntervalSet(double num)
         {
-            Intervals=new IntervalBase[1]{new IntervalBase(num) };
+            Intervals = new Range[1] { new Range(num) };
+            Def = (true, true);
+            Cont = true;
+        }
+        public IntervalSet(double[] nums)
+        {
+            Array.Sort(nums);
+            Intervals= new Range[nums.Length];
+            for(int i=0;i<nums.Length;i++)
+                Intervals[i]= new Range(nums[i]);
             Def = (true, true);
             Cont = true;
         }
         public IntervalSet(double num1,double num2)
         {
-            Intervals = new IntervalBase[1] { new IntervalBase(num1,num2) };
+            Intervals = new Range[1] { new Range(num1,num2) };
             Def = (true, true);
             Cont = true;
         }
-        public IntervalSet(IntervalBase[] ibs,(bool,bool) def,bool cont)
+        public IntervalSet(Range[] Ranges, (bool, bool) def, bool cont)
         {
-            Intervals = ibs;
+            Intervals = Ranges;
             Def = def;
             Cont = cont;
+        }
+        public IntervalSet(Range[] Ranges)
+        {
+            Intervals = Ranges;
+            Def = (true,true);
+            Cont =true;
         }
         public double GetMax()
         {
@@ -38,6 +53,15 @@ namespace CsGrafeq
         public double GetMin()
         {
             return Intervals[0].Max;
+        }
+        public override string ToString()
+        {
+            string result = "";
+            foreach(Range r in Intervals)
+            {
+                result += r.ToString()+",";
+            }
+            return $"{{Def:{Def},Cont:{Cont},Intervals:{result}}}";
         }
     }
 }

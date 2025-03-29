@@ -36,11 +36,12 @@ namespace CsGrafeq
             nc.Invoke(1, 2, new double['z' - 'a' + 1]);
             return new CompileResult { IntervalImpFunctionDelegate = ic, NumberImpFunctionDelegate = nc ,IntervalSetImpFunctionDelegate=isc,UsedConstant=usedconst};
         }
-        public static CompileResult Complie(ExpressionCompared ec)
+        public static CompileResult Complie(Expression ec)
         {
             DynamicMethod imp = new DynamicMethod("ImpFunction", typeof((bool, bool)), new Type[] { typeof(IntervalSet), typeof(IntervalSet), typeof(double[]) });
             ILGenerator il = imp.GetILGenerator();
             usedconst = new bool['z' - 'a' + 1];
+            ec=ec.Compared?ec:(ec == 0);
             EmitElements(il,ec.Elements.ToArray(), FunctionType.IntervalSet);
             il.Emit(OpCodes.Ret);
             IntervalSetImpFunctionDelegate ic = (IntervalSetImpFunctionDelegate)imp.CreateDelegate(typeof(IntervalSetImpFunctionDelegate));
@@ -134,7 +135,7 @@ namespace CsGrafeq
                                 exp.Push(new Element(ElementType.Function, Tokenname, dimcount));
                             }
                         }
-                        else if (Tokenname.Length == 1 && 'a' <= Tokenname.ToLower()[0] && 'z' >= Tokenname.ToLower()[0])//var
+                        else if (Tokenname.Length == 1 && 'a' <= Tokenname.ToLower()[0] && 'z' >= Tokenname.ToLower()[0] || Tokenname.ToLower()=="pi")//var
                         {
                             Previous = ElementType.Variable;
                             exp.Push(new Element(ElementType.Variable, Tokenname, 0));

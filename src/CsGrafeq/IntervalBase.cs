@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace CsGrafeq
 {
-    public struct IntervalBase:IInterval
+    public struct Range:IInterval
     {
         public double Min, Max;
-        public IntervalBase(double num) : this(num, num)
+        public Range(double num) : this(num, num)
         {
         }
-        public IntervalBase(double min, double max)
+        public Range(double min, double max)
         {
             if (min > max)
                 (min, max) = (max, min);

@@ -231,6 +231,48 @@ namespace CsGrafeq
         {
             return new Interval(Math.Max(i1.Min, i2.Min), Math.Max(i1.Max, i2.Max)) { Def = And(i1.Def, i2.Def), Cont = i1.Cont & i2.Cont };
         }
+        public static Interval Floor(Interval i1)
+        {
+            i1.Min= Math.Floor(i1.Min);
+            i1.Max= Math.Floor(i1.Max);
+            i1.Cont &= i1.Min == i1.Max;
+            return i1;
+        }
+        public static Interval Ceil(Interval i1)
+        {
+            i1.Min = Math.Ceiling(i1.Min);
+            i1.Max = Math.Ceiling(i1.Max);
+            i1.Cont &=i1.Min==i1.Max;
+            return i1;
+        }
+        public static Interval GCD(Interval i1, Interval i2)
+        {
+            if (i1.isEmpty() || i2.isEmpty())
+                return EmptyInterval;
+            if (!(i1.IsInterger() && i2.IsInterger()))
+                return new Interval(NegativeInfinity, PositiveInfinity);
+            return new Interval(GCDBase((int)i1.Min, (int)i2.Min)) { Def = And(i1.Def, i2.Def), Cont = i1.Cont && i2.Cont };
+        }
+        public static Interval LCM(Interval i1, Interval i2)
+        {
+            if (i1.isEmpty() || i2.isEmpty())
+                return EmptyInterval;
+            if (!(i1.IsInterger() && i2.IsInterger()))
+                return new Interval(NegativeInfinity, PositiveInfinity);
+            return new Interval(LCMBase((int)i1.Min, (int)i2.Min)) { Def = And(i1.Def, i2.Def), Cont = i1.Cont && i2.Cont };
+        }
+        private static int GCDBase(int a, int b)
+        {
+            return a == 0 || b == 0 ? 0 : GCDForInt(a, b);
+        }
+        private static int GCDForInt(int a, int b)
+        {
+            return b == 0 ? Math.Abs(a) : GCDForInt(b, a % b);
+        }
+        private static int LCMBase(int a, int b)
+        {
+            return a == 0 || b == 0 ? 0 : a * b / GCDForInt(a, b);
+        }
         #endregion
         #region 三角函数
         public static Interval Sin(Interval i)
@@ -242,12 +284,12 @@ namespace CsGrafeq
             double a = i.Min;
             double b = i.Max;
             Interval minmax = new Interval();
-            if (Floor((a / PI - 0.5) / 2) < Floor((b / PI - 0.5) / 2))
+            if (Math.Floor((a / PI - 0.5) / 2) < Math.Floor((b / PI - 0.5) / 2))
             {
                 minmax.Max = 1;
                 i.Max = 1;
             }
-            if (Floor((a / PI + 0.5) / 2) < Floor((b / PI + 0.5) / 2))
+            if (Math.Floor((a / PI + 0.5) / 2) < Math.Floor((b / PI + 0.5) / 2))
             {
                 minmax.Min = 1;
                 i.Min = -1;
@@ -274,8 +316,8 @@ namespace CsGrafeq
             {
                 return EmptyInterval;
             }
-            double l = Floor((i.Max + PI / 2) / PI);
-            double r = Floor((i.Min + PI / 2) / PI);
+            double l = Math.Floor((i.Max + PI / 2) / PI);
+            double r = Math.Floor((i.Min + PI / 2) / PI);
             if (l - r == 1)
             {
                 return new Interval(NegativeInfinity, PositiveInfinity) { Def=i.Def,Cont=false};
@@ -383,5 +425,16 @@ namespace CsGrafeq
             return (minnum, maxnum);
         }
         #endregion
+    }
+    internal static partial class ExMethods
+    {
+        public static bool IsInterger(this Interval Range)
+        {
+            if (double.IsInfinity(Range.Min) || double.IsInfinity(Range.Max))
+                return false;
+            if (double.IsNaN(Range.Min) || double.IsNaN(Range.Max))
+                return false;
+            return (Range.Min == Range.Max) && Range.Min == (int)Range.Min;
+        }
     }
 }

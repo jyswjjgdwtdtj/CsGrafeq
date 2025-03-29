@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Linq;
+using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -103,7 +104,7 @@ namespace CsGrafeq
             }
             set
             {
-                _Quality = (int)Range(0, 4, value);
+                _Quality = (int)RangeIn(0, 4, value);
                 Render(TargetGraphics);
             }
         }
@@ -202,7 +203,8 @@ namespace CsGrafeq
                 {
                     RectToRender = new ConcurrentBag<RectangleF>();
                     Parallel.For(i, Math.Min(i + 100, rs.Length), atn);
-                    if(RectToRender.Count!=0)
+                    //for (int j = i; j < Math.Min(i + 100, rs.Length); j++) atn(j);
+                    if (RectToRender.Count!=0)
                         rt.FillRectangles(brush,RectToRender.ToArray());
                     RectToRender = null;
                 }
@@ -480,7 +482,7 @@ namespace CsGrafeq
             {
                 _UnitLength /= delta;
             }
-            _UnitLength = Range(0.01, 1000000, _UnitLength);
+            _UnitLength = RangeIn(0.01, 1000000, _UnitLength);
             _Zero = new PointL()
             {
                 X = (long)(times_x * _UnitLength + cursor_x),
@@ -571,7 +573,7 @@ namespace CsGrafeq
         {
             this.fd = fd;
         }
-        public ImplicitFunction Add(ExpressionCompared ec)
+        public ImplicitFunction Add(Expression ec)
         {
             ImplicitFunction impf=new ImplicitFunction(ec);
             impf.Bitmap = new Bitmap(fd.width,fd.height);

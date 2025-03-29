@@ -1,0 +1,12 @@
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\PlayGround\CsGrafeqPlayGround\bin\Debug\CsGrafeqPlayGround.exe.config
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\PlayGround\CsGrafeqPlayGround\bin\Debug\CsGrafeqPlayGround.exe
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\PlayGround\CsGrafeqPlayGround\bin\Debug\CsGrafeqPlayGround.pdb
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\PlayGround\CsGrafeqPlayGround\bin\Debug\CsGrafeq.pdb
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\PlayGround\CsGrafeqPlayGround\obj\Debug\CsGrafeqPlayGround.csproj.AssemblyReference.cache
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\PlayGround\CsGrafeqPlayGround\obj\Debug\CsGrafeqPlayGround.Form1.resources
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\PlayGround\CsGrafeqPlayGround\obj\Debug\CsGrafeqPlayGround.Properties.Resources.resources
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\PlayGround\CsGrafeqPlayGround\obj\Debug\CsGrafeqPlayGround.csproj.GenerateResource.cache
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\PlayGround\CsGrafeqPlayGround\obj\Debug\CsGrafeqPlayGround.csproj.CoreCompileInputs.cache
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\PlayGround\CsGrafeqPlayGround\obj\Debug\CsGrafeq.E66D0EFF.Up2Date
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\PlayGround\CsGrafeqPlayGround\obj\Debug\CsGrafeqPlayGround.exe
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\PlayGround\CsGrafeqPlayGround\obj\Debug\CsGrafeqPlayGround.pdb

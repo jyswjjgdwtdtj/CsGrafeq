@@ -89,32 +89,33 @@ namespace CsGrafeq
             (IntervalImpFunction, IntervalSetImpFunction, NumberFunction,UsedConstant) = ExpressionComplier.Complie(expression);
             ExpressionRecord = ExpressionComplier.Record;
             color = GetRandomColor();
-            if (!expression.Contains("="))
-            {
-                color = Color.FromArgb(120, color);
-                Type = expression.Contains("<") ? ExpressionType.Less : ExpressionType.Greater;
-            }
-            else
+            if (expression.Contains("="))
             {
                 Type = ExpressionType.Equal;
                 DrawingMode = DrawingMode.IntervalSet;
             }
+            else
+            {
+                color = Color.FromArgb(120, color);
+                Type = expression.Contains("<") ? ExpressionType.Less : ExpressionType.Greater;
+            }
         }
-        internal ImplicitFunction(ExpressionCompared ec)
+        internal ImplicitFunction(Expression ec)
         {
             _Expression = String.Empty;
             (IntervalImpFunction, IntervalSetImpFunction, NumberFunction, UsedConstant) = ExpressionComplier.Complie(ec);
             ExpressionRecord = ExpressionComplier.Record;
             color = GetRandomColor();
             ExpressionComplier.Element ele = ec.Elements[ec.Elements.Count - 1];
-            if (ele.NameOrValue!="Equal")
+            if (ele.NameOrValue=="Equal"||ec.Compared==false)
             {
-                color = Color.FromArgb(120, color);
-                Type = ele.NameOrValue=="Less" ? ExpressionType.Less : ExpressionType.Greater;
+                Type = ExpressionType.Equal;
+                DrawingMode = DrawingMode.IntervalSet;
             }
             else
             {
-                Type = ExpressionType.Equal;
+                color = Color.FromArgb(120, color);
+                Type = ele.NameOrValue == "Less" ? ExpressionType.Less : ExpressionType.Greater;
             }
         }
         public void Dispose()
