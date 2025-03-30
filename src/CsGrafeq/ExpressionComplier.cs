@@ -36,12 +36,11 @@ namespace CsGrafeq
             nc.Invoke(1, 2, new double['z' - 'a' + 1]);
             return new CompileResult { IntervalImpFunctionDelegate = ic, NumberImpFunctionDelegate = nc ,IntervalSetImpFunctionDelegate=isc,UsedConstant=usedconst};
         }
-        public static CompileResult Complie(Expression ec)
+        public static CompileResult Complie(ComparedExpression ec)
         {
             DynamicMethod imp = new DynamicMethod("ImpFunction", typeof((bool, bool)), new Type[] { typeof(IntervalSet), typeof(IntervalSet), typeof(double[]) });
             ILGenerator il = imp.GetILGenerator();
             usedconst = new bool['z' - 'a' + 1];
-            ec=ec.Compared?ec:(ec == 0);
             EmitElements(il,ec.Elements.ToArray(), FunctionType.IntervalSet);
             il.Emit(OpCodes.Ret);
             IntervalSetImpFunctionDelegate ic = (IntervalSetImpFunctionDelegate)imp.CreateDelegate(typeof(IntervalSetImpFunctionDelegate));
@@ -76,7 +75,7 @@ namespace CsGrafeq
         static ExpressionComplier()
         {
         }
-        private static Element[] ParseTokens(Token[] Tokens)
+        internal static Element[] ParseTokens(Token[] Tokens)
         {
             Stack<OperatorType> op = new Stack<OperatorType>();
             Stack<Element> exp = new Stack<Element>();
@@ -240,7 +239,7 @@ namespace CsGrafeq
                                 stacklength -= mf.GetParameters().Length; ;
                             }
                             else
-                                throw new Exception("未知函数");
+                                throw new Exception("未知函数:"+ele.NameOrValue);
                         }
                         sb.AppendLine("call oper:" + ele.NameOrValue);
                         stacklength++;
@@ -298,9 +297,9 @@ namespace CsGrafeq
                             MethodInfo mf = mih.GetMethod(ele.NameOrValue, ele.arg);
                             if (mf == null)
                                 if (mih.Contains(ele.NameOrValue))
-                                    throw new Exception("函数参数数量错误");
+                                    throw new Exception("函数参数数量错误:"+ele.NameOrValue);
                                 else
-                                    throw new Exception("函数不存在");
+                                    throw new Exception("函数不存在:"+ele.NameOrValue);
                             IL.Emit(OpCodes.Call, mf);
                             stacklength -= mf.GetParameters().Length;
                         }
@@ -309,9 +308,9 @@ namespace CsGrafeq
                             MethodInfo mf = mihis.GetMethod(ele.NameOrValue, ele.arg);
                             if (mf == null)
                                 if (mihis.Contains(ele.NameOrValue))
-                                    throw new Exception("函数参数数量错误");
+                                    throw new Exception("函数参数数量错误:" + ele.NameOrValue);
                                 else
-                                    throw new Exception("函数不存在");
+                                    throw new Exception("函数不存在:" + ele.NameOrValue);
                             IL.Emit(OpCodes.Call, mf);
                             stacklength -= mf.GetParameters().Length;
                         }
@@ -327,14 +326,14 @@ namespace CsGrafeq
                                 MethodInfo mf = mihn.GetMethod(ele.NameOrValue, ele.arg);
                                 if (mf == null)
                                     if (mihn.Contains(ele.NameOrValue))
-                                        throw new Exception("函数参数数量错误");
+                                        throw new Exception("函数参数数量错误:" + ele.NameOrValue);
                                     else
-                                        throw new Exception("函数不存在");
+                                        throw new Exception("函数不存在:" + ele.NameOrValue);
                                 IL.Emit(OpCodes.Call, mf);
                                 stacklength -= mf.GetParameters().Length; ;
                             }
                             else
-                                throw new Exception("未知函数");
+                                throw new Exception("未知函数:" + ele.NameOrValue);
                         }
                         sb.AppendLine("call func:" + ele.NameOrValue.ToLower());
                         stacklength++;
@@ -365,7 +364,7 @@ namespace CsGrafeq
                     }*/
                     break;
                 default:
-                    throw new Exception("未知Element");
+                    throw new Exception("未知Element:" + ele.ToString());
             }
         }
         private static void EmitElements(ILGenerator IL, Element[] eles, FunctionType functionType)
@@ -383,7 +382,7 @@ namespace CsGrafeq
         {
             EmitElements(IL, ParseTokens(Tokens), functionType);
         }
-        private static Token[] GetTokens(string script)//词法分析器
+        internal static Token[] GetTokens(string script)//词法分析器
         {
             bool compareoperatorexists = false;
             script += '#';
@@ -461,7 +460,7 @@ namespace CsGrafeq
                         case ',':
                             t.type = TokenType.Comma; break;
                         default:
-                            throw new Exception("未知符号");
+                            throw new Exception("未知符号:"+t.NameOrValue);
                     }
                     loc++;
                 }
@@ -583,7 +582,7 @@ namespace CsGrafeq
                 return type.ToString() + " " + NameOrValue + " " + arg;
             }
         }
-        private enum TokenType
+        internal enum TokenType
         {
             Add, Subtract, Multiply, Divide, Pow, Mod,
             LeftBracket, RightBracket, Start, Neg,
@@ -591,7 +590,7 @@ namespace CsGrafeq
             VariableOrFunction, Number, Comma,
             Err_UnDefined
         }
-        private struct Token
+        internal struct Token
         {
             public TokenType type;
             public string NameOrValue;

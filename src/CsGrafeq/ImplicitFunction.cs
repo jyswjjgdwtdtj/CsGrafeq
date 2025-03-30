@@ -100,14 +100,14 @@ namespace CsGrafeq
                 Type = expression.Contains("<") ? ExpressionType.Less : ExpressionType.Greater;
             }
         }
-        internal ImplicitFunction(Expression ec)
+        internal ImplicitFunction(ComparedExpression ec)
         {
-            _Expression = String.Empty;
+            _Expression = string.Empty;
             (IntervalImpFunction, IntervalSetImpFunction, NumberFunction, UsedConstant) = ExpressionComplier.Complie(ec);
             ExpressionRecord = ExpressionComplier.Record;
             color = GetRandomColor();
             ExpressionComplier.Element ele = ec.Elements[ec.Elements.Count - 1];
-            if (ele.NameOrValue=="Equal"||ec.Compared==false)
+            if (ele.NameOrValue=="Equal")
             {
                 Type = ExpressionType.Equal;
                 DrawingMode = DrawingMode.IntervalSet;

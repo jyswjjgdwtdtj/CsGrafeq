@@ -33,102 +33,77 @@ namespace CsGrafeq
             exp.Elements.Add(new Element(ElementType.Number, num.ToString(), 0));
             return exp;
         }
-        public static Expression Less(Expression a, Expression b)
+        public static Expression FromString(string s)
         {
-            if(a.Compared||b.Compared)
-                throw new ArgumentException("不能比较已经比较过的算式");
-            Expression expressionCompared = new Expression();
+            Expression exp= new Expression();
+            exp.Elements.AddRange(ExpressionComplier.ParseTokens(ExpressionComplier.GetTokens(s)));
+            return exp;
+        }
+        public static ComparedExpression Less(Expression a, Expression b)
+        {
+            ComparedExpression expressionCompared = new ComparedExpression();
             expressionCompared.Elements.AddRange(a.Elements);
             expressionCompared.Elements.AddRange(b.Elements);
             expressionCompared.Elements.Add(new Element(ElementType.Function, "Less", 2));
-            expressionCompared.Compared = true;
             return expressionCompared;
         }
-        public static Expression Greater(Expression a, Expression b)
+        public static ComparedExpression Greater(Expression a, Expression b)
         {
-            if (a.Compared || b.Compared)
-                throw new ArgumentException("不能比较已经比较过的算式");
-            Expression expressionCompared = new Expression();
+            ComparedExpression expressionCompared = new ComparedExpression();
             expressionCompared.Elements.AddRange(a.Elements);
             expressionCompared.Elements.AddRange(b.Elements);
             expressionCompared.Elements.Add(new Element(ElementType.Function, "Greater", 2));
-            expressionCompared.Compared = true;
             return expressionCompared;
         }
-        public static Expression Equal(Expression a, Expression b)
+        public static ComparedExpression Equal(Expression a, Expression b)
         {
-            if (a.Compared || b.Compared)
-                throw new ArgumentException("不能比较已经比较过的算式");
-            Expression expressionCompared = new Expression();
+            ComparedExpression expressionCompared = new ComparedExpression();
             expressionCompared.Elements.AddRange(a.Elements);
             expressionCompared.Elements.AddRange(b.Elements);
             expressionCompared.Elements.Add(new Element(ElementType.Function, "Equal", 2));
-            expressionCompared.Compared = true;
             return expressionCompared;
+        }
+        private static Expression OneVariable(Expression exp1, string name)
+        {
+            Expression newexp = new Expression();
+            newexp.Elements.AddRange(exp1.Elements);
+            newexp.Elements.Add(new Element(ElementType.Operator, name, 1));
+            return newexp;
+        }
+        private static Expression TwoVariable(Expression exp1, Expression exp2, string name)
+        {
+            Expression newexp = new Expression();
+            newexp.Elements.AddRange(exp1.Elements);
+            newexp.Elements.AddRange(exp2.Elements);
+            newexp.Elements.Add(new Element(ElementType.Operator, name, 2));
+            return newexp;
         }
         public static Expression Add(Expression exp1, Expression exp2)
         {
-            if (exp1.Compared || exp2.Compared)
-                throw new ArgumentException("不能对已经比较过的算式执行计算");
-            Expression newexp= new Expression();
-            newexp.Elements.AddRange(exp1.Elements);
-            newexp.Elements.AddRange(exp2.Elements);
-            newexp.Elements.Add(new Element(ElementType.Operator, "Add", 2));
-            return newexp;
+            return TwoVariable(exp1,exp2,"Add");
         }
         public static Expression Subtract(Expression exp1, Expression exp2)
         {
-            if (exp1.Compared || exp2.Compared)
-                throw new ArgumentException("不能对已经比较过的算式执行计算");
-            Expression newexp = new Expression();
-            newexp.Elements.AddRange(exp1.Elements);
-            newexp.Elements.AddRange(exp2.Elements);
-            newexp.Elements.Add(new Element(ElementType.Operator, "Subtract", 2));
-            return newexp;
+            return TwoVariable(exp1, exp2, "Subtract");
         }
         public static Expression Multiply(Expression exp1, Expression exp2)
         {
-            if (exp1.Compared || exp2.Compared)
-                throw new ArgumentException("不能对已经比较过的算式执行计算");
-            Expression newexp = new Expression();
-            newexp.Elements.AddRange(exp1.Elements);
-            newexp.Elements.AddRange(exp2.Elements);
-            newexp.Elements.Add(new Element(ElementType.Operator, "Multiply", 2));
-            return newexp;
+            return TwoVariable(exp1, exp2, "Multiply");
         }
         public static Expression Divide(Expression exp1, Expression exp2)
         {
-            if (exp1.Compared || exp2.Compared)
-                throw new ArgumentException("不能对已经比较过的算式执行计算");
-            Expression newexp = new Expression();
-            newexp.Elements.AddRange(exp1.Elements);
-            newexp.Elements.AddRange(exp2.Elements);
-            newexp.Elements.Add(new Element(ElementType.Operator, "Divide", 2));
-            return newexp;
+            return TwoVariable(exp1, exp2, "Divide");
         }
         public static Expression Pow(Expression exp1, Expression exp2)
         {
-            if (exp1.Compared || exp2.Compared)
-                throw new ArgumentException("不能对已经比较过的算式执行计算");
-            Expression newexp = new Expression();
-            newexp.Elements.AddRange(exp1.Elements);
-            newexp.Elements.AddRange(exp2.Elements);
-            newexp.Elements.Add(new Element(ElementType.Operator, "Pow", 2));
-            return newexp;
+            return TwoVariable(exp1, exp2, "Pow");
         }
         public static Expression Sgn(Expression exp1)
         {
-            if (exp1.Compared)
-                throw new ArgumentException("不能对已经比较过的算式执行计算");
-            Expression newexp = new Expression();
-            newexp.Elements.AddRange(exp1.Elements);
-            newexp.Elements.Add(new Element(ElementType.Function, "Sgn", 1));
-            return newexp;
+            return OneVariable(exp1, "Sgn");
         }
         public static Expression Median(Expression exp1, Expression exp2, Expression exp3)
         {
-            if (exp1.Compared || exp2.Compared || exp3.Compared)
-                throw new ArgumentException("不能对已经比较过的算式执行计算");
             Expression newexp = new Expression();
             newexp.Elements.AddRange(exp1.Elements);
             newexp.Elements.AddRange(exp2.Elements);
@@ -138,168 +113,90 @@ namespace CsGrafeq
         }
         public static Expression Exp(Expression exp1)
         {
-            if (exp1.Compared)
-                throw new ArgumentException("不能对已经比较过的算式执行计算");
-            Expression newexp = new Expression();
-            newexp.Elements.AddRange(exp1.Elements);
-            newexp.Elements.Add(new Element(ElementType.Function, "Exp", 1));
-            return newexp;
+            return OneVariable(exp1, "Exp");
         }
         public static Expression Ln(Expression exp1)
         {
-            if (exp1.Compared)
-                throw new ArgumentException("不能对已经比较过的算式执行计算");
-            Expression newexp = new Expression();
-            newexp.Elements.AddRange(exp1.Elements);
-            newexp.Elements.Add(new Element(ElementType.Function, "Ln", 1));
-            return newexp;
+            return OneVariable(exp1, "Ln");
         }
         public static Expression Lg(Expression exp1)
         {
-            if (exp1.Compared)
-                throw new ArgumentException("不能对已经比较过的算式执行计算");
-            Expression newexp = new Expression();
-            newexp.Elements.AddRange(exp1.Elements);
-            newexp.Elements.Add(new Element(ElementType.Function, "Lg", 1));
-            return newexp;
+            return OneVariable(exp1, "Lg");
         }
         public static Expression Log(Expression exp1, Expression exp2)
         {
-            if (exp1.Compared)
-                throw new ArgumentException("不能对已经比较过的算式执行计算");
-            Expression newexp = new Expression();
-            newexp.Elements.AddRange(exp1.Elements);
-            newexp.Elements.AddRange(exp2.Elements);
-            newexp.Elements.Add(new Element(ElementType.Function, "Log", 2));
-            return newexp;
+            return TwoVariable(exp1, exp2, "Log");
         }
         public static Expression Sqrt(Expression exp1)
         {
-            if (exp1.Compared)
-                throw new ArgumentException("不能对已经比较过的算式执行计算");
-            Expression newexp = new Expression();
-            newexp.Elements.AddRange(exp1.Elements);
-            newexp.Elements.Add(new Element(ElementType.Function, "Sqrt", 1));
-            return newexp;
+            return OneVariable(exp1, "Sqrt");
+
         }
         public static Expression Root(Expression exp1, Expression exp2)
         {
-            if (exp1.Compared||exp2.Compared)
-                throw new ArgumentException("不能对已经比较过的算式执行计算");
-            Expression newexp = new Expression();
-            newexp.Elements.AddRange(exp1.Elements);
-            newexp.Elements.AddRange(exp2.Elements);
-            newexp.Elements.Add(new Element(ElementType.Function, "Root", 2));
-            return newexp;
+            return TwoVariable(exp1, exp2, "Root");
         }
         public static Expression Min(Expression exp1, Expression exp2)
         {
-            if (exp1.Compared || exp2.Compared)
-                throw new ArgumentException("不能对已经比较过的算式执行计算");
-            Expression newexp = new Expression();
-            newexp.Elements.AddRange(exp1.Elements);
-            newexp.Elements.AddRange(exp2.Elements);
-            newexp.Elements.Add(new Element(ElementType.Function, "Min", 2));
-            return newexp;
+            return TwoVariable(exp1, exp2, "Min");
         }
         public static Expression Max(Expression exp1, Expression exp2)
         {
-            if (exp1.Compared || exp2.Compared)
-                throw new ArgumentException("不能对已经比较过的算式执行计算");
-            Expression newexp = new Expression();
-            newexp.Elements.AddRange(exp1.Elements);
-            newexp.Elements.AddRange(exp2.Elements);
-            newexp.Elements.Add(new Element(ElementType.Function, "Max", 2));
-            return newexp;
+            return TwoVariable(exp1, exp2, "Max");
         }
         public static Expression Sin(Expression exp1)
         {
-            if (exp1.Compared)
-                throw new ArgumentException("不能对已经比较过的算式执行计算");
-            Expression newexp = new Expression();
-            newexp.Elements.AddRange(exp1.Elements);
-            newexp.Elements.Add(new Element(ElementType.Function, "Sin", 1));
-            return newexp;
+            return OneVariable(exp1, "Sin");
         }
         public static Expression Cos(Expression exp1)
         {
-            if (exp1.Compared)
-                throw new ArgumentException("不能对已经比较过的算式执行计算");
-            Expression newexp = new Expression();
-            newexp.Elements.AddRange(exp1.Elements);
-            newexp.Elements.Add(new Element(ElementType.Function, "Cos", 1));
-            return newexp;
+            return OneVariable(exp1, "Cos");
         }
         public static Expression Tan(Expression exp1)
         {
-            if (exp1.Compared)
-                throw new ArgumentException("不能对已经比较过的算式执行计算");
-            Expression newexp = new Expression();
-            newexp.Elements.AddRange(exp1.Elements);
-            newexp.Elements.Add(new Element(ElementType.Function, "Tan", 1));
-            return newexp;
+            return OneVariable(exp1, "Tan");
         }
         public static Expression Arcsin(Expression exp1)
         {
-            if (exp1.Compared)
-                throw new ArgumentException("不能对已经比较过的算式执行计算");
-            Expression newexp = new Expression();
-            newexp.Elements.AddRange(exp1.Elements);
-            newexp.Elements.Add(new Element(ElementType.Function, "Arcsin", 1));
-            return newexp;
+            return OneVariable(exp1, "Arcsin");
         }
         public static Expression Arccos(Expression exp1)
         {
-            if (exp1.Compared)
-                throw new ArgumentException("不能对已经比较过的算式执行计算");
-            Expression newexp = new Expression();
-            newexp.Elements.AddRange(exp1.Elements);
-            newexp.Elements.Add(new Element(ElementType.Function, "Arccos", 1));
-            return newexp;
+            return OneVariable(exp1, "Arccos");
         }
         public static Expression Arctan(Expression exp1)
         {
-            if (exp1.Compared)
-                throw new ArgumentException("不能对已经比较过的算式执行计算");
-            Expression newexp = new Expression();
-            newexp.Elements.AddRange(exp1.Elements);
-            newexp.Elements.Add(new Element(ElementType.Function, "Arctan", 1));
-            return newexp;
+            return OneVariable(exp1, "Arctan");
         }
         public static Expression Floor(Expression exp1)
         {
-            if (exp1.Compared)
-                throw new ArgumentException("不能对已经比较过的算式执行计算");
-            Expression newexp = new Expression();
-            newexp.Elements.AddRange(exp1.Elements);
-            newexp.Elements.Add(new Element(ElementType.Function, "Floor", 1));
-            return newexp;
+            return OneVariable(exp1, "Floor");
         }
         public static Expression Ceil(Expression exp1)
         {
-            if (exp1.Compared)
-                throw new ArgumentException("不能对已经比较过的算式执行计算");
-            Expression newexp = new Expression();
-            newexp.Elements.AddRange(exp1.Elements);
-            newexp.Elements.Add(new Element(ElementType.Function, "Ceil", 1));
-            return newexp;
+            return OneVariable(exp1, "Ceil");
         }
         public static Expression GCD(Expression exp1, Expression exp2)
         {
-            if (exp1.Compared || exp2.Compared)
-                throw new ArgumentException("不能对已经比较过的算式执行计算");
-            Expression newexp = new Expression();
-            newexp.Elements.AddRange(exp1.Elements);
-            newexp.Elements.AddRange(exp2.Elements);
-            newexp.Elements.Add(new Element(ElementType.Function, "GCD", 1));
-            return newexp;
+            return TwoVariable(exp1, exp2, "GCD");
+        }
+        public static Expression LCM(Expression exp1, Expression exp2)
+        {
+            return TwoVariable(exp1, exp2, "LCM");
+        }
+        public static Expression Factorial(Expression exp1)
+        {
+            return OneVariable(exp1, "Factorial");
         }
     }
-    public class Expression
+    public class ExpressionBase
+    {
+        internal ExpressionBase() { }
+        internal List<Element> Elements = new List<Element>();
+    }
+    public class Expression:ExpressionBase
     {
         internal Expression() { }
-        internal List<Element> Elements=new List<Element>();
-        internal bool Compared = false;
         public static Expression operator +(Expression exp1, Expression exp2)
         {
             return ExpressionBuilder.Add(exp1, exp2);
@@ -320,19 +217,19 @@ namespace CsGrafeq
         {
             return ExpressionBuilder.Pow(exp1, exp2);
         }
-        public static Expression operator ==(Expression exp1, Expression exp2)
+        public static ComparedExpression operator ==(Expression exp1, Expression exp2)
         {
             return ExpressionBuilder.Equal(exp1, exp2);
         }
-        public static Expression operator !=(Expression exp1, Expression exp2)
+        public static ComparedExpression operator !=(Expression exp1, Expression exp2)
         {
             throw new NotImplementedException();
         }
-        public static Expression operator <(Expression exp1, Expression exp2)
+        public static ComparedExpression operator <(Expression exp1, Expression exp2)
         {
             return ExpressionBuilder.Less(exp1, exp2);
         }
-        public static Expression operator >(Expression exp1, Expression exp2)
+        public static ComparedExpression operator >(Expression exp1, Expression exp2)
         {
             return ExpressionBuilder.Greater(exp1, exp2);
         }
@@ -348,5 +245,9 @@ namespace CsGrafeq
         {
             return base.GetHashCode();
         }
+    }
+    public class ComparedExpression : ExpressionBase
+    {
+        internal ComparedExpression() { }
     }
 }

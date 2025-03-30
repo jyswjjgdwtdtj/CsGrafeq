@@ -61,7 +61,7 @@ namespace CsGrafeq
             int b = (int)db;
             int a= (int)da;
             if (b != db || a != da)
-                throw new ArgumentException();
+                throw new Exception(a+" "+b);
             while (b != 0)
             {
                 int tmp = a;
@@ -81,6 +81,18 @@ namespace CsGrafeq
         public static double Root(double n1,double n2)
         {
             return Math.Pow(n1, 1 / n2);
+        }
+        public static double Factorial(double num1)
+        {
+            if(num1!=(int)num1)
+                throw new Exception();
+            int num = (int)num1;
+            if (num < 0)
+                return double.NaN;
+            long result = 1;
+            for (int i = 1; i <= num; i++)
+                result *= i;
+            return result;
         }
         public static int Equal(double x, double y)
         {

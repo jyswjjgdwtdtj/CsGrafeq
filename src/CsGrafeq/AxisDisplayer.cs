@@ -11,7 +11,7 @@ namespace CsGrafeq
         protected bool loaded = false;
         protected BufferedGraphics buf;
 
-        protected double _UnitLength = 20.00000001;
+        protected double _UnitLength = 20;
         public double UnitLength
         {
             get { return _UnitLength; }

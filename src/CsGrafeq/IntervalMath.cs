@@ -290,6 +290,24 @@ namespace CsGrafeq
         {
             return a == 0 || b == 0 ? 0 : a * b / GCDForInt(a, b);
         }
+        public static Interval Factorial(Interval i1)
+        {
+            if (i1.isEmpty())
+                return EmptyInterval;
+            if (i1.Max < 0)
+                return EmptyInterval;
+            if (!i1.IsInterger())
+                return new Interval(NegativeInfinity, PositiveInfinity);
+            return new Interval(FactorialBase((int)i1.Min)) { Def=i1.Def, Cont = i1.Cont };
+        }
+        private static double FactorialBase(int num)
+        {
+            long result = 1;
+            for (int i = 1; i <= num; i++)
+                result *= i;
+            return result;
+        }
+
         #endregion
         #region 三角函数
         public static Interval Sin(Interval i)

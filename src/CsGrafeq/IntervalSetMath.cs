@@ -534,6 +534,36 @@ namespace CsGrafeq
         {
             return a == 0 || b == 0 ? 0 : a*b/GCDForInt(a, b);
         }
+        public static IntervalSet Factorial(IntervalSet i1)
+        {
+            if (!i1.Def.Item2)
+                return EmptyIntervalSet;
+            if(i1.GetMax()<0)
+                return EmptyIntervalSet;
+            if (!i1.Intervals[0].IsInterger())
+            {
+                throw new ArgumentException("参数需经过Floor,Ceil函数处理");
+            }
+            if (i1.Intervals.Length == 1)
+            {
+                return new IntervalSet(FactorialBase((int)i1.Intervals[0].Min));
+            }
+            if (i1.Intervals.Length ==2)
+            {
+                return new IntervalSet(new double[] {
+                    FactorialBase((int) i1.Intervals[0].Min),
+                    FactorialBase((int) i1.Intervals[1].Min),});
+            }
+            return new IntervalSet(1, posinf);
+        }
+
+        private static double FactorialBase(int num)
+        {
+            long result = 1;
+            for (int i = 1; i <= num; i++)
+                result *= i;
+            return result;
+        }
         private unsafe static IntervalSet AddNumber(IntervalSet i1,double i2)
         {
             int len = i1.Intervals.Length;

@@ -91,7 +91,7 @@ namespace CsGrafeq
         /// <summary>
         /// 当移动坐标系时是否重新渲染全部的函数图像
         /// </summary>
-        public MovingRenderModeFlag MovingRenderMode { get; set; }
+        public MovingRenderMode MovingRenderMode { get; set; }
         /// <summary>
         /// 函数绘制精度
         /// </summary>
@@ -112,7 +112,11 @@ namespace CsGrafeq
         public FunctionDisplayer() : base()
         {
             ImpFuncs = new ImplicitFunctionList(this);
-            MovingRenderMode = MovingRenderModeFlag.RenderAll;
+#if DEBUG
+            MovingRenderMode = MovingRenderMode.RenderEdge;
+#else
+            MovingRenderMode = MovingRenderMode.RenderEdge;
+#endif
             Bitmap = new Bitmap(Width, Height);
             WheelingTimer.Tick += (s, e) =>
             {
@@ -126,6 +130,9 @@ namespace CsGrafeq
                 }
             };
             WheelingTimer.Start();
+#if DEBUG
+            ImpFuncs.Add(GCD(Floor(y),Factorial(Floor(Sqrt(2*Floor(y))-0.5)))<1);
+#endif
         }
         /// <summary>
         /// 绘制
@@ -200,17 +207,16 @@ namespace CsGrafeq
                 case ExpressionType.Less: func = IsAllLeThanZero; break;
                 default: func = IsAllGeThanZero; break;
             }
-            if (f.CheckPixelMode == CheckPixelMode.None)
-                func = Ret;
+            bool checkpixel = f.CheckPixelMode != CheckPixelMode.None;
             do
             {
                 Rectangle[] rs = RectToCalc.ToArray();
                 RectToCalc = new ConcurrentBag<Rectangle>();
                 Action<int> atn;
                 if(f.DrawingMode == DrawingMode.Interval)
-                    atn=(idx) => RenderRectInterval(rt, f, rs[idx], RectToCalc, RectToRender, brush, func,ratio);
+                    atn=(idx) => RenderRectInterval(rt, f, rs[idx], RectToCalc, RectToRender, brush, func,checkpixel,ratio);
                 else
-                    atn= (idx) => RenderRectIntervalSet(rt, f, rs[idx], RectToCalc, RectToRender, brush, func, ratio);
+                    atn= (idx) => RenderRectIntervalSet(rt, f, rs[idx], RectToCalc, RectToRender, brush, func,checkpixel, ratio);
                 for (int i = 0; i < rs.Length; i += 100)
                 {
                     RectToRender = new ConcurrentBag<RectangleF>();
@@ -230,7 +236,7 @@ namespace CsGrafeq
         /// <param name="r">绘制区域</param>
         /// <param name="RectToCalc">要继续细化绘制的区域</param>
         /// <param name="RectToRender">要绘制的区域</param>
-        private void RenderRectInterval(Graphics rt, ImplicitFunction f, Rectangle r, ConcurrentBag<Rectangle> RectToCalc, ConcurrentBag<RectangleF> RectToRender, SolidBrush brush, Func<int, int, int, int, bool> func, double ratio)
+        private void RenderRectInterval(Graphics rt, ImplicitFunction f, Rectangle r, ConcurrentBag<Rectangle> RectToCalc, ConcurrentBag<RectangleF> RectToRender, SolidBrush brush, Func<int, int, int, int, bool> func,bool checkpixel, double ratio)
         {
             if (r.Height == 0 || r.Width == 0)
                 return;
@@ -254,7 +260,7 @@ namespace CsGrafeq
 
                     if (result == (true, true))
                     {
-                        if (func(
+                        if ((!checkpixel) || func(
                             nf.Invoke(xi.Min, yi.Min,_ConstantsValue),
                             nf.Invoke(xi.Min, yi.Max, _ConstantsValue),
                             nf.Invoke(xi.Max, yi.Max, _ConstantsValue),
@@ -266,7 +272,7 @@ namespace CsGrafeq
                     {
                         if (dx <= 1 && dx <= 1)
                         {
-                            if (func(
+                            if ((!checkpixel) || func(
                             nf.Invoke(xi.Min, yi.Min, _ConstantsValue),
                             nf.Invoke(xi.Min, yi.Max, _ConstantsValue),
                             nf.Invoke(xi.Max, yi.Max, _ConstantsValue),
@@ -290,7 +296,7 @@ namespace CsGrafeq
         /// <param name="r">绘制区域</param>
         /// <param name="RectToCalc">要继续细化绘制的区域</param>
         /// <param name="RectToRender">要绘制的区域</param>
-        private void RenderRectIntervalSet(Graphics rt, ImplicitFunction f, Rectangle r, ConcurrentBag<Rectangle> RectToCalc, ConcurrentBag<RectangleF> RectToRender, SolidBrush brush, Func<int, int, int, int, bool> func, double ratio)
+        private void RenderRectIntervalSet(Graphics rt, ImplicitFunction f, Rectangle r, ConcurrentBag<Rectangle> RectToCalc, ConcurrentBag<RectangleF> RectToRender, SolidBrush brush, Func<int, int, int, int, bool> func,bool checkpixel, double ratio)
         {
             if (r.Height == 0 || r.Width == 0)
                 return;
@@ -319,7 +325,7 @@ namespace CsGrafeq
 
                     if (result == (true, true))
                     {
-                        if (func(
+                        if ((!checkpixel) || func(
                             nf.Invoke(xmin,ymin , _ConstantsValue),
                             nf.Invoke(xmax, ymin, _ConstantsValue),
                             nf.Invoke(xmax, ymax, _ConstantsValue),
@@ -331,11 +337,11 @@ namespace CsGrafeq
                     {
                         if (dx <= 1 && dx <= 1)
                         {
-                            if (func(
-                            nf.Invoke(xmin, ymin, _ConstantsValue),
-                            nf.Invoke(xmax, ymin, _ConstantsValue),
-                            nf.Invoke(xmax, ymax, _ConstantsValue),
-                            nf.Invoke(xmin, ymax, _ConstantsValue)
+                            if ((!checkpixel) || func(
+                                nf.Invoke(xmin, ymin, _ConstantsValue),
+                                nf.Invoke(xmax, ymin, _ConstantsValue),
+                                nf.Invoke(xmax, ymax, _ConstantsValue),
+                                nf.Invoke(xmin, ymax, _ConstantsValue)
                             ))
                                 RectToRender.Add(CreateRectFByBound((float)(di / ratio), (float)(dj / ratio), (float)Math.Min((di + dx) / ratio, r.Right), (float)Math.Min((dj + dy) / ratio, r.Bottom)));
                         }
@@ -355,7 +361,7 @@ namespace CsGrafeq
             {//移动零点
                 _Zero.X = (MouseDownZeroPos.X + e.X - MouseDownPos.X);
                 _Zero.Y = (MouseDownZeroPos.Y + e.Y - MouseDownPos.Y);
-                if (MovingRenderMode == MovingRenderModeFlag.RenderAll)
+                if (MovingRenderMode == MovingRenderMode.RenderAll)
                 {
                     Render(TargetGraphics);
                     return;
@@ -365,7 +371,7 @@ namespace CsGrafeq
                 Graphics graphics = buf.Graphics;
                 graphics.Clear(Color_White);
                 RenderAxisLine(graphics,ClientRectangle);
-                if (Math.Abs(LastZeroPos.X - _Zero.X) > 20 || Math.Abs(LastZeroPos.Y - _Zero.Y) > 20 || e.Clicks == 142857)
+                if (Math.Abs(LastZeroPos.X - _Zero.X) > 20 || Math.Abs(LastZeroPos.Y - _Zero.Y) > 20 || e.Clicks == 142857 )
                 {
                     //需修改图片
                     Bitmap bmp;
@@ -376,9 +382,9 @@ namespace CsGrafeq
                         bmp = new Bitmap(i._Bitmap);
                         i.BitmapGraphics.Clear(Color_A);
                         i.BitmapGraphics.DrawImage(bmp, _Zero.X - LastZeroPos.X, _Zero.Y - LastZeroPos.Y);
-                        RenderMovedPlace(i.BitmapGraphics);
-                        imageGraphics.DrawImage(i._Bitmap,0,0);
                         bmp.Dispose();
+                        RenderMovedPlace(i.BitmapGraphics,i);
+                        imageGraphics.DrawImage(i._Bitmap,0,0);
                     }
                     graphics.DrawImage(Bitmap,0,0);
                     LastZeroPos = _Zero;
@@ -396,46 +402,49 @@ namespace CsGrafeq
         }
         private void RenderMovedPlace(Graphics graphics)
         {
-            foreach (var impFunc in ImpFuncs.innerList)
+            foreach(var impfunc in ImpFuncs.innerList)
             {
-                Graphics drawtogf = Graphics.FromImage(impFunc._Bitmap);
-                if (_Zero.X < LastZeroPos.X)
+                RenderMovedPlace(graphics,impfunc);
+            }
+        }
+        private void RenderMovedPlace(Graphics drawtogf,ImplicitFunction impFunc)
+        {
+            if (_Zero.X < LastZeroPos.X)
+            {
+                RenderImpFunc(drawtogf, impFunc, CreateRectByBound((int)(width - LastZeroPos.X + _Zero.X), 0, width, height));
+                if (_Zero.Y < LastZeroPos.Y)
                 {
-                    RenderImpFunc(drawtogf, impFunc, CreateRectByBound((int)(width - LastZeroPos.X + _Zero.X), 0, width, height));
-                    if (_Zero.Y < LastZeroPos.Y)
-                    {
-                        RenderImpFunc(drawtogf, impFunc, CreateRectByBound(0, (int)(height - LastZeroPos.Y + _Zero.Y), (int)(width - LastZeroPos.X + _Zero.X), height));
+                    RenderImpFunc(drawtogf, impFunc, CreateRectByBound(0, (int)(height - LastZeroPos.Y + _Zero.Y), (int)(width - LastZeroPos.X + _Zero.X), height));
 
-                    }
-                    else if (_Zero.Y > LastZeroPos.Y)
-                    {
-                        RenderImpFunc(drawtogf, impFunc, CreateRectByBound(0, 0, (int)(width - LastZeroPos.X + _Zero.X), (int)(_Zero.Y - LastZeroPos.Y)));
-                    }
                 }
-                else if (_Zero.X > LastZeroPos.X)
+                else if (_Zero.Y > LastZeroPos.Y)
                 {
-                    RenderImpFunc(drawtogf, impFunc, CreateRectByBound(0, 0, (int)(_Zero.X - LastZeroPos.X), height));
-                    if (_Zero.Y < LastZeroPos.Y)
-                    {
-                        RenderImpFunc(drawtogf, impFunc, CreateRectByBound((int)(_Zero.X - LastZeroPos.X), (int)(height - LastZeroPos.Y + _Zero.Y), width, height));
-
-                    }
-                    else if (_Zero.Y > LastZeroPos.Y)
-                    {
-                        RenderImpFunc(drawtogf, impFunc, CreateRectByBound((int)(_Zero.X - LastZeroPos.X), 0, width, (int)(_Zero.Y - LastZeroPos.Y)));
-                    }
+                    RenderImpFunc(drawtogf, impFunc, CreateRectByBound(0, 0, (int)(width - LastZeroPos.X + _Zero.X), (int)(_Zero.Y - LastZeroPos.Y)));
                 }
-                else
+            }
+            else if (_Zero.X > LastZeroPos.X)
+            {
+                RenderImpFunc(drawtogf, impFunc, CreateRectByBound(0, 0, (int)(_Zero.X - LastZeroPos.X), height));
+                if (_Zero.Y < LastZeroPos.Y)
                 {
-                    if (_Zero.Y < LastZeroPos.Y)
-                    {
-                        RenderImpFunc(drawtogf, impFunc, CreateRectByBound(0, (int)(height - LastZeroPos.Y + _Zero.Y), width, height));
+                    RenderImpFunc(drawtogf, impFunc, CreateRectByBound((int)(_Zero.X - LastZeroPos.X), (int)(height - LastZeroPos.Y + _Zero.Y), width, height));
 
-                    }
-                    else if (_Zero.Y > LastZeroPos.Y)
-                    {
-                        RenderImpFunc(drawtogf, impFunc, CreateRectByBound(0, 0, width, (int)(_Zero.Y - LastZeroPos.Y)));
-                    }
+                }
+                else if (_Zero.Y > LastZeroPos.Y)
+                {
+                    RenderImpFunc(drawtogf, impFunc, CreateRectByBound((int)(_Zero.X - LastZeroPos.X), 0, width, (int)(_Zero.Y - LastZeroPos.Y)));
+                }
+            }
+            else
+            {
+                if (_Zero.Y < LastZeroPos.Y)
+                {
+                    RenderImpFunc(drawtogf, impFunc, CreateRectByBound(0, (int)(height - LastZeroPos.Y + _Zero.Y), width, height));
+
+                }
+                else if (_Zero.Y > LastZeroPos.Y)
+                {
+                    RenderImpFunc(drawtogf, impFunc, CreateRectByBound(0, 0, width, (int)(_Zero.Y - LastZeroPos.Y)));
                 }
             }
         }
@@ -523,7 +532,7 @@ namespace CsGrafeq
             }
         }
     }
-    public enum MovingRenderModeFlag
+    public enum MovingRenderMode
     {
         RenderAll,
         RenderEdge
@@ -571,10 +580,6 @@ namespace CsGrafeq
         internal static bool IsAllLeThanZero(int n1, int n2, int n3, int n4)
         {
             return (n1 + n2 + n3 + n4)%10!=0;
-        }
-        internal static bool Ret(int n1, int n2, int n3, int n4)
-        {
-            return true;
         }
     }
     public class ImplicitFunctionList
