@@ -39,6 +39,7 @@ namespace CsGrafeq
             {"min","Min"},
             {"floor","Floor"},
             {"ceil","Ceiling"},
+            {"abs","Abs"},
         };
         public static double Neg(double n)
         {

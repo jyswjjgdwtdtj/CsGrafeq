@@ -107,7 +107,24 @@ namespace CsGrafeq
                 return EmptyInterval;
             i.Min = Sign(i.Min);
             i.Max = Sign(i.Max);
-            i.Cont&=(i.Min==i.Max);
+            i.Cont &= (i.Min == i.Max);
+            return i;
+        }
+        public static Interval Abs(Interval i)
+        {
+            if (i.isEmpty())
+                return EmptyInterval;
+            if (i.ContainsEqual(0))
+            {
+                i.Max=Math.Max(-i.Min, i.Max);
+                i.Min = 0;
+                return i;
+            }
+            if (i.Max < 0)
+            {
+                (i.Min, i.Max) = (-i.Max,-i.Min);
+                return i;
+            }
             return i;
         }
         public static Interval Median(Interval i1, Interval i2, Interval i3)

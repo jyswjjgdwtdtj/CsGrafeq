@@ -3,30 +3,31 @@
   "WorkspaceRootPath": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|c:\\users\\liboyuan\\documents\\github\\csgrafeq\\src\\csgrafeq\\axisdisplayer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|solutionrelative:csgrafeq\\axisdisplayer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|c:\\users\\liboyuan\\documents\\github\\csgrafeq\\src\\csgrafeq\\functiondisplayer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|solutionrelative:csgrafeq\\functiondisplayer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|c:\\users\\liboyuan\\documents\\github\\csgrafeq\\src\\csgrafeq\\functiondisplayer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|solutionrelative:csgrafeq\\functiondisplayer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|c:\\users\\liboyuan\\documents\\github\\csgrafeq\\src\\csgrafeq\\intervalsetmath.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|solutionrelative:csgrafeq\\intervalsetmath.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{00000000-0000-0000-0000-000000000000}|\u003CSolution\u003E|CsGrafeq||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|"
+      "AbsoluteMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|c:\\users\\liboyuan\\documents\\github\\csgrafeq\\src\\csgrafeq\\intervalmath.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|solutionrelative:csgrafeq\\intervalmath.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|c:\\users\\liboyuan\\documents\\github\\csgrafeq\\src\\csgrafeq\\axisdisplayer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "AbsoluteMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\csgrafeq\\functiondisplayer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|solutionrelative:csgrafeq\\functiondisplayer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\csgrafeq\\axisdisplayer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
       "RelativeMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|solutionrelative:csgrafeq\\axisdisplayer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|c:\\users\\liboyuan\\documents\\github\\csgrafeq\\src\\csgrafeq\\||{B270807C-D8C6-49EB-8EBE-8E8D566637A1}|5e9a8ac2-4f34-4521-858f-4c248ba31532"
+      "AbsoluteMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\csgrafeq\\functiondisplayer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|solutionrelative:csgrafeq\\functiondisplayer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\csgrafeq\\axisdisplayer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}|CsGrafeq\\CsGrafeq.csproj|solutionrelative:csgrafeq\\axisdisplayer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00000000-0000-0000-0000-000000000000}|\u003CSolution\u003E|CsGrafeq||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|"
     }
   ],
   "DocumentGroupContainers": [
@@ -36,7 +37,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Bookmark",
@@ -45,19 +46,45 @@
             {
               "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "IntervalMath.cs",
+              "DocumentMoniker": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\CsGrafeq\\IntervalMath.cs",
+              "RelativeDocumentMoniker": "CsGrafeq\\IntervalMath.cs",
+              "ToolTip": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\CsGrafeq\\IntervalMath.cs",
+              "RelativeToolTip": "CsGrafeq\\IntervalMath.cs",
+              "ViewState": "AgIAAOgAAAAAAAAAAAAowPQAAABSAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-30T03:25:53.899Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "IntervalSetMath.cs",
+              "DocumentMoniker": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\CsGrafeq\\IntervalSetMath.cs",
+              "RelativeDocumentMoniker": "CsGrafeq\\IntervalSetMath.cs",
+              "ToolTip": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\CsGrafeq\\IntervalSetMath.cs",
+              "RelativeToolTip": "CsGrafeq\\IntervalSetMath.cs",
+              "ViewState": "AgIAAN4AAAAAAAAAAAA1wO4AAABRAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-30T03:14:41.925Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "FunctionDisplayer.cs",
               "DocumentMoniker": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\CsGrafeq\\FunctionDisplayer.cs",
               "RelativeDocumentMoniker": "CsGrafeq\\FunctionDisplayer.cs",
               "ToolTip": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\CsGrafeq\\FunctionDisplayer.cs",
               "RelativeToolTip": "CsGrafeq\\FunctionDisplayer.cs",
-              "ViewState": "AgIAAGwAAAAAAAAAAAAcwH8AAAAiAAAAAAAAAA==",
+              "ViewState": "AgIAAI8AAAAAAAAAAAAUwJ4AAAAxAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-29T10:40:51.595Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 4,
               "Title": "FunctionDisplayer.cs [\u8BBE\u8BA1]",
               "DocumentMoniker": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\CsGrafeq\\FunctionDisplayer.cs",
               "RelativeDocumentMoniker": "CsGrafeq\\FunctionDisplayer.cs",
@@ -69,53 +96,37 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 6,
               "Title": "CsGrafeq",
               "DocumentMoniker": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\CsGrafeq\\CsGrafeq.csproj",
               "RelativeDocumentMoniker": "CsGrafeq\\CsGrafeq.csproj",
               "ToolTip": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\CsGrafeq\\CsGrafeq.csproj",
               "RelativeToolTip": "CsGrafeq\\CsGrafeq.csproj",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2025-03-29T10:39:49.772Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-03-29T10:39:49.772Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "IntervalSetMath.cs",
-              "DocumentMoniker": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\CsGrafeq\\IntervalSetMath.cs",
-              "RelativeDocumentMoniker": "CsGrafeq\\IntervalSetMath.cs",
-              "ToolTip": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\CsGrafeq\\IntervalSetMath.cs",
-              "RelativeToolTip": "CsGrafeq\\IntervalSetMath.cs",
-              "ViewState": "AgIAABUAAAAAAAAAAAAlwBkAAAAtAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-29T10:39:41.72Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 5,
               "Title": "AxisDisplayer.cs",
               "DocumentMoniker": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\CsGrafeq\\AxisDisplayer.cs",
               "RelativeDocumentMoniker": "CsGrafeq\\AxisDisplayer.cs",
               "ToolTip": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\CsGrafeq\\AxisDisplayer.cs",
               "RelativeToolTip": "CsGrafeq\\AxisDisplayer.cs",
-              "ViewState": "AgIAAFMBAAAAAAAAAAA6wFgBAAAXAAAAAAAAAA==",
+              "ViewState": "AgIAAAgAAAAAAAAAAADwvx4AAAAuAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-29T10:38:36.81Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-03-29T10:38:36.81Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 3,
               "Title": "AxisDisplayer.cs [\u8BBE\u8BA1]",
               "DocumentMoniker": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\CsGrafeq\\AxisDisplayer.cs",
               "RelativeDocumentMoniker": "CsGrafeq\\AxisDisplayer.cs",
               "ToolTip": "C:\\Users\\liboyuan\\Documents\\GitHub\\CsGrafeq\\src\\CsGrafeq\\AxisDisplayer.cs [\u8BBE\u8BA1]",
               "RelativeToolTip": "CsGrafeq\\AxisDisplayer.cs [\u8BBE\u8BA1]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-29T10:38:26.365Z",
-              "EditorCaption": " [\u8BBE\u8BA1]"
+              "WhenOpened": "2025-03-29T10:38:26.365Z"
             }
           ]
         }

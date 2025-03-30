@@ -143,6 +143,21 @@ namespace CsGrafeqPlayGround
         }
         private void textBox1_KeyPress(object sender, KeyPressEventArgs e)
         {
+            if(e.KeyChar == 19)//ctrl+s
+            {
+                SaveFileDialog saveFileDialog = new SaveFileDialog();
+                saveFileDialog.Filter = "*.jpg|Jpg File";
+                saveFileDialog.DefaultExt = ".jpg";
+                saveFileDialog.Title = "保存";
+                saveFileDialog.AddExtension = true;
+                saveFileDialog.FileName = "1.jpg";
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    Bitmap bitmap = new Bitmap(fd.Width,fd.Height);
+                    fd.RenderTo(Graphics.FromImage(bitmap),fd.ClientRectangle);
+                    bitmap.Save(saveFileDialog.FileName);
+                }
+            }
             if (
                  (e.KeyChar == '.') || (e.KeyChar == '\b') ||
                 ('0' <= e.KeyChar && e.KeyChar <= '9') ||

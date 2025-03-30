@@ -10,3 +10,7 @@ C:\Users\liboyuan\Documents\GitHub\CsGrafeq\PlayGround\CsGrafeqPlayGround\obj\De
 C:\Users\liboyuan\Documents\GitHub\CsGrafeq\PlayGround\CsGrafeqPlayGround\obj\Debug\CsGrafeq.E66D0EFF.Up2Date
 C:\Users\liboyuan\Documents\GitHub\CsGrafeq\PlayGround\CsGrafeqPlayGround\obj\Debug\CsGrafeqPlayGround.exe
 C:\Users\liboyuan\Documents\GitHub\CsGrafeq\PlayGround\CsGrafeqPlayGround\obj\Debug\CsGrafeqPlayGround.pdb
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\PlayGround\CsGrafeqPlayGround\bin\Debug\CsGrafeq.dll
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\PlayGround\CsGrafeqPlayGround\bin\Debug\zh\CsGrafeqPlayGround.resources.dll
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\PlayGround\CsGrafeqPlayGround\obj\Debug\CsGrafeqPlayGround.Form1.zh.resources
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\PlayGround\CsGrafeqPlayGround\obj\Debug\zh\CsGrafeqPlayGround.resources.dll

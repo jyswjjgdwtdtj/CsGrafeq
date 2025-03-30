@@ -7,6 +7,7 @@ using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Forms.ComponentModel.Com2Interop;
 
 namespace CsGrafeq
 {
@@ -174,6 +175,68 @@ namespace CsGrafeq
             }
             i.Intervals = Ranges;
             return i;
+        }
+        public unsafe static IntervalSet Abs(IntervalSet i1)
+        {
+            if (!i1.Def.Item2)
+                return EmptyIntervalSet;
+            Range[] Ranges = new Range[i1.Intervals.Length];
+            int loc = 0;
+            fixed (Range* first = i1.Intervals, Rangesfirst = Ranges)
+                for (Range* i = first; i < first + i1.Intervals.Length; i++)
+                    *(Rangesfirst + loc++) = RangeAbs(*i);
+            return GetIntervalSetFromRangeArray(Ranges,i1.Def,i1.Cont);
+        }
+        private static Range RangeAbs(Range i)
+        {
+            if (i.ContainsEqual(0))
+            {
+                i.Max = Math.Max(-i.Min, i.Max);
+                i.Min = 0;
+                return i;
+            }
+            if (i.Max < 0)
+            {
+                (i.Min, i.Max) = (-i.Max, -i.Min);
+                return i;
+            }
+            return i;
+        }
+        public unsafe static IntervalSet Min(IntervalSet i1, IntervalSet i2)
+        {
+            if (!(i1.Def.Item2 && i2.Def.Item2))
+                return EmptyIntervalSet;
+            Range[] Ranges = new Range[i1.Intervals.Length * i2.Intervals.Length];
+            int loc = 0;
+            fixed (Range* ptr = Ranges, i1start = i1.Intervals, i2start = i2.Intervals)
+            {
+                for (Range* i = i1start; i < i1start + i1.Intervals.Length; i++)
+                    for (Range* j = i2start; j < i2start + i2.Intervals.Length; j++)
+                        *(ptr + loc++) = RangeMin(i, j);
+            }
+            return GetIntervalSetFromRangeArray(Ranges, And(i1.Def, i2.Def), i1.Cont && i2.Cont);
+        }
+        private unsafe static Range RangeMin(Range* i1, Range* i2)
+        {
+            return new Range() { Min = Math.Min(i1->Min, i2->Min), Max = Math.Min(i1->Max, i2->Max) };
+        }
+        public unsafe static IntervalSet Max(IntervalSet i1, IntervalSet i2)
+        {
+            if (!(i1.Def.Item2 && i2.Def.Item2))
+                return EmptyIntervalSet;
+            Range[] Ranges = new Range[i1.Intervals.Length * i2.Intervals.Length];
+            int loc = 0;
+            fixed (Range* ptr = Ranges, i1start = i1.Intervals, i2start = i2.Intervals)
+            {
+                for (Range* i = i1start; i < i1start + i1.Intervals.Length; i++)
+                    for (Range* j = i2start; j < i2start + i2.Intervals.Length; j++)
+                        *(ptr + loc++) = RangeMax(i, j);
+            }
+            return GetIntervalSetFromRangeArray(Ranges, And(i1.Def, i2.Def), i1.Cont && i2.Cont);
+        }
+        private unsafe static Range RangeMax(Range* i1, Range* i2)
+        {
+            return new Range() { Min = Math.Max(i1->Min, i2->Min), Max = Math.Max(i1->Max, i2->Max) };
         }
         public unsafe static IntervalSet Median(IntervalSet c1, IntervalSet c2, IntervalSet c3)
         {

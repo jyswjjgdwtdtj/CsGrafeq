@@ -154,6 +154,18 @@ namespace CsGrafeq
             buf.Render();
         }
 
+        public bool RenderTo(Graphics g,Rectangle rectangle)
+        {
+            BufferedGraphics buf = g.GetBuffer(rectangle);
+            Graphics graphics = buf.Graphics;
+            graphics.Clear(Color_White);
+            RenderAxisLine(graphics, rectangle);
+            RenderImpFuncs(graphics, rectangle);
+            RenderAxisNumber(graphics, rectangle);
+            buf.Render();
+            return true;
+        }
+
         /// <summary>
         /// 绘制函数
         /// </summary>
