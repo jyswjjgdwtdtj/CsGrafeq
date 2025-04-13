@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using System.Collections;
 
 namespace CsGrafeq
 {
@@ -14,52 +15,141 @@ namespace CsGrafeq
         private static bool[] usedconst;
         public static CompileResult Complie(string Expression)
         {
-            DynamicMethod imp = new DynamicMethod("ImpFunction", typeof((bool, bool)), new Type[] { typeof(Interval), typeof(Interval), typeof(double[]) });
-            ILGenerator il = imp.GetILGenerator();
-            usedconst = new bool['z' - 'a' + 1];
-            EmitTokens(il, GetTokens(Expression), FunctionType.Interval);
-            il.Emit(OpCodes.Ret);
-            IntervalImpFunctionDelegate ic = (IntervalImpFunctionDelegate)imp.CreateDelegate(typeof(IntervalImpFunctionDelegate));
-
-            DynamicMethod isfunc = new DynamicMethod("ImpFunction", typeof((bool, bool)), new Type[] { typeof(IntervalSet), typeof(IntervalSet), typeof(double[]) });
-            ILGenerator ilis = isfunc.GetILGenerator();
-            EmitTokens(ilis, GetTokens(Expression), FunctionType.IntervalSet);
-            ilis.Emit(OpCodes.Ret);
-            IntervalSetImpFunctionDelegate isc = (IntervalSetImpFunctionDelegate)isfunc.CreateDelegate(typeof(IntervalSetImpFunctionDelegate));
-            DynamicMethod num = new DynamicMethod("NumberFunction", typeof(int), new Type[] { typeof(double), typeof(double), typeof(double[]) });
-            ILGenerator ilnum = num.GetILGenerator();
-            EmitTokens(ilnum, GetTokens(Expression), FunctionType.Number);
-            ilnum.Emit(OpCodes.Ret);
-            NumberImpFunctionDelegate nc = (NumberImpFunctionDelegate)num.CreateDelegate(typeof(NumberImpFunctionDelegate));
-            ic.Invoke(new Interval(0),new Interval(1),new double['z'-'a'+1]);
-            isc.Invoke(new IntervalSet(0), new IntervalSet(1), new double['z' - 'a' + 1]);
-            nc.Invoke(1, 2, new double['z' - 'a' + 1]);
-            return new CompileResult { IntervalImpFunctionDelegate = ic, NumberImpFunctionDelegate = nc ,IntervalSetImpFunctionDelegate=isc,UsedConstant=usedconst};
+            Element[] eles = ParseTokens(GetTokens(Expression));
+            IntervalImpFunctionDelegate IntervalDg = GetDelegate<IntervalImpFunctionDelegate>(new Type[] { typeof(Interval), typeof(Interval), typeof(double[]) }, eles,FunctionType.Interval);
+            IntervalSetImpFunctionDelegate IntervalSetDg = GetDelegate<IntervalSetImpFunctionDelegate>(new Type[] { typeof(IntervalSet), typeof(IntervalSet), typeof(double[]) }, eles, FunctionType.IntervalSet);
+            MarchingSquaresDelegate msd = GetMSDelegate(eles);
+            msd.Invoke(0, 0, 1, 1, new double[26]);
+            return new CompileResult { IntervalImpFunctionDelegate = IntervalDg, MarchingSquaresDelegate=msd ,IntervalSetImpFunctionDelegate=IntervalSetDg,UsedConstant=usedconst};
         }
         public static CompileResult Complie(ComparedExpression ec)
         {
-            DynamicMethod imp = new DynamicMethod("ImpFunction", typeof((bool, bool)), new Type[] { typeof(IntervalSet), typeof(IntervalSet), typeof(double[]) });
+            Element[] eles = ec.Elements.ToArray();
+            IntervalImpFunctionDelegate IntervalDg = GetDelegate<IntervalImpFunctionDelegate>(new Type[] { typeof(Interval), typeof(Interval), typeof(double[]) }, eles, FunctionType.Interval);
+            IntervalSetImpFunctionDelegate IntervalSetDg = GetDelegate<IntervalSetImpFunctionDelegate>(new Type[] { typeof(IntervalSet), typeof(IntervalSet), typeof(double[]) }, eles, FunctionType.IntervalSet);
+            MarchingSquaresDelegate msd = GetMSDelegate(eles);
+            return new CompileResult { IntervalImpFunctionDelegate = IntervalDg, MarchingSquaresDelegate=msd, IntervalSetImpFunctionDelegate = IntervalSetDg,UsedConstant=usedconst };
+        }
+        private static T GetDelegate<T>(Type[] tarray, Element[] eles, FunctionType ft) where T : Delegate
+        {
+            DynamicMethod imp = new DynamicMethod("ImpFunction", typeof((bool, bool)), tarray);
             ILGenerator il = imp.GetILGenerator();
             usedconst = new bool['z' - 'a' + 1];
-            EmitElements(il,ec.Elements.ToArray(), FunctionType.IntervalSet);
+            EmitElements(il, eles, ft);
             il.Emit(OpCodes.Ret);
-            IntervalSetImpFunctionDelegate ic = (IntervalSetImpFunctionDelegate)imp.CreateDelegate(typeof(IntervalSetImpFunctionDelegate));
-
-            imp = new DynamicMethod("ImpFunction", typeof((bool, bool)), new Type[] { typeof(Interval), typeof(Interval), typeof(double[]) });
-            il = imp.GetILGenerator();
-            EmitElements(il, ec.Elements.ToArray(), FunctionType.Interval);
+            return (T)imp.CreateDelegate(typeof(T));
+        }
+        private static DynamicMethod GetNumDelegate(Element[] eles)
+        {
+            DynamicMethod imp = new DynamicMethod("NumFunction", typeof(int), new Type[] { typeof(double), typeof(double), typeof(double[]) });
+            ILGenerator il = imp.GetILGenerator();
+            EmitElements(il, eles, FunctionType.Number);
             il.Emit(OpCodes.Ret);
-            IntervalImpFunctionDelegate icc = (IntervalImpFunctionDelegate)imp.CreateDelegate(typeof(IntervalImpFunctionDelegate));
-            DynamicMethod num = new DynamicMethod("NumberFunction", typeof(int), new Type[] { typeof(double), typeof(double), typeof(double[]) });
-            ILGenerator ilnum = num.GetILGenerator();
-            EmitElements(ilnum, ec.Elements.ToArray(), FunctionType.Number);
-            ilnum.Emit(OpCodes.Ret);
-            NumberImpFunctionDelegate nc = (NumberImpFunctionDelegate)num.CreateDelegate(typeof(NumberImpFunctionDelegate));
-            return new CompileResult { IntervalImpFunctionDelegate = icc, NumberImpFunctionDelegate = nc,IntervalSetImpFunctionDelegate=ic,UsedConstant=usedconst };
+            return imp;
+        }
+        private static MarchingSquaresDelegate GetMSDelegate(Element[] eles)
+        {
+            DynamicMethod imp = new DynamicMethod("MSFunction", typeof(bool), new Type[] { typeof(double), typeof(double), typeof(double), typeof(double), typeof(double[])});
+            ILGenerator ilg = imp.GetILGenerator();
+            ILRecorder il = new ILRecorder(ilg);
+            Stack<DynamicMethod> numfuncs=new Stack<DynamicMethod>();
+            Stack<Element> uiopers = new Stack<Element>();
+            Stack<Element> cpopers= new Stack<Element>();
+            List<Element> elelist = new List<Element>();
+            int loc = 0;
+            string s = "LessEqualGreaterEqual";
+            for (; loc < eles.Length; loc++)
+            {
+                if (eles[loc].NameOrValue == "Union" || eles[loc].NameOrValue == "Intersect")
+                {
+                    uiopers.Push(eles[loc]);
+                    numfuncs.Push(GetNumDelegate(elelist.ToArray()));
+                    elelist.Clear();
+                }
+                if (s.Contains(eles[loc].NameOrValue))
+                {
+                    cpopers.Push(eles[loc]);
+                }
+                elelist.Add(eles[loc]);
+            }
+            numfuncs.Push(GetNumDelegate(elelist.ToArray()));
+            elelist.Clear();
+            OpCode left = OpCodes.Ldarg_0;
+            OpCode top=OpCodes.Ldarg_1;
+            OpCode right=OpCodes.Ldarg_2;
+            OpCode bottom = OpCodes.Ldarg_3;
+            MethodInfo allless = ((Func<int, int, int, int, bool>)NumberMath.IsAllLeThanZero).Method;
+            MethodInfo allgreater = ((Func<int, int, int, int, bool>)NumberMath.IsAllGeThanZero).Method;
+            MethodInfo crosszero = ((Func<int, int, int, int, bool>)NumberMath.IsCrossZero).Method;
+            //载入四个点
+            DynamicMethod numfunc = numfuncs.Pop();
+            il.Emit(left);
+            il.Emit(top);
+            il.Emit(OpCodes.Ldarg, 4);
+            il.Emit(OpCodes.Call, numfunc);
+            il.Emit(left);
+            il.Emit(bottom);
+            il.Emit(OpCodes.Ldarg, 4);
+            il.Emit(OpCodes.Call, numfunc);
+            il.Emit(right);
+            il.Emit(top);
+            il.Emit(OpCodes.Ldarg, 4);
+            il.Emit(OpCodes.Call, numfunc);
+            il.Emit(right);
+            il.Emit(bottom);
+            il.Emit(OpCodes.Ldarg, 4);
+            il.Emit(OpCodes.Call, numfunc);
+            Element ele = cpopers.Pop();
+            if (ele.NameOrValue.Contains("Less"))
+                il.Emit(OpCodes.Call, allless);
+            else if (ele.NameOrValue.Contains("Greater"))
+                il.Emit(OpCodes.Call, allgreater);
+            else
+                il.Emit(OpCodes.Call, crosszero);
+            //此时栈中有一个bool类型
+            for (int i = 0; i < uiopers.Count; i++)
+            {
+                //载入四个点
+                numfunc = numfuncs.Pop();
+                il.Emit(left);
+                il.Emit(top);
+                il.Emit(OpCodes.Ldarg, 4);
+                il.Emit(OpCodes.Call, numfunc);
+                il.Emit(left);
+                il.Emit(bottom);
+                il.Emit(OpCodes.Ldarg, 4);
+                il.Emit(OpCodes.Call, numfunc);
+                il.Emit(right);
+                il.Emit(top);
+                il.Emit(OpCodes.Ldarg, 4);
+                il.Emit(OpCodes.Call, numfunc);
+                il.Emit(right);
+                il.Emit(bottom);
+                il.Emit(OpCodes.Ldarg, 4);
+                il.Emit(OpCodes.Call, numfunc);
+                ele = cpopers.Pop();
+                if (ele.NameOrValue.Contains("Less"))
+                    il.Emit(OpCodes.Call, allless);
+                else if(ele.NameOrValue.Contains("Greater"))
+                    il.Emit(OpCodes.Call, allgreater);
+                else
+                    il.Emit(OpCodes.Call, crosszero);
+                //此时栈中有两个bool类型
+                ele=uiopers.Pop();
+                if (ele.NameOrValue == "Union")
+                    il.Emit(OpCodes.Or);
+                else
+                    il.Emit(OpCodes.And);
+                //此时有一个bool类型
+            }
+            //此时有一个bool类型
+            il.Emit(OpCodes.Ret);
+            //MessageBox.Show(il.GetRecord());
+            return (MarchingSquaresDelegate)imp.CreateDelegate(typeof(MarchingSquaresDelegate));
         }
         private static readonly Regex letter = new Regex("[a-zA-Z]");
         private static readonly Regex number = new Regex("[0-9]");
-        private static readonly Regex oper = new Regex("([/<>+=^*%(),]|-)");
+        private static readonly Regex oper = new Regex("([/<>+=^*%(),|&]|-)");
         private static readonly Regex letterOrnumberOr_ = new Regex("[a-zA-Z0-9_]");
         private static readonly Regex numberOrpoint = new Regex("[0-9.]");
         private static readonly Regex spaceOrtab = new Regex(@"([ ]|\t)");
@@ -91,47 +181,54 @@ namespace CsGrafeq
                         if (Previous == ElementType.Number || Previous == ElementType.Variable || Previous == ElementType.Function)
                             throw new Exception("缺少运算符:" + Tokens[loc - 1] + "与" + Tokens[loc] + "之间");
                         string Tokenname = Tokens[loc].NameOrValue;
-                        if (mih.Contains(Tokenname.ToLower()))
-                        {//函数
-                            Previous = ElementType.Variable;
-                            loc += 2;
-                            if (Tokens[loc].type == TokenType.RightBracket)
-                            {
-                                exp.Push(new Element(ElementType.Function, Tokenname, 0));
-                                loc++;
+                        if (Tokens[Math.Min(loc + 1, len)].type == TokenType.LeftBracket)
+                        {
+                            if (mih.Contains(Tokenname.ToLower()))
+                            {//函数
+                                Previous = ElementType.Variable;
+                                loc += 2;
+                                if (Tokens[loc].type == TokenType.RightBracket)
+                                {
+                                    exp.Push(new Element(ElementType.Function, Tokenname, 0));
+                                    loc++;
+                                }
+                                else
+                                {
+                                    int bc = 0;
+                                    int dimcount = 0;
+                                    List<Token> ts = new List<Token>();
+                                    while (true)
+                                    {
+                                        if (bc == 0 && Tokens[loc].type == TokenType.Comma)
+                                        {
+                                            dimcount++;
+                                            foreach (var i in ParseTokens(ts.ToArray()))
+                                                exp.Push(i);
+                                            ts.Clear();
+                                            loc++;
+                                            continue;
+                                        }
+                                        if (bc == 0 && Tokens[loc].type == TokenType.RightBracket)
+                                        {
+                                            dimcount++;
+                                            foreach (var i in ParseTokens(ts.ToArray()))
+                                                exp.Push(i);
+                                            loc++;
+                                            break;
+                                        }
+                                        if (Tokens[loc].type == TokenType.LeftBracket)
+                                            bc++;
+                                        if (Tokens[loc].type == TokenType.RightBracket)
+                                            bc--;
+                                        ts.Add(Tokens[loc]);
+                                        loc++;
+                                    }
+                                    exp.Push(new Element(ElementType.Function, Tokenname, dimcount));
+                                }
                             }
                             else
                             {
-                                int bc = 0;
-                                int dimcount = 0;
-                                List<Token> ts = new List<Token>();
-                                while (true)
-                                {
-                                    if (bc == 0 && Tokens[loc].type == TokenType.Comma)
-                                    {
-                                        dimcount++;
-                                        foreach (var i in ParseTokens(ts.ToArray()))
-                                            exp.Push(i);
-                                        ts.Clear();
-                                        loc++;
-                                        continue;
-                                    }
-                                    if (bc == 0 && Tokens[loc].type == TokenType.RightBracket)
-                                    {
-                                        dimcount++;
-                                        foreach (var i in ParseTokens(ts.ToArray()))
-                                            exp.Push(i);
-                                        loc++;
-                                        break;
-                                    }
-                                    if (Tokens[loc].type == TokenType.LeftBracket)
-                                        bc++;
-                                    if (Tokens[loc].type == TokenType.RightBracket)
-                                        bc--;
-                                    ts.Add(Tokens[loc]);
-                                    loc++;
-                                }
-                                exp.Push(new Element(ElementType.Function, Tokenname, dimcount));
+                                throw new Exception("未知函数:" + Tokenname);
                             }
                         }
                         else if (Tokenname.Length == 1 && 'a' <= Tokenname.ToLower()[0] && 'z' >= Tokenname.ToLower()[0] || Tokenname.ToLower()=="pi")//var
@@ -299,7 +396,9 @@ namespace CsGrafeq
                                 if (mih.Contains(ele.NameOrValue))
                                     throw new Exception("函数参数数量错误:"+ele.NameOrValue);
                                 else
-                                    throw new Exception("函数不存在:"+ele.NameOrValue);
+                                {
+                                    throw new Exception("函数不存在:" + ele.NameOrValue);
+                                }
                             IL.Emit(OpCodes.Call, mf);
                             stacklength -= mf.GetParameters().Length;
                         }
@@ -384,7 +483,6 @@ namespace CsGrafeq
         }
         internal static Token[] GetTokens(string script)//词法分析器
         {
-            bool compareoperatorexists = false;
             script += '#';
             int loc = 0;
             List<Token> Tokens = new List<Token>();
@@ -440,27 +538,36 @@ namespace CsGrafeq
                         case ')':
                             t.type = TokenType.RightBracket; break;
                         case '>':
-                            if (compareoperatorexists)
-                                throw new Exception("比较运算符超过一个");
-                            t.type = TokenType.Greater;
-                            compareoperatorexists = true;
+                            if (script[loc + 1] == '=')
+                            {
+                                t.type = TokenType.GreaterEqual;
+                                loc++;
+                            }
+                            else
+                                t.type = TokenType.Greater;
                             break;
                         case '<':
-                            if (compareoperatorexists)
-                                throw new Exception("比较运算符超过一个");
-                            t.type = TokenType.Less;
-                            compareoperatorexists = true;
+                            if (script[loc + 1] == '=')
+                            {
+                                t.type = TokenType.LessEqual;
+                                loc++;
+                            }
+                            else
+                                t.type = TokenType.Less;
                             break;
                         case '=':
-                            if (compareoperatorexists)
-                                throw new Exception("比较运算符超过一个");
                             t.type = TokenType.Equal;
-                            compareoperatorexists = true;
+                            break;
+                        case '|':
+                            t.type = TokenType.Union;
+                            break;
+                        case '&':
+                            t.type = TokenType.Intersect;
                             break;
                         case ',':
                             t.type = TokenType.Comma; break;
                         default:
-                            throw new Exception("未知符号:"+t.NameOrValue);
+                            throw new Exception("未知符号:" + t.NameOrValue);
                     }
                     loc++;
                 }
@@ -475,8 +582,6 @@ namespace CsGrafeq
                 }
                 Tokens.Add(t);
             }
-            if (!compareoperatorexists)
-                throw new Exception("需要比较运算符");
             return Tokens.ToArray();
         }
         private static int GetTokenLevel(Token c)
@@ -496,9 +601,14 @@ namespace CsGrafeq
         {
             switch (o)
             {
+                case OperatorType.Union:
+                case OperatorType.Intersect:
+                    return -1;
                 case OperatorType.Equal:
                 case OperatorType.Less:
                 case OperatorType.Greater:
+                case OperatorType.LessEqual:
+                case OperatorType.GreaterEqual:
                     return 0;
                 case OperatorType.Add:
                 case OperatorType.Subtract:
@@ -564,7 +674,8 @@ namespace CsGrafeq
         {
             Add, Subtract, Multiply, Divide, Pow, Mod,
             LeftBracket, RightBracket, Start, Neg,
-            Equal, Less, Greater
+            Equal, Less, Greater, LessEqual, GreaterEqual,
+            Union,Intersect
         }
         public struct Element
         {
@@ -586,7 +697,7 @@ namespace CsGrafeq
         {
             Add, Subtract, Multiply, Divide, Pow, Mod,
             LeftBracket, RightBracket, Start, Neg,
-            Equal, Less, Greater,
+            Equal, Less, Greater, LessEqual, GreaterEqual, Union,Intersect,
             VariableOrFunction, Number, Comma,
             Err_UnDefined
         }
@@ -659,16 +770,81 @@ namespace CsGrafeq
         {
             public IntervalImpFunctionDelegate IntervalImpFunctionDelegate;
             public IntervalSetImpFunctionDelegate IntervalSetImpFunctionDelegate;
-            public NumberImpFunctionDelegate NumberImpFunctionDelegate;
+            public MarchingSquaresDelegate MarchingSquaresDelegate;
             public bool[] UsedConstant;
-            public void Deconstruct(out IntervalImpFunctionDelegate impfunc, out IntervalSetImpFunctionDelegate isfunc, out NumberImpFunctionDelegate numfunc,out bool[] usedconstant)
+            public void Deconstruct(out IntervalImpFunctionDelegate impfunc, out IntervalSetImpFunctionDelegate isfunc, out MarchingSquaresDelegate msd,out bool[] usedconstant)
             {
                 impfunc = IntervalImpFunctionDelegate;
-                numfunc = NumberImpFunctionDelegate;
+                msd = MarchingSquaresDelegate;
                 isfunc = IntervalSetImpFunctionDelegate;
                 usedconstant = UsedConstant;
             }
         }
         #endregion
+        public class ILRecorder
+        {
+            private ILGenerator IL;
+            private StringBuilder sb = new StringBuilder();
+            public ILRecorder(ILGenerator il)
+            {
+                IL = il;
+            }
+            public void Emit(OpCode op)
+            {
+                sb.AppendLine(op.Name);
+                IL.Emit(op);
+            }
+            public void Emit(OpCode op, byte b)
+            {
+                sb.AppendLine(op.Name + " " + b.ToString()); IL.Emit(op, b);
+            }
+            public void Emit(OpCode op, ConstructorInfo ci)
+            {
+                sb.AppendLine(op.Name + " " + ci.ToString()); IL.Emit(op, ci);
+            }
+            public void Emit(OpCode op, double d)
+            {
+                sb.AppendLine(op.Name + " " + d.ToString()); IL.Emit(op, d);
+            }
+            public void Emit(OpCode op, FieldInfo fi)
+            {
+                sb.AppendLine(op.Name + " " + fi.ToString()); IL.Emit(op, fi);
+            }
+            public void Emit(OpCode op, float f)
+            {
+                sb.AppendLine(op.Name + " " + f.ToString()); IL.Emit(op, f);
+            }
+            public void Emit(OpCode op, int i)
+            {
+                sb.AppendLine(op.Name + " " + i.ToString()); IL.Emit(op, i);
+            }
+            public void Emit(OpCode op, long l)
+            {
+                sb.AppendLine(op.Name + " " + l.ToString()); IL.Emit(op, l);
+            }
+            public void Emit(OpCode op, MethodInfo l)
+            {
+                sb.AppendLine(op.Name + " " + l.ToString().Split('\r')[0]); IL.Emit(op, l);
+            }
+            public void Emit(OpCode op, string l)
+            {
+                sb.AppendLine(op.Name + " " + l.ToString()); IL.Emit(op, l);
+            }
+            public void Emit(OpCode op, Type l)
+            {
+                sb.AppendLine(op.Name + " " + l.ToString()); IL.Emit(op, l);
+            }
+            public void EmitWriteLine(string s)
+            {
+                Emit(OpCodes.Ldstr, s);
+                Type[] types = new Type[1] { typeof(string) };
+                MethodInfo method = typeof(Console).GetMethod("WriteLine", types);
+                Emit(OpCodes.Call, method);
+            }
+            public string GetRecord()
+            {
+                return sb.ToString();
+            }
+        }
     }
 }

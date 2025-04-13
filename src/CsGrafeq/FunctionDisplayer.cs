@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using static CsGrafeq.ExMethods;
 using static CsGrafeq.ExpressionBuilder;
-using static CsGrafeq.ImplicitFunction;
 
 namespace CsGrafeq
 {
@@ -93,7 +92,7 @@ namespace CsGrafeq
         /// </summary>
         public MovingRenderMode MovingRenderMode { get; set; }
         /// <summary>
-        /// 函数绘制精度
+        /// 函数绘制精度 不可使用！
         /// </summary>
         /// <value>只能为0-4的整数</value>
         public int Quality
@@ -131,7 +130,9 @@ namespace CsGrafeq
             };
             WheelingTimer.Start();
 #if DEBUG
-            ImpFuncs.Add(GCD(Floor(y),Factorial(Floor(Sqrt(2*Floor(y))-0.5)))<1);
+            ImpFuncs.Add(
+                "sin(x)/x+sin(y)/y=sin(x*y)/(x*y)"
+            );
 #endif
         }
         /// <summary>
@@ -161,6 +162,11 @@ namespace CsGrafeq
             buf.Render();
         }
 
+        /// <summary>
+        /// 绘制到指定Graphics 与控件状态无关
+        /// </summary>
+        /// <param name="g">指定的绘制对象</param>
+        /// <param name="rectangle">绘制区域</param>
         public bool RenderTo(Graphics g,Rectangle rectangle)
         {
             BufferedGraphics buf = g.GetBuffer(rectangle);
@@ -200,13 +206,7 @@ namespace CsGrafeq
             ConcurrentBag<Rectangle> RectToCalc = new ConcurrentBag<Rectangle>() { CreateRectByBound((int)(ratio * targetrect.Left), (int)(ratio * targetrect.Top), (int)(ratio * targetrect.Right), (int)(ratio * targetrect.Bottom)) };
             ConcurrentBag<RectangleF> RectToRender = new ConcurrentBag<RectangleF>();
             SolidBrush brush = new SolidBrush(f.color);
-            Func<int, int, int, int, bool> func;
-            switch (f.Type)
-            {
-                case ExpressionType.Equal: func = IsAllGeOrLeThanZero; break;
-                case ExpressionType.Less: func = IsAllLeThanZero; break;
-                default: func = IsAllGeThanZero; break;
-            }
+            Func<int, int, int, int, bool> func=null;
             bool checkpixel = f.CheckPixelMode != CheckPixelMode.None;
             do
             {
@@ -247,38 +247,38 @@ namespace CsGrafeq
                 xtimes = 1;
             int dx = (int)Math.Ceiling(((double)r.Width) / xtimes);
             int dy = (int)Math.Ceiling(((double)r.Height) / ytimes);
-            NumberImpFunctionDelegate nf = f.NumberFunction;
+            MarchingSquaresDelegate msd = f.MarchingSquaresFunction;
             for (int i = r.Left; i < r.Right; i += dx)
             {
                 double di = i;
-                Interval xi = new Interval(PixelToMathX(i / ratio), PixelToMathX((i + dx) / ratio));
+                double xmin = PixelToMathX(i / ratio);
+                double xmax = PixelToMathX((i + dx) / ratio);
+                Interval xi = new Interval(xmin,xmax);
                 for (int j = r.Top; j < r.Bottom; j += dy)
                 {
                     double dj = j;
-                    Interval yi = new Interval(PixelToMathY(j / ratio), PixelToMathY((j + dy) / ratio));
+                    double ymin = PixelToMathY(j / ratio);
+                    double ymax = PixelToMathY((j + dy) / ratio);
+                    Interval yi = new Interval(ymin,ymax);
                     (bool first, bool second) result = f.IntervalImpFunction.Invoke(xi, yi,ConstantsValue);
-
+                    if (checkpixel)
+                        if (msd.Invoke(xmin, ymin, xmax, ymax, ConstantsValue))
+                            result = (false, false);
                     if (result == (true, true))
                     {
-                        if ((!checkpixel) || func(
+                        /*if ((!checkpixel) || func(
                             nf.Invoke(xi.Min, yi.Min,_ConstantsValue),
                             nf.Invoke(xi.Min, yi.Max, _ConstantsValue),
                             nf.Invoke(xi.Max, yi.Max, _ConstantsValue),
                             nf.Invoke(xi.Max, yi.Min, _ConstantsValue)
-                        ))
-                            RectToRender.Add(CreateRectFByBound((float)(di / ratio), (float)(dj / ratio), (float)Math.Min((di + dx) / ratio, r.Right), (float)Math.Min((dj + dy) / ratio, r.Bottom)));
+                        ))*/
+                        RectToRender.Add(CreateRectFByBound((float)(di / ratio), (float)(dj / ratio), (float)Math.Min((di + dx) / ratio, r.Right), (float)Math.Min((dj + dy) / ratio, r.Bottom)));
                     }
                     else if (result == (false, true))
                     {
-                        if (dx <= 1 && dx <= 1)
+                        if (dx == 1 && dx == 1)
                         {
-                            if ((!checkpixel) || func(
-                            nf.Invoke(xi.Min, yi.Min, _ConstantsValue),
-                            nf.Invoke(xi.Min, yi.Max, _ConstantsValue),
-                            nf.Invoke(xi.Max, yi.Max, _ConstantsValue),
-                            nf.Invoke(xi.Max, yi.Min, _ConstantsValue)
-                            ))
-                                RectToRender.Add(CreateRectFByBound((float)(di / ratio), (float)(dj / ratio), (float)Math.Min((di + dx) / ratio, r.Right), (float)Math.Min((dj + dy) / ratio, r.Bottom)));
+                            RectToRender.Add(CreateRectFByBound((float)(di / ratio), (float)(dj / ratio), (float)Math.Min((di + dx) / ratio, r.Right), (float)Math.Min((dj + dy) / ratio, r.Bottom)));
                         }
                         else
                         {
@@ -296,7 +296,7 @@ namespace CsGrafeq
         /// <param name="r">绘制区域</param>
         /// <param name="RectToCalc">要继续细化绘制的区域</param>
         /// <param name="RectToRender">要绘制的区域</param>
-        private void RenderRectIntervalSet(Graphics rt, ImplicitFunction f, Rectangle r, ConcurrentBag<Rectangle> RectToCalc, ConcurrentBag<RectangleF> RectToRender, SolidBrush brush, Func<int, int, int, int, bool> func,bool checkpixel, double ratio)
+        private void RenderRectIntervalSet(Graphics rt, ImplicitFunction f, Rectangle r, ConcurrentBag<Rectangle> RectToCalc, ConcurrentBag<RectangleF> RectToRender, SolidBrush brush, Func<int, int, int, int, bool> func, bool checkpixel, double ratio)
         {
             if (r.Height == 0 || r.Width == 0)
                 return;
@@ -307,43 +307,32 @@ namespace CsGrafeq
                 xtimes = 1;
             int dx = (int)Math.Ceiling(((double)r.Width) / xtimes);
             int dy = (int)Math.Ceiling(((double)r.Height) / ytimes);
-            double xmin, xmax, ymin, ymax;
-            NumberImpFunctionDelegate nf = f.NumberFunction;
+            double exhaust=0.25d/UnitLength;
+            MarchingSquaresDelegate msd = f.MarchingSquaresFunction;
             for (int i = r.Left; i < r.Right; i += dx)
             {
                 double di = i;
-                xmin = PixelToMathX((i+0.01d) / ratio);
-                xmax = PixelToMathX((i + 0.01d+ dx) / ratio);
-                IntervalSet xi = new IntervalSet(xmin,xmax );
+                double xmin = PixelToMathX(i / ratio);
+                double xmax = PixelToMathX((i + dx) / ratio);
+                IntervalSet xi = new IntervalSet(xmin,xmax);
                 for (int j = r.Top; j < r.Bottom; j += dy)
                 {
                     double dj = j;
-                    ymin = PixelToMathY((j + 0.01d) / ratio);
-                    ymax = PixelToMathY((j +0.01d+ dy) / ratio);
+                    double ymin = PixelToMathY(j / ratio);
+                    double ymax = PixelToMathY((j + dy) / ratio);
                     IntervalSet yi = new IntervalSet(ymin,ymax);
                     (bool first, bool second) result = f.IntervalSetImpFunction.Invoke(xi, yi, ConstantsValue);
-
                     if (result == (true, true))
                     {
-                        if ((!checkpixel) || func(
-                            nf.Invoke(xmin,ymin , _ConstantsValue),
-                            nf.Invoke(xmax, ymin, _ConstantsValue),
-                            nf.Invoke(xmax, ymax, _ConstantsValue),
-                            nf.Invoke(xmin, ymax, _ConstantsValue)
-                        ))
-                            RectToRender.Add(CreateRectFByBound((float)(di / ratio), (float)(dj / ratio), (float)Math.Min((di + dx) / ratio, r.Right), (float)Math.Min((dj + dy) / ratio, r.Bottom)));
+                        RectToRender.Add(CreateRectFByBound((float)(di / ratio), (float)(dj / ratio), (float)Math.Min((di + dx) / ratio, r.Right), (float)Math.Min((dj + dy) / ratio, r.Bottom)));
                     }
                     else if (result == (false, true))
                     {
-                        if (dx <= 1 && dx <= 1)
+                        if (dx == 1 && dx == 1)
                         {
-                            if ((!checkpixel) || func(
-                                nf.Invoke(xmin, ymin, _ConstantsValue),
-                                nf.Invoke(xmax, ymin, _ConstantsValue),
-                                nf.Invoke(xmax, ymax, _ConstantsValue),
-                                nf.Invoke(xmin, ymax, _ConstantsValue)
-                            ))
-                                RectToRender.Add(CreateRectFByBound((float)(di / ratio), (float)(dj / ratio), (float)Math.Min((di + dx) / ratio, r.Right), (float)Math.Min((dj + dy) / ratio, r.Bottom)));
+                            if (checkpixel)
+                                if (CheckCurveExists(msd,xmin,ymin,xmax,ymax,exhaust,ConstantsValue))
+                                    RectToRender.Add(CreateRectFByBound((float)(di / ratio), (float)(dj / ratio), (float)Math.Min((di + dx) / ratio, r.Right), (float)Math.Min((dj + dy) / ratio, r.Bottom)));
                         }
                         else
                         {
@@ -351,6 +340,27 @@ namespace CsGrafeq
                         }
                     }
                 }
+            }
+        }
+        internal bool CheckCurveExists(MarchingSquaresDelegate msd,double xmin,double ymin,double xmax,double ymax,double exhaust, double[] consts)
+        {
+            if(xmax-xmin<exhaust&&ymax-ymin<exhaust)
+                return false;
+            if (msd.Invoke(xmin, ymin, xmax, ymax, consts))
+                return true;
+            if (ymax - ymin > xmax - xmin)
+            {
+                double half = (ymax + ymin) / 2;
+                return
+                    CheckCurveExists(msd, xmin, ymin, xmax, half, exhaust, consts) ||
+                    CheckCurveExists(msd, xmin, half, xmax, ymax, exhaust, consts);
+            }
+            else
+            {
+                double half = (xmax + xmin) / 2;
+                return
+                    CheckCurveExists(msd, xmin, ymin, half, ymax, exhaust, consts) ||
+                    CheckCurveExists(msd, half, ymin, xmax, ymax, exhaust, consts);
             }
         }
         protected override void OnMouseMove(MouseEventArgs e)
@@ -568,19 +578,8 @@ namespace CsGrafeq
             int a = (*(int*)(&num) - 1);
             return *(float*)(&a);
         }*/
-        internal static bool IsAllGeOrLeThanZero(int n1, int n2, int n3, int n4)
-        {
-            int a = n1 + n2 + n3 + n4;
-            return !(a % 10==0 || a < 5);
-        }
-        internal static bool IsAllGeThanZero(int n1, int n2, int n3, int n4)
-        {
-            return !(n1 + n2 + n3 + n4<5);
-        }
-        internal static bool IsAllLeThanZero(int n1, int n2, int n3, int n4)
-        {
-            return (n1 + n2 + n3 + n4)%10!=0;
-        }
+        //大于0则为10 等于0为0 小于0为1
+        
     }
     public class ImplicitFunctionList
     {
@@ -590,7 +589,7 @@ namespace CsGrafeq
         {
             this.fd = fd;
         }
-        public ImplicitFunction Add(Expression ec)
+        public ImplicitFunction Add(ComparedExpression ec)
         {
             ImplicitFunction impf=new ImplicitFunction(ec);
             impf.Bitmap = new Bitmap(fd.width,fd.height);

@@ -58,7 +58,7 @@
     <Compile Include="IInterval.cs" />
     <Compile Include="ImplicitFunction.cs" />
     <Compile Include="Interval.cs" />
-    <Compile Include="IntervalBase.cs" />
+    <Compile Include="Range.cs" />
     <Compile Include="IntervalMath.cs" />
     <Compile Include="IntervalSet.cs" />
     <Compile Include="IntervalSetMath.cs" />

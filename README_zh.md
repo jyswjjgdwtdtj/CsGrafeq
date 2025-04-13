@@ -1,12 +1,9 @@
 # CsGrafeq
 ## 简介
-CsGrafeq一个支持隐函数绘制的Winform控件
-
-CsGrafeq 是一个强大的控件以绘制带有两个参数（x与y）的隐函数，是Grafeq的开源替代品
-
-CsGrafeq 部分基于由Jeff Tupper of University of Toronto, SIGGRAPH 2001的Reliable Two-Dimensional Graphing Methods for Mathematical Formulae with Two Free Variables，同时在判断像素的存在性时使用了Marching Cubes算法的思路
-
-出于精简的考量，CsGrafeq 使用GDI+来绘制函数，于是它没有任何依赖项
+CsGrafeq一个支持隐函数绘制的Winform控件\
+CsGrafeq 是一个强大的控件以绘制带有两个参数（x与y）的隐函数，是Grafeq的开源替代品\
+CsGrafeq 基于由Jeff Tupper of University of Toronto, SIGGRAPH 2001的Reliable Two-Dimensional Graphing Methods for Mathematical Formulae with Two Free Variables，实现了Branch Cut Tracking即Algorithm 3.2之前的算法\
+出于精简的考量，CsGrafeq 使用GDI+来绘制函数，于是它没有任何依赖项\
 
 ## 特点
 1. 用鼠标控制以调整坐标轴大小与显示的区域
@@ -16,7 +13,7 @@ CsGrafeq 部分基于由Jeff Tupper of University of Toronto, SIGGRAPH 2001的Re
 
 ## 用法示例
 用以下方式添加函数
-```
+```C#
 yourCsGrafeq.ImpFuncs.Add("x+1<Log(y)-sin(x)/x")
 
 //或

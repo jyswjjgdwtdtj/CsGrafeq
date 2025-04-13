@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 
 namespace CsGrafeq
 {
-    internal interface IInterval
+    public interface IInterval
     {
-        double Length {  get; }
+        double GetLength();
         bool Contains(double n);
         bool ContainsEqual(double n);
+        IInterval SetDef((bool, bool) def);
+        IInterval SetCont(bool cont);
     }
 }

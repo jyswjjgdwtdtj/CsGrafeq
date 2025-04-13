@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Net.Configuration;
 using System.Net.NetworkInformation;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -17,17 +18,25 @@ namespace CsGrafeq
     /// </summary>
     public static class IntervalSetMath
     {
-        private static IntervalSet EmptyIntervalSet=new IntervalSet(double.NaN) { Def = (false, false) };
+        private static IntervalSet EmptyIntervalSet=new IntervalSet(double.NaN) { Def = (false, false),IsNumber=false };
         private static Range EmptyRange = new Range(double.NaN);
         private static readonly double neginf = double.NegativeInfinity;
         private static readonly double posinf = double.PositiveInfinity;
         private const double PI=Math.PI;
         private const double E=Math.E;
+        private static readonly (bool, bool) AllExist = (true, true);
+        private static readonly (bool, bool) PartiallyExist = (false, true);
+        private static readonly (bool, bool) NoneExist = (false,false);
+
         #region 四则运算
         public unsafe static IntervalSet Add(IntervalSet i1,IntervalSet i2)
         {
             if(!(i1.Def.Item2&&i2.Def.Item2))
                 return EmptyIntervalSet;
+            if (i1.IsNumber && i2.IsNumber)
+            {
+                return new IntervalSet(i1.GetMin()+i2.GetMin());
+            }
             Range[] Ranges = new Range[i1.Intervals.Length * i2.Intervals.Length];
             int loc = 0;
             fixed (Range* ptr=Ranges,i1start=i1.Intervals,i2start=i2.Intervals)
@@ -44,6 +53,10 @@ namespace CsGrafeq
         }
         public unsafe static IntervalSet Neg(IntervalSet i)
         {
+            if (i.IsNumber)
+            {
+                return new IntervalSet(-i.GetMin());
+            }
             int len = i.Intervals.Length;
             Range[] Ranges = new Range[i.Intervals.Length];
             for(int j = 0; j < i.Intervals.Length; j++)
@@ -65,6 +78,10 @@ namespace CsGrafeq
         {
             if (!(i1.Def.Item2 && i2.Def.Item2))
                 return EmptyIntervalSet;
+            if (i1.IsNumber && i2.IsNumber)
+            {
+                return new IntervalSet(i1.GetMin() * i2.GetMin());
+            }
             Range[] Ranges = new Range[i1.Intervals.Length * i2.Intervals.Length];
             int loc = 0;
             fixed (Range* ptr = Ranges, i1start = i1.Intervals, i2start = i2.Intervals)
@@ -95,21 +112,22 @@ namespace CsGrafeq
         public static IntervalSet Divide(IntervalSet i1, IntervalSet i2)
         {
             //a/b=>a*(1/b)
+            if (i1.IsNumber && i2.IsNumber)
+            {
+                return new IntervalSet(i1.GetMin() / i2.GetMin());
+            }
             if (!(i1.Def.Item2 && i2.Def.Item2))
                 return EmptyIntervalSet;
             if(i2.Intervals.Length==1)
-                if (i2.Intervals[0].Min==0&& i2.Intervals[0].Max == 0)
+                if (i2.Intervals[0].Min==0&&i2.Intervals[0].Max == 0)
                     return EmptyIntervalSet;
-            //1/i2
-            Range[] Ranges = new Range[5];
-            int loc = 0;
-            int len = 5;
+            OnlyAddList<Range> ranges= new OnlyAddList<Range>(5);
             Range Range1, Range2;
-            //for(int ii = 0; ii < i1.Intervals.Length; ii++)
-            //{
-                //i1.Intervals[ii].Max = i1.Intervals[ii].Max == 0 ? -double.Epsilon : i1.Intervals[ii].Max;
-                //i1.Intervals[ii].Min = i1.Intervals[ii].Min == 0 ? double.Epsilon : i1.Intervals[ii].Min;
-            //}
+            for(int ii = 0; ii < i1.Intervals.Length; ii++)
+            {
+                i1.Intervals[ii].Max = i1.Intervals[ii].Max == 0 ? -double.Epsilon : i1.Intervals[ii].Max;
+                i1.Intervals[ii].Min = i1.Intervals[ii].Min == 0 ? double.Epsilon : i1.Intervals[ii].Min;
+            }
             foreach (Range i in i2.Intervals)
             {
                 if (i.ContainsEqual(0))
@@ -118,35 +136,75 @@ namespace CsGrafeq
                     Range2 = new Range() { Min = 1 / i.Max, Max = posinf };
                     foreach (Range j in i1.Intervals)
                     {
-                        Ranges[loc++] = RangeMultiply(Range1, j);
-                        if (loc == len)
-                        {
-                            len *= 2;
-                            Array.Resize(ref Ranges, len);
-                        }
-                        Ranges[loc++] = RangeMultiply(Range2, j);
-                        if (loc == len)
-                        {
-                            len *= 2;
-                            Array.Resize(ref Ranges, len);
-                        }
+                        ranges.Add(RangeMultiply(Range1, j));
+                        ranges.Add(RangeMultiply(Range2, j));
                     }
                     continue;
                 }
                 Range1 = new Range(1 / i.Min, 1 / i.Max);
                 foreach (Range j in i1.Intervals)
                 {
-                    Ranges[loc++] = RangeMultiply(Range1, j);
-                    if (loc == len)
-                    {
-                        len *= 2;
-                        Array.Resize(ref Ranges, len);
-                    }
+                    ranges.Add(RangeMultiply(Range1, j));
                 }
             }
-            Array.Resize(ref Ranges, loc);
-            IntervalSet iss = GetIntervalSetFromRangeArray(Ranges, And(i1.Def, i2.Def), i1.Cont && i2.Cont);
+            IntervalSet iss = GetIntervalSetFromRangeArray(ranges.GetArray(), And(i1.Def, i2.Def), i1.Cont && i2.Cont);
             return iss;
+        }
+        public static IntervalSet Mod(IntervalSet i1,IntervalSet i2)
+        {
+            if (i1.IsNumber && i2.IsNumber)
+            {
+                return new IntervalSet(i1.GetMin() % i2.GetMin());
+            }
+            if ((!i1.Def.Item2) || (!i2.Def.Item2))
+                return EmptyIntervalSet;
+            if (i2.IsNumber)
+            {
+                double num=i2.GetMin();
+                Range[] ranges = new Range[i1.Intervals.Length*2];
+                int loc = 0;
+                foreach (Range i in i1.Intervals)
+                {
+                    double min = Math.Floor(i.Min / num);
+                    double max = Math.Floor(i.Max / num);
+                    if (min == max)
+                        ranges[loc++]=new Range(i.Min-min*num, i.Max-max*num);
+                    else if (min + 1 == max)
+                    {
+                        ranges[loc++] = new Range(i.Min - min * num, num);
+                        ranges[loc++] = new Range(0, i.Max - max * num);
+                    }
+                    else
+                    {
+                        return new IntervalSet(0,num);
+                    }
+                }
+                Array.Resize(ref ranges, loc);
+                return new IntervalSet(ranges,(false,true),false);
+            }
+            else
+            {
+                Range[] ranges = new Range[i1.Intervals.Length * i2.Intervals.Length];
+                int loc = 0;
+                foreach (Range r1 in i1.Intervals)
+                {
+                    foreach (Range r2 in i2.Intervals)
+                    {
+                        ranges[loc++] = RangeMod(r1, r2);
+                    }
+                }
+                return GetIntervalSetFromRangeArray(ranges);
+            }
+        }
+        private static Range RangeMod(Range a,Range b)
+        {
+            Interval ia = a.ToInterval();
+            Interval ib = b.ToInterval();
+            return IntervalMath.Subtract(ia, IntervalMath.Multiply(IntervalMath.Floor(IntervalMath.Divide(ia, ib)), ib)).ToRange();
+        }
+        private static double NumMod(double a, double b)
+        {
+            return a - Math.Floor(a / b) * b;
         }
         #endregion
         #region 数学函数    
@@ -154,6 +212,10 @@ namespace CsGrafeq
         {
             if (!i.Def.Item2)
                 return EmptyIntervalSet;
+            if (i.IsNumber)
+            {
+                return new IntervalSet(Math.Sign(i.GetMin()));
+            }
             Range[] Ranges = new Range[3];
             int loc = 0;
             fixed(Range* first = i.Intervals)
@@ -180,6 +242,10 @@ namespace CsGrafeq
         {
             if (!i1.Def.Item2)
                 return EmptyIntervalSet;
+            if (i1.IsNumber)
+            {
+                return new IntervalSet(Math.Abs(i1.GetMin()));
+            }
             Range[] Ranges = new Range[i1.Intervals.Length];
             int loc = 0;
             fixed (Range* first = i1.Intervals, Rangesfirst = Ranges)
@@ -204,6 +270,10 @@ namespace CsGrafeq
         }
         public unsafe static IntervalSet Min(IntervalSet i1, IntervalSet i2)
         {
+            if (i1.IsNumber && i2.IsNumber)
+            {
+                return new IntervalSet(Math.Min(i1.GetMin(), i2.GetMin()));
+            }
             if (!(i1.Def.Item2 && i2.Def.Item2))
                 return EmptyIntervalSet;
             Range[] Ranges = new Range[i1.Intervals.Length * i2.Intervals.Length];
@@ -222,6 +292,10 @@ namespace CsGrafeq
         }
         public unsafe static IntervalSet Max(IntervalSet i1, IntervalSet i2)
         {
+            if (i1.IsNumber && i2.IsNumber)
+            {
+                return new IntervalSet(Math.Max(i1.GetMin(), i2.GetMin()));
+            }
             if (!(i1.Def.Item2 && i2.Def.Item2))
                 return EmptyIntervalSet;
             Range[] Ranges = new Range[i1.Intervals.Length * i2.Intervals.Length];
@@ -240,6 +314,12 @@ namespace CsGrafeq
         }
         public unsafe static IntervalSet Median(IntervalSet c1, IntervalSet c2, IntervalSet c3)
         {
+            if (c1.IsNumber && c2.IsNumber&&c3.IsNumber)
+            {
+                double[] da = new double[] {c1.GetMin(),c2.GetMin(),c3.GetMin() };
+                Array.Sort(da);
+                return new IntervalSet(da[1]);
+            }
             if (!(c1.Def.Item2&&c2.Def.Item2&&c3.Def.Item2))
                 return EmptyIntervalSet;
             Range[] Ranges=new Range[5];
@@ -271,6 +351,10 @@ namespace CsGrafeq
         }
         public unsafe static IntervalSet Exp(IntervalSet i1)
         {
+            if (i1.IsNumber)
+            {
+                return new IntervalSet(Math.Exp(i1.GetMin()));
+            }
             if (!i1.Def.Item2)
                 return EmptyIntervalSet;
             Range[] Ranges = new Range[i1.Intervals.Length];
@@ -283,6 +367,10 @@ namespace CsGrafeq
         }
         public unsafe static IntervalSet Ln(IntervalSet i1)
         {
+            if (i1.IsNumber)
+            {
+                return new IntervalSet(Math.Log(i1.GetMin()));
+            }
             //e为底
             if (!i1.Def.Item2)
                 return EmptyIntervalSet;
@@ -311,6 +399,10 @@ namespace CsGrafeq
         }
         public unsafe static IntervalSet Lg(IntervalSet i1)
         {
+            if (i1.IsNumber)
+            {
+                return new IntervalSet(Math.Log10(i1.GetMin()));
+            }
             //e为底
             if (!i1.Def.Item2)
                 return EmptyIntervalSet;
@@ -339,15 +431,72 @@ namespace CsGrafeq
         }
         public static IntervalSet Log(IntervalSet i1,IntervalSet i2)
         {
+            if (i1.IsNumber&&i2.IsNumber)
+            {
+                return new IntervalSet(Math.Log(i1.GetMin(),i2.GetMin()));
+            }
             return Divide(Ln(i1),Ln(i2));
         }
         public static IntervalSet Pow(IntervalSet i1, IntervalSet i2)
         {
+            if (i1.IsNumber && i2.IsNumber)
+            {
+                return new IntervalSet(Math.Pow(i1.GetMin(), i2.GetMin()));
+            }
+            if (i2.IsNumber)
+            {
+                double num = i2.GetMin();
+                if (num == (int)num)
+                {
+                    int inum = (int)num;
+                    if (inum % 2 == 0)//偶数
+                    {
+                        Range[] ranges = new Range[i1.Intervals.Length + 1];
+                        int loc = 0;
+                        foreach (Range r in i1.Intervals)
+                        {
+                            if (r.Contains(0))
+                            {
+                                if (inum < 0)
+                                {
+                                    ranges[loc++] = new Range(Math.Pow(r.Min, num), neginf);
+                                    ranges[loc++] = new Range(Math.Pow(r.Max, num), posinf);
+                                }
+                                else
+                                {
+                                    ranges[loc++] = new Range(0, Math.Max(Math.Pow(r.Max, num), Math.Pow(r.Min, num)));
+                                }
+                            }
+                            else
+                            {
+                                ranges[loc++] = new Range(Math.Pow(r.Min, num), Math.Pow(r.Max, num));
+                            }
+                        }
+                        Array.Resize(ref ranges, loc);
+                        return GetIntervalSetFromRangeArray(ranges);
+                    }
+                    else
+                    {
+                        Range[] ranges = new Range[i1.Intervals.Length + 1];
+                        int loc = 0;
+                        foreach (Range r in i1.Intervals)
+                        {
+                            ranges[loc++] = new Range(Math.Pow(r.Min, num), Math.Pow(r.Max, num));
+                        }
+                        return new IntervalSet(ranges);
+                    }
+                }
+            }
             return Exp(Multiply(Ln(i1), i2));
         }
         public unsafe static IntervalSet Sqrt(IntervalSet i1)
         {
-            //e为底
+            if (i1.IsNumber)
+            {
+                if (i1.GetMin() < 0)
+                    return EmptyIntervalSet;
+                return new IntervalSet(Math.Sqrt(i1.GetMin()));
+            }
             if (!i1.Def.Item2)
                 return EmptyIntervalSet;
             int len = i1.Intervals.Length;
@@ -371,6 +520,8 @@ namespace CsGrafeq
                 }
             }
             i1.Intervals = Ranges;
+            if (i1.Intervals.Length == 0)
+                i1.Def.Item2 = false;
             return i1;
         }
         private unsafe static Range RangeMedian(Range* i1, Range* i2, Range* i3)
@@ -386,28 +537,32 @@ namespace CsGrafeq
         }
         public unsafe static IntervalSet Floor(IntervalSet i1)
         {
+            if (i1.IsNumber)
+            {
+                return new IntervalSet(Math.Floor(i1.GetMin()));
+            }
             if (!i1.Def.Item2)
                 return EmptyIntervalSet;
             int len = i1.Intervals.Length;
-            int loc=0;
-            Range[] Ranges=new Range[len*2+1];
-            fixed(Range* first = i1.Intervals)
+            int loc = 0;
+            Range[] Ranges = new Range[len * 2 + 1];
+            fixed (Range* first = i1.Intervals)
             {
                 for (int i = 0; i < len; i++)
                 {
-                    if (loc <2)
+                    if (loc < 2)
                     {
                         double min = Math.Floor((first + i)->Min);
                         double max = Math.Floor((first + i)->Max);
                         if (min == max)
                         {
-                            Ranges[loc++]=new Range(min);
+                            Ranges[loc++] = new Range(min);
                             continue;
                         }
                         Ranges[loc++] = new Range(min);
-                        Ranges[loc++] = new Range(min+1);
+                        Ranges[loc++] = new Range(min + 1);
                         if (max > min + 1)
-                            Ranges[loc++] = new Range(min + 2,max);
+                            Ranges[loc++] = new Range(min + 2, max);
                         continue;
                     }
                     for (int j = i; j < len; j++)
@@ -421,6 +576,10 @@ namespace CsGrafeq
         }
         public unsafe static IntervalSet Ceil(IntervalSet i1)
         {
+            if (i1.IsNumber)
+            {
+                return new IntervalSet(Math.Ceiling(i1.GetMin()));
+            }
             if (!i1.Def.Item2)
                 return EmptyIntervalSet;
             int len = i1.Intervals.Length;
@@ -456,6 +615,12 @@ namespace CsGrafeq
         }
         public static IntervalSet GCD(IntervalSet i1, IntervalSet i2)
         {
+            if (i1.IsNumber&&i2.IsNumber)
+            {
+                if (i1.GetMin() == (int)i1.GetMin() && i2.GetMin() == (int)i2.GetMin())
+                    return new IntervalSet(GCDBase((int)i1.GetMin(),(int)i2.GetMin()));
+                throw new ArgumentException("参数需经过Floor,Ceil函数处理");
+            }
             if ((!i1.Def.Item2) || (!i2.Def.Item2))
                 return EmptyIntervalSet;
             if (!(i1.Intervals[0].IsInterger() && i2.Intervals[0].IsInterger()))
@@ -490,6 +655,12 @@ namespace CsGrafeq
         }
         public static IntervalSet LCM(IntervalSet i1, IntervalSet i2)
         {
+            if (i1.IsNumber && i2.IsNumber)
+            {
+                if (i1.GetMin() == (int)i1.GetMin() && i2.GetMin() == (int)i2.GetMin())
+                    return new IntervalSet(LCMBase((int)i1.GetMin(), (int)i2.GetMin()));
+                throw new ArgumentException("参数需经过Floor,Ceil函数处理");
+            }
             if ((!i1.Def.Item2) || (!i2.Def.Item2))
                 return EmptyIntervalSet;
             if (!(i1.Intervals[0].IsInterger() && i2.Intervals[0].IsInterger()))
@@ -536,6 +707,15 @@ namespace CsGrafeq
         }
         public static IntervalSet Factorial(IntervalSet i1)
         {
+            if (i1.IsNumber)
+            {
+                double num = i1.GetMin();
+                if (num < 0)
+                    throw new Exception();
+                if (num==(int)num)
+                    return new IntervalSet(FactorialBase((int)num));
+                throw new ArgumentException("参数需经过Floor,Ceil函数处理");
+            }
             if (!i1.Def.Item2)
                 return EmptyIntervalSet;
             if(i1.GetMax()<0)
@@ -582,6 +762,10 @@ namespace CsGrafeq
         #region 三角函数
         public unsafe static IntervalSet Sin(IntervalSet i1)
         {
+            if (i1.IsNumber)
+            {
+                return new IntervalSet(Math.Sin(i1.GetMin()));
+            }
             if (!i1.Def.Item2)
                 return EmptyIntervalSet;
             Range[] Ranges = new Range[i1.Intervals.Length];
@@ -593,16 +777,11 @@ namespace CsGrafeq
         }
         public unsafe static IntervalSet Cos(IntervalSet i1)
         {
-            Range[] Ranges=new Range[i1.Intervals.Length];
-            fixed(Range* first = i1.Intervals,Rangesfirst=Ranges)
+            if (i1.IsNumber)
             {
-                for (Range* i = first,j=Rangesfirst;i< first + i1.Intervals.Length; i++,j++)
-                {
-                    *j = new Range() {Min=i->Min+PI/2,Max=i->Max+PI/2 };
-                }
+                return new IntervalSet(Math.Cos(i1.GetMin()));
             }
-            i1.Intervals = Ranges;
-            return Sin(i1);
+            return Sin(AddNumber(i1, PI / 2));
         }
         private static Range RangeSin(Range i)
         {
@@ -631,6 +810,10 @@ namespace CsGrafeq
         }
         public unsafe static IntervalSet Tan(IntervalSet i1)
         {
+            if (i1.IsNumber)
+            {
+                return new IntervalSet(Math.Tan(i1.GetMin()));
+            }
             if (!i1.Def.Item2)
                 return EmptyIntervalSet;
             Range[] Ranges = new Range[5];
@@ -674,6 +857,10 @@ namespace CsGrafeq
         }
         public unsafe static IntervalSet Cot(IntervalSet i1)
         {
+            if (i1.IsNumber)
+            {
+                return new IntervalSet(1/Math.Tan(i1.GetMin()));
+            }
             if (!i1.Def.Item2)
                 return EmptyIntervalSet;
             Range[] Ranges = new Range[i1.Intervals.Length];
@@ -687,6 +874,10 @@ namespace CsGrafeq
         }
         public unsafe static IntervalSet ArcTan(IntervalSet i1)
         {
+            if (i1.IsNumber)
+            {
+                return new IntervalSet(Math.Atan(i1.GetMin()));
+            }
             if (!i1.Def.Item2)
                 return EmptyIntervalSet;
             Range[] Ranges = new Range[i1.Intervals.Length];
@@ -699,6 +890,10 @@ namespace CsGrafeq
         }
         public unsafe static IntervalSet ArcCos(IntervalSet i1)
         {
+            if (i1.IsNumber)
+            {
+                return new IntervalSet(Math.Acos(i1.GetMin()));
+            }
             if (!i1.Def.Item2)
                 return EmptyIntervalSet;
             if (i1.GetMax() < -1 || i1.GetMin() > 1)
@@ -720,6 +915,10 @@ namespace CsGrafeq
         }
         public unsafe static IntervalSet ArcSin(IntervalSet i1)
         {
+            if (i1.IsNumber)
+            {
+                return new IntervalSet(Math.Asin(i1.GetMin()));
+            }
             if (!i1.Def.Item2)
                 return EmptyIntervalSet;
             if (i1.GetMax() < -1 || i1.GetMin() > 1)
@@ -741,6 +940,10 @@ namespace CsGrafeq
         }
         public unsafe static IntervalSet Sinh(IntervalSet i1)
         {
+            if (i1.IsNumber)
+            {
+                return new IntervalSet(Math.Sinh(i1.GetMin()));
+            }
             if (!i1.Def.Item2)
                 return EmptyIntervalSet;
             Range[] Ranges = new Range[i1.Intervals.Length];
@@ -753,6 +956,10 @@ namespace CsGrafeq
         }
         public unsafe static IntervalSet Cosh(IntervalSet i1)
         {
+            if (i1.IsNumber)
+            {
+                return new IntervalSet(Math.Cosh(i1.GetMin()));
+            }
             if (!i1.Def.Item2)
                 return EmptyIntervalSet;
             Range[] Ranges = new Range[i1.Intervals.Length];
@@ -784,7 +991,19 @@ namespace CsGrafeq
         }
         public static (bool,bool) Greater(IntervalSet i1,IntervalSet i2)
         {
-            return IntervalMath.Greater(new Interval(i1.GetMin(), i1.GetMax()) { Def = i1.Def, Cont = i1.Cont }, new Interval(i2.GetMin(), i2.GetMax()) { Def = i2.Def, Cont = i2.Cont });
+            (bool,bool) result=IntervalMath.Greater(
+                new Interval(i1.GetMin(), i1.GetMax())
+                {
+                    Def = i1.Def,
+                    Cont = i1.Cont
+                },
+                new Interval(i2.GetMin(), i2.GetMax())
+                {
+                    Def = i2.Def,
+                    Cont = i2.Cont
+                }
+            );
+            return result;
         }
         public static (bool,bool) Less(IntervalSet i1,IntervalSet i2)
         {
@@ -795,6 +1014,14 @@ namespace CsGrafeq
             if (double.IsNaN(i1.Min) || double.IsNaN(i2.Min))
                 return false;
             return !(i2.Max < i1.Min || i2.Min > i1.Max);
+        }
+        public static (bool, bool) LessEqual(IntervalSet i1, IntervalSet i2)
+        {
+            return Union(Less(i1, i2), Equal(i1, i2));
+        }
+        public static (bool, bool) GreaterEqual(IntervalSet i1, IntervalSet i2)
+        {
+            return Union(Greater(i1, i2), Equal(i1, i2));
         }
         #endregion
         private static (bool, bool) And((bool, bool) a, (bool, bool) b)
@@ -879,6 +1106,14 @@ namespace CsGrafeq
             Array.Resize(ref intervals, loc);
             return new IntervalSet(intervals,def,cont);
         }
+        public static (bool, bool) Union((bool, bool) a, (bool, bool) b)
+        {
+            return (a.Item1 || b.Item1, a.Item2 || b.Item2);
+        }
+        public static (bool, bool) Intersect((bool, bool) a, (bool, bool) b)
+        {
+            return (a.Item1 && b.Item1, a.Item2 && b.Item2);
+        }
     }
     internal static partial class ExMethods
     {
@@ -886,9 +1121,54 @@ namespace CsGrafeq
         {
             if (double.IsInfinity(Range.Min) || double.IsInfinity(Range.Max))
                 return false;
-            if (double.IsNaN(Range.Min) || double.IsNaN(Range.Max)) 
+            if (double.IsNaN(Range.Min) || double.IsNaN(Range.Max))
                 return false;
-            return (Range.Min == Range.Max)&&Range.Min==(int)Range.Min;
+            return (Range.Min == Range.Max) && Range.Min == (int)Range.Min;
         }
+        public static bool IsNumber(this Range Range)
+        {
+            return Range.Min==Range.Max;
+        }
+        public static T MsgBoxToString<T>(this T t)
+        {
+            MessageBox.Show(t.ToString());
+            return (T)t;
+        }
+    }
+    internal struct OnlyAddList<T>//不可被赋值！ 
+    {
+        public OnlyAddList(int len)
+        {
+            this.len = len;
+            loc = 0;
+            values = new T[len];
+            Disposed = false;
+        }
+        public void Add(T t)
+        {
+            if (Disposed)
+                throw new Exception();
+            if (loc == len)
+            {
+                len *= 2;
+                Array.Resize(ref values, len);
+            }
+            values[loc] = t;
+            loc++;
+        }
+        public T[] GetArray()
+        {
+            if (Disposed)
+                throw new Exception();
+            T[] array = values;
+            values = null;
+            Disposed = true;
+            Array.Resize(ref array,loc);
+            return array;
+        }
+        private bool Disposed;
+        private int loc;
+        private int len;
+        private T[] values;
     }
 }

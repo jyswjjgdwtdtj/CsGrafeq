@@ -94,6 +94,10 @@ namespace CsGrafeq
                 result *= i;
             return result;
         }
+        public static double Mod(double num1,double num2)
+        {
+            return num2-Math.Floor(num1/num2)*num2;
+        }
         public static int Equal(double x, double y)
         {
             if (x == y)
@@ -102,15 +106,24 @@ namespace CsGrafeq
         }
         public static int Less(double x, double y)
         {
-            if (x == y)
-                return 0;
-            return (x > y) ? 10 : 1;
+            return Equal(x, y);
         }
         public static int Greater(double x, double y)
         {
-            if (x == y)
-                return 0;
-            return (x > y) ? 10 : 1;
+            return Equal(x, y);
+        }
+        public static bool IsCrossZero(int n1, int n2, int n3, int n4)
+        {
+            int a = n1 + n2 + n3 + n4;
+            return !(a <= 4 || a % 10 == 0);
+        }
+        public static bool IsAllGeThanZero(int n1, int n2, int n3, int n4)
+        {
+            return (n1 + n2 + n3 + n4 <= 4);
+        }
+        public static bool IsAllLeThanZero(int n1, int n2, int n3, int n4)
+        {
+            return (n1 + n2 + n3 + n4) % 10 == 0;
         }
     }
 }

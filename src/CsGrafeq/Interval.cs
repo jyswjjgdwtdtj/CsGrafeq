@@ -22,9 +22,9 @@ namespace CsGrafeq
             Def = (true, true);
             Cont=true;
         }
-        public double Length
+        public double GetLength()
         {
-            get => Max - Min;
+           return Max - Min;
         }
         public (bool, bool) Def;
         //指定义域不完整 即定义域的所有值不能一一对应到函数值
@@ -53,5 +53,30 @@ namespace CsGrafeq
         {
             return Min == Max;
         }
+        IInterval IInterval.SetDef((bool, bool) def)
+        {
+            Def = def;
+            return this;
+        }
+        IInterval IInterval.SetCont(bool cont)
+        {
+            Cont = cont;
+            return this;
+        }
+        public Interval SetCont(bool cont)
+        {
+            Cont = cont;
+            return this;
+        }
+        public Interval SetDef((bool, bool) def)
+        {
+            Def = def;
+            return this;
+        }
+        public Range ToRange()
+        {
+            return new Range(Min, Max);
+        }
+
     }
 }

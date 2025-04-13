@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static System.Math;
 using static System.Double;
+using System.Windows.Forms;
 
 namespace CsGrafeq
 {
@@ -57,6 +58,23 @@ namespace CsGrafeq
                 return Multiply(m, i1);
             }
         }
+        public static Interval Mod(Interval a, Interval b)
+        {
+            if (b.Min == b.Max)
+            {
+                double num=b.Min;
+                double min =Math.Floor(a.Min / num);
+                double max=Math.Floor(a.Max / num);
+                if (min==max)
+                    return new Interval(NumMod(b.Min, num), NumMod(b.Max, num)) { Def=And(a.Def,b.Def)};
+                return new Interval(0, b.Max) { Def = (false,true) };
+            }
+            return Subtract(a,Multiply(Floor(Divide(a, b)), b)).SetDef((false,true));
+        }
+        private static double NumMod(double a,double b)
+        {
+            return a - Math.Floor(a / b) * b;
+        }
         public static Interval Neg(Interval a)
         {
             return new Interval(-a.Max, -a.Min) { Def = a.Def, Cont = a.Cont };
@@ -87,10 +105,6 @@ namespace CsGrafeq
                 {
                     return (false, true);
                 }
-                if ((!i1.Cont) || (!i2.Cont))
-                {
-                    return (false, true);
-                }
                 return (true, true);
             }
             return (false, true);
@@ -98,6 +112,14 @@ namespace CsGrafeq
         public static (bool, bool) Less(Interval i1, Interval i2)
         {
             return Greater(i2, i1);
+        }
+        public static (bool, bool) LessEqual(Interval i1, Interval i2)
+        {
+            return Union(Less(i1, i2), Equal(i1, i2));
+        }
+        public static (bool, bool) GreaterEqual(Interval i1, Interval i2)
+        {
+            return Union(Greater(i1, i2), Equal(i1, i2));
         }
         #endregion
         #region 数学函数
@@ -306,6 +328,14 @@ namespace CsGrafeq
             for (int i = 1; i <= num; i++)
                 result *= i;
             return result;
+        }
+        public static (bool, bool) Union((bool, bool) a, (bool, bool) b)
+        {
+            return (a.Item1 || b.Item1, a.Item2 || b.Item2);
+        }
+        public static (bool, bool) Intersect((bool, bool) a, (bool, bool) b)
+        {
+            return (a.Item1 && b.Item1, a.Item2 && b.Item2);
         }
 
         #endregion
