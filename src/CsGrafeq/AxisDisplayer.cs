@@ -1,17 +1,22 @@
 ﻿using System;
 using System.Drawing;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace CsGrafeq
 {
     public partial class AxisDisplayer :UserControl
     {
+        public bool ShowAxis = true;
+        public bool ShowNumber = true;
+        public bool CanMove = true;
+        public bool CanZoom = true;
         protected Graphics TargetGraphics;
         internal int width, height;
         protected bool loaded = false;
         protected BufferedGraphics buf;
 
-        protected double _UnitLength = 20;
+        protected double _UnitLength = 20.0001d;
         public double UnitLength
         {
             get { return _UnitLength; }
@@ -22,6 +27,11 @@ namespace CsGrafeq
         {
             get { return _Zero; }
             set { _Zero = value; Render(TargetGraphics); }
+        }
+        public Point ZeroInt
+        {
+            get { return new Point((int)_Zero.X, (int)_Zero.Y); }
+            set { _Zero =new PointL(value.X,value.Y); Render(TargetGraphics); }
         }
         protected Color Color_White, Color_Black,Color_A;
         protected SolidBrush Brush_White, Brush_Black;
@@ -59,10 +69,14 @@ namespace CsGrafeq
         {
             if (!loaded)
                 return;
+            if (!ShowAxis)
+                return;
             Pen b0, b1, b2;
             b0 = new Pen(Color.FromArgb(190, 190, 190));
             b1 = new Pen(Color.FromArgb(128, 128, 128));
             Pen pb =Pen_Black;
+            float width=rect.Width;
+            float height=rect.Height;
             if (RangeIn(0, width, _Zero.X) == _Zero.X)
             {
                 gb.DrawLine(
@@ -132,6 +146,10 @@ namespace CsGrafeq
         {
             if (!loaded)
                 return;
+            if (!ShowNumber)
+                return;
+            float width = rect.Width;
+            float height = rect.Height;
             int zsX = (int)Math.Floor(Math.Log((350 / _UnitLength), 10));
             int zsY = (int)Math.Floor(Math.Log((350 / _UnitLength), 10));
             double addnumX = Math.Pow(10, zsX);
@@ -281,7 +299,7 @@ namespace CsGrafeq
         }
         protected override void OnMouseMove(MouseEventArgs e)
         {
-            if (MouseDownLeft)
+            if (MouseDownLeft&&CanMove)
             {//移动零点
                 _Zero.X = (MouseDownZeroPos.X + e.X - MouseDownPos.X);
                 _Zero.Y = (MouseDownZeroPos.Y + e.Y - MouseDownPos.Y);
@@ -301,7 +319,7 @@ namespace CsGrafeq
             {
                 MouseDownRight = false;
             }
-            if(LastZeroPos!=_Zero)
+            if(LastZeroPos!=_Zero && CanMove)
                 Render(TargetGraphics);
             LastZeroPos = _Zero;
         }
@@ -312,6 +330,8 @@ namespace CsGrafeq
         }
         protected override void OnMouseWheel(MouseEventArgs e)
         {
+            if(!CanZoom)
+                return;
             double cursor_x = e.X, cursor_y = e.Y;
             double times_x = (_Zero.X - cursor_x) / _UnitLength;
             double times_y = (_Zero.Y - cursor_y) / _UnitLength;
@@ -330,10 +350,14 @@ namespace CsGrafeq
                 _UnitLength /= delta;
             }
             _UnitLength = RangeIn(0.01, 1000000, _UnitLength);
-            _Zero = new PointL() {
-                X=(long)(times_x * _UnitLength + cursor_x),
-                Y=(long)(times_y * _UnitLength + cursor_y)
-            };
+            if (CanMove)
+            {
+                _Zero = new PointL()
+                {
+                    X = (long)(times_x * _UnitLength + cursor_x),
+                    Y = (long)(times_y * _UnitLength + cursor_y)
+                };
+            }
             Render(TargetGraphics);
         }
 
@@ -352,7 +376,7 @@ namespace CsGrafeq
 #if DEBUG
             if (!loaded)
             {
-                FunctionDisplayer FD = new FunctionDisplayer();
+                ImplicitFunctionDisplayer FD = new ImplicitFunctionDisplayer();
                 this.Controls.Add(FD);
                 FD.Dock = DockStyle.Fill;
             }
@@ -412,6 +436,10 @@ namespace CsGrafeq
     {
         public long X;
         public long Y;
+        public PointL(long x,long y)
+        {
+            X = x; Y = y;
+        }
         public static bool operator ==(PointL left, PointL right)
         {
             return left.X == right.X && left.Y == right.Y;

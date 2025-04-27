@@ -4,17 +4,20 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using CsGrafeq;
+using System.IO;
 namespace CsGrafeqPlayGround
 {
     public partial class Form1 : Form
     {
-        FunctionDisplayer fd=new FunctionDisplayer();
+        ImplicitFunctionDisplayer fd=new ImplicitFunctionDisplayer();
         private (double min, double max)[] varScrollRange = new (double min, double max)[26];
-        
+        private string[] expressions;
+        private string allexpressions;
         private List<string> history = new List<string>();
         public Form1()
         {
@@ -30,6 +33,15 @@ namespace CsGrafeqPlayGround
             Controls.Add(fd);
             fd.Dock = DockStyle.Fill;
             fd.SendToBack();
+            expressions= new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("CsGrafeqPlayGround.expressions.txt")).ReadToEnd().Replace("\r\n","\n").Split('\n');
+            foreach (string expression in expressions)
+            {
+                allexpressions += expression.Split(';')[0] + "\r\n";
+            }
+            fd.CanMove = false;
+            fd.Size = new System.Drawing.Size(600,600);
+            fd.Zero=new PointL(300,300);
+            ClientSize = new System.Drawing.Size(600, 600);
         }
         public void button2_Click(object sender, EventArgs e)
         {
@@ -46,6 +58,8 @@ namespace CsGrafeqPlayGround
         }
         private int historyindex = 0;
         private string latesttext = "";
+        private int index = 0;
+        private string ss;
         public void textBox1_KeyDown(object sender, KeyEventArgs e)
         {
             TextBox textBox = (TextBox)sender;
@@ -54,7 +68,7 @@ namespace CsGrafeqPlayGround
                 case Keys.Enter:
                     if (textBox.Text != "")
                     {
-                        ImplicitFunction imf=fd.ImpFuncs.Add(textBox.Text);
+                        ImplicitFunction imf=fd.Functions.Add(textBox.Text);
                         imf.CheckPixelMode = checkBox1.Checked ? CheckPixelMode.UseMarchingSquares:CheckPixelMode.None;
                         history.Add(textBox.Text);
                         historyindex = history.Count;
@@ -101,8 +115,53 @@ namespace CsGrafeqPlayGround
                     textBox1.SelectionStart = textBox1.TextLength;
                     e.Handled = true;
                     break;
+                case Keys.Q:
+                    if (e.Control)
+                    {
+                        e.Handled = true;
+                        Random rnd = new Random();
+                        //string[] s = expressions[rnd.Next(expressions.Length)].Split(';');
+                        string[] s = expressions[index++].Split(';');
+                        ss=textBox.Text = s[0];
+                        if (s.Length == 1)
+                            checkBox1.Checked = false;
+                        else
+                            checkBox1.Checked = s[1] != "no";
+                    }
+                    break;
+                case Keys.S:
+                    if (e.Control && e.Shift)
+                    {
+                    }else if (e.Control)
+                    {
+                        /*SaveFileDialog saveFileDialog = new SaveFileDialog();
+                        saveFileDialog.Filter = "*.jpg|Jpg File";
+                        saveFileDialog.DefaultExt = ".jpg";
+                        saveFileDialog.Title = "保存";
+                        saveFileDialog.AddExtension = true;
+                        saveFileDialog.FileName = "1.jpg";*/
+                        //if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                        {
+                            Bitmap bitmap = new Bitmap(fd.Width, fd.Height);
+                            Graphics g = Graphics.FromImage(bitmap);
+                            fd.RenderTo(g, fd.ClientRectangle);
+                            string sss = "";
+                            for(int i = 0; i < ss.Length / 40; i++)
+                            {
+                                sss += ss.Substring(i * 40, Math.Min(40, ss.Length - 40 * (i)))+"\r\n";
+                            }
+                            g.DrawString(ss, new Font("Consolas", 14), new SolidBrush(Color.Black), new Point(4,4));
+                            bitmap.Save("C:\\Users\\liboyuan\\Desktop\\images\\"+index+".jpg");
+                        }
+                    }
+                        break;
 
             }
+        }
+        protected override void OnSizeChanged(EventArgs e)
+        {
+            base.OnSizeChanged(e);
+            Console.WriteLine(ClientSize);
         }
         private void label3_Click(object sender, EventArgs e)
         {
@@ -143,21 +202,6 @@ namespace CsGrafeqPlayGround
         }
         private void textBox1_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if(e.KeyChar == 19)//ctrl+s
-            {
-                SaveFileDialog saveFileDialog = new SaveFileDialog();
-                saveFileDialog.Filter = "*.jpg|Jpg File";
-                saveFileDialog.DefaultExt = ".jpg";
-                saveFileDialog.Title = "保存";
-                saveFileDialog.AddExtension = true;
-                saveFileDialog.FileName = "1.jpg";
-                if (saveFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    Bitmap bitmap = new Bitmap(fd.Width,fd.Height);
-                    fd.RenderTo(Graphics.FromImage(bitmap),fd.ClientRectangle);
-                    bitmap.Save(saveFileDialog.FileName);
-                }
-            }
             if (
                  (e.KeyChar == '.') || (e.KeyChar == '\b') ||
                 ('0' <= e.KeyChar && e.KeyChar <= '9') ||
@@ -202,10 +246,67 @@ namespace CsGrafeqPlayGround
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if (fd.ImpFuncs.Count==0)
+            if (fd.Functions.Count==0)
                 return;
-            fd.ImpFuncs.RemoveAt(fd.ImpFuncs.Count-1);
+            fd.Functions.RemoveAt(fd.Functions.Count-1);
             fd.Render();
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            Form f=new Form();
+            f.ShowIcon = false;
+            f.ShowInTaskbar = false;
+            f.FormBorderStyle = FormBorderStyle.Sizable;
+            TextBox textBox = new TextBox();
+            textBox.ReadOnly = true;
+            textBox.Text = allexpressions;
+            textBox.Dock = DockStyle.Fill;
+            textBox.Multiline = true;
+            textBox.ScrollBars = ScrollBars.Both;
+            textBox.Font = new Font("Microsoft Yahei",13);
+            textBox.WordWrap = false;
+            textBox.SelectionStart = 0;
+            textBox.SelectionLength = 0;
+            f.Controls.Add(textBox);
+            f.ShowDialog();
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void checkedListBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        {
+            fd.ShowAxis=checkBox2.Checked;
+            fd.Render();
+        }
+
+        private void checkBox4_CheckedChanged(object sender, EventArgs e)
+        {
+            fd.ShowNumber=checkBox4.Checked;
+            fd.Render();
+        }
+
+        private void checkBox3_CheckedChanged(object sender, EventArgs e)
+        {
+            fd.CanZoom = checkBox3.Checked;
+        }
+
+        private void checkBox5_CheckedChanged(object sender, EventArgs e)
+        {
+            fd.CanMove = checkBox3.Checked;
         }
     }
 }

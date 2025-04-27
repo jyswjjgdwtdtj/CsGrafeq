@@ -5,7 +5,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static CsGrafeq.ExpressionComplier;
+using static CsGrafeq.ExpressionCompiler;
 
 namespace CsGrafeq
 {
@@ -43,7 +43,7 @@ namespace CsGrafeq
         public static Expression FromString(string s)
         {
             Expression exp= new Expression();
-            exp.Elements.AddRange(ExpressionComplier.ParseTokens(ExpressionComplier.GetTokens(s)));
+            exp.Elements.AddRange(ExpressionCompiler.ParseTokens(ExpressionCompiler.GetTokens(s)));
             return exp;
         }
         public static ComparedExpression Less(Expression a, Expression b)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -84,33 +85,23 @@ namespace CsGrafeq
         {
             get => _Expression;
         }
-        internal ImplicitFunction(string expression)
+        internal ImplicitFunction(string expression):this(ExpressionCompiler.ParseTokens(ExpressionCompiler.GetTokens(expression)))
         {
-            _Expression = expression;
-            (IntervalImpFunction, IntervalSetImpFunction, MarchingSquaresFunction, UsedConstant) = ExpressionComplier.Complie(expression);
-            ExpressionRecord = ExpressionComplier.Record;
-            color = GetRandomColor();
-            if (expression.Contains("="))
-            {
-                DrawingMode = DrawingMode.IntervalSet;
-            }
-            else
-            {
-                color = Color.FromArgb(120, color);
-                DrawingMode = DrawingMode.IntervalSet;
-            }
-            CheckPixelMode = CheckPixelMode.UseMarchingSquares;
         }
-        internal ImplicitFunction(ComparedExpression ec)
+        internal ImplicitFunction(ComparedExpression ec):this(ec.Elements.ToArray())
+        {
+        }
+        internal ImplicitFunction(ExpressionCompiler.Element[] eles)
         {
             _Expression = string.Empty;
-            (IntervalImpFunction, IntervalSetImpFunction, MarchingSquaresFunction, UsedConstant) = ExpressionComplier.Complie(ec);
-            ExpressionRecord = ExpressionComplier.Record;
+            (IntervalImpFunction, IntervalSetImpFunction, MarchingSquaresFunction, UsedConstant) = ExpressionCompiler.Compile(eles);
+            ExpressionRecord = ExpressionCompiler.Record;
             color = GetRandomColor();
             bool containequal = false;
-            foreach (var i in ec.Elements)
+            foreach (var i in eles)
             {
-                if (i.NameOrValue.Contains("Equal")) {
+                if (i.NameOrValue.Contains("Equal"))
+                {
                     containequal = true;
                     break;
                 }
@@ -128,6 +119,23 @@ namespace CsGrafeq
         public void Dispose()
         {
             _Bitmap.Dispose();
+        }
+        public ImplicitFunction SetProperty(string propname, object value)
+        {
+            Type t = typeof(AxisDisplayer);
+            FieldInfo f = t.GetField(propname, BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase);
+            if (f != null)
+            {
+                f.SetValue(this, value);
+                return this;
+            }
+            PropertyInfo p = t.GetProperty(propname, BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase);
+            if (p != null)
+            {
+                p.SetValue(this, value);
+                return this;
+            }
+            return this;
         }
     }
     public enum ExpressionType

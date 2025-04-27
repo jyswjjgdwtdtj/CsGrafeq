@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization.Formatters;
@@ -14,6 +15,10 @@ namespace CsGrafeq
     {
         static IntervalMath() { }
         private static Interval EmptyInterval=new Interval(NaN) { Def=(false,false),Cont=false};
+        public static Interval New(double num)
+        {
+            return new Interval(num);
+        }
         #region 四则运算
         public static Interval Add(Interval a, Interval b)
         {
@@ -324,10 +329,9 @@ namespace CsGrafeq
         }
         private static double FactorialBase(int num)
         {
-            long result = 1;
-            for (int i = 1; i <= num; i++)
-                result *= i;
-            return result;
+            if (num >= FactorialValue.Values.Length)
+                return double.MaxValue;
+            return FactorialValue.Values[num];
         }
         public static (bool, bool) Union((bool, bool) a, (bool, bool) b)
         {

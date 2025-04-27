@@ -12,8 +12,6 @@ namespace CsGrafeq
         internal (bool, bool) Def;
         internal bool Cont;
         internal bool IsNumber;
-        //Range2为可空 空则标识为MinMax均为nan
-        //Range1小于Range2
         public IntervalSet(double num)
         {
             Intervals = new Range[1] { new Range(num) };
@@ -96,6 +94,22 @@ namespace CsGrafeq
         {
             Def = def;
             return this;
+        }
+        public static IntervalSet operator +(IntervalSet i1, IntervalSet i2)
+        {
+            return IntervalSetMath.Add(i1, i2);
+        }
+        public static IntervalSet operator -(IntervalSet i1, IntervalSet i2)
+        {
+            return IntervalSetMath.Subtract(i1, i2);
+        }
+        public static IntervalSet operator *(IntervalSet i1, IntervalSet i2)
+        {
+            return IntervalSetMath.Multiply(i1, i2);
+        }
+        public static IntervalSet operator /(IntervalSet i1, IntervalSet i2)
+        {
+            return IntervalSetMath.Divide(i1, i2);
         }
     }
 }

@@ -26,11 +26,12 @@ The case in string expression is not distinguished.
 
 ## Example
 
-![image](https://github.com/jyswjjgdwtdtj/CsGrafeq/blob/main/ExampleImage/1.jpg)
-![image](https://github.com/jyswjjgdwtdtj/CsGrafeq/blob/main/ExampleImage/2.jpg)
-![image](https://github.com/jyswjjgdwtdtj/CsGrafeq/blob/main/ExampleImage/3.jpg)
-![image](https://github.com/jyswjjgdwtdtj/CsGrafeq/blob/main/ExampleImage/4.jpg)
-![image](https://github.com/jyswjjgdwtdtj/CsGrafeq/blob/main/ExampleImage/5.jpg)
-![image](https://github.com/jyswjjgdwtdtj/CsGrafeq/blob/main/ExampleImage/6.jpg)
-![image](https://github.com/jyswjjgdwtdtj/CsGrafeq/blob/main/ExampleImage/7.jpg)
-![image](https://github.com/jyswjjgdwtdtj/CsGrafeq/blob/main/ExampleImage/8.jpg)
+![image](ExampleImage/1-1.jpg)
+![image](ExampleImage/1-2.jpg)
+![image](ExampleImage/1-3.jpg)
+![image](ExampleImage/1-4.jpg)
+![image](ExampleImage/1-5.jpg)
+![image](ExampleImage/1-6.jpg)
+![image](ExampleImage/1-7.jpg)
+![image](ExampleImage/1-8.jpg)\
+[More examples](Example.md)

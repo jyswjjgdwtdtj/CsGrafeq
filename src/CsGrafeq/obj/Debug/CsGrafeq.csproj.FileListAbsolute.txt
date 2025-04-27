@@ -1,9 +1,9 @@
 C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\obj\Debug\CsGrafeq.csproj.AssemblyReference.cache
 C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\obj\Debug\CsGrafeq.AxisDisplayer.resources
-C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\obj\Debug\CsGrafeq.FunctionDisplayer.resources
 C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\obj\Debug\CsGrafeq.csproj.GenerateResource.cache
 C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\obj\Debug\CsGrafeq.csproj.CoreCompileInputs.cache
 C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\bin\Debug\CsGrafeq.dll
 C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\bin\Debug\CsGrafeq.pdb
 C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\obj\Debug\CsGrafeq.dll
 C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\obj\Debug\CsGrafeq.pdb
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\obj\Debug\CsGrafeq.ImplicitFunctionDisplayer.resources

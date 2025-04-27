@@ -51,8 +51,8 @@
       <DependentUpon>AxisDisplayer.cs</DependentUpon>
     </Compile>
     <Compile Include="ExpressionBuilder.cs" />
-    <Compile Include="ExpressionComplier.cs" />
-    <Compile Include="FunctionDisplayer.cs">
+    <Compile Include="ExpressionCompiler.cs" />
+    <Compile Include="ImplicitFunctionDisplayer.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="IInterval.cs" />
@@ -70,8 +70,8 @@
     <EmbeddedResource Include="AxisDisplayer.resx">
       <DependentUpon>AxisDisplayer.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="FunctionDisplayer.resx">
-      <DependentUpon>FunctionDisplayer.cs</DependentUpon>
+    <EmbeddedResource Include="ImplicitFunctionDisplayer.resx">
+      <DependentUpon>ImplicitFunctionDisplayer.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
