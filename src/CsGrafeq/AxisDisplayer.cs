@@ -5,22 +5,24 @@ using System.Windows.Forms;
 
 namespace CsGrafeq
 {
-    public partial class AxisDisplayer :UserControl
+    public partial class AxisDisplayer :DoubleBufferedControl
     {
         public bool ShowAxis = true;
         public bool ShowNumber = true;
         public bool CanMove = true;
         public bool CanZoom = true;
-        protected Graphics TargetGraphics;
-        internal int width, height;
-        protected bool loaded = false;
-        protected BufferedGraphics buf;
 
-        protected double _UnitLength = 20.0001d;
-        public double UnitLength
+        protected double _UnitLengthX = 20.0001d;
+        protected double _UnitLengthY = 20.0001d;
+        public double UnitLengthX
         {
-            get { return _UnitLength; }
-            set { _UnitLength = value;Render(TargetGraphics); }
+            get { return _UnitLengthX; }
+            set { _UnitLengthX = value; Render(TargetGraphics); }
+        }
+        public double UnitLengthY
+        {
+            get { return _UnitLengthY; }
+            set { _UnitLengthY = value; Render(TargetGraphics); }
         }
         protected PointL _Zero = new PointL() { X=250,Y=250};
         public PointL Zero
@@ -33,38 +35,38 @@ namespace CsGrafeq
             get { return new Point((int)_Zero.X, (int)_Zero.Y); }
             set { _Zero =new PointL(value.X,value.Y); Render(TargetGraphics); }
         }
-        protected Color Color_White, Color_Black,Color_A;
-        protected SolidBrush Brush_White, Brush_Black;
-        protected Pen Pen_White, Pen_Black;
-        public AxisDisplayer()
+        public AxisDisplayer() : base()
         {
-            TargetGraphics = CreateGraphics();
-            buf = TargetGraphics.GetBuffer(ClientRectangle);
             Size = new Size(500, 500);
-            Initialize();
-        }
-        protected void Initialize()
-        {
-            Font = new Font("Consolas", 15);
-            Color_White = Color.White;
-            Color_Black = Color.Black;
-            Color_A = Color.FromArgb(0,255,255,255);
-            Pen_White = new Pen(Color_White, 1);
-            Pen_Black = new Pen(Color_Black, 1);
-            Brush_White = new SolidBrush(Color_White);
-            Brush_Black = new SolidBrush(Color_Black);
+            DBRender.Add(1, (Graphics graphics) =>
+            {
+                RenderAxisLine(graphics, ClientRectangle);
+            });
+            DBRender.Add(3, (Graphics graphics) =>
+            {
+                RenderAxisNumber(graphics, ClientRectangle);
+            });
+            DBRenderTo.Add(1, ((Graphics,Rectangle) st) =>
+            {
+                RenderAxisLine(st.Item1, st.Item2);
+            });
+            DBRenderTo.Add(3, ((Graphics, Rectangle) st) =>
+            {
+                RenderAxisNumber(st.Item1, st.Item2);
+            });
+#if DEBUG
+            /*DBPrint+=(2,(g) =>
+            {
+                if (!loaded)
+                {
+                    ImplicitFunctionDisplayer FD = new ImplicitFunctionDisplayer();
+                    this.Controls.Add(FD);
+                    FD.Dock = DockStyle.Fill;
+                }
+            });*/
+#endif
         }
         #region Render
-        protected virtual void Render(Graphics rt)
-        {
-            if (!loaded)
-                return;
-            Graphics graphics = buf.Graphics;
-            graphics.Clear(Color_White);
-            RenderAxisLine(graphics, ClientRectangle);
-            RenderAxisNumber(graphics,ClientRectangle);
-            buf.Render();
-        }
         protected void RenderAxisLine(Graphics gb,Rectangle rect)
         {
             if (!loaded)
@@ -75,12 +77,14 @@ namespace CsGrafeq
             b0 = new Pen(Color.FromArgb(190, 190, 190));
             b1 = new Pen(Color.FromArgb(128, 128, 128));
             Pen pb =Pen_Black;
+            Pen bluepen = new Pen(Color.Blue,3);
             float width=rect.Width;
             float height=rect.Height;
+            //y
             if (RangeIn(0, width, _Zero.X) == _Zero.X)
             {
                 gb.DrawLine(
-                    pb,
+                    MouseOnYAxis?bluepen:pb,
                     new PointF(_Zero.X, 0f),
                     new PointF(_Zero.X, height)
                 );
@@ -89,19 +93,19 @@ namespace CsGrafeq
             if (RangeIn(0, height, _Zero.Y) == _Zero.Y)
             {
                 gb.DrawLine(
-                    pb,
+                    MouseOnXAxis ? bluepen : pb,
                     new PointF(0f, _Zero.Y),
                     new PointF(width, _Zero.Y)
                 );
             }
-            int zsX = (int)Math.Floor(Math.Log((350 / _UnitLength), 10));
-            int zsY = (int)Math.Floor(Math.Log((350 / _UnitLength), 10));
+            int zsX = (int)Math.Floor(Math.Log((350 / _UnitLengthX), 10));
+            int zsY = (int)Math.Floor(Math.Log((350 / _UnitLengthY), 10));
             double addnumX = Math.Pow(10, zsX);
             double addnumY = Math.Pow(10, zsY);
             decimal addnumDX = (decimal)Math.Pow(10, zsX);
             decimal addnumDY = (decimal)Math.Pow(10, zsY);
             double p = RangeIn(rect.Top - 3, rect.Bottom - Font.Height + 1, _Zero.Y);
-            for (double i = Math.Min(_Zero.X - (addnumX * _UnitLength), MathToPixelX(Round(PixelToMathX(width), -zsX))); i > 0; i -= (addnumX * _UnitLength))
+            for (double i = Math.Min(_Zero.X - (addnumX * _UnitLengthX), MathToPixelX(Round(PixelToMathX(width), -zsX))); i > 0; i -= (addnumX * _UnitLengthX))
             {
                 decimal num = Round((decimal)PixelToMathX(i), -zsX);
                 if (num % (10 * addnumDX) == 0) { b2 = b1; } else { b2 = b0; }
@@ -111,7 +115,7 @@ namespace CsGrafeq
                     (float)i, height
                 );
             }
-            for (double i = Math.Max(_Zero.X + (addnumX * _UnitLength), MathToPixelX(Round(PixelToMathX(0), -zsX))); i < width; i += (addnumX * _UnitLength))
+            for (double i = Math.Max(_Zero.X + (addnumX * _UnitLengthX), MathToPixelX(Round(PixelToMathX(0), -zsX))); i < width; i += (addnumX * _UnitLengthX))
             {
                 decimal num = Round((decimal)PixelToMathX(i), -zsX);
                 if (num % (10 * addnumDX) == 0) { b2 = b1; } else { b2 = b0; }
@@ -121,7 +125,7 @@ namespace CsGrafeq
                     (float)i, height
                 );
             }
-            for (double i = Math.Min(_Zero.Y - (addnumY * _UnitLength), MathToPixelY(Round(PixelToMathY(height), -zsY))); i > 0; i -= (addnumY * _UnitLength))
+            for (double i = Math.Min(_Zero.Y - (addnumY * _UnitLengthY), MathToPixelY(Round(PixelToMathY(height), -zsY))); i > 0; i -= (addnumY * _UnitLengthY))
             {
                 decimal num = Round((decimal)PixelToMathY(i), -zsY);
                 if (num % (10 * addnumDY) == 0) { b2 = b1; } else { b2 = b0; }
@@ -131,7 +135,7 @@ namespace CsGrafeq
                     width, (float)i
                 );
             }
-            for (double i = Math.Max(_Zero.Y + (addnumY * _UnitLength), MathToPixelY(Round(PixelToMathY(0), -zsY))); i < height; i += (addnumY * _UnitLength))
+            for (double i = Math.Max(_Zero.Y + (addnumY * _UnitLengthY), MathToPixelY(Round(PixelToMathY(0), -zsY))); i < height; i += (addnumY * _UnitLengthY))
             {
                 decimal num = Round((decimal)PixelToMathY(i), -zsY);
                 if (num % (10 * addnumDY) == 0) { b2 = b1; } else { b2 = b0; }
@@ -150,25 +154,25 @@ namespace CsGrafeq
                 return;
             float width = rect.Width;
             float height = rect.Height;
-            int zsX = (int)Math.Floor(Math.Log((350 / _UnitLength), 10));
-            int zsY = (int)Math.Floor(Math.Log((350 / _UnitLength), 10));
+            int zsX = (int)Math.Floor(Math.Log((350 / _UnitLengthX), 10));
+            int zsY = (int)Math.Floor(Math.Log((350 / _UnitLengthY), 10));
             double addnumX = Math.Pow(10, zsX);
             double addnumY = Math.Pow(10, zsY);
             decimal addnumDX = (decimal)Math.Pow(10, zsX);
             decimal addnumDY = (decimal)Math.Pow(10, zsY);
             double p = RangeIn(rect.Top - 3, rect.Bottom - Font.Height + 1, _Zero.Y);
             float fff = 1f / 4f * Font.Height;
-            for (double i = Math.Min(_Zero.X - (addnumX * _UnitLength), MathToPixelX(Round(PixelToMathX(width), -zsX))); i > 0; i -= (addnumX * _UnitLength))
+            for (double i = Math.Min(_Zero.X - (addnumX * _UnitLengthX), MathToPixelX(Round(PixelToMathX(width), -zsX))); i > 0; i -= (addnumX * _UnitLengthX))
             {
                 decimal num = Round((decimal)PixelToMathX(i), -zsX);
                 gb.DrawString(num.ToString(), Font, Brush_Black, (float)(i - (num.ToString().Length) * fff - 2), (float)p);
             }
-            for (double i = Math.Max(_Zero.X + (addnumX * _UnitLength), MathToPixelX(Round(PixelToMathX(0), -zsX))); i < width; i += (addnumX * _UnitLength))
+            for (double i = Math.Max(_Zero.X + (addnumX * _UnitLengthX), MathToPixelX(Round(PixelToMathX(0), -zsX))); i < width; i += (addnumX * _UnitLengthX))
             {
                 decimal num = Round((decimal)PixelToMathX(i), -zsX);
                 gb.DrawString(num.ToString(), Font, Brush_Black, (float)(i - (num.ToString().Length) * fff - 2), (float)p);
             }
-            for (double i = Math.Min(_Zero.Y - (addnumY * _UnitLength), MathToPixelY(Round(PixelToMathY(height), -zsY))); i > 0; i -= (addnumY * _UnitLength))
+            for (double i = Math.Min(_Zero.Y - (addnumY * _UnitLengthY), MathToPixelY(Round(PixelToMathY(height), -zsY))); i > 0; i -= (addnumY * _UnitLengthY))
             {
                 decimal num = Round((decimal)PixelToMathY(i), -zsY);
                 if (rect.Left + 3 > _Zero.X)
@@ -184,7 +188,7 @@ namespace CsGrafeq
                     gb.DrawString(num.ToString(), Font, Brush_Black, (float)_Zero.X, (float)(i - Font.Height / 2 - 2));
                 }
             }
-            for (double i = Math.Max(_Zero.Y + (addnumY * _UnitLength), MathToPixelY(Round(PixelToMathY(0), -zsY))); i < height; i += (addnumY * _UnitLength))
+            for (double i = Math.Max(_Zero.Y + (addnumY * _UnitLengthY), MathToPixelY(Round(PixelToMathY(0), -zsY))); i < height; i += (addnumY * _UnitLengthY))
             {
                 decimal num = Round((decimal)PixelToMathY(i), -zsY);
                 if (rect.Left + 3 > _Zero.X)
@@ -261,20 +265,20 @@ namespace CsGrafeq
 
         protected virtual double MathToPixelX(double d)
         {
-            return _Zero.X + d * _UnitLength;
+            return _Zero.X + d * _UnitLengthX;
         }
 
         protected virtual double MathToPixelY(double d)
         {
-            return _Zero.Y + -d * _UnitLength;
+            return _Zero.Y + -d * _UnitLengthY;
         }
         protected virtual double PixelToMathX(double d)
         {
-            return ((d - _Zero.X) / _UnitLength);
+            return ((d - _Zero.X) / _UnitLengthX);
         }
         protected virtual double PixelToMathY(double d)
         {
-            return -(d - _Zero.Y) / _UnitLength;
+            return -(d - _Zero.Y) / _UnitLengthY;
         }
         #endregion
         #region OverridedMethods
@@ -283,6 +287,8 @@ namespace CsGrafeq
         protected PointL LastZeroPos;
         protected bool MouseDownLeft = false;
         protected bool MouseDownRight = false;
+        protected bool MouseOnXAxis=false;
+        protected bool MouseOnYAxis=false;
         protected override void OnMouseDown(MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
@@ -299,6 +305,11 @@ namespace CsGrafeq
         }
         protected override void OnMouseMove(MouseEventArgs e)
         {
+            bool l=MouseOnYAxis,ll=MouseOnXAxis;
+            MouseOnYAxis = Math.Abs(e.X - _Zero.X) < 3;
+            MouseOnXAxis = Math.Abs(e.Y - _Zero.Y) < 3;
+            if (l != MouseOnYAxis || ll != MouseOnXAxis)
+                Render(TargetGraphics);
             if (MouseDownLeft&&CanMove)
             {//移动零点
                 _Zero.X = (MouseDownZeroPos.X + e.X - MouseDownPos.X);
@@ -307,7 +318,6 @@ namespace CsGrafeq
             }
             LastZeroPos = _Zero;
             return;
-
         }
         protected override void OnMouseUp(MouseEventArgs e)
         {
@@ -333,8 +343,8 @@ namespace CsGrafeq
             if(!CanZoom)
                 return;
             double cursor_x = e.X, cursor_y = e.Y;
-            double times_x = (_Zero.X - cursor_x) / _UnitLength;
-            double times_y = (_Zero.Y - cursor_y) / _UnitLength;
+            double times_x = (_Zero.X - cursor_x) / _UnitLengthX;
+            double times_y = (_Zero.Y - cursor_y) / _UnitLengthY;
             double delta;
             delta = Math.Pow(Math.Log(Math.Abs(e.Delta)+1)+1,0.1);
             if (e.Delta == 120)
@@ -343,48 +353,49 @@ namespace CsGrafeq
                 delta = 1.3;
             if (e.Delta > 0)
             {
-                _UnitLength *= delta;
+                if (MouseOnXAxis&&MouseOnYAxis)
+                {
+                    _UnitLengthX *= delta;
+                    _UnitLengthY *= delta;
+                }
+                else if (MouseOnYAxis)
+                    _UnitLengthY *= delta;
+                else if (MouseOnXAxis)
+                    _UnitLengthX *= delta;
+                else
+                {
+                    _UnitLengthX *= delta;
+                    _UnitLengthY *= delta;
+                }
             }
             else
             {
-                _UnitLength /= delta;
+                if (MouseOnXAxis && MouseOnYAxis)
+                {
+                    _UnitLengthX /= delta;
+                    _UnitLengthY /= delta;
+                }
+                else if (MouseOnYAxis)
+                    _UnitLengthY /= delta;
+                else if (MouseOnXAxis)
+                    _UnitLengthX /= delta;
+                else
+                {
+                    _UnitLengthX /= delta;
+                    _UnitLengthY /= delta;
+                }
             }
-            _UnitLength = RangeIn(0.01, 1000000, _UnitLength);
+            _UnitLengthX = RangeIn(0.01, 1000000, _UnitLengthX);
+            _UnitLengthY = RangeIn(0.01, 1000000, _UnitLengthY);
             if (CanMove)
             {
                 _Zero = new PointL()
                 {
-                    X = (long)(times_x * _UnitLength + cursor_x),
-                    Y = (long)(times_y * _UnitLength + cursor_y)
+                    X = (long)(times_x * _UnitLengthX + cursor_x),
+                    Y = (long)(times_y * _UnitLengthY + cursor_y)
                 };
             }
             Render(TargetGraphics);
-        }
-
-        protected override void OnSizeChanged(EventArgs e)
-        {
-            base.OnSizeChanged(e);
-            width = ClientSize.Width; height = ClientSize.Height;
-            buf = TargetGraphics.GetBuffer(ClientRectangle);
-            Render(TargetGraphics);
-        }
-
-        protected override void OnPaint(PaintEventArgs e)
-        {
-            base.OnPaint(e);
-            width = ClientSize.Width; height = ClientSize.Height;
-#if DEBUG
-            if (!loaded)
-            {
-                ImplicitFunctionDisplayer FD = new ImplicitFunctionDisplayer();
-                this.Controls.Add(FD);
-                FD.Dock = DockStyle.Fill;
-            }
-            loaded = true;
-#else
-            loaded = true;
-            Render(TargetGraphics);
-#endif
         }
         protected override void OnKeyDown(KeyEventArgs e)
         {
@@ -426,7 +437,7 @@ namespace CsGrafeq
     #region ExtendedMethods
     internal static partial class ExMethods
     {
-        public static BufferedGraphics GetBuffer(this Graphics graphics,Rectangle r)
+        public static BufferedGraphics GetBuffer(this Graphics graphics, Rectangle r)
         {
             return BufferedGraphicsManager.Current.Allocate(graphics, r);
         }

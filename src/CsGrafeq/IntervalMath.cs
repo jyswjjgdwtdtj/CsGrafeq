@@ -8,13 +8,14 @@ using System.Threading.Tasks;
 using static System.Math;
 using static System.Double;
 using System.Windows.Forms;
+using static CsGrafeq.ExMethods;
 
 namespace CsGrafeq
 {
     public static class IntervalMath
     {
         static IntervalMath() { }
-        private static Interval EmptyInterval=new Interval(NaN) { Def=(false,false),Cont=false};
+		private static Interval EmptyInterval=new Interval(NaN) { Def=FF,Cont=false};
         public static Interval New(double num)
         {
             return new Interval(num);
@@ -72,9 +73,9 @@ namespace CsGrafeq
                 double max=Math.Floor(a.Max / num);
                 if (min==max)
                     return new Interval(NumMod(b.Min, num), NumMod(b.Max, num)) { Def=And(a.Def,b.Def)};
-                return new Interval(0, b.Max) { Def = (false,true) };
+                return new Interval(0, b.Max) { Def = FT };
             }
-            return Subtract(a,Multiply(Floor(Divide(a, b)), b)).SetDef((false,true));
+            return Subtract(a,Multiply(Floor(Divide(a, b)), b)).SetDef(FT);
         }
         private static double NumMod(double a,double b)
         {
@@ -92,7 +93,7 @@ namespace CsGrafeq
             if (!def.Item2)
                 return def;
             if (i2.Max < i1.Min || i2.Min > i1.Max)
-                return (false, false);
+                return FF;
             //if(i2.Max==i1.Max&&i2.Min==i1.Min)
             //    return def;
             return (false,def.Item2);
@@ -101,18 +102,18 @@ namespace CsGrafeq
         {
             (bool, bool) def = And(i1.Def, i2.Def);
             if (i1.isEmpty() || i2.isEmpty())
-                return (false, false);
+                return FF;
             if (i1.Max < i2.Min)
-                return (false, false);
+                return FF;
             if (i1.Min > i2.Max)
             {
                 if ((!i1.Def.Item1) || (!i2.Def.Item1))
                 {
-                    return (false, true);
+                    return FT;
                 }
-                return (true, true);
+                return TT;
             }
-            return (false, true);
+            return FT;
         }
         public static (bool, bool) Less(Interval i1, Interval i2)
         {
@@ -189,7 +190,7 @@ namespace CsGrafeq
             }
             i.Min = Double.NegativeInfinity;
             i.Max = Math.Log(i.Max);
-            i.Def = (false, true);
+            i.Def = FT;
             return i;
         }
         public static Interval Lg(Interval i)
@@ -206,7 +207,7 @@ namespace CsGrafeq
             }
             i.Min = Double.NegativeInfinity;
             i.Max = Log10(i.Max);
-            i.Def = (false, true);
+            i.Def = FT;
             return i;
         }
         public static Interval Log(Interval i1,Interval i2)
@@ -231,7 +232,7 @@ namespace CsGrafeq
             }
             i.Min = 0;
             i.Max = Math.Sqrt(i.Max);
-            i.Def = (false, true);
+            i.Def = FT;
             return i;
         }
         public static Interval Root(Interval i, Interval i2)
@@ -258,7 +259,7 @@ namespace CsGrafeq
                 else if (i.Contains(0))
                 {
                     i = new Interval(0, Math.Pow(i.Max, 1 / num));
-                    i.Def = (false, true);
+                    i.Def = FT;
                     return i;
                 }
                 else
@@ -421,7 +422,7 @@ namespace CsGrafeq
             if (i.Max < -1 || i.Min > 1)
                 return EmptyInterval;
             if (i.Min < -1 || i.Max > 1)
-                i.Def = (false, true);
+                i.Def = FT;
             i.Min = Math.Asin(Math.Max(i.Min, -1));
             i.Min = Math.Asin(Math.Min(i.Max, 1));
             return i;
@@ -433,7 +434,7 @@ namespace CsGrafeq
             if (i.Max < -1 || i.Min > 1)
                 return EmptyInterval;
             if (i.Min < -1 || i.Max > 1)
-                i.Def = (false, true);
+                i.Def = FT;
             double max = i.Max;
             i.Max = Math.Acos(Math.Max(i.Min, -1));
             i.Min = Math.Acos(Math.Min(max, 1));

@@ -38,7 +38,6 @@ namespace CsGrafeqPlayGround
             {
                 allexpressions += expression.Split(';')[0] + "\r\n";
             }
-            fd.CanMove = false;
             fd.Size = new System.Drawing.Size(600,600);
             fd.Zero=new PointL(300,300);
             ClientSize = new System.Drawing.Size(600, 600);
@@ -120,8 +119,8 @@ namespace CsGrafeqPlayGround
                     {
                         e.Handled = true;
                         Random rnd = new Random();
-                        //string[] s = expressions[rnd.Next(expressions.Length)].Split(';');
-                        string[] s = expressions[index++].Split(';');
+                        string[] s = expressions[rnd.Next(expressions.Length)].Split(';');
+                        //string[] s = expressions[index++].Split(';');
                         ss=textBox.Text = s[0];
                         if (s.Length == 1)
                             checkBox1.Checked = false;
@@ -134,24 +133,32 @@ namespace CsGrafeqPlayGround
                     {
                     }else if (e.Control)
                     {
-                        /*SaveFileDialog saveFileDialog = new SaveFileDialog();
+                        SaveFileDialog saveFileDialog = new SaveFileDialog();
                         saveFileDialog.Filter = "*.jpg|Jpg File";
                         saveFileDialog.DefaultExt = ".jpg";
                         saveFileDialog.Title = "保存";
                         saveFileDialog.AddExtension = true;
-                        saveFileDialog.FileName = "1.jpg";*/
-                        //if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                        saveFileDialog.FileName = "1.jpg";
+                        if (saveFileDialog.ShowDialog() == DialogResult.OK)
                         {
                             Bitmap bitmap = new Bitmap(fd.Width, fd.Height);
                             Graphics g = Graphics.FromImage(bitmap);
                             fd.RenderTo(g, fd.ClientRectangle);
-                            string sss = "";
-                            for(int i = 0; i < ss.Length / 40; i++)
+                            /*string sss = "";
+                            int l = 600 / new Font("Consolas", 14).Height * 2;
+                            for (int i = 0; i < ss.Length; i+=l)
                             {
-                                sss += ss.Substring(i * 40, Math.Min(40, ss.Length - 40 * (i)))+"\r\n";
+                                sss += SubString(ss, i, i +l) +"\r\n";
                             }
-                            g.DrawString(ss, new Font("Consolas", 14), new SolidBrush(Color.Black), new Point(4,4));
-                            bitmap.Save("C:\\Users\\liboyuan\\Desktop\\images\\"+index+".jpg");
+                            g.DrawString(sss, new Font("Consolas", 14), new SolidBrush(Color.Black), new Point(4,4));*/
+                            //bitmap.Save();
+                            try
+                            {
+                                bitmap.Save(saveFileDialog.FileName);
+                                MessageBox.Show("保存成功");
+                            }catch (Exception ex){
+                                MessageBox.Show("保存失败"+ex.Message);
+                            }
                         }
                     }
                         break;
@@ -307,6 +314,10 @@ namespace CsGrafeqPlayGround
         private void checkBox5_CheckedChanged(object sender, EventArgs e)
         {
             fd.CanMove = checkBox3.Checked;
+        }
+        private string SubString(string s,int start,int end)
+        {
+            return s.Substring(Math.Min(start,s.Length),Math.Min(end,s.Length)- Math.Min(start, s.Length));
         }
     }
 }

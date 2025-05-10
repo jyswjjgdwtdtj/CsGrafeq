@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Windows.Forms.ComponentModel.Com2Interop;
+using static CsGrafeq.ExMethods;
 
 namespace CsGrafeq
 {
@@ -19,15 +19,12 @@ namespace CsGrafeq
     /// </summary>
     public static class IntervalSetMath
     {
-        private static IntervalSet EmptyIntervalSet=new IntervalSet(double.NaN) { Def = (false, false),IsNumber=false };
+        private static IntervalSet EmptyIntervalSet=new IntervalSet(double.NaN) { Def = FF,IsNumber=false };
         private static Range EmptyRange = new Range(double.NaN);
         private static readonly double neginf = double.NegativeInfinity;
         private static readonly double posinf = double.PositiveInfinity;
         private const double PI=Math.PI;
         private const double E=Math.E;
-        private static readonly (bool, bool) AllExist = (true, true);
-        private static readonly (bool, bool) PartiallyExist = (false, true);
-        private static readonly (bool, bool) NoneExist = (false,false);
 
         public static IntervalSet New(double num)
         {
@@ -204,7 +201,7 @@ namespace CsGrafeq
                 Array.Resize(ref ranges, loc);
                 if (loc==0)
                     return EmptyIntervalSet;
-                return new IntervalSet(ranges,(false,true),false);
+                return new IntervalSet(ranges,FT,false);
             }
             else
             {
@@ -951,7 +948,7 @@ namespace CsGrafeq
             if (i1.GetMax() < -1 || i1.GetMin() > 1)
                 return EmptyIntervalSet;
             if (i1.GetMax() > 1 || i1.GetMin() < -1)
-                i1.Def = (false, true);
+                i1.Def = FT;
             Range[] Ranges = new Range[i1.Intervals.Length];
             int loc = 0;
             fixed (Range* first = i1.Intervals, Rangesfirst = Ranges)
@@ -976,7 +973,7 @@ namespace CsGrafeq
             if (i1.GetMax() < -1 || i1.GetMin() > 1)
                 return EmptyIntervalSet;
             if (i1.GetMax() > 1 || i1.GetMin() < -1)
-                i1.Def = (false, true);
+                i1.Def = FT;
             Range[] Ranges = new Range[i1.Intervals.Length];
             int loc = 0;
             fixed (Range* first = i1.Intervals, Rangesfirst = Ranges)
@@ -1028,18 +1025,18 @@ namespace CsGrafeq
 
         public static (bool,bool) Equal(IntervalSet i1,IntervalSet i2)
         {
-            if (i1.Def == (false, false) || i2.Def == (false, false))
+            if (i1.Def == FF || i2.Def == FF)
             {
-                return (false, false);
+                return FF;
             }
             if(i1.Intervals.Length*i2.Intervals.Length==0)
-                return (false, false);
+                return FF;
             foreach (var j1 in Subtract(i1,i2).Intervals)
             {
                 if(j1.ContainsEqual(0))
-                    return (false, true);
+                    return FT;
             }
-            return (false,false);
+            return FF;
         }
         public static (bool,bool) Greater(IntervalSet i1,IntervalSet i2)
         {
@@ -1110,7 +1107,7 @@ namespace CsGrafeq
         }
         public unsafe static IntervalSet GetIntervalSetFromRangeArray(Range[] Ranges)
         {
-            return GetIntervalSetFromRangeArray(Ranges, (true,true),true);
+            return GetIntervalSetFromRangeArray(Ranges, TT,true);
         }
         public unsafe static IntervalSet GetIntervalSetFromRangeArray(Range[] Ranges,(bool,bool) def,bool cont)
         {
@@ -1186,6 +1183,9 @@ namespace CsGrafeq
             MessageBox.Show(t.ToString());
             return t;
         }
+        public static readonly (bool, bool) TT = (true, true);
+        public static readonly (bool, bool) FT = (false, true);
+        public static readonly (bool, bool) FF = (false, false);
     }
     internal struct OnlyAddList<T>//不可被赋值！ 
     {

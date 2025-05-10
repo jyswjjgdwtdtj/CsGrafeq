@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using static CsGrafeq.ExMethods;
 
 namespace CsGrafeq
 {
@@ -19,7 +20,7 @@ namespace CsGrafeq
                 (min, max) = (max, min);
             Min = min;
             Max = max;
-            Def = (true, true);
+            Def = TT;
             Cont=true;
         }
         public double GetLength()
@@ -47,7 +48,7 @@ namespace CsGrafeq
         }
         public bool isPartial()
         {
-            return Def == (false, true);
+            return Def == FT;
         }
         public bool isNumber()
         {

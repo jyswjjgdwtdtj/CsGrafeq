@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.CodeDom;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -12,13 +13,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static CsGrafeq.ExMethods;
-using static CsGrafeq.ExpressionBuilder;
-using System.Numerics;
 namespace CsGrafeq
 {
     public class ImplicitFunctionDisplayer : AxisDisplayer
     {
-        public readonly ImplicitFunctionList Functions;
+        public readonly CsGrafeqImplicitFunctionCollection Functions;
         private const int AtoZ = 'z' - 'a' + 1;
         private double[] _ConstantsValue = new double[AtoZ] ;
 
@@ -73,7 +72,7 @@ namespace CsGrafeq
                 if (i.UsedConstant[index])
                 {
                     i.BitmapGraphics.Clear(Color_A);
-                    RenderImpFunc(i.BitmapGraphics, i, ClientRectangle);
+                    RenderFunction(i.BitmapGraphics, i, ClientRectangle);
                 }
                 ImageGraphics.DrawImage(i._Bitmap,0,0);
             }
@@ -101,7 +100,7 @@ namespace CsGrafeq
         {
             get
             {
-                throw new NotImplementedException();
+                //throw new NotImplementedException();
                 return _Quality;
             }
             set
@@ -114,7 +113,7 @@ namespace CsGrafeq
         private Bitmap Bitmap;
         public ImplicitFunctionDisplayer() : base()
         {
-            Functions = new ImplicitFunctionList(this);
+            Functions = new CsGrafeqImplicitFunctionCollection(this);
             MovingRenderMode = MovingRenderMode.RenderEdge;
             Bitmap = new Bitmap(Width, Height);
             WheelingTimer.Tick += (s, e) =>
@@ -129,56 +128,26 @@ namespace CsGrafeq
                 }
             };
             WheelingTimer.Start();
+            DBRender.Add(2, (Graphics graphics) =>
+            {
+                Graphics bmpgraphics = Graphics.FromImage(Bitmap);
+                bmpgraphics.Clear(Color_A);
+                RenderFunctions(bmpgraphics, ClientRectangle);
+                graphics.DrawImage(Bitmap, 0, 0);
+            });
+            DBRenderTo.Add(2, ((Graphics, Rectangle) st) =>
+            {
+                foreach (ImplicitFunction func in Functions.innerList)
+                {
+                    RenderFunction(st.Item1, func, st.Item2);
+                }
+            });
 #if DEBUG
             Functions.Add(
-                "tan(sin(x)+cos(y))=sin(tan(x+y))"
+                "0=tan((x))+tan((y))"
             ).CheckPixelMode=CheckPixelMode.UseMarchingSquares;
 #endif
         }
-        /// <summary>
-        /// 绘制
-        /// </summary>
-        public void Render()
-        {
-            Render(TargetGraphics);
-        }
-
-        /// <summary>
-        /// 绘制到指定Graphics
-        /// </summary>
-        /// <param name="rt">指定的绘制对象</param>
-        protected override void Render(Graphics rt)
-        {
-            if ((!loaded) || (!Visible))
-                return;
-            Graphics graphics = buf.Graphics;
-            graphics.Clear(Color_White);
-            Graphics bmpgraphics = Graphics.FromImage(Bitmap);
-            bmpgraphics.Clear(Color_A);
-            RenderFunctions(bmpgraphics, ClientRectangle);
-            RenderAxisLine(graphics,ClientRectangle);
-            graphics.DrawImage(Bitmap,0,0);
-            RenderAxisNumber(graphics,ClientRectangle);
-            buf.Render();
-        }
-
-        /// <summary>
-        /// 绘制到指定Graphics 与控件状态无关
-        /// </summary>
-        /// <param name="g">指定的绘制对象</param>
-        /// <param name="rectangle">绘制区域</param>
-        public bool RenderTo(Graphics g,Rectangle rectangle)
-        {
-            BufferedGraphics buf = g.GetBuffer(rectangle);
-            Graphics graphics = buf.Graphics;
-            graphics.Clear(Color_White);
-            RenderAxisLine(graphics, rectangle);
-            RenderFunctions(graphics, rectangle);
-            RenderAxisNumber(graphics, rectangle);
-            buf.Render();
-            return true;
-        }
-
         /// <summary>
         /// 绘制函数
         /// </summary>
@@ -189,7 +158,7 @@ namespace CsGrafeq
             foreach (ImplicitFunction func in Functions.innerList)
             {
                 func.BitmapGraphics.Clear(Color_A);
-                RenderImpFunc(func.BitmapGraphics, func, r);
+                RenderFunction(func.BitmapGraphics, func, r);
                 rt.DrawImage(func._Bitmap,0,0);
             }
         }
@@ -200,7 +169,7 @@ namespace CsGrafeq
         /// <param name="rt">指定的绘制对象</param>
         /// <param name="f">要绘制的函数</param>
         /// <param name="targetrect">绘制区域</param>
-        private void RenderImpFunc(Graphics rt, ImplicitFunction f, Rectangle targetrect)
+        private void RenderFunction(Graphics rt, ImplicitFunction f, Rectangle targetrect)
         {
             double ratio = Math.Pow(2, _Quality);
             ConcurrentBag<Rectangle> RectToCalc = new ConcurrentBag<Rectangle>() { CreateRectByBound((int)(ratio * targetrect.Left), (int)(ratio * targetrect.Top), (int)(ratio * targetrect.Right), (int)(ratio * targetrect.Bottom)) };
@@ -247,7 +216,8 @@ namespace CsGrafeq
                 xtimes = 1;
             int dx = (int)Math.Ceiling(((double)r.Width) / xtimes);
             int dy = (int)Math.Ceiling(((double)r.Height) / ytimes);
-            double exhaust = 0.25d / UnitLength;
+            double Xexhaust = 0.25d / UnitLengthX;
+            double Yexhaust = 0.25d / UnitLengthY;
             MarchingSquaresDelegate msd = f.MarchingSquaresFunction;
             for (int i = r.Left; i < r.Right; i += dx)
             {
@@ -262,15 +232,15 @@ namespace CsGrafeq
                     double ymax = PixelToMathY((j + dy) / ratio);
                     Interval yi = new Interval(ymin,ymax);
                     (bool first, bool second) result = f.IntervalImpFunction.Invoke(xi, yi,ConstantsValue);
-                    if (result == (true, true))
+                    if (result == TT)
                     {
                         RectToRender.Add(CreateRectFByBound((float)(di / ratio), (float)(dj / ratio), (float)Math.Min((di + dx) / ratio, r.Right), (float)Math.Min((dj + dy) / ratio, r.Bottom)));
                     }
-                    else if (result == (false, true))
+                    else if (result == FT)
                     {
                         if (dx == 1 && dx == 1)
                         {
-                            if ((!checkpixel)||(checkpixel&& CheckCurveExists(msd, xmin, ymin, xmax, ymax, exhaust, ConstantsValue)))
+                            if ((!checkpixel)||(checkpixel&& CheckCurveExists(msd, xmin, ymin, xmax, ymax, Xexhaust, Yexhaust, ConstantsValue)))
                                 RectToRender.Add(CreateRectFByBound((float)(di / ratio), (float)(dj / ratio), (float)Math.Min((di + dx) / ratio, r.Right), (float)Math.Min((dj + dy) / ratio, r.Bottom)));
                         }
                         else
@@ -300,7 +270,8 @@ namespace CsGrafeq
                 xtimes = 1;
             int dx = (int)Math.Ceiling(((double)r.Width) / xtimes);
             int dy = (int)Math.Ceiling(((double)r.Height) / ytimes);
-            double exhaust=0.25d/UnitLength;
+            double Xexhaust=0.25d/UnitLengthX;
+            double Yexhaust=0.25d/UnitLengthY;
             MarchingSquaresDelegate msd = f.MarchingSquaresFunction;
             for (int i = r.Left; i < r.Right; i += dx)
             {
@@ -315,15 +286,15 @@ namespace CsGrafeq
                     double ymax = PixelToMathY((j + dy) / ratio);
                     IntervalSet yi = new IntervalSet(ymin,ymax);
                     (bool first, bool second) result = f.IntervalSetImpFunction.Invoke(xi, yi, ConstantsValue);
-                    if (result == (true, true))
+                    if (result == TT)
                     {
                         RectToRender.Add(CreateRectFByBound((float)(di / ratio), (float)(dj / ratio), (float)Math.Min((di + dx) / ratio, r.Right), (float)Math.Min((dj + dy) / ratio, r.Bottom)));
                     }
-                    else if (result == (false, true))
+                    else if (result == FT)
                     {
                         if (dx == 1 && dx == 1)
                         {
-                            if ((!checkpixel) || (checkpixel && CheckCurveExists(msd, xmin, ymin, xmax, ymax, exhaust, ConstantsValue)))
+                            if ((!checkpixel) || (checkpixel && CheckCurveExists(msd, xmin, ymin, xmax, ymax, Xexhaust,Yexhaust, ConstantsValue)))
                                 RectToRender.Add(CreateRectFByBound((float)(di / ratio), (float)(dj / ratio), (float)Math.Min((di + dx) / ratio, r.Right), (float)Math.Min((dj + dy) / ratio, r.Bottom)));
                         }
                         else
@@ -334,31 +305,44 @@ namespace CsGrafeq
                 }
             }
         }
-        internal bool CheckCurveExists(MarchingSquaresDelegate msd,double xmin,double ymin,double xmax,double ymax,double exhaust, double[] consts)
+        internal bool CheckCurveExists(MarchingSquaresDelegate msd,double xmin,double ymin,double xmax,double ymax,double Xexhaust,double Yexhaust, double[] consts)
         {
             if (msd.Invoke(xmin, ymin, xmax, ymax, consts))
                 return true;
-            if (xmax-xmin<exhaust&&ymax-ymin<exhaust)
+            if (xmax-xmin<Xexhaust&&ymax-ymin<Yexhaust)
                 return false;
             if (ymax - ymin > xmax - xmin)
             {
                 double half = (ymax + ymin) / 2;
                 return
-                    CheckCurveExists(msd, xmin, ymin, xmax, half, exhaust, consts) ||
-                    CheckCurveExists(msd, xmin, half, xmax, ymax, exhaust, consts);
+                    CheckCurveExists(msd, xmin, ymin, xmax, half, Xexhaust, Yexhaust, consts) ||
+                    CheckCurveExists(msd, xmin, half, xmax, ymax, Xexhaust, Yexhaust, consts);
             }
             else
             {
                 double half = (xmax + xmin) / 2;
                 return
-                    CheckCurveExists(msd, xmin, ymin, half, ymax, exhaust, consts) ||
-                    CheckCurveExists(msd, half, ymin, xmax, ymax, exhaust, consts);
+                    CheckCurveExists(msd, xmin, ymin, half, ymax, Xexhaust, Yexhaust, consts) ||
+                    CheckCurveExists(msd, half, ymin, xmax, ymax, Xexhaust, Yexhaust, consts);
             }
         }
         protected override void OnMouseMove(MouseEventArgs e)
         {
             if ((!loaded) || (!Visible))
                 return;
+            bool l = MouseOnYAxis, ll = MouseOnXAxis;
+            MouseOnYAxis = Math.Abs(e.X - _Zero.X) < 3;
+            MouseOnXAxis = Math.Abs(e.Y - _Zero.Y) < 3;
+            if (l != MouseOnYAxis || ll != MouseOnXAxis)
+            {
+                Graphics gg = buf.Graphics;
+                gg.Clear(Color_White);
+                RenderAxisLine(gg,ClientRectangle);
+                gg.DrawImage(Bitmap,0,0);
+                RenderAxisNumber(gg,ClientRectangle);
+                CallDBRender(gg);
+                buf.Render();
+            }
             if (MouseDownLeft&&CanMove)
             {//移动零点
                 _Zero.X = (MouseDownZeroPos.X + e.X - MouseDownPos.X);
@@ -397,6 +381,7 @@ namespace CsGrafeq
                     RenderMovedPlace(graphics);
                 }
                 RenderAxisNumber(graphics,ClientRectangle);
+                //CallDBRender(graphics);
                 buf.Render();
             }
             return;
@@ -413,40 +398,40 @@ namespace CsGrafeq
         {
             if (_Zero.X < LastZeroPos.X)
             {
-                RenderImpFunc(drawtogf, impFunc, CreateRectByBound((int)(width - LastZeroPos.X + _Zero.X), 0, width, height));
+                RenderFunction(drawtogf, impFunc, CreateRectByBound((int)(width - LastZeroPos.X + _Zero.X), 0, width, height));
                 if (_Zero.Y < LastZeroPos.Y)
                 {
-                    RenderImpFunc(drawtogf, impFunc, CreateRectByBound(0, (int)(height - LastZeroPos.Y + _Zero.Y), (int)(width - LastZeroPos.X + _Zero.X), height));
+                    RenderFunction(drawtogf, impFunc, CreateRectByBound(0, (int)(height - LastZeroPos.Y + _Zero.Y), (int)(width - LastZeroPos.X + _Zero.X), height));
 
                 }
                 else if (_Zero.Y > LastZeroPos.Y)
                 {
-                    RenderImpFunc(drawtogf, impFunc, CreateRectByBound(0, 0, (int)(width - LastZeroPos.X + _Zero.X), (int)(_Zero.Y - LastZeroPos.Y)));
+                    RenderFunction(drawtogf, impFunc, CreateRectByBound(0, 0, (int)(width - LastZeroPos.X + _Zero.X), (int)(_Zero.Y - LastZeroPos.Y)));
                 }
             }
             else if (_Zero.X > LastZeroPos.X)
             {
-                RenderImpFunc(drawtogf, impFunc, CreateRectByBound(0, 0, (int)(_Zero.X - LastZeroPos.X), height));
+                RenderFunction(drawtogf, impFunc, CreateRectByBound(0, 0, (int)(_Zero.X - LastZeroPos.X), height));
                 if (_Zero.Y < LastZeroPos.Y)
                 {
-                    RenderImpFunc(drawtogf, impFunc, CreateRectByBound((int)(_Zero.X - LastZeroPos.X), (int)(height - LastZeroPos.Y + _Zero.Y), width, height));
+                    RenderFunction(drawtogf, impFunc, CreateRectByBound((int)(_Zero.X - LastZeroPos.X), (int)(height - LastZeroPos.Y + _Zero.Y), width, height));
 
                 }
                 else if (_Zero.Y > LastZeroPos.Y)
                 {
-                    RenderImpFunc(drawtogf, impFunc, CreateRectByBound((int)(_Zero.X - LastZeroPos.X), 0, width, (int)(_Zero.Y - LastZeroPos.Y)));
+                    RenderFunction(drawtogf, impFunc, CreateRectByBound((int)(_Zero.X - LastZeroPos.X), 0, width, (int)(_Zero.Y - LastZeroPos.Y)));
                 }
             }
             else
             {
                 if (_Zero.Y < LastZeroPos.Y)
                 {
-                    RenderImpFunc(drawtogf, impFunc, CreateRectByBound(0, (int)(height - LastZeroPos.Y + _Zero.Y), width, height));
+                    RenderFunction(drawtogf, impFunc, CreateRectByBound(0, (int)(height - LastZeroPos.Y + _Zero.Y), width, height));
 
                 }
                 else if (_Zero.Y > LastZeroPos.Y)
                 {
-                    RenderImpFunc(drawtogf, impFunc, CreateRectByBound(0, 0, width, (int)(_Zero.Y - LastZeroPos.Y)));
+                    RenderFunction(drawtogf, impFunc, CreateRectByBound(0, 0, width, (int)(_Zero.Y - LastZeroPos.Y)));
                 }
             }
         }
@@ -467,19 +452,9 @@ namespace CsGrafeq
             }
         }
 
-        protected override void OnPaint(PaintEventArgs e)
-        {
-            loaded = true;
-            if (width != ClientSize.Width||height!=ClientSize.Height||Bitmap.Width!=ClientSize.Width||Bitmap.Height!=ClientSize.Height)
-            {
-                OnSizeChanged(new EventArgs());
-            }
-            Render(TargetGraphics);
-        }
-
         private bool Wheeling = false;
         private DateTime WheelingTime = DateTime.Now;
-        private double previousunitlength;
+        private double previousunitlengthX,previousunitlengthY;
         private PointL previouszero;
         private readonly Timer WheelingTimer = new Timer() { Interval = 30 };
         protected override void OnMouseWheel(MouseEventArgs e)
@@ -490,12 +465,13 @@ namespace CsGrafeq
             if (!Wheeling)
             {
                 Wheeling = true;
-                previousunitlength = _UnitLength;
+                previousunitlengthX = _UnitLengthX;
+                previousunitlengthY = _UnitLengthY;
                 previouszero = _Zero;
             }
             double cursor_x = e.X, cursor_y = e.Y;
-            double times_x = (_Zero.X - cursor_x) / _UnitLength;
-            double times_y = (_Zero.Y - cursor_y) / _UnitLength;
+            double times_x = (_Zero.X - cursor_x) / _UnitLengthX;
+            double times_y = (_Zero.Y - cursor_y) / _UnitLengthY;
             double delta;
             delta = Math.Pow(Math.Log(Math.Abs(e.Delta) + 1) + 1, 0.1);
             if (e.Delta == 120)
@@ -504,25 +480,54 @@ namespace CsGrafeq
                 delta = 1.3;
             if (e.Delta > 0)
             {
-                _UnitLength *= delta;
+                if (MouseOnXAxis && MouseOnYAxis)
+                {
+                    _UnitLengthX *= delta;
+                    _UnitLengthY *= delta;
+                }
+                else if (MouseOnYAxis)
+                    _UnitLengthY *= delta;
+                else if (MouseOnXAxis)
+                    _UnitLengthX *= delta;
+                else
+                {
+                    _UnitLengthX *= delta;
+                    _UnitLengthY *= delta;
+                }
             }
             else
             {
-                _UnitLength /= delta;
+                if (MouseOnXAxis && MouseOnYAxis)
+                {
+                    _UnitLengthX /= delta;
+                    _UnitLengthY /= delta;
+                }
+                else if (MouseOnYAxis)
+                    _UnitLengthY /= delta;
+                else if (MouseOnXAxis)
+                    _UnitLengthX /= delta;
+                else
+                {
+                    _UnitLengthX /= delta;
+                    _UnitLengthY /= delta;
+                }
             }
-            _UnitLength = RangeIn(0.01, 1000000, _UnitLength);
+            _UnitLengthX = RangeIn(0.01, 1000000, _UnitLengthX);
+            _UnitLengthY = RangeIn(0.01, 1000000, _UnitLengthY);
             if (CanMove)
             {
                 _Zero = new PointL()
                 {
-                    X = (long)(times_x * _UnitLength + cursor_x),
-                    Y = (long)(times_y * _UnitLength + cursor_y)
+                    X = (long)(times_x * _UnitLengthX + cursor_x),
+                    Y = (long)(times_y * _UnitLengthY + cursor_y)
                 };
             }
-            double ratio = _UnitLength / previousunitlength;
-            if (ratio > 2 || ratio < 0.5)
+            double ratioX = _UnitLengthX / previousunitlengthX;
+            double ratioY = _UnitLengthY / previousunitlengthY;
+            if (ratioX > 2 || ratioX < 0.5|| ratioY > 2 || ratioY < 0.5)
             {
-                previousunitlength = _UnitLength;
+                previousunitlengthX = _UnitLengthX;
+                previousunitlengthY = _UnitLengthY;
                 previouszero = _Zero;
                 Render(TargetGraphics);
             }
@@ -532,10 +537,10 @@ namespace CsGrafeq
                 graphics.Clear(Color_White);
                 RenderAxisLine(graphics,ClientRectangle);
                 graphics.DrawImage(Bitmap,new RectangleF(
-                    (float)(_Zero.X - previouszero.X * ratio),
-                    (float)(_Zero.Y - previouszero.Y * ratio),
-                    (float)(ratio*Bitmap.Width),
-                    (float)(ratio*Bitmap.Height)
+                    (float)(_Zero.X - previouszero.X * ratioX),
+                    (float)(_Zero.Y - previouszero.Y * ratioY),
+                    (float)(ratioX*Bitmap.Width),
+                    (float)(ratioY*Bitmap.Height)
                 ));
                 RenderAxisNumber(graphics,ClientRectangle);
                 buf.Render();
@@ -581,42 +586,25 @@ namespace CsGrafeq
         //大于0则为10 等于0为0 小于0为1
         
     }
-    public class ImplicitFunctionList
+    public class CsGrafeqImplicitFunctionCollection 
     {
         internal List<ImplicitFunction> innerList=new List<ImplicitFunction>();
-        internal ImplicitFunctionDisplayer fd;
-        internal ImplicitFunctionList(ImplicitFunctionDisplayer fd)
+        internal Control owner;
+        internal CsGrafeqImplicitFunctionCollection(Control fd)
         {
-            this.fd = fd;
+            this.owner = fd;
         }
         public ImplicitFunction Add(ComparedExpression ec)
         {
-            ImplicitFunction impf=new ImplicitFunction(ec);
-            impf.Bitmap = new Bitmap(fd.width,fd.height);
+            ImplicitFunction impf =new ImplicitFunction(ec,owner.ClientSize);
             innerList.Add(impf);
             return impf;
         }
         public ImplicitFunction Add(string expression)
         {
-            ImplicitFunction impf = new ImplicitFunction(expression);
-            impf.Bitmap = new Bitmap(fd.width, fd.height);
+            ImplicitFunction impf = new ImplicitFunction(expression, owner.ClientSize);
             innerList.Add(impf);
             return impf;
-        }
-        public bool Remove(string expression)
-        {
-            if (expression == "")
-                return false;
-            for (int i = 0; i < innerList.Count; i++)
-            {
-                if (innerList[i].Expression == expression)
-                {
-                    innerList[i].Dispose();
-                    innerList.RemoveAt(i);
-                    return true;
-                }
-            }
-            return false;
         }
         public bool RemoveAt(int index)
         {
@@ -625,19 +613,6 @@ namespace CsGrafeq
             innerList[index].Dispose();
             innerList.RemoveAt(index);
             return true;
-        }
-        public bool Contains(string expression)
-        {
-            if (expression == "")
-                return false;
-            for (int i = 0; i < innerList.Count; i++)
-            {
-                if (innerList[i].Expression == expression)
-                {
-                    return true;
-                }
-            }
-            return false;
         }
         public ImplicitFunction this[int index]
         {

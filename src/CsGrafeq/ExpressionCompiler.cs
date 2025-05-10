@@ -211,7 +211,7 @@ namespace CsGrafeq
         static ExpressionCompiler()
         {
         }
-        internal static Element[] ParseTokens(Token[] Tokens)
+        internal static Element[] ParseTokens(this Token[] Tokens)
         {
             Stack<OperatorType> op = new Stack<OperatorType>();
             Stack<Element> exp = new Stack<Element>();
@@ -450,7 +450,7 @@ namespace CsGrafeq
             //if (stacklength != 1)
             //    throw new Exception("缺少运算符或函数"+stacklength);
         }
-        internal static Token[] GetTokens(string script)//词法分析器
+        internal static Token[] GetTokens(this string script)//词法分析器
         {
             script += '#';
             int loc = 0;
@@ -632,56 +632,7 @@ namespace CsGrafeq
                 return;
             }
         }
-        public enum FunctionType
-        {
-            Interval,IntervalSet, Number
-        }
-        #region 枚举/类型
-        public enum ElementType
-        {
-            Variable, Number, Function, BasicOperator, Operator,
-        }
-        public enum OperatorType
-        {
-            Add, Subtract, Multiply, Divide, Pow, Mod,
-            LeftBracket, RightBracket, Start, Neg,
-            Equal, Less, Greater, LessEqual, GreaterEqual,
-            Union,Intersect
-        }
-        public struct Element
-        {
-            public ElementType type;
-            public string NameOrValue;
-            public int arg;
-            public Element(ElementType type, string nameOrValue, int arg)
-            {
-                this.type = type;
-                this.NameOrValue = nameOrValue;
-                this.arg = arg;
-            }
-            public override string ToString()
-            {
-                return type.ToString() + " " + NameOrValue + " " + arg;
-            }
-        }
-        internal enum TokenType
-        {
-            Add, Subtract, Multiply, Divide, Pow, Mod,
-            LeftBracket, RightBracket, Start, Neg,
-            Equal, Less, Greater, LessEqual, GreaterEqual, Union,Intersect,
-            VariableOrFunction, Number, Comma,
-            Err_UnDefined
-        }
-        internal struct Token
-        {
-            public TokenType type;
-            public string NameOrValue;
-            public override string ToString()
-            {
-                return type.ToString() + " " + NameOrValue;
-            }
-        }
-        #endregion
+        
         #region 其他函数
         private static Element ToElement(this OperatorType t)
         {
@@ -762,7 +713,7 @@ namespace CsGrafeq
             }
         }
         #endregion
-        public class ILRecorder
+        internal class ILRecorder
         {
             private ILGenerator IL;
             private StringBuilder sb = new StringBuilder();
@@ -865,9 +816,59 @@ namespace CsGrafeq
             this.il = il;
         }
     }
+    #region 枚举/类型
     public enum ConstantMode
     {
         None,
         Array
     }
+    public enum FunctionType
+    {
+        Interval, IntervalSet, Number
+    }
+    public enum ElementType
+    {
+        Variable, Number, Function, BasicOperator, Operator,
+    }
+    public enum OperatorType
+    {
+        Add, Subtract, Multiply, Divide, Pow, Mod,
+        LeftBracket, RightBracket, Start, Neg,
+        Equal, Less, Greater, LessEqual, GreaterEqual,
+        Union, Intersect
+    }
+    internal enum TokenType
+    {
+        Add, Subtract, Multiply, Divide, Pow, Mod,
+        LeftBracket, RightBracket, Start, Neg,
+        Equal, Less, Greater, LessEqual, GreaterEqual, Union, Intersect,
+        VariableOrFunction, Number, Comma,
+        Err_UnDefined
+    }
+    internal struct Token
+    {
+        public TokenType type;
+        public string NameOrValue;
+        public override string ToString()
+        {
+            return type.ToString() + " " + NameOrValue;
+        }
+    }
+    internal struct Element
+    {
+        public ElementType type;
+        public string NameOrValue;
+        public int arg;
+        public Element(ElementType type, string nameOrValue, int arg)
+        {
+            this.type = type;
+            this.NameOrValue = nameOrValue;
+            this.arg = arg;
+        }
+        public override string ToString()
+        {
+            return type.ToString() + " " + NameOrValue + " " + arg;
+        }
+    }
+    #endregion
 }

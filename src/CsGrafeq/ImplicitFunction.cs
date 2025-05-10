@@ -7,6 +7,8 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using CsGrafeq;
+using static CsGrafeq.ExMethods;
 
 namespace CsGrafeq
 {
@@ -14,7 +16,8 @@ namespace CsGrafeq
     internal delegate (bool, bool) IntervalSetImpFunctionDelegate(IntervalSet i1, IntervalSet i2, double[] constlist);
     internal delegate int NumberImpFunctionDelegate(double n1, double n2, double[] constlist);
     internal delegate bool MarchingSquaresDelegate(double left,double top,double right,double bottom,double[] constlist);
-    public class ImplicitFunction : IDisposable
+
+    public abstract class Function : IDisposable
     {
         private static readonly Array colors = Enum.GetValues(typeof(KnownColor));
         private static readonly Random rnd = new Random();
@@ -24,7 +27,7 @@ namespace CsGrafeq
         {
             return (k * Math.Pow(Math.Pow(((double)c.R / 255), 2.2) + Math.Pow(((double)c.G / 255 * 1.5), 2.2) + Math.Pow(((double)c.B / 255 * 0.6), 2.2), 1 / 2.2));
         }
-        private static Color GetRandomColor()
+        protected static Color GetRandomColor()
         {
             Color color;
             do
@@ -33,7 +36,20 @@ namespace CsGrafeq
             } while (GetRealBrightness(color) > 0.7);
             return color;
         }
-
+        void IDisposable.Dispose()
+        {
+            throw new NotImplementedException();
+        }
+        internal string _Expression;
+        internal Color color;
+        internal string ExpressionRecord;
+        internal Function()
+        {
+            color = GetRandomColor();
+        }
+    } 
+    public class ImplicitFunction : Function
+    {
         internal IntervalImpFunctionDelegate IntervalImpFunction;
         internal MarchingSquaresDelegate MarchingSquaresFunction;
         internal IntervalSetImpFunctionDelegate IntervalSetImpFunction;
@@ -48,10 +64,6 @@ namespace CsGrafeq
             }
         }
         internal Graphics BitmapGraphics;
-        internal RectangleF Rects;
-        private string _Expression;
-        internal Color color;
-        internal string ExpressionRecord;
         /// <summary>
         /// 使用Interval或IntervalSet计算
         /// </summary>
@@ -61,42 +73,25 @@ namespace CsGrafeq
         /// </summary>
         public CheckPixelMode CheckPixelMode = CheckPixelMode.None;
         /// <summary>
-        /// 获取指定x区间与y区间的计算结果
-        /// </summary>
-        public (bool, bool) GetFunctionResult(Interval i1, Interval i2, double[] constlist)
-        {
-            if (IntervalImpFunction == null)
-                throw new Exception("函数未生成");
-            return IntervalImpFunction(i1, i2, constlist);
-        }
-        /// <summary>
-        /// 获取指定x区间与y区间的计算结果
-        /// </summary>
-        public (bool, bool) GetFunctionResult(IntervalSet i1, IntervalSet i2, double[] constlist)
-        {
-            if (IntervalSetImpFunction == null)
-                throw new Exception("函数未生成");
-            return IntervalSetImpFunction(i1, i2, constlist);
-        }
-        /// <summary>
         /// 表达式
         /// </summary>
         public string Expression
         {
             get => _Expression;
         }
-        internal ImplicitFunction(string expression):this(ExpressionCompiler.ParseTokens(ExpressionCompiler.GetTokens(expression)))
+        internal ImplicitFunction(string expression,Size s):this(ExpressionCompiler.ParseTokens(ExpressionCompiler.GetTokens(expression)),s)
         {
         }
-        internal ImplicitFunction(ComparedExpression ec):this(ec.Elements.ToArray())
+        internal ImplicitFunction(ComparedExpression ec,Size s):this(ec.Elements.ToArray(),s)
         {
         }
-        internal ImplicitFunction(ExpressionCompiler.Element[] eles)
+        internal ImplicitFunction(Element[] eles,Size s):base()
         {
             _Expression = string.Empty;
             (IntervalImpFunction, IntervalSetImpFunction, MarchingSquaresFunction, UsedConstant) = ExpressionCompiler.Compile(eles);
+            _Bitmap = new Bitmap(s.Width,s.Height);
+            BitmapGraphics= Graphics.FromImage(_Bitmap);
             ExpressionRecord = ExpressionCompiler.Record;
-            color = GetRandomColor();
             bool containequal = false;
             foreach (var i in eles)
             {
@@ -120,23 +115,6 @@ namespace CsGrafeq
         {
             _Bitmap.Dispose();
         }
-        public ImplicitFunction SetProperty(string propname, object value)
-        {
-            Type t = typeof(AxisDisplayer);
-            FieldInfo f = t.GetField(propname, BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase);
-            if (f != null)
-            {
-                f.SetValue(this, value);
-                return this;
-            }
-            PropertyInfo p = t.GetProperty(propname, BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase);
-            if (p != null)
-            {
-                p.SetValue(this, value);
-                return this;
-            }
-            return this;
-        }
     }
     public enum ExpressionType
     {
@@ -153,5 +131,66 @@ namespace CsGrafeq
     public struct RectangleD
     {
         public double X,Y,Width,Height;
+    }
+    internal static partial class ExMethods
+    {
+        internal static bool MyContains<T>(this IEnumerable<T> iter, Func<T, bool> predicate)
+        {
+            foreach(var i in iter)
+            {
+                if(predicate.Invoke(i))
+                    return true;
+            }
+            return false;
+        }
+        internal static T SetProperty<T>(this T obj, string propname, object value)
+        {
+            Type t = typeof(T);
+            FieldInfo f = t.GetField(propname, BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase);
+            if (f != null)
+            {
+                f.SetValue(obj, value);
+                return obj;
+            }
+            PropertyInfo p = t.GetProperty(propname, BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase);
+            if (p != null)
+            {
+                p.SetValue(obj, value);
+                return obj;
+            }
+            return obj;
+        }
+        internal static object GetProperty<T>(this T obj, string propname)
+        {
+            Type t = typeof(T);
+            FieldInfo f = t.GetField(propname, BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase);
+            if (f != null)
+            {
+                return f.GetValue(obj);
+            }
+            PropertyInfo p = t.GetProperty(propname, BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase);
+            if (p != null)
+            {
+                return p.GetValue(obj);
+            }
+            return null;
+        }
+        internal static T GetProperty<T>(this T obj, string propname,ref object value)
+        {
+            Type t = typeof(T);
+            FieldInfo f = t.GetField(propname, BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase);
+            if (f != null)
+            {
+                value=f.GetValue(obj);
+                return obj;
+            }
+            PropertyInfo p = t.GetProperty(propname, BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase);
+            if (p != null)
+            {
+                value=p.GetValue(obj);
+                return obj;
+            }
+            return obj;
+        }
     }
 }

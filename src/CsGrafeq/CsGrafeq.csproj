@@ -50,6 +50,9 @@
     <Compile Include="AxisDisplayer.Designer.cs">
       <DependentUpon>AxisDisplayer.cs</DependentUpon>
     </Compile>
+    <Compile Include="DoubleBufferedControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="ExpressionBuilder.cs" />
     <Compile Include="ExpressionCompiler.cs" />
     <Compile Include="ImplicitFunctionDisplayer.cs">

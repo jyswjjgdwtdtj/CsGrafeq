@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static CsGrafeq.ExMethods;
 
 namespace CsGrafeq
 {
@@ -15,7 +16,7 @@ namespace CsGrafeq
         public IntervalSet(double num)
         {
             Intervals = new Range[1] { new Range(num) };
-            Def = (true, true);
+            Def = TT;
             Cont = true;
             IsNumber= true;
         }
@@ -25,14 +26,14 @@ namespace CsGrafeq
             Intervals= new Range[nums.Length];
             for(int i=0;i<nums.Length;i++)
                 Intervals[i]= new Range(nums[i]);
-            Def = (true, true);
+            Def = TT;
             Cont = true;
             IsNumber = false;
         }
         public IntervalSet(double num1,double num2)
         {
             Intervals = new Range[1] { new Range(num1,num2) };
-            Def = (true, true);
+            Def = TT;
             Cont = true;
             IsNumber = num1 == num2;
         }
@@ -46,7 +47,7 @@ namespace CsGrafeq
         public IntervalSet(Range[] Ranges)
         {
             Intervals = Ranges;
-            Def = (true,true);
+            Def = TT;
             Cont =true;
             IsNumber = false;
         }

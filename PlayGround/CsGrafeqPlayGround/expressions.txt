@@ -27,3 +27,4 @@ sin(x^2+y^2)=cos(x*y);yes
 abs(sin(x^2-y^2))=sin(x+y)+cos(x*y);yes
 abs(sin(x^2+2*x*y))=sin(x-2*y);no
 tan(sin(x)+cos(y))=sin(tan(x+y));no
+arctan(sin(x)+cos(y))=sin(arctan(x+y));no
