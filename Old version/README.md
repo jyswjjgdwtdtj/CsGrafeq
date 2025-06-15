@@ -1,0 +1,2 @@
+The old version is constructed as a form of inheritance, which means controls like "ImplicitFunctionDisplayer" must be inherited from controls like "AxisDisplyer". 
+However, this form makes CsGrafeq unscalable and impossible to paint an function image and some shapes on one sketchpad.
