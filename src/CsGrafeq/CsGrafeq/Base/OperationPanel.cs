@@ -22,7 +22,7 @@ namespace CsGrafeq.Base
         {
             Graphics g = e.Graphics;
             Brush _textBrush=new SolidBrush(Color.Black);
-            TabControl tabControl1 = noFlashTabControl2;
+            TabControl tabControl1 = tabControl_Operation;
             TabPage _tabPage = tabControl1.TabPages[e.Index];
             Rectangle _tabBounds = tabControl1.GetTabRect(e.Index);
 

@@ -40,6 +40,19 @@ namespace CsGrafeq.Geometry.Shapes
                 p.AddToChangeEvent(RefreshValues,this);
             RefreshValues();
         }
+        internal Polygon(PointGetter[] ps, params PointGetter[] points)
+        {
+            if(ps.Length+points.Length<3)
+                throw new ArgumentLengthLessThanThreeException();
+            List<PointGetter> ls=new List<PointGetter>();
+            ls.AddRange(ps);
+            ls.AddRange(points);
+            Points = ls.ToArray();
+            Locations = new Vec[Points.Length];
+            foreach (PointGetter p in Points)
+                p.AddToChangeEvent(RefreshValues, this);
+            RefreshValues();
+        }
         internal override void RefreshValues()
         {
             for(int i=0; i<Points.Length; i++)

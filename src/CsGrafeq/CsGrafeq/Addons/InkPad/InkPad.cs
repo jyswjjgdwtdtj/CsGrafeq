@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using static CsGrafeq.Base.Values;
 
-namespace CsGrafeq.InkPad
+namespace CsGrafeq.Addons.InkPad
 {
     public class InkPad:Addon
     {

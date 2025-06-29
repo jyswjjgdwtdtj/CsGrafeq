@@ -31,6 +31,7 @@ namespace CsGrafeq.Base
                 {
                     c.Size = c.GetPreferredSize(parentDisplayRectangle.Size);
                 }
+                c.Width=parentDisplayRectangle.Width;
                 nextControlLocation.X = parentDisplayRectangle.X;
                 nextControlLocation.Y += c.Height + c.Margin.Bottom;
             }

@@ -12,6 +12,8 @@ using CsGrafeq.Base;
 using System.Diagnostics;
 using CsGrafeq.Geometry;
 using System.Runtime.CompilerServices;
+using CsGrafeq.Addons;
+using CsGrafeq.Addons.Implicit;
 
 namespace CsGrafeq.Base
 {
@@ -23,8 +25,8 @@ namespace CsGrafeq.Base
         private int width, height;
         private bool loaded = false;
         private BufferedGraphics buf;
-        private LinkedList<AddonClass> Addons = new LinkedList<AddonClass>();
-        private PointL _Zero = new PointL() { X = 250, Y = 250 };
+        internal LinkedList<AddonClass> Addons = new LinkedList<AddonClass>();
+        private PointL _Zero = new PointL() { X = 500, Y = 250 };
         private OwnerArguments BasicOA = new OwnerArguments();
         private double[] Constants = new double['z' - 'a' + 1];
         private DateTime LastRenderTimer = DateTime.Now;
@@ -58,6 +60,8 @@ namespace CsGrafeq.Base
             get { return new Point((int)_Zero.X, (int)_Zero.Y); }
             set { _Zero = new PointL(value.X, value.Y); Render(); }
         }
+
+        internal event EventHandler AddonListChanged;
         public DisplayerBase()
         {
             Initialize();
@@ -126,7 +130,7 @@ namespace CsGrafeq.Base
         public Addon GetAddon(string name, int index)
         {
             if (index < 0)
-                throw new ArgumentOutOfRangeException("index");
+                return null;
             int i = 0;
             foreach (var addon in Addons)
             {
@@ -137,12 +141,12 @@ namespace CsGrafeq.Base
                     i++;
                 }
             }
-            throw new ArgumentOutOfRangeException("index");
+            return null;
         }
         public T GetAddon<T>(int index) where T : Addon
         {
             if (index < 0)
-                throw new ArgumentOutOfRangeException("index");
+                return null;
             int i = 0;
             foreach (var addon in Addons)
             {
@@ -153,21 +157,23 @@ namespace CsGrafeq.Base
                     i++;
                 }
             }
-            throw new ArgumentOutOfRangeException("index");
+            return null;
         }
-        public void AppendAddon(Addon addon)
+        public Addon AppendAddon(Addon addon)
         {
             foreach(var i in Addons)
             {
                 if (i.Addon == addon)
                 {
-                    return;
+                    return addon;
                 }
             }
             AddonClass ac = new AddonClass(addon, ClientSize);
             Addons.AddLast(ac);
+            AddonListChanged?.Invoke(null, EventArgs.Empty);
             BasicOA.AskForRender = () => AskRenderAddon(ac);
             addon.OwnerArguments = BasicOA;
+            return addon;
         }
         public void RemoveAddon(Addon addon)
         {
@@ -176,6 +182,8 @@ namespace CsGrafeq.Base
                 if (i.Addon == addon)
                 {
                     Addons.Remove(i);
+                    AddonListChanged?.Invoke(null, EventArgs.Empty);
+                    return;
                 }
             }
         }
@@ -196,7 +204,10 @@ namespace CsGrafeq.Base
             foreach (var i in Addons)
             {
                 if (i.Addon == s)
+                {
                     Addons.AddBefore(Addons.Find(i), ao);
+                    AddonListChanged?.Invoke(null,EventArgs.Empty);
+                }
             }
         }
         public void InsertAddonAfter(Addon addontoinsert, Addon s)
@@ -216,7 +227,10 @@ namespace CsGrafeq.Base
             foreach (var i in Addons)
             {
                 if (i.Addon == s)
+                {
                     Addons.AddAfter(Addons.Find(i), ao);
+                    AddonListChanged?.Invoke(null, EventArgs.Empty);
+                }
             }
         }
         public void CallRender(Graphics graphics, Rectangle s, bool RenderToAddonImage, bool clearimage)
@@ -260,7 +274,6 @@ namespace CsGrafeq.Base
                 RenderAxisLine(graphics);
                 CallRender(graphics, ClientRectangle, true, true);
                 RenderAxisNumber(graphics);
-                DrawDebugStr(graphics);
                 buf.Render();
             }
             else
@@ -278,7 +291,6 @@ namespace CsGrafeq.Base
                 graphics.DrawImage(addon.Image,0,0);
             }
             RenderAxisNumber(graphics);
-            DrawDebugStr(graphics);
             buf.Render();
         }
         public void AskToRender(Addon caller)
@@ -552,6 +564,7 @@ namespace CsGrafeq.Base
         #endregion
         #region OverridedMethods
         private PointL MouseDownPos = new PointL() { X = 0, Y = 0 };
+        private Point MouseDownLocation=Point.Empty;
         private PointL MouseDownZeroPos = new PointL() { X = 0, Y = 0 };
         private PointL LastZeroPos;
         private bool MouseDownLeft = false;
@@ -561,13 +574,6 @@ namespace CsGrafeq.Base
         protected override void OnMouseClick(MouseEventArgs e)
         {
             this.Focus();
-            foreach (var addon in Addons)
-                if (!addon.Addon.AddonOnMouseClick(e))
-                {
-                    EventOver();
-                    return;
-                }
-            EventOver();
             base.OnMouseClick(e);
         }
         protected override void OnMouseDoubleClick(MouseEventArgs e)
@@ -575,22 +581,17 @@ namespace CsGrafeq.Base
             this.Focus();
             foreach (var addon in Addons)
                 if (!addon.Addon.AddonOnMouseDoubleClick(e))
-                {
-                    EventOver();
-                    return;
-                }
+                    break;
             EventOver();
             base.OnMouseDoubleClick(e);
         }
         protected override void OnMouseDown(MouseEventArgs e)
         {
+            MouseDownLocation = e.Location;
             this.Focus();
             foreach (var addon in Addons)
                 if (!addon.Addon.AddonOnMouseDown(e))
-                {
-                    EventOver();
-                    return;
-                }
+                    break;
             EventOver();
             if (e.Button == MouseButtons.Left)
             {
@@ -622,7 +623,6 @@ namespace CsGrafeq.Base
                         gg.DrawImage(i.Image, 0, 0);
                     }
                     RenderAxisNumber(gg);
-                    DrawDebugStr(gg);
                     buf.Render();
                     return;
                 }
@@ -640,7 +640,6 @@ namespace CsGrafeq.Base
                     gg.DrawImage(i.Image, 0, 0);
                 }
                 RenderAxisNumber(gg);
-                DrawDebugStr(gg);
                 buf.Render();
                 LastRenderTimer = DateTime.Now;
                 return;
@@ -650,77 +649,65 @@ namespace CsGrafeq.Base
             {//移动零点
                 _Zero.X = (MouseDownZeroPos.X + e.X - MouseDownPos.X);
                 _Zero.Y = (MouseDownZeroPos.Y + e.Y - MouseDownPos.Y);
-
-                if ((DateTime.Now - LastRenderTimer).TotalMilliseconds > MINRENDERINTERVAL)
+                Graphics graphics = buf.Graphics;
+                graphics.Clear(Color_White);
+                RenderAxisLine(graphics);
+                if (false && (Math.Abs(LastZeroPos.X - _Zero.X) > 20 || Math.Abs(LastZeroPos.Y - _Zero.Y) > 20 || e.Clicks == 142857))
                 {
-                    Graphics graphics = buf.Graphics;
-                    graphics.Clear(Color_White);
-                    RenderAxisLine(graphics);
-                    if (false && Math.Abs(LastZeroPos.X - _Zero.X) > 20 || Math.Abs(LastZeroPos.Y - _Zero.Y) > 20 || e.Clicks == 142857)
+                    Bitmap tmpbmp;
+                    //需修改图片
+                    foreach (var i in Addons)
                     {
-                        Bitmap tmpbmp = new Bitmap(width, height);
-                        //需修改图片
-                        foreach (var i in Addons)
+                        if (i.Addon.AddonMode == AddonMode.ForPlot)
                         {
-                            if (i.Addon.AddonMode == AddonMode.ForPlot)
-                            {
-                                tmpbmp = new Bitmap(i.Image);
-                                i.ImageGraphics.Clear(Color_Transparent);
-                                i.ImageGraphics.DrawImage(tmpbmp, _Zero.X - LastZeroPos.X, _Zero.Y - LastZeroPos.Y);
-                                tmpbmp.Dispose();
-                                if(i.Addon.RenderMode==RenderMode.Move)
-                                    RenderMovedPlace(i.ImageGraphics, i.Addon);
-                                else
-                                {
-                                    i.ImageGraphics.Clear(Color_Transparent);
-                                    i.Addon.AddonRender(i.ImageGraphics, ClientRectangle);
-                                }
-                            }
-                            graphics.DrawImage(i.Image, 0, 0);
-                        }
-                        LastZeroPos = _Zero;
-                    }
-                    else
-                    {
-                        foreach (var i in Addons)
-                        {
-                            if(i.Addon.AddonMode==AddonMode.ForPixel)
-                                graphics.DrawImage(i.Image, 0, 0);
-                            else if (i.Addon.RenderMode==RenderMode.Move)
-                                graphics.DrawImage(i.Image, _Zero.X - LastZeroPos.X, _Zero.Y - LastZeroPos.Y);
-                                
-
+                            tmpbmp = new Bitmap(i.Image);
+                            i.ImageGraphics.Clear(Color_Transparent);
+                            i.ImageGraphics.DrawImage(tmpbmp, _Zero.X - LastZeroPos.X, _Zero.Y - LastZeroPos.Y);
+                            tmpbmp.Dispose();
                             if (i.Addon.RenderMode == RenderMode.Move)
                                 RenderMovedPlace(i.ImageGraphics, i.Addon);
                             else
                             {
                                 i.ImageGraphics.Clear(Color_Transparent);
                                 i.Addon.AddonRender(i.ImageGraphics, ClientRectangle);
-                                graphics.DrawImage(i.Image, 0, 0);
                             }
                         }
+                        graphics.DrawImage(i.Image, 0, 0);
                     }
-                    RenderAxisNumber(graphics);
-                    DrawDebugStr(graphics);
-                    buf.Render();
-                    LastRenderTimer = DateTime.Now;
+                    LastZeroPos = _Zero;
                 }
                 else
                 {
-                    NeedRender = true;
+                    foreach (var i in Addons)
+                    {
+                        if (i.Addon.AddonMode == AddonMode.ForPixel)
+                            graphics.DrawImage(i.Image, 0, 0);
+                        else if (i.Addon.RenderMode == RenderMode.Move)
+                            graphics.DrawImage(i.Image, _Zero.X - LastZeroPos.X, _Zero.Y - LastZeroPos.Y);
+                        if (i.Addon.RenderMode != RenderMode.Move)
+                        {
+                            i.ImageGraphics.Clear(Color_Transparent);
+                            i.Addon.AddonRender(i.ImageGraphics, ClientRectangle);
+                            graphics.DrawImage(i.Image, 0, 0);
+                        }
+                    }
                 }
+                RenderAxisNumber(graphics);
+                buf.Render();
             }
             return;
         }
+        private void DoSomething() { }
         protected override void OnMouseUp(MouseEventArgs e)
         {
             this.Focus();
             foreach (var addon in Addons)
                 if (!addon.Addon.AddonOnMouseUp(e))
-                {
-                    EventOver();
-                    return;
-                }
+                    break;
+            if (e.Location==MouseDownLocation)
+                foreach (var addon in Addons)
+                    if (!addon.Addon.AddonOnMouseClick(e))
+                        break;
             EventOver();
             if (e.Button == MouseButtons.Left)
             {
@@ -731,13 +718,19 @@ namespace CsGrafeq.Base
                 MouseDownRight = false;
             }
             if (LastZeroPos != _Zero)
+            {
                 Render(true);
+            }
             LastZeroPos = _Zero;
         }
         protected override void OnMouseLeave(EventArgs e)
         {
             this.Focus();
             MouseDownLeft = MouseDownRight = false;
+            foreach (var addon in Addons)
+                if (!addon.Addon.AddonOnMouseLeave(e))
+                    break;
+            EventOver();
             Render();
         }
         private bool Wheeling = false;
@@ -819,32 +812,24 @@ namespace CsGrafeq.Base
             }
             else
             {
-                if ((DateTime.Now - LastRenderTimer).TotalMilliseconds > MINRENDERINTERVAL)
+                Graphics graphics = buf.Graphics;
+                graphics.Clear(Color_White);
+                RenderAxisLine(graphics);
+                RectangleF rect = new RectangleF(
+                    (float)(_Zero.X - previouszero.X * ratioX),
+                    (float)(_Zero.Y - previouszero.Y * ratioY),
+                    (float)(ratioX * width),
+                    (float)(ratioY * height));
+                foreach (var i in Addons)
                 {
-                    Graphics graphics = buf.Graphics;
-                    graphics.Clear(Color_White);
-                    RenderAxisLine(graphics);
-                    RectangleF rect = new RectangleF(
-                        (float)(_Zero.X - previouszero.X * ratioX),
-                        (float)(_Zero.Y - previouszero.Y * ratioY),
-                        (float)(ratioX * width),
-                        (float)(ratioY * height));
-                    foreach (var i in Addons)
-                    {
-                        if (i.Addon.AddonMode == AddonMode.ForPlot)
-                            graphics.DrawImage(i.Image, rect);
-                        else
-                            graphics.DrawImage(i.Image, 0, 0);
-                    }
-                    RenderAxisNumber(graphics);
-                    DrawDebugStr(graphics);
-                    buf.Render();
-                    LastRenderTimer = DateTime.Now;
+                    if (i.Addon.AddonMode == AddonMode.ForPlot)
+                        graphics.DrawImage(i.Image, rect);
+                    else
+                        graphics.DrawImage(i.Image, 0, 0);
                 }
-                else
-                {
-                    NeedRender = true;
-                }
+                RenderAxisNumber(graphics);
+                buf.Render();
+                NeedRender = false;
             }
         }
         protected override void OnKeyDown(KeyEventArgs e)
@@ -924,12 +909,6 @@ namespace CsGrafeq.Base
             return base.ProcessDialogKey(keyData);
         }
         #endregion
-        public static string DebugStr;
-        [Conditional("DEBUG")]
-        public static void DrawDebugStr(Graphics g)
-        {
-            g.DrawBubblePopup(DebugStr, new Font("Arial", 9), new Point(1, 1), Color.White);
-        }
 
     }
     public static class Values
@@ -937,9 +916,11 @@ namespace CsGrafeq.Base
         public static Color Color_White, Color_Black, Color_Transparent,Color_Blue,Color_T_Grey,Color_Red;
         public static SolidBrush Brush_White, Brush_Black,Brush_Blue,Brush_T_Grey,Brush_Red;
         public static Pen Pen_White, Pen_Black,Pen_Blue,Pen_Red;
-        public static (bool, bool) TT = (true, true);
-        public static (bool, bool) FT = (false, true);
-        public static (bool, bool) FF = (false, false);
+        public static readonly (bool, bool) TT = (true, true);
+        public static readonly (bool, bool) FT = (false, true);
+        public static readonly (bool, bool) FF = (false, false);
+        public const bool Intercept = false;
+        public const bool DoNext = true;
         static Values()
         {
             Color_White = Color.White;

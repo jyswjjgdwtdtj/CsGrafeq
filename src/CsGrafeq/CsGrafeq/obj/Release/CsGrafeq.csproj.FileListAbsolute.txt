@@ -1,0 +1,14 @@
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\obj\Release\CsGrafeq.csproj.AssemblyReference.cache
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\obj\Release\CsGrafeq.Addons.Geometry.OpControl.resources
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\obj\Release\CsGrafeq.Addons.Implicit.OpControl.resources
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\obj\Release\CsGrafeq.Addons.Implicit.ExpressionBar.resources
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\obj\Release\CsGrafeq.Base.DisplayerBase.resources
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\obj\Release\CsGrafeq.Base.OperationPanel.resources
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\obj\Release\CsGrafeq.Base.PropertyDialog.resources
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\obj\Release\CsGrafeq.Base.ShowBar.resources
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\obj\Release\CsGrafeq.csproj.GenerateResource.cache
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\obj\Release\CsGrafeq.csproj.CoreCompileInputs.cache
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\bin\Release\CsGrafeq.exe
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\bin\Release\CsGrafeq.pdb
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\obj\Release\CsGrafeq.exe
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\obj\Release\CsGrafeq.pdb

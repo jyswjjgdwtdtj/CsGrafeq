@@ -10,9 +10,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static CsGrafeq.ExMethods;
-using static CsGrafeq.Base.Values;
 
-namespace CsGrafeq.Implicit
+namespace CsGrafeq
 {
     /// <summary>
     /// 1.对于所能达到的最小区间，计算结果必须绝对精确
@@ -48,6 +47,7 @@ namespace CsGrafeq.Implicit
                     for (Range* j = i2start; j < i2start + i2.Intervals.Length; j++)
                         *(ptr+loc++) = RangeAdd(i, j);
             }
+            i1.Intervals = null; i2.Intervals=null;
             return GetIntervalSetFromRangeArray(Ranges, And(i1.Def, i2.Def), i1.Cont && i2.Cont);
         }
         private unsafe static Range RangeAdd(Range* i1,Range* i2)
@@ -1213,6 +1213,9 @@ namespace CsGrafeq.Implicit
             MessageBox.Show(t.ToString());
             return t;
         }
+        public static readonly (bool, bool) TT = (true, true);
+        public static readonly (bool, bool) FT = (false, true);
+        public static readonly (bool, bool) FF = (false, false);
     }
     internal struct OnlyAddList<T>//不可被赋值！ 
     {

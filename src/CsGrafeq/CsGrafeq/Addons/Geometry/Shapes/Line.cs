@@ -75,9 +75,9 @@ namespace CsGrafeq.Geometry.Shapes
         internal override bool CheckIsValid(Vec vec)
         {
             if (Point1.X == Point2.X)
-                return Math.Sign(Point2.Y-Point1.Y)==Math.Sign(vec.Y-Point1.Y);
+                return Sgn(Point2.Y-Point1.Y)==Sgn(vec.Y-Point1.Y);
             else
-                return Math.Sign(Point2.X - Point1.X) == Math.Sign(vec.X - Point1.X);
+                return Sgn(Point2.X - Point1.X) == Sgn(vec.X - Point1.X);
         }
     }
     /// <summary>
@@ -200,6 +200,10 @@ namespace CsGrafeq.Geometry
 {
     internal static partial class GeometryMath
     {
+        internal static double Sgn(double num)
+        {
+            return double.IsNaN(num) ? num : Math.Sign(num);
+        }
         internal static Vec GetIntersectionPoint(Vec s1, Vec e1, Vec s2, Vec e2)
         {
             double k1, k2;

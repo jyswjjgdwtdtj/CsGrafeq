@@ -264,6 +264,29 @@ namespace CsGrafeq.Geometry.Shapes.Getter
         }
 
     }
+    internal class PointGetter_PointOfLine : PointGetter
+    {
+        private Line line;
+        private int index;
+        public PointGetter_PointOfLine(Line line, int index = 1)
+        {
+            this.line = line;
+            this.index = index;
+        }
+        public override Vec GetPoint()
+        {
+            if (index == 1)
+                return line.Point1;
+            else if(index==2)
+                return line.Point2;
+            return Vec.InvalidVec;
+        }
+        public override void AddToChangeEvent(ShapeChangeHandler handler, Shape subShape)
+        {
+            line.Changed += handler;
+            line.SubShapes.Add(subShape);
+        }
+    }
     internal class PointGetter_MiddlePoint : PointGetter_FromTwoPoint
     {
         public PointGetter_MiddlePoint(Point point1, Point point2) : base(point1, point2)

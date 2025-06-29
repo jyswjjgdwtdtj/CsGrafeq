@@ -20,3 +20,6 @@ C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\obj\Debug\CsGr
 C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\obj\Debug\CsGrafeq.csproj.CoreCompileInputs.cache
 C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\obj\Debug\CsGrafeq.exe
 C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\obj\Debug\CsGrafeq.pdb
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\obj\Debug\CsGrafeq.Addons.Geometry.OpControl.resources
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\obj\Debug\CsGrafeq.Addons.Implicit.OpControl.resources
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\obj\Debug\CsGrafeq.Addons.Implicit.ExpressionBar.resources

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CsGrafeq.Geometry.Shapes.Getter
 {
-    /*internal abstract class TextGetter:Getter
+    internal abstract class TextGetter:Getter
     {
         public abstract string GetText();
     }
@@ -21,16 +21,16 @@ namespace CsGrafeq.Geometry.Shapes.Getter
         {
             return Text;
         }
-        public void SetText(String s)
+        public void SetText(string s)
         {
             Text = s;
         }
 
-        public override void AddToChangeEvent(ShapeChangeHandler handler)
+        public override void AddToChangeEvent(ShapeChangeHandler handler,Shape subshape)
         {
         }
     }
-    internal class TextGetter_FromDistance : TextGetter
+    /*internal class TextGetter_FromDistance : TextGetter
     {
         public NumberGetter NumberGetter;
         public TextGetter_FromDistance(NumberGetter NumberGetter)

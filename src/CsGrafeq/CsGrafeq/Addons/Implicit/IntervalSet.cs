@@ -4,9 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static CsGrafeq.ExMethods;
-using static CsGrafeq.Base.Values;
 
-namespace CsGrafeq.Implicit
+namespace CsGrafeq
 {
     public struct IntervalSet:IInterval
     {

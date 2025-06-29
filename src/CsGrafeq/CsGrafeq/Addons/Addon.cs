@@ -7,10 +7,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static CsGrafeq.Base.Values;
-namespace CsGrafeq.Base
+namespace CsGrafeq.Addons
 {
     public abstract class Addon
     {
+        internal Control OpControl;
         protected abstract void Render(Graphics graphics, Rectangle size);
         internal void AddonRender(Graphics graphics, Rectangle size)
         {
@@ -56,6 +57,7 @@ namespace CsGrafeq.Base
         public Action AskForRender;
         public double[] Constants;
         public Size Size;
+        public Rectangle Rectangle;
         protected void RefreshOwnerArguments()
         {
             OwnerArguments value= OwnerArguments;
@@ -64,60 +66,67 @@ namespace CsGrafeq.Base
             Zero = value.GetZero();
             Constants = value.GetConstants();
             Size = value.GetSize();
+            Rectangle = new Rectangle(Point.Empty,Size);
         }
         internal virtual bool AddonOnKeyDown(KeyEventArgs e)
         {
             if ((!Loaded) || (!Enabled))
-                return true;
+                return DoNext;
             return OnKeyDown(e);
         }
         internal virtual bool AddonOnKeyUp(KeyEventArgs e)
         {
             if ((!Loaded) || (!Enabled))
-                return true;
+                return DoNext;
             return OnKeyUp(e);
         }
         internal virtual bool AddonOnKeyPress(KeyPressEventArgs e)
         {
             if ((!Loaded) || (!Enabled))
-                return true;
+                return DoNext;
             return OnKeyPress(e);
         }
         internal virtual bool AddonOnMouseMove(AddonMouseMoveEventArgs e)
         {
             if ((!Loaded) ||(!Enabled))
-                return true;
+                return DoNext;
             return OnMouseMove(e);
         }
         internal virtual bool AddonOnMouseDown(MouseEventArgs e)
         {
             if ((!Loaded) || (!Enabled))
-                return true;
+                return DoNext;
             return OnMouseDown(e);
         }
         internal virtual bool AddonOnMouseUp(MouseEventArgs e)
         {
             if ((!Loaded) || (!Enabled))
-                return true;
+                return DoNext;
             return OnMouseUp(e);
         }
         internal virtual bool AddonOnMouseDoubleClick(MouseEventArgs e)
         {
             if ((!Loaded) || (!Enabled))
-                return true;
+                return DoNext;
             return OnMouseDoubleClick(e);
         }
         internal virtual bool AddonOnMouseClick(MouseEventArgs e)
         {
             if ((!Loaded) || (!Enabled))
-                return true;
+                return DoNext;
             return OnMouseClick(e);
         }
-        internal virtual bool AddonOnMousWheel(MouseEventArgs e)
+        internal virtual bool AddonOnMouseWheel(MouseEventArgs e)
         {
             if ((!Loaded) || (!Enabled))
-                return true;
+                return DoNext;
             return OnMouseWheel(e);
+        }
+        internal virtual bool AddonOnMouseLeave(EventArgs e)
+        {
+            if ((!Loaded) || (!Enabled))
+                return DoNext;
+            return OnMouseLeave(e);
         }
         //true代表可继续传递
         //false代表拦截
@@ -127,35 +136,39 @@ namespace CsGrafeq.Base
         }
         protected virtual bool OnKeyUp(KeyEventArgs e)
         {
-            return true;
+            return DoNext;
         }
         protected virtual bool OnKeyPress(KeyPressEventArgs e)
         {
-            return true;
+            return DoNext;
         }
         protected virtual bool OnMouseDown(MouseEventArgs e)
         {
-            return true;
+            return DoNext;
         }
         protected virtual bool OnMouseMove(AddonMouseMoveEventArgs e)
         {
-            return true;
+            return DoNext;
         }
         protected virtual bool OnMouseUp(MouseEventArgs e)
         {
-            return true;
+            return DoNext;
         }
         protected virtual bool OnMouseClick(MouseEventArgs e)
         {
-            return true;
+            return DoNext;
         }
         protected virtual bool OnMouseDoubleClick(MouseEventArgs e)
         {
-            return true;
+            return DoNext;
         }
         protected virtual bool OnMouseWheel(MouseEventArgs e)
         {
-            return true;
+            return DoNext;
+        }
+        protected virtual bool OnMouseLeave(EventArgs e)
+        {
+            return DoNext;
         }
         protected virtual void OnLoaded()
         {
@@ -168,16 +181,6 @@ namespace CsGrafeq.Base
         {
             _DebugStr = str;
         }
-    }
-    internal struct OwnerArguments
-    {
-        public Action AskForRender;
-        public Func<double> GetUX, GetUY;
-        public Func<double, double> PMX, PMY, MPX, MPY;
-        public Func<double[]> GetConstants;
-        public Func<PointL> GetZero;
-        public Func<Size> GetSize;
-        public Func<int> GetPanelWidth;
     }
     public struct AddonMouseMoveEventArgs
     {

@@ -44,6 +44,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
@@ -62,7 +63,27 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Base\Addon.cs" />
+    <Compile Include="Addons\Geometry\OpControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Addons\Geometry\OpControl.Designer.cs">
+      <DependentUpon>OpControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Addons\Addon.cs" />
+    <Compile Include="Addons\Implicit\OpControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Addons\Implicit\OpControl.Designer.cs">
+      <DependentUpon>OpControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Addons\Implicit\ExpressionBar.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Addons\Implicit\ExpressionBar.Designer.cs">
+      <DependentUpon>ExpressionBar.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Base\DistinctList.cs" />
+    <Compile Include="Base\OwnerArguments.cs" />
     <Compile Include="Base\FlowLayout.cs" />
     <Compile Include="Base\ShowBar.cs">
       <SubType>UserControl</SubType>
@@ -108,7 +129,6 @@
     <Compile Include="Addons\Geometry\Shapes\Angle.cs" />
     <Compile Include="Addons\Geometry\Shapes\Circle.cs" />
     <Compile Include="Addons\Geometry\Shapes\Getter\CircleGetter.cs" />
-    <Compile Include="Addons\Geometry\Shapes\TextLabel.cs" />
     <Compile Include="Addons\Geometry\Shapes\Getter\AngleGetter.cs" />
     <Compile Include="Addons\Geometry\Shapes\Getter\TextGetter.cs" />
     <Compile Include="Addons\Geometry\Shapes\Getter\NumberGetter.cs" />
@@ -133,6 +153,15 @@
     <Service Include="{94E38DFF-614B-4cbd-B67C-F211BB35CE8B}" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Addons\Geometry\OpControl.resx">
+      <DependentUpon>OpControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Addons\Implicit\OpControl.resx">
+      <DependentUpon>OpControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Addons\Implicit\ExpressionBar.resx">
+      <DependentUpon>ExpressionBar.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Base\DisplayerBase.resx">
       <DependentUpon>DisplayerBase.cs</DependentUpon>
     </EmbeddedResource>

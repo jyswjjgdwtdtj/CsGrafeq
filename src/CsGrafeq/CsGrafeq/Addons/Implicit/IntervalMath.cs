@@ -9,9 +9,8 @@ using static System.Math;
 using static System.Double;
 using System.Windows.Forms;
 using static CsGrafeq.ExMethods;
-using static CsGrafeq.Base.Values;
 
-namespace CsGrafeq.Implicit
+namespace CsGrafeq
 {
     [Obsolete("Never use methods for interval", true)]
     public static class IntervalMath

@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Collections;
 using System.Linq.Expressions;
-using CsGrafeq.Implicit;
+using CsGrafeq.Addons.Implicit;
 
 namespace CsGrafeq.Expression
 {
