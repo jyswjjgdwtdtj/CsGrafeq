@@ -711,13 +711,6 @@ namespace CsGrafeq.Expression
         {
             sb.AppendLine(op.Name + " " + l.ToString()); IL.Emit(op, l);
         }
-        public void EmitWriteLine(string s)
-        {
-            Emit(OpCodes.Ldstr, s);
-            Type[] types = new Type[1] { typeof(string) };
-            MethodInfo method = typeof(Console).GetMethod("WriteLine", types);
-            Emit(OpCodes.Call, method);
-        }
         public string GetRecord()
         {
             return sb.ToString();

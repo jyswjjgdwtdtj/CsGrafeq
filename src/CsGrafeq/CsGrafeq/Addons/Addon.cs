@@ -12,6 +12,7 @@ namespace CsGrafeq.Addons
     public abstract class Addon
     {
         internal Control OpControl;
+        internal Type ScriptMethodType;
         protected abstract void Render(Graphics graphics, Rectangle size);
         internal void AddonRender(Graphics graphics, Rectangle size)
         {

@@ -1,5 +1,9 @@
-﻿using System;
+﻿using CsGrafeq.Base;
+using ScriptCompilerEngine.CompileEngine;
+using ScriptCompilerEngine.ScriptNative.ScriptNativeObject;
+using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -116,7 +120,22 @@ namespace CsGrafeq.Geometry.Shapes.Getter
         public virtual void SetControlPoint(Vec controlPoint)
         {
             ControlPoint = controlPoint;
-            
+        }
+        public override bool Adjust()
+        {
+            Vec v=GetPoint();
+            PropertyDialog dlg = new PropertyDialog(new Dictionary<string, (string init, Type t)>() {
+                        { "X:",(v.X.ToString(),typeof(double))},
+                        { "Y:",(v.Y.ToString(),typeof(double))}
+                    });
+            dlg.ShowDialog();
+            if (dlg.OK)
+            {
+                var dic = dlg.returndic;
+                SetControlPoint(new Vec(double.Parse(dic["X:"]), double.Parse(dic["Y:"])));
+                return true;
+            }
+            return false;
         }
     }
     
@@ -445,6 +464,70 @@ namespace CsGrafeq.Geometry.Shapes.Getter
             return Vec.InvalidVec;
         }
 
+    }
+    #endregion
+    #region FromScript
+    internal class PointGetter_FromScript : PointGetter
+    {
+        private NoArgFunc ScriptFunc=()=> { return Empty.Instance; };
+        private string _Script="'返回xy数组 如array(x,y)";
+        public PointGetter_FromScript(string script)
+        {
+            SetScript(script);
+        }
+        public PointGetter_FromScript()
+        {
+            Adjust();
+        }
+        public void SetScript(string script)
+        {
+            if (script == _Script)
+                return;
+            _Script = script;
+            ScriptFunc=ScriptCompilerEngine.CompileEngine.CompileEngine.CompileNoArgFunc(script);
+            Console.WriteLine(CompileEngine.LastILRecord);
+        }
+        public string GetScript()
+        {
+            return _Script;
+        }
+        public override Vec GetPoint()
+        {
+            object obj;
+            try
+            {
+                obj = ScriptFunc.Invoke();
+            }
+            catch
+            {
+                return Vec.InvalidVec;
+            }
+            if(obj is object[] arr)
+            {
+                if (arr.Length == 2 && (arr[0] is long || arr[0] is double) && (arr[1] is long || arr[1] is double))
+                {
+                    Vec v = new Vec();
+                    v.X = arr[0] is long ? (long)arr[0] : (double)arr[0];
+                    v.Y = arr[1] is long ? (long)arr[1] : (double)arr[1];
+                    return v;
+                }
+            }
+            return Vec.InvalidVec;
+        }
+        public override void AddToChangeEvent(ShapeChangeHandler handler, Shape subShape)
+        {
+        }
+        public override bool Adjust()
+        {
+            ScriptDialog dlg = new ScriptDialog(_Script);
+            dlg.ShowDialog();
+            if (dlg.OK)
+            {
+                SetScript(dlg.Script);
+                return true;
+            }
+                return false;
+        }
     }
     #endregion
 }

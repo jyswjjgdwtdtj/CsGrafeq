@@ -15,6 +15,8 @@ namespace CsGrafeq
         {
             Application.EnableVisualStyles();
             Form form = new Form();
+            form.ShowIcon = false;
+            form.Text = "CsGrafeq - 画板";
             form.Size=new Size(900,650);
             GraphicPanel db=new GraphicPanel();
             db.Dock = DockStyle.Fill;

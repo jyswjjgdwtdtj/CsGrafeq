@@ -17,13 +17,14 @@ using System.Reflection.Emit;
 using CsGrafeq.Addons.Geometry;
 using CsGrafeq.Addons;
 using Microsoft.VisualBasic;
+using static System.Net.Mime.MediaTypeNames;
 
 
 namespace CsGrafeq.Geometry
 {
     public class GeometryPad:Addon
     {
-        private ShapeList Shapes=new ShapeList();
+        internal ShapeList Shapes=new ShapeList();
         public readonly DistinctList<Point> SelectedPoints = new DistinctList<Point>();
         public readonly DistinctList<Circle> SelectedCircles= new DistinctList<Circle>();
         public readonly DistinctList<Line> SelectedLines= new DistinctList<Line>();
@@ -33,12 +34,20 @@ namespace CsGrafeq.Geometry
             Enabled = true;
             _RenderMode = RenderMode.All;
             OpControl = new Addons.Geometry.OpControl(this);
-            
+            ScriptMethodType = typeof(GeoGet);
+            GeoGet.GeoPad = this;
+            ScriptCompilerEngine.CompileEngine.CompileEngine.AddMethodClass(typeof(GeoGet));
         }
         Point MovingPoint = null;
         System.Drawing.Point DownPoint=new System.Drawing.Point(-1,-1);
         System.Drawing.Point MovePoint;
         bool mousedown=false;
+        private void ShapeChanged()
+        {
+            foreach(var i in Shapes)
+                if (i.FromScript)
+                    i.RefreshValues();
+        }
         protected override bool OnMouseDown(MouseEventArgs e)
         {
             mousedown=true;
@@ -74,8 +83,11 @@ namespace CsGrafeq.Geometry
                 return DoNext;
             if(MovePoint!=DownPoint)
                 ClearSelect();
-            (MovingPoint.PointGetter as PointGetter_Movable)?.SetControlPoint(new Vec(PixelToMathX(e.X),PixelToMathY(e.Y)));
-            MovingPoint.RefreshValues();
+            if(MovingPoint.PointGetter is PointGetter_Movable mpg)
+            {
+                mpg.SetControlPoint(new Vec(PixelToMathX(e.X), PixelToMathY(e.Y)));
+                MovingPoint.RefreshValues();
+            }
             AskForRender();
             return Intercept;
         }
@@ -156,341 +168,393 @@ namespace CsGrafeq.Geometry
         }
         protected override bool OnMouseClick(MouseEventArgs e)
         {
-            if (GeoPadAction == "PutPoint")
+            if (e.Button == MouseButtons.Left)
             {
-                ClearSelect();
-                PutPoint(e.Location);
+                if (GeoPadAction == "PutPoint")
+                {
+                    ClearSelect();
+                    PutPoint(e.Location);
+                    AskForRender();
+                    return Intercept;
+                }
+                Point first = SelectedPoints.Count > 0 ? SelectedPoints[0] : null;
+                if (TryGetPoint(e.Location, out Point point))
+                {
+                    if (SelectedPoints.Contains(point))
+                        SelectedPoints.Remove(point);
+                    else
+                        SelectedPoints.Add(point);
+                }
+                else if (TryGetLine(e.Location, out Line line))
+                {
+                    if (SelectedLines.Contains(line))
+                        SelectedLines.Remove(line);
+                    else
+                        SelectedLines.Add(line);
+                }
+                else if (TryGetCircle(e.Location, out Circle circle))
+                {
+                    if (SelectedCircles.Contains(circle))
+                        SelectedCircles.Remove(circle);
+                    else
+                        SelectedCircles.Add(circle);
+                }
+                else if (GeoPadAction != "Move" && GeoPadAction != "Choose")
+                {
+                    SelectedPoints.Add(PutPoint(e.Location));
+                }
+                int plen = SelectedPoints.Count;
+                int llen = SelectedLines.Count;
+                int clen = SelectedCircles.Count;
+                switch (GeoPadAction)
+                {
+                    case "Choose":
+                    case "Move":
+                        {
+                        }
+                        break;
+                    case "PutPoint":
+                        {
+                            ClearSelect();
+                        }
+                        break;
+                    case "MiddlePoint":
+                        {
+                            if ((plen == 2) && (llen == 0) && (clen == 0))
+                            {
+                                Point newpoint = new Point(new PointGetter_MiddlePoint(SelectedPoints[0], SelectedPoints[1]));
+                                AddShape(newpoint);
+                                SelectedPoints.Clear();
+                            }
+                            else if (plen == 0 && llen == 1 && clen == 0)
+                            {
+                                if (SelectedLines[0] is LineSegment)
+                                {
+                                    Point newpoint = new Point(new PointGetter_MiddlePoint(
+                                        new Point(new PointGetter_PointOfLine(SelectedLines[0], 1)),
+                                        new Point(new PointGetter_PointOfLine(SelectedLines[0], 2))
+                                    ));
+                                    AddShape(newpoint);
+                                    SelectedLines.Clear();
+                                }
+                            }
+                            SelectedCircles.Clear();
+                            SelectedLines.Clear();
+                            if (plen >= 2)
+                                SelectedPoints.Clear();
+                        }
+                        break;
+                    case "MedianCenter":
+                        {
+                            if (plen == 3 && llen == 0 && clen == 0)
+                            {
+                                Point newpoint = new Point(new PointGetter_MedianCenter(SelectedPoints[0], SelectedPoints[1], SelectedPoints[2]));
+                                AddShape(newpoint);
+                                SelectedPoints.Clear();
+                            }
+                            SelectedCircles.Clear();
+                            SelectedLines.Clear();
+                            if (plen > 3)
+                                SelectedPoints.Clear();
+                        }
+                        break;
+                    case "InCenter":
+                        {
+                            if (plen == 3 && llen == 0 && clen == 0)
+                            {
+                                Point newpoint = new Point(new PointGetter_InCenter(SelectedPoints[0], SelectedPoints[1], SelectedPoints[2]));
+                                AddShape(newpoint);
+                                SelectedPoints.Clear();
+                            }
+                            SelectedCircles.Clear();
+                            SelectedLines.Clear();
+                            if (plen > 3)
+                                SelectedPoints.Clear();
+                        }
+                        break;
+                    case "OutCenter":
+                        {
+                            if (plen == 3 && llen == 0 && clen == 0)
+                            {
+                                Point newpoint = new Point(new PointGetter_OutCenter(SelectedPoints[0], SelectedPoints[1], SelectedPoints[2]));
+                                AddShape(newpoint);
+                                SelectedPoints.Clear();
+                            }
+                            SelectedCircles.Clear();
+                            SelectedLines.Clear();
+                            if (plen > 3)
+                                SelectedPoints.Clear();
+                        }
+                        break;
+                    case "OrthoCenter":
+                        {
+                            if (plen == 3 && llen == 0 && clen == 0)
+                            {
+                                Point newpoint = new Point(new PointGetter_OrthoCenter(SelectedPoints[0], SelectedPoints[1], SelectedPoints[2]));
+                                AddShape(newpoint);
+                                SelectedPoints.Clear();
+                            }
+                            SelectedCircles.Clear();
+                            SelectedLines.Clear();
+                            if (plen > 3)
+                                SelectedPoints.Clear();
+                        }
+                        break;
+                    case "AxialSymmetryPoint":
+                        {
+                            if (plen == 1 && llen == 1 && clen == 0)
+                            {
+                                Point newpoint = new Point(new PointGetter_AxialSymmetryPoint(SelectedPoints[0], SelectedLines[0]));
+                                AddShape(newpoint);
+                                SelectedPoints.Clear();
+                                SelectedLines.Clear();
+
+                            }
+                            if (plen > 1)
+                                SelectedPoints.Clear();
+                            if (llen > 1)
+                                SelectedLines.Clear();
+                            SelectedCircles.Clear();
+                        }
+                        break;
+                    case "NearestPoint":
+                        {
+                            if (plen == 1 && llen == 1 && clen == 0)
+                            {
+                                Point newpoint = new Point(new PointGetter_NearestPointOnLine(SelectedLines[0], SelectedPoints[0]));
+                                AddShape(newpoint);
+                                SelectedPoints.Clear();
+                                SelectedLines.Clear();
+                            }
+                            if (plen > 1)
+                                SelectedPoints.Clear();
+                            if (llen > 1)
+                                SelectedLines.Clear();
+                            SelectedCircles.Clear();
+                        }
+                        break;
+                    case "StraightLine":
+                        {
+                            if (plen == 2 && llen == 0 && clen == 0)
+                            {
+                                var line = new StraightLine(new PointGetter_FromPoint(SelectedPoints[0]), new PointGetter_FromPoint(SelectedPoints[1]));
+                                AddShape(line);
+                                SelectedPoints.Clear();
+                            }
+                            if (plen > 2)
+                                SelectedPoints.Clear();
+                            SelectedCircles.Clear();
+                            SelectedLines.Clear();
+                        }
+                        break;
+                    case "LineSegment":
+                        {
+                            if (plen == 2 && llen == 0 && clen == 0)
+                            {
+                                var line = new LineSegment(new PointGetter_FromPoint(SelectedPoints[0]), new PointGetter_FromPoint(SelectedPoints[1]));
+                                AddShape(line);
+                                SelectedPoints.Clear();
+                            }
+                            if (plen > 2)
+                                SelectedPoints.Clear();
+                            SelectedCircles.Clear();
+                            SelectedLines.Clear();
+                        }
+                        break;
+                    case "HalfLine":
+                        {
+                            if (plen == 2 && llen == 0 && clen == 0)
+                            {
+                                var line = new HalfLine(new PointGetter_FromPoint(SelectedPoints[0]), new PointGetter_FromPoint(SelectedPoints[1]));
+                                AddShape(line);
+                                SelectedPoints.Clear();
+                            }
+                            if (plen > 2)
+                                SelectedPoints.Clear();
+                            SelectedCircles.Clear();
+                            SelectedLines.Clear();
+                        }
+                        break;
+                    case "VerticalLine":
+                        {
+                            if (plen == 1 && llen == 1 && clen == 0)
+                            {
+                                var line = new VerticalLine(new PointGetter_FromPoint(SelectedPoints[0]), SelectedLines[0]);
+                                AddShape(line);
+                                SelectedPoints.Clear();
+                                SelectedLines.Clear();
+                            }
+                            if (plen > 1)
+                                SelectedPoints.Clear();
+                            if (llen > 1)
+                                SelectedLines.Clear();
+                            SelectedCircles.Clear();
+                        }
+                        break;
+                    case "ParallelLine":
+                        {
+                            if (plen == 1 && llen == 1 && clen == 0)
+                            {
+                                var line = new ParallelLine(new PointGetter_FromPoint(SelectedPoints[0]), SelectedLines[0]);
+                                AddShape(line);
+                                SelectedPoints.Clear();
+                                SelectedLines.Clear();
+                            }
+                            if (plen > 1)
+                                SelectedPoints.Clear();
+                            if (llen > 1)
+                                SelectedLines.Clear();
+                            SelectedCircles.Clear();
+                        }
+                        break;
+                    case "PerpendicularBisector":
+                        {
+                            if ((plen == 2) && (llen == 0) && (clen == 0))
+                            {
+                                var line = new PerpendicularBisector(new PointGetter_FromPoint(SelectedPoints[0]), new PointGetter_FromPoint((SelectedPoints[1])));
+                                AddShape(line);
+                                SelectedPoints.Clear();
+                            }
+                            else if (plen == 0 && llen == 1 && clen == 0)
+                            {
+                                if (SelectedLines[0] is LineSegment)
+                                {
+                                    var line = new PerpendicularBisector(SelectedLines[0] as LineSegment);
+                                    AddShape(line);
+                                    SelectedLines.Clear();
+                                }
+                            }
+                            SelectedCircles.Clear();
+                            SelectedLines.Clear();
+                            if (plen > 2)
+                                SelectedPoints.Clear();
+                        }
+                        break;
+                    case "ThreePointCircle":
+                        {
+                            if (plen == 3 && llen == 0 && clen == 0)
+                            {
+                                Circle circle = new Circle(new CircleGetter_FromThreePoint(SelectedPoints[0], SelectedPoints[1], SelectedPoints[2]));
+                                AddShape(circle);
+                                SelectedPoints.Clear();
+                            }
+                            SelectedCircles.Clear();
+                            SelectedLines.Clear();
+                            if (plen > 3)
+                                SelectedPoints.Clear();
+                        }
+                        break;
+                    case "TwoPointCircle":
+                        {
+                            if (plen == 2 && llen == 0 && clen == 0)
+                            {
+                                Circle circle = new Circle(new CircleGetter_FromCenterAndPoint(SelectedPoints[0], SelectedPoints[1]));
+                                AddShape(circle);
+                                SelectedPoints.Clear();
+                            }
+                            SelectedCircles.Clear();
+                            SelectedLines.Clear();
+                            if (plen > 2)
+                                SelectedPoints.Clear();
+                        }
+                        break;
+                    case "TextBoxOnPlot":
+                        {
+                            if (plen == 1 && llen == 0 && clen == 0)
+                            {
+                                if (SelectedPoints[0].TextGetters.Count == 0)
+                                    SelectedPoints[0].TextGetters.Add(new TextGetter_FromScript());
+                                else
+                                    (SelectedPoints[0].TextGetters[0] as TextGetter_FromScript).Adjust();
+                            }
+                            ClearSelect();
+                        }
+                        break;
+                    case "Polygon":
+                        {
+                            if (llen == 0 && clen == 0 && plen > 2)
+                            {
+                                if (first == GetPoint(e.Location))
+                                {
+                                    Polygon polygon = new Polygon(SelectedPoints.ToArray().ToPointGetters(), new PointGetter_FromPoint(first));
+                                    AddShape(polygon);
+                                    SelectedPoints.Clear();
+                                }
+                            }
+                            SelectedCircles.Clear();
+                            SelectedLines.Clear();
+                        }
+                        break;
+                    case "FittedLine":
+                        {
+                            if (llen == 0 && clen == 0 && plen > 2)
+                            {
+                                if (first == GetPoint(e.Location))
+                                {
+                                    var l = new List<PointGetter>(SelectedPoints.ToArray().ToPointGetters());
+                                    l.Add(new PointGetter_FromPoint(first));
+                                    FittedLine fl = new FittedLine(l.ToArray());
+                                    AddShape(fl);
+                                    SelectedPoints.Clear();
+                                }
+                            }
+                            SelectedCircles.Clear();
+                            SelectedLines.Clear();
+                        }
+                        break;
+                    case "Angle":
+                        {
+                            if (plen == 3 && llen == 0 && clen == 0)
+                            {
+                                Angle angle = new Angle(SelectedPoints[0], SelectedPoints[1], SelectedPoints[2]);
+                                AddShape(angle);
+                                SelectedPoints.Clear();
+                            }
+                            SelectedCircles.Clear();
+                            SelectedLines.Clear();
+                            if (plen > 3)
+                                SelectedPoints.Clear();
+                        }
+                        break;
+                    default:
+                        MessageBox.Show(GeoPadAction);
+                        return DoNext;
+                }
                 AskForRender();
                 return Intercept;
             }
-            Point first=SelectedPoints.Count>0?SelectedPoints[0]:null;
-            if (TryGetPoint(e.Location,out Point point))
+            else if (e.Button == MouseButtons.Right)
             {
-                if(SelectedPoints.Contains(point))
-                    SelectedPoints.Remove(point);
+                ClearSelect();
+                Shape shape;
+                if (TryGetPoint(e.Location, out Point point))
+                {
+                    shape = point;
+                }
+                else if (TryGetLine(e.Location, out Line line))
+                {
+                    shape=line;
+                }
+                else if (TryGetCircle(e.Location, out Circle circle))
+                {
+                    shape = circle;
+                }
                 else
-                    SelectedPoints.Add(point);
-            }else if(TryGetLine(e.Location,out Line line))
-            {
-                if(SelectedLines.Contains(line))
-                    SelectedLines.Remove(line);
-                else
-                    SelectedLines.Add(line);
-            }
-            else if(TryGetCircle(e.Location,out Circle circle))
-            {
-                if(SelectedCircles.Contains(circle))
-                    SelectedCircles.Remove(circle);
-                else
-                    SelectedCircles.Add(circle);
-            }else if (GeoPadAction != "Move"&&GeoPadAction!="Choose")
-            {
-                SelectedPoints.Add(PutPoint(e.Location));
-            }
-            int plen = SelectedPoints.Count;
-            int llen=SelectedLines.Count;
-            int clen=SelectedCircles.Count;
-            switch (GeoPadAction)
-            {
-                case "Choose":
-                case "Move":
-                    {
-                    }
-                    break;
-                case "PutPoint":
-                    {
-                        ClearSelect();
-                    }
-                    break;
-                case "MiddlePoint":
-                    {
-                        if ((plen == 2)&&(llen==0)&&(clen==0))
-                        {
-                            Point newpoint = new Point(new PointGetter_MiddlePoint(SelectedPoints[0], SelectedPoints[1]));
-                            AddShape(newpoint);
-                            SelectedPoints.Clear();
-                        }
-                        else if (plen==0&&llen==1&&clen==0)
-                        {
-                            if (SelectedLines[0] is LineSegment)
-                            {
-                                Point newpoint= new Point(new PointGetter_MiddlePoint(
-                                    new Point(new PointGetter_PointOfLine(SelectedLines[0],1)),
-                                    new Point(new PointGetter_PointOfLine(SelectedLines[0], 2))
-                                ));
-                                AddShape(newpoint);
-                                SelectedLines.Clear();
-                            }
-                        }
-                        SelectedCircles.Clear();
-                        SelectedLines.Clear();
-                        if(plen>=2)
-                            SelectedPoints.Clear();
-                    }
-                    break;
-                case "MedianCenter":
-                    {
-                        if (plen == 3 && llen == 0 && clen == 0)
-                        {
-                            Point newpoint = new Point(new PointGetter_MedianCenter(SelectedPoints[0], SelectedPoints[1], SelectedPoints[2]));
-                            AddShape(newpoint);
-                            SelectedPoints.Clear();
-                        }
-                        SelectedCircles.Clear();
-                        SelectedLines.Clear();
-                        if (plen > 3)
-                            SelectedPoints.Clear();
-                    }
-                    break;
-                case "InCenter":
-                    {
-                        if (plen == 3 && llen == 0 && clen == 0)
-                        {
-                            Point newpoint = new Point(new PointGetter_InCenter(SelectedPoints[0], SelectedPoints[1], SelectedPoints[2]));
-                            AddShape(newpoint);
-                            SelectedPoints.Clear();
-                        }
-                        SelectedCircles.Clear();
-                        SelectedLines.Clear();
-                        if (plen > 3)
-                            SelectedPoints.Clear();
-                    }
-                    break;
-                case "OutCenter":
-                    {
-                        if (plen == 3 && llen == 0 && clen == 0)
-                        {
-                            Point newpoint = new Point(new PointGetter_OutCenter(SelectedPoints[0], SelectedPoints[1], SelectedPoints[2]));
-                            AddShape(newpoint);
-                            SelectedPoints.Clear();
-                        }
-                        SelectedCircles.Clear();
-                        SelectedLines.Clear();
-                        if (plen > 3)
-                            SelectedPoints.Clear();
-                    }
-                    break;
-                case "OrthoCenter":
-                    {
-                        if (plen == 3 && llen == 0 && clen == 0)
-                        {
-                            Point newpoint = new Point(new PointGetter_OrthoCenter(SelectedPoints[0], SelectedPoints[1], SelectedPoints[2]));
-                            AddShape(newpoint);
-                            SelectedPoints.Clear();
-                        }
-                        SelectedCircles.Clear();
-                        SelectedLines.Clear();
-                        if (plen > 3)
-                            SelectedPoints.Clear();
-                    }
-                    break;
-                case "AxialSymmetryPoint":
-                    {
-                        if (plen == 1 && llen == 1 && clen == 0)
-                        {
-                            Point newpoint = new Point(new PointGetter_AxialSymmetryPoint(SelectedPoints[0], SelectedLines[0]));
-                            AddShape(newpoint);
-                            SelectedPoints.Clear();
-                            SelectedLines.Clear();
-
-                        }
-                        if(plen>1)
-                            SelectedPoints.Clear();
-                        if(llen>1)
-                            SelectedLines.Clear();
-                        SelectedCircles.Clear();
-                    }
-                    break;
-                case "NearestPoint":
-                    {
-                        if (plen == 1 && llen == 1 && clen == 0)
-                        {
-                            Point newpoint = new Point(new PointGetter_NearestPointOnLine( SelectedLines[0], SelectedPoints[0]));
-                            AddShape(newpoint);
-                            SelectedPoints.Clear();
-                            SelectedLines.Clear();
-                        }
-                        if (plen > 1)
-                            SelectedPoints.Clear();
-                        if (llen > 1)
-                            SelectedLines.Clear();
-                        SelectedCircles.Clear();
-                    }
-                    break;
-                case "StraightLine":
-                    {
-                        if (plen == 2 && llen == 0 && clen == 0)
-                        {
-                            var line = new StraightLine(new PointGetter_FromPoint(SelectedPoints[0]), new PointGetter_FromPoint(SelectedPoints[1]));
-                            AddShape(line);
-                            SelectedPoints.Clear();
-                        }
-                        if (plen > 2)
-                            SelectedPoints.Clear();
-                        SelectedCircles.Clear();
-                        SelectedLines.Clear();
-                    }
-                    break;
-                case "LineSegment":
-                    {
-                        if (plen == 2 && llen == 0 && clen == 0)
-                        {
-                            var line = new LineSegment(new PointGetter_FromPoint(SelectedPoints[0]), new PointGetter_FromPoint(SelectedPoints[1]));
-                            AddShape(line);
-                            SelectedPoints.Clear();
-                        }
-                        if (plen > 2)
-                            SelectedPoints.Clear();
-                        SelectedCircles.Clear();
-                        SelectedLines.Clear();
-                    }
-                    break;
-                case "HalfLine":
-                    {
-                        if (plen == 2 && llen == 0 && clen == 0)
-                        {
-                            var line = new HalfLine(new PointGetter_FromPoint(SelectedPoints[0]), new PointGetter_FromPoint(SelectedPoints[1]));
-                            AddShape(line);
-                            SelectedPoints.Clear();
-                        }
-                        if (plen > 2)
-                            SelectedPoints.Clear();
-                        SelectedCircles.Clear();
-                        SelectedLines.Clear();
-                    }
-                    break;
-                case "VerticalLine":
-                    {
-                        if (plen == 1 && llen == 1 && clen == 0)
-                        {
-                            var line = new VerticalLine(new PointGetter_FromPoint(SelectedPoints[0]), SelectedLines[0]);
-                            AddShape(line);
-                            SelectedPoints.Clear();
-                            SelectedLines.Clear();
-                        }
-                        if (plen > 1)
-                            SelectedPoints.Clear();
-                        if (llen > 1)
-                            SelectedLines.Clear();
-                        SelectedCircles.Clear();
-                    }
-                    break;
-                case "ParallelLine":
-                    {
-                        if (plen == 1 && llen == 1 && clen == 0)
-                        {
-                            var line = new ParallelLine(new PointGetter_FromPoint(SelectedPoints[0]), SelectedLines[0]);
-                            AddShape(line);
-                            SelectedPoints.Clear();
-                            SelectedLines.Clear();
-                        }
-                        if (plen > 1)
-                            SelectedPoints.Clear();
-                        if (llen > 1)
-                            SelectedLines.Clear();
-                        SelectedCircles.Clear();
-                    }
-                    break;
-                case "PerpendicularBisector":
-                    {
-                        if ((plen == 2) && (llen == 0) && (clen == 0))
-                        {
-                            var line = new PerpendicularBisector(new PointGetter_FromPoint(SelectedPoints[0]), new PointGetter_FromPoint((SelectedPoints[1])));
-                            AddShape(line);
-                            SelectedPoints.Clear();
-                        }
-                        else if (plen == 0 && llen == 1 && clen == 0)
-                        {
-                            if (SelectedLines[0] is LineSegment)
-                            {
-                                var line = new PerpendicularBisector(SelectedLines[0] as LineSegment);
-                                AddShape(line);
-                                SelectedLines.Clear();
-                            }
-                        }
-                        SelectedCircles.Clear();
-                        SelectedLines.Clear();
-                        if (plen > 2)
-                            SelectedPoints.Clear();
-                    }
-                    break;
-                case "ThreePointCircle":
-                    {
-                        if (plen == 3 && llen == 0 && clen == 0)
-                        {
-                            Circle circle = new Circle(new CircleGetter_FromThreePoint(SelectedPoints[0], SelectedPoints[1], SelectedPoints[2]));
-                            AddShape(circle);
-                            SelectedPoints.Clear();
-                        }
-                        SelectedCircles.Clear();
-                        SelectedLines.Clear();
-                        if (plen > 3)
-                            SelectedPoints.Clear();
-                    }
-                    break;
-                case "TwoPointCircle":
-                    {
-                        if (plen == 2 && llen == 0 && clen == 0)
-                        {
-                            Circle circle = new Circle(new CircleGetter_FromCenterAndPoint(SelectedPoints[0], SelectedPoints[1]));
-                            AddShape(circle);
-                            SelectedPoints.Clear();
-                        }
-                        SelectedCircles.Clear();
-                        SelectedLines.Clear();
-                        if (plen > 2)
-                            SelectedPoints.Clear();
-                    }
-                    break;
-                case "TextBoxOnPlot":
-                    {
-                        if(plen == 1 &&llen== 0 && clen == 0)
-                        {
-                            string text = Interaction.InputBox("文本内容");
-                            if (!string.IsNullOrEmpty(text))
-                            {
-                                SelectedPoints[0].TextGetters.Add(new TextGetter_FromString(text));
-                            }
-                        }
-                        ClearSelect();
-                    }
-                    break;
-                case "Polygon":
-                    {
-                        if (llen == 0 && clen == 0&&plen>2)
-                        {
-                            if (first == GetPoint(e.Location))
-                            {
-                                Polygon polygon= new Polygon(SelectedPoints.ToArray().ToPointGetters(),new PointGetter_FromPoint(first));
-                                AddShape(polygon);
-                                SelectedPoints.Clear();
-                            }
-                        }
-                        SelectedCircles.Clear();
-                        SelectedLines.Clear();
-                    }
-                    break;
-                case "Angle":
-                    {
-                        if (plen == 3 && llen == 0 && clen == 0)
-                        {
-                            Angle angle = new Angle(SelectedPoints[0], SelectedPoints[1], SelectedPoints[2]);
-                            AddShape(angle);
-                            SelectedPoints.Clear();
-                        }
-                        SelectedCircles.Clear();
-                        SelectedLines.Clear();
-                        if (plen > 3)
-                            SelectedPoints.Clear();
-                    }
-                    break;
-                default:
-                    MessageBox.Show(GeoPadAction);
+                {
                     return DoNext;
+                }
+                PropertyDialog dlg = new PropertyDialog(new Dictionary<string, (string init, Type t)>() { { "Name:", (shape.Name, typeof(string)) } });
+                dlg.ShowDialog();
+                if (dlg.OK)
+                {
+                    shape.Name = dlg.returndic["Name:"];
+                    AskForRender();
+                }
+                return Intercept;
             }
-            AskForRender();
-            return Intercept;
+            return DoNext;
         }
+            
         //部分逻辑不同 难以重用
         internal void CreateShapeFromSelects()
         {
@@ -749,11 +813,10 @@ namespace CsGrafeq.Geometry
                     {
                         if (plen == 1 && llen == 0 && clen == 0)
                         {
-                            string text = Interaction.InputBox("文本内容");
-                            if (!string.IsNullOrEmpty(text))
-                            {
-                                SelectedPoints[0].TextGetters.Add(new TextGetter_FromString(text));
-                            }
+                            if (SelectedPoints[0].TextGetters.Count == 0)
+                                SelectedPoints[0].TextGetters.Add(new TextGetter_FromScript());
+                            else
+                                (SelectedPoints[0].TextGetters[0] as TextGetter_FromScript).Adjust();
                         }
                         ClearSelect();
                     }
@@ -764,6 +827,18 @@ namespace CsGrafeq.Geometry
                         {
                             Polygon polygon = new Polygon(SelectedPoints.ToArray().ToPointGetters());
                             AddShape(polygon);
+                            SelectedPoints.Clear();
+                        }
+                        SelectedCircles.Clear();
+                        SelectedLines.Clear();
+                    }
+                    break;
+                case "FittedLine":
+                    {
+                        if (llen == 0 && clen == 0 && plen >= 3)
+                        {
+                            FittedLine fl=new FittedLine(SelectedPoints.ToArray().ToPointGetters());
+                            AddShape(fl);
                             SelectedPoints.Clear();
                         }
                         SelectedCircles.Clear();
@@ -801,22 +876,9 @@ namespace CsGrafeq.Geometry
             SelectedLines.Clear();
             SelectedPoints.Clear();
             Point point;
-            if(TryGetPoint(e.Location,out point)&&point.PointGetter is PointGetter_Movable)
+            if(TryGetPoint(e.Location,out point)&&point.Adjust())
             {
-                PropertyDialog dlg = new PropertyDialog(new Dictionary<string, (string init, Type t)>() {
-                        { "名字:",(point.Name,typeof(string))},
-                        { "X:",(point.Location.X.ToString(),typeof(double))},
-                        { "Y:",(point.Location.Y.ToString(),typeof(double))}
-                    });
-                dlg.ShowDialog();
-                if (dlg.OK)
-                {
-                    var dic = dlg.returndic;
-                    point.Name = dic["名字:"];
-                    (point.PointGetter as PointGetter_Movable).SetControlPoint(new Vec(double.Parse(dic["X:"]), double.Parse(dic["Y:"])));
-                    point.RefreshValues();
-                    AskForRender();
-                }
+                AskForRender();
                 return DoNext;
             }
             return Intercept;
@@ -882,7 +944,8 @@ namespace CsGrafeq.Geometry
                                 g.FillEllipse(Brush_Black, new System.Drawing.RectangleF((float)MathToPixelX(p.Location.X) - 2, (float)MathToPixelY(p.Location.Y) - 2, 4, 4));
                             foreach(var t in p.TextGetters)
                             {
-                                g.DrawBubblePopup(t.GetText(), font, MathToPixelForPoint(p.Location).OffSetBy(2, 2 + 20 * (index++)));
+                                if(!string.IsNullOrEmpty(t.GetText()))
+                                    g.DrawBubblePopup(t.GetText(), font, MathToPixelForPoint(p.Location).OffSetBy(2, 2 + 20 * (index++)));
                             }
                         }
                         break;
@@ -946,7 +1009,6 @@ namespace CsGrafeq.Geometry
                                 else
                                     p = vs.Item2;
                             }
-                            Console.WriteLine(p.ToString()); 
                             v1.X = MathToPixelX(v1.X);
                             p.X = MathToPixelX(p.X);
                             v1.Y = MathToPixelY(v1.Y);
@@ -1025,7 +1087,7 @@ namespace CsGrafeq.Geometry
         {
             return new System.Drawing.PointF((float)MathToPixelX(vec.X), (float)MathToPixelY(vec.Y));
         }
-        private class ShapeList : List<Shape>
+        internal class ShapeList : List<Shape>
         {
             private Point[] PointCounter = new Point[100];
             public ShapeList()
@@ -1165,7 +1227,7 @@ namespace CsGrafeq.Geometry
                     return null;
                 }
             }
-            Shapes.Add(newp);
+            AddShape(newp);
             return newp;
         }
         public bool TryGetPoint(System.Drawing.Point Location,out Point point)
@@ -1251,7 +1313,10 @@ namespace CsGrafeq.Geometry
         }
         public void AddShape(Shape s)
         {
+            if(!s.FromScript)
+                s.Changed += ShapeChanged;
             Shapes.Add(s);
+            AskForRender();
         }
     }
     

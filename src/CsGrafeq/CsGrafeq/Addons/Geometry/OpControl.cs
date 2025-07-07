@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using CsGrafeq.Base;
 using CsGrafeq.Geometry.Shapes;
+using CsGrafeq.Geometry.Shapes.Getter;
 
 namespace CsGrafeq.Addons.Geometry
 {
@@ -42,6 +43,7 @@ namespace CsGrafeq.Addons.Geometry
             btn_TwoPointCircle.Click += Btn_Click;
             btn_VerticalLine.Click += Btn_Click;
             btn_Choose.Click += Btn_Click;
+            btn_FittedLine.Click += Btn_Click;
             btnlist = new List<CheckBox>() {
             btn_Move,
             btn_Angle,
@@ -64,6 +66,7 @@ namespace CsGrafeq.Addons.Geometry
             btn_TwoPointCircle,
             btn_VerticalLine,
             btn_Choose,
+            btn_FittedLine,
             };
         }
 
@@ -87,6 +90,12 @@ namespace CsGrafeq.Addons.Geometry
                 GP.AskForRender();
             }
 
+        }
+
+        private void btn_PointScript_CheckedChanged(object sender, EventArgs e)
+        {
+            Button cb = (sender as Button);
+            GP.AddShape(new CsGrafeq.Geometry.Shapes.Point(new PointGetter_FromScript()));
         }
     }
 }

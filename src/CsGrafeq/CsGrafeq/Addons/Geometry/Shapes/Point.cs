@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using CsGrafeq.Base;
+using System.Drawing;
 
 namespace CsGrafeq.Geometry.Shapes
 {
@@ -18,6 +19,8 @@ namespace CsGrafeq.Geometry.Shapes
         internal Point(PointGetter pointgetter){
             if(pointgetter is PointGetter_FromPoint)
                 throw new ArgumentNullException(nameof(pointgetter)+" 不能为指向点");
+            if (pointgetter is PointGetter_FromScript)
+                _FromScript = true;
             PointGetter = pointgetter;
             PointGetter.AddToChangeEvent(RefreshValues,this);
             RefreshValues();
@@ -26,6 +29,14 @@ namespace CsGrafeq.Geometry.Shapes
         {
             Location = PointGetter.GetPoint();
             InvokeEvent();
+        }
+        internal override bool Adjust()
+        {
+            if (PointGetter.Adjust()){
+                RefreshValues();
+                return true;
+            }
+            return false;
         }
     }
 }

@@ -47,7 +47,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject />
+    <StartupObject>CsGrafeq.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualBasic" />
@@ -63,6 +63,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Addons\Geometry\GeoGet.cs" />
     <Compile Include="Addons\Geometry\OpControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -83,24 +84,30 @@
       <DependentUpon>ExpressionBar.cs</DependentUpon>
     </Compile>
     <Compile Include="Base\DistinctList.cs" />
+    <Compile Include="Base\WinFormControl\ScriptDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Base\WinFormControl\ScriptDialog.Designer.cs">
+      <DependentUpon>ScriptDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Base\OwnerArguments.cs" />
-    <Compile Include="Base\FlowLayout.cs" />
-    <Compile Include="Base\ShowBar.cs">
+    <Compile Include="Base\WinFormControl\FlowLayout.cs" />
+    <Compile Include="Base\WinFormControl\ShowBar.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Base\ShowBar.Designer.cs">
+    <Compile Include="Base\WinFormControl\ShowBar.Designer.cs">
       <DependentUpon>ShowBar.cs</DependentUpon>
     </Compile>
-    <Compile Include="Base\VerticalFlowLayoutPanel.cs">
+    <Compile Include="Base\WinFormControl\VerticalFlowLayoutPanel.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Base\DisplayerBase.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Base\PropertyDialog.cs">
+    <Compile Include="Base\WinFormControl\PropertyDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Base\PropertyDialog.Designer.cs">
+    <Compile Include="Base\WinFormControl\PropertyDialog.Designer.cs">
       <DependentUpon>PropertyDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Base\GraphicPanel.cs">
@@ -109,16 +116,16 @@
     <Compile Include="Base\GraphicPanel.Designer.cs">
       <DependentUpon>GraphicPanel.cs</DependentUpon>
     </Compile>
-    <Compile Include="Base\OperationPanel.cs">
+    <Compile Include="Base\WinFormControl\OperationPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Base\OperationPanel.Designer.cs">
+    <Compile Include="Base\WinFormControl\OperationPanel.Designer.cs">
       <DependentUpon>OperationPanel.cs</DependentUpon>
     </Compile>
-    <Compile Include="Base\NoFlashTabControl.cs">
+    <Compile Include="Base\WinFormControl\NoFlashTabControl.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Base\NoFlashTabControl.Designer.cs">
+    <Compile Include="Base\WinFormControl\NoFlashTabControl.Designer.cs">
       <DependentUpon>NoFlashTabControl.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
@@ -165,13 +172,16 @@
     <EmbeddedResource Include="Base\DisplayerBase.resx">
       <DependentUpon>DisplayerBase.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Base\OperationPanel.resx">
+    <EmbeddedResource Include="Base\WinFormControl\OperationPanel.resx">
       <DependentUpon>OperationPanel.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Base\PropertyDialog.resx">
+    <EmbeddedResource Include="Base\WinFormControl\PropertyDialog.resx">
       <DependentUpon>PropertyDialog.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Base\ShowBar.resx">
+    <EmbeddedResource Include="Base\WinFormControl\ScriptDialog.resx">
+      <DependentUpon>ScriptDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Base\WinFormControl\ShowBar.resx">
       <DependentUpon>ShowBar.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
@@ -186,6 +196,12 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ScriptCompilerEngine\ScriptCompilerEngine.csproj">
+      <Project>{d0d55e8a-b783-46a8-bd3f-f938235057b2}</Project>
+      <Name>ScriptCompilerEngine</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

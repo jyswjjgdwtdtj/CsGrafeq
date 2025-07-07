@@ -23,3 +23,7 @@ C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\obj\Debug\CsGr
 C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\obj\Debug\CsGrafeq.Addons.Geometry.OpControl.resources
 C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\obj\Debug\CsGrafeq.Addons.Implicit.OpControl.resources
 C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\obj\Debug\CsGrafeq.Addons.Implicit.ExpressionBar.resources
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\bin\Debug\ScriptCompilerEngine.dll
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\bin\Debug\ScriptCompilerEngine.pdb
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\obj\Debug\CsGrafeq.csproj.Up2Date
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\obj\Debug\CsGrafeq.Base.ScriptDialog.resources

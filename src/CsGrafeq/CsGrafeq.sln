@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35913.81 d17.13
+VisualStudioVersion = 17.13.35913.81
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsGrafeq", "CsGrafeq\CsGrafeq.csproj", "{92C60D1E-F6CA-4DB6-87CB-8CCEAFE7D5F4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptCompilerEngine", "ScriptCompilerEngine\ScriptCompilerEngine.csproj", "{D0D55E8A-B783-46A8-BD3F-F938235057B2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{92C60D1E-F6CA-4DB6-87CB-8CCEAFE7D5F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{92C60D1E-F6CA-4DB6-87CB-8CCEAFE7D5F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{92C60D1E-F6CA-4DB6-87CB-8CCEAFE7D5F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0D55E8A-B783-46A8-BD3F-F938235057B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0D55E8A-B783-46A8-BD3F-F938235057B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0D55E8A-B783-46A8-BD3F-F938235057B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0D55E8A-B783-46A8-BD3F-F938235057B2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

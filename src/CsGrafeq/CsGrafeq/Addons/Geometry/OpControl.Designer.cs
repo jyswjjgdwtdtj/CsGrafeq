@@ -49,6 +49,7 @@
             this.btn_VerticalLine = new System.Windows.Forms.CheckBox();
             this.btn_ParallelLine = new System.Windows.Forms.CheckBox();
             this.btn_PerpendicularBisector = new System.Windows.Forms.CheckBox();
+            this.btn_FittedLine = new System.Windows.Forms.CheckBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.flowLayoutPanel3 = new System.Windows.Forms.FlowLayoutPanel();
@@ -64,6 +65,7 @@
             this.btn_AxialSymmetryPoint = new System.Windows.Forms.CheckBox();
             this.btn_NearestPoint = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.btn_PointFromScript = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.flowLayoutPanel7.SuspendLayout();
             this.flowLayoutPanel6.SuspendLayout();
@@ -267,6 +269,7 @@
             this.flowLayoutPanel2.Controls.Add(this.btn_VerticalLine);
             this.flowLayoutPanel2.Controls.Add(this.btn_ParallelLine);
             this.flowLayoutPanel2.Controls.Add(this.btn_PerpendicularBisector);
+            this.flowLayoutPanel2.Controls.Add(this.btn_FittedLine);
             this.flowLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanel2.Location = new System.Drawing.Point(3, 149);
             this.flowLayoutPanel2.Name = "flowLayoutPanel2";
@@ -339,6 +342,17 @@
             this.btn_PerpendicularBisector.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.btn_PerpendicularBisector.UseVisualStyleBackColor = true;
             // 
+            // btn_FittedLine
+            // 
+            this.btn_FittedLine.Appearance = System.Windows.Forms.Appearance.Button;
+            this.btn_FittedLine.Location = new System.Drawing.Point(279, 3);
+            this.btn_FittedLine.Name = "btn_FittedLine";
+            this.btn_FittedLine.Size = new System.Drawing.Size(40, 40);
+            this.btn_FittedLine.TabIndex = 6;
+            this.btn_FittedLine.Text = "拟合直线";
+            this.btn_FittedLine.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.btn_FittedLine.UseVisualStyleBackColor = true;
+            // 
             // label3
             // 
             this.label3.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -405,6 +419,7 @@
             this.flowLayoutPanel1.Controls.Add(this.btn_OrthoCenter);
             this.flowLayoutPanel1.Controls.Add(this.btn_AxialSymmetryPoint);
             this.flowLayoutPanel1.Controls.Add(this.btn_NearestPoint);
+            this.flowLayoutPanel1.Controls.Add(this.btn_PointFromScript);
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanel1.Location = new System.Drawing.Point(3, 83);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
@@ -511,6 +526,16 @@
             this.label1.Text = "操作";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
+            // btn_PointFromScript
+            // 
+            this.btn_PointFromScript.Location = new System.Drawing.Point(371, 3);
+            this.btn_PointFromScript.Name = "btn_PointFromScript";
+            this.btn_PointFromScript.Size = new System.Drawing.Size(40, 40);
+            this.btn_PointFromScript.TabIndex = 8;
+            this.btn_PointFromScript.Text = "脚本";
+            this.btn_PointFromScript.UseVisualStyleBackColor = true;
+            this.btn_PointFromScript.Click += new System.EventHandler(this.btn_PointScript_CheckedChanged);
+            // 
             // OpControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -570,5 +595,7 @@
         public System.Windows.Forms.CheckBox btn_NearestPoint;
         public System.Windows.Forms.Label label1;
         public System.Windows.Forms.CheckBox btn_Choose;
+        public System.Windows.Forms.CheckBox btn_FittedLine;
+        private System.Windows.Forms.Button btn_PointFromScript;
     }
 }

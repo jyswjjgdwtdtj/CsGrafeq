@@ -12,3 +12,7 @@ C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\bin\Release\Cs
 C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\bin\Release\CsGrafeq.pdb
 C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\obj\Release\CsGrafeq.exe
 C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\obj\Release\CsGrafeq.pdb
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\bin\Release\ScriptCompilerEngine.dll
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\bin\Release\ScriptCompilerEngine.pdb
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\obj\Release\CsGrafeq.csproj.Up2Date
+C:\Users\liboyuan\Documents\GitHub\CsGrafeq\src\CsGrafeq\CsGrafeq\obj\Release\CsGrafeq.Base.ScriptDialog.resources

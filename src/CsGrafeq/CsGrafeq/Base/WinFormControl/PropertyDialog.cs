@@ -16,6 +16,7 @@ namespace CsGrafeq.Base
         {
             InitializeComponent();
             SetValue(obj);
+            StartPosition=FormStartPosition.CenterParent;
         }
         private Label[] Labels;
         private TextBox[] TextBoxes;
@@ -65,6 +66,7 @@ namespace CsGrafeq.Base
             pp.Dock = System.Windows.Forms.DockStyle.Fill;
             pp.Size = new System.Drawing.Size(333, 50);
             verticalFlowLayoutPanel1.Controls.Add(pp);
+            Height=verticalFlowLayoutPanel1.Height+15;
         }
         public Dictionary<string,string> returndic = new Dictionary<string,string>();
         public bool OK=false;
@@ -83,7 +85,7 @@ namespace CsGrafeq.Base
             }
             catch (Exception ex)
             {
-                MessageBox.Show("坐标值不合法"+ex.Message);
+                MessageBox.Show("值不合法"+ex.Message);
                 return;
             }
             OK=true;    

@@ -194,6 +194,55 @@ namespace CsGrafeq.Geometry.Shapes
             InvokeEvent();
         }
     }
+    public class FittedLine : StraightLine
+    {
+        private PointGetter[] PointGetters;
+        private Vec[] Vecs;
+        internal FittedLine(PointGetter[] pointGetters)
+        {
+            PointGetters = pointGetters;
+            Vecs= new Vec[pointGetters.Length];
+            foreach(var i in pointGetters)
+            {
+                i.AddToChangeEvent(RefreshValues,this);
+            }
+            RefreshValues();
+        }
+        internal override void RefreshValues()
+        {
+            double meanX=0,meanY=0; 
+            for(int i = 0; i < PointGetters.Length; i++)
+            {
+                Vecs[i] = PointGetters[i].GetPoint();
+                meanX += Vecs[i].X;
+                meanY += Vecs[i].Y;
+            }
+            meanX/= Vecs.Length;
+            meanY/= Vecs.Length;
+            double a = 0, c = 0;
+            for (int i = 0; i < PointGetters.Length; i++)
+            {
+                double x = Vecs[i].X;
+                double y = Vecs[i].Y;
+                a += (x -meanX  ) * (y - meanY);
+                c += (x - meanX) * (x-meanX);
+            }
+            double m = a / c;
+            double b = meanY - m *meanX;
+            if (c == 0)//x的常值函数
+            {
+                Point1 = new Vec(meanX,1);
+                Point2= new Vec(meanX,2);
+            }
+            else
+            {
+                Point1 = new Vec(1,m+b);
+                Point2= new Vec(2,2*m+b);
+            }
+            InvokeEvent();
+        }
+
+    }
     
 }
 namespace CsGrafeq.Geometry
