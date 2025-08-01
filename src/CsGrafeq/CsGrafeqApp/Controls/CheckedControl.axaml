@@ -1,0 +1,57 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:CsGrafeqApp.Controls"
+		xmlns:valueconv="clr-namespace:CsGrafeqApp.ValueConverter">
+
+	<!--
+    Additional resources 
+    Using Control Themes:
+         https://docs.avaloniaui.net/docs/basics/user-interface/styling/control-themes
+    Using Theme Variants:
+         https://docs.avaloniaui.net/docs/guides/styles-and-resources/how-to-use-theme-variants
+  -->
+
+	<Design.PreviewWith>
+		<controls:CheckedControl>
+			<TextBlock Text="123"></TextBlock>
+		</controls:CheckedControl>
+	</Design.PreviewWith>
+
+	<ControlTheme x:Key="{x:Type controls:CheckedControl}" TargetType="controls:CheckedControl">
+		<ControlTheme.Resources>
+			<SolidColorBrush x:Key="Median" Color="#5a00b89f"></SolidColorBrush>
+			<SolidColorBrush x:Key="Light" Color="#5a88ffcc"></SolidColorBrush>
+			<valueconv:BoolToBrush x:Key="BoolToBrush1">
+				<valueconv:BoolToBrush.Brush1>
+					<SolidColorBrush Color="#5a00b89f"></SolidColorBrush>
+				</valueconv:BoolToBrush.Brush1>
+			</valueconv:BoolToBrush>
+			<valueconv:BoolToBrush x:Key="BoolToBrush2">
+				<valueconv:BoolToBrush.Brush1>
+					<SolidColorBrush Color="#5a88ffcc"></SolidColorBrush>
+				</valueconv:BoolToBrush.Brush1>
+			</valueconv:BoolToBrush>
+		</ControlTheme.Resources>
+		<Style Selector="^ /template/ Border#Container">
+			<Setter Property="Background" Value="Transparent"></Setter>
+			<Setter Property="Transitions">
+				<Transitions>
+					<BrushTransition Duration="0:0:0.1" Property="Background"></BrushTransition>
+				</Transitions>
+			</Setter>
+		</Style>
+		<Style Selector="^:pointerover /template/ Border#Container">
+			<Setter Property="Background" Value="{StaticResource Light}"></Setter>
+		</Style>
+		<Style Selector="^:checked /template/ Border#Container">
+			<Setter Property="Background" Value="{StaticResource Median}"></Setter>
+		</Style>
+		<Setter Property="Template">
+			<ControlTemplate>
+				<Border Name="Container" CornerRadius="5">
+					<ContentPresenter Content="{TemplateBinding Content}"></ContentPresenter>
+				</Border>
+			</ControlTemplate>
+		</Setter>
+	</ControlTheme>
+</ResourceDictionary>

@@ -1,0 +1,279 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:geopad="clr-namespace:CsGrafeqApp.Addons.GeometryPad;assembly=CsGrafeqApp"
+			 xmlns:ctls="clr-namespace:CsGrafeqApp.Controls"
+			 xmlns:shapes="clr-namespace:CsGrafeqApp.Shapes"
+			 xmlns:getter="clr-namespace:CsGrafeqApp.Shapes.ShapeGetter"
+			 xmlns:system="clr-namespace:System"
+			 xmlns:avacol="clr-namespace:Avalonia.Collections"
+			 xmlns:classes="clr-namespace:CsGrafeqApp.Classes"
+			 xmlns:collections="clr-namespace:Avalonia.Collections;assembly=Avalonia.Base"
+			 mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="CsGrafeqApp.Addons.GeometryPad.OpControl"
+			 x:DataType="geopad:OpControl">
+	<UserControl.Resources>
+		<SolidColorBrush x:Key="Median" Color="#5a00b89f"></SolidColorBrush>
+		<SolidColorBrush x:Key="Light" Color="#5a88ffcc"></SolidColorBrush>
+	</UserControl.Resources>
+	<UserControl.Styles>
+		<Style Selector="Expander.NoBorderExpander">
+			<Style Selector="^ /template/ ToggleButton#ExpanderHeader">
+				<Setter Property="BorderThickness" Value="0,1,0,0"></Setter>
+			</Style>
+			<Style Selector="^  /template/ Border#ExpanderContent">
+				<Setter Property="BorderThickness" Value="0"></Setter>
+			</Style>
+		</Style>
+		<Style Selector="DataValidationErrors">
+			<Setter Property="Template">
+				<ControlTemplate>
+					<DockPanel LastChildFill="True">
+						<ContentControl IsVisible="False"/>
+						<ContentPresenter Background="{TemplateBinding Background}"
+										  BorderBrush="{TemplateBinding BorderBrush}"
+										  BorderThickness="{TemplateBinding BorderThickness}"
+										  CornerRadius="{TemplateBinding CornerRadius}"
+										  ContentTemplate="{TemplateBinding ContentTemplate}"
+										  Content="{TemplateBinding Content}"
+										  Padding="{TemplateBinding Padding}"/>
+					</DockPanel>
+				</ControlTemplate>
+			</Setter>
+			
+		</Style>
+		<Style Selector="TextBox.CommonTextBox">
+			<Setter Property="AcceptsReturn" Value="False"></Setter>
+			<Setter Property="MinWidth" Value="30"></Setter>
+			<Setter Property="Width" Value="NaN"></Setter>
+			<Setter Property="BorderThickness" Value="0"></Setter>
+			
+		</Style>
+		<Style Selector="TextBox.Big">
+			<Setter Property="FontSize" Value="14"></Setter>
+			<Setter Property="Foreground" Value="Black"></Setter>
+		</Style>
+		<Style Selector="TextBox.Small">
+			<Setter Property="FontSize" Value="10"></Setter>
+			<Setter Property="Foreground" Value="Gray"></Setter>
+			<Setter Property="Height" Value="20"></Setter>
+		</Style>
+		<Style Selector="TextBlock.Big">
+			<Setter Property="FontSize" Value="14"></Setter>
+			<Setter Property="Foreground" Value="Black"></Setter>
+		</Style>
+		<Style Selector="TextBlock.Small">
+			<Setter Property="FontSize" Value="12"></Setter>
+			<Setter Property="Foreground" Value="Gray"></Setter>
+			<Setter Property="Height" Value="20"></Setter>
+		</Style>
+		<Style Selector="RadioButton.GeoRadio">
+			<Setter Property="Width" Value="45"></Setter>
+			<Setter Property="Height" Value="45"></Setter>
+			<Setter Property="BorderThickness" Value="1"></Setter>
+			<Setter Property="BorderBrush" Value="{StaticResource Median}"/>
+			<Setter Property="GroupName" Value="GeoRadio"/>
+			<Setter Property="Template">
+				<ControlTemplate>
+					<ContentPresenter Content="{TemplateBinding Content}"></ContentPresenter>
+				</ControlTemplate>
+			</Setter>
+			<Style Selector="^ /template/ ContentPresenter">
+				<Setter Property="Background" Value="Transparent"></Setter>
+				<Setter Property="Transitions">
+					<Transitions>
+						<BrushTransition Duration="0:0:0.1" Property="Background"></BrushTransition>
+					</Transitions>
+				</Setter>
+				<Setter Property="CornerRadius" Value="5"></Setter>
+			</Style>
+			<Style Selector="^:pointerover /template/ ContentPresenter">
+				<Setter	Property="Background" Value="{StaticResource Light}"></Setter>
+			</Style>
+			<Style Selector="^:checked /template/ ContentPresenter">
+				<Setter	Property="Background" Value="{StaticResource Median}"></Setter>
+			</Style>
+		</Style>
+	</UserControl.Styles>
+	<TabControl TabStripPlacement="Left" Name="TabControl" Margin="0" Padding="0" Background="White">
+		<TabItem>
+			<TabItem.Header>
+				<Svg Path="/Assets/calc.svg" Width="25" Height="25" Margin="0"></Svg>
+			</TabItem.Header>
+			<ListBox ItemsSource="{CompiledBinding Shapes}"  Padding="0" Margin="0" Name="ShapeListBox" Background="White" SelectionMode="Multiple">
+				<ListBox.ItemContainerTheme>
+					<ControlTheme TargetType="ListBoxItem">
+						<Setter Property="Margin" Value="0" />
+						<Setter Property="Padding" Value="0"/>
+						<Style Selector="^:pointerover">
+							<Setter Property="Background" Value="Transparent"></Setter>
+						</Style>
+						<Style Selector="^:selected">
+							<Setter Property="Background" Value="Transparent"></Setter>
+						</Style>
+						<Setter Property="Height" Value="70"></Setter>
+						<Setter Property="CornerRadius" Value="3"></Setter>
+					</ControlTheme>
+				</ListBox.ItemContainerTheme>
+				<ListBox.ItemTemplate>
+					<geopad:ShapeListBoxDataTemplate>
+						<geopad:ShapeListBoxDataTemplate.IsCommonPoint>
+							<DataTemplate DataType="shapes:Point">
+								<ctls:CheckedControl IsChecked="{CompiledBinding Selected, Mode=TwoWay}" IsPointerOver="{CompiledBinding PointerOver, Mode=OneWayToSource}">
+									<StackPanel Orientation="Horizontal" Background="Transparent" Margin="5" VerticalAlignment="Center" Grid.Column="0" Grid.Row="0">
+										<CheckBox IsChecked="{CompiledBinding Visible,Mode=TwoWay}"/>
+										<Grid ColumnDefinitions="Auto,Auto" RowDefinitions="Auto,Auto" VerticalAlignment="Center">
+											<TextBox Text="{CompiledBinding Name,Mode=TwoWay}"  Classes="CommonTextBox Big" Grid.Column="0" Grid.Row="0" Height="20" Margin="0"/>
+											<StackPanel Orientation="Horizontal" Background="Transparent" Margin="0,5" VerticalAlignment="Center" Grid.Column="1" Grid.Row="0">
+												<TextBlock Text="=" TextAlignment="Left" VerticalAlignment="Center" Classes="Big"/>
+												<TextBlock Text="{CompiledBinding Getter.ActionName}" TextAlignment="Left" VerticalAlignment="Center" Classes="Big"/>
+												<TextBlock Text="(" TextAlignment="Left" VerticalAlignment="Center" Classes="Big"/>
+												<ctls:TplControl Source="{CompiledBinding Getter.Parameters}">
+													<ctls:TplControl.DataTemplate>
+														<geopad:ShapeShowCaseDataTemplate>
+															<geopad:ShapeShowCaseDataTemplate.ShapeShowcaseTemplate>
+																<DataTemplate DataType="shapes:Shape">
+																	<ctls:CheckedControl IsChecked="{CompiledBinding Selected, Mode=TwoWay}" IsPointerOver="{CompiledBinding PointerOver, Mode=OneWayToSource}">
+																		<TextBlock Text="{CompiledBinding Name}"></TextBlock>
+																	</ctls:CheckedControl>
+																</DataTemplate>
+															</geopad:ShapeShowCaseDataTemplate.ShapeShowcaseTemplate>
+														</geopad:ShapeShowCaseDataTemplate>
+													</ctls:TplControl.DataTemplate>
+												</ctls:TplControl>
+												<TextBlock Text=")" TextAlignment="Left" VerticalAlignment="Center" Classes="Big"/>
+											</StackPanel>
+											<StackPanel Orientation="Horizontal" Background="Transparent" Margin="5" VerticalAlignment="Center" Grid.Column="1" Grid.Row="1">
+												<TextBlock Text="=(" TextAlignment="Left" VerticalAlignment="Center" Classes="Small"/>
+												<TextBlock Text="{CompiledBinding  LocationX,Mode=TwoWay}"  Classes="CommonTextBox Small"/>
+												<TextBlock Text="," TextAlignment="Left" VerticalAlignment="Center" Classes="Small"/>
+												<TextBlock Text="{CompiledBinding  LocationY,Mode=TwoWay}" Classes="CommonTextBox Small"/>
+												<TextBlock Text=")" TextAlignment="Left" VerticalAlignment="Center" Classes="Small"/>
+											</StackPanel>
+										</Grid>
+									</StackPanel>
+								</ctls:CheckedControl>
+							</DataTemplate>
+						</geopad:ShapeListBoxDataTemplate.IsCommonPoint>
+						<geopad:ShapeListBoxDataTemplate.IsOnShapePoint>
+							<DataTemplate DataType="shapes:Point">
+								<ctls:CheckedControl IsChecked="{CompiledBinding Selected, Mode=TwoWay}" IsPointerOver="{CompiledBinding PointerOver, Mode=OneWayToSource}">
+									<StackPanel Orientation="Horizontal" Background="Transparent" Margin="5" VerticalAlignment="Center" Grid.Column="0" Grid.Row="0">
+										<CheckBox IsChecked="{CompiledBinding Visible,Mode=TwoWay}"/>
+										<Grid ColumnDefinitions="Auto,Auto" RowDefinitions="Auto,Auto" VerticalAlignment="Center">
+											<TextBox Text="{CompiledBinding Name,Mode=TwoWay}"  Classes="CommonTextBox Big" Grid.Column="0" Grid.Row="0" Height="20" Margin="0"/>
+											<StackPanel Orientation="Horizontal" Background="Transparent" Margin="0,5" VerticalAlignment="Center" Grid.Column="1" Grid.Row="0">
+												<TextBlock Text="=Controled(" TextAlignment="Left" VerticalAlignment="Center" Classes="Big"/>
+												<TextBox Text="{CompiledBinding  LocationX,Mode=TwoWay}"  Classes="CommonTextBox Big" LostFocus="TextBoxLostFocus" KeyDown="TextBoxKeyDown"/>
+												<TextBlock Text="," TextAlignment="Left" VerticalAlignment="Center" Classes="Big"/>
+												<TextBox Text="{CompiledBinding  LocationY,Mode=TwoWay}" Classes="CommonTextBox Big" LostFocus="TextBoxLostFocus" KeyDown="TextBoxKeyDown"/>
+												<TextBlock Text=")" TextAlignment="Left" VerticalAlignment="Center" Classes="Big"/>
+											</StackPanel>
+											<StackPanel DataContext="{CompiledBinding Getter}" Orientation="Horizontal" Background="Transparent" Margin="5" VerticalAlignment="Center" Grid.Column="1" Grid.Row="1">
+												<TextBlock Text="On " TextAlignment="Left" VerticalAlignment="Center" Classes="Small"/>
+												<TextBlock Text="{CompiledBinding On.TypeName,Mode=TwoWay,DataType=getter:PointGetter_Movable}"  Classes="CommonTextBox Small"/>
+												<TextBlock Text=" " TextAlignment="Left" VerticalAlignment="Center" Classes="Small"/>
+												<ctls:CheckedControl IsChecked="{CompiledBinding On.Selected, Mode=TwoWay,DataType=getter:PointGetter_Movable}" IsPointerOver="{CompiledBinding On.PointerOver, Mode=OneWayToSource,DataType=getter:PointGetter_Movable}">
+													<TextBlock Text="{CompiledBinding On.Name,DataType=getter:PointGetter_Movable}" VerticalAlignment="Center" Classes="Small"></TextBlock>
+												</ctls:CheckedControl>
+											</StackPanel>
+										</Grid>
+									</StackPanel>
+								</ctls:CheckedControl>
+							</DataTemplate>
+						</geopad:ShapeListBoxDataTemplate.IsOnShapePoint>
+						<geopad:ShapeListBoxDataTemplate.IsLocationPoint>
+							<DataTemplate DataType="shapes:Point">
+								<ctls:CheckedControl IsChecked="{CompiledBinding Selected, Mode=TwoWay}" IsPointerOver="{CompiledBinding PointerOver, Mode=OneWayToSource}">
+									<StackPanel Orientation="Horizontal" Background="Transparent" Margin="5" VerticalAlignment="Center">
+										<CheckBox IsChecked="{CompiledBinding Visible,Mode=TwoWay}"/>
+										<TextBox Text="{CompiledBinding Name,Mode=TwoWay}"  Classes="CommonTextBox Big" KeyDown="TextBoxKeyDown"/>
+										<TextBlock Text="=Point(" TextAlignment="Left" VerticalAlignment="Center" Classes="Big"/>
+										<TextBox Text="{CompiledBinding  LocationX,Mode=TwoWay}"  Classes="CommonTextBox Big" LostFocus="TextBoxLostFocus" KeyDown="TextBoxKeyDown"/>
+										<TextBlock Text="," TextAlignment="Left" VerticalAlignment="Center" Classes="Big"/>
+										<TextBox Text="{CompiledBinding  LocationY,Mode=TwoWay}" Classes="CommonTextBox Big" LostFocus="TextBoxLostFocus" KeyDown="TextBoxKeyDown"/>
+										<TextBlock Text=")" TextAlignment="Left" VerticalAlignment="Center" Classes="Big"/>
+									</StackPanel>
+								</ctls:CheckedControl>
+							</DataTemplate>
+						</geopad:ShapeListBoxDataTemplate.IsLocationPoint>
+						<geopad:ShapeListBoxDataTemplate.Common>
+							<DataTemplate DataType="shapes:Shape">
+								<ctls:CheckedControl IsChecked="{CompiledBinding Selected, Mode=TwoWay}" IsPointerOver="{CompiledBinding PointerOver, Mode=OneWayToSource}">
+									<StackPanel Orientation="Horizontal" Background="Transparent" Margin="5" VerticalAlignment="Center" Grid.Column="0" Grid.Row="0">
+										<CheckBox IsChecked="{CompiledBinding Visible,Mode=TwoWay}"/>
+										<Grid ColumnDefinitions="Auto,Auto" RowDefinitions="Auto,Auto" VerticalAlignment="Center">
+											<TextBox Text="{CompiledBinding Name,Mode=TwoWay}"  Classes="CommonTextBox Big" Grid.Column="0" Grid.Row="0" Height="20" Margin="0"/>
+											<StackPanel Orientation="Horizontal" Background="Transparent" Margin="0,5" VerticalAlignment="Center" Grid.Column="1" Grid.Row="0">
+												<TextBlock Text="=" TextAlignment="Left" VerticalAlignment="Center" Classes="Big"/>
+												<TextBlock Text="{CompiledBinding Getter.ActionName}" TextAlignment="Left" VerticalAlignment="Center" Classes="Big"/>
+												<TextBlock Text="(" TextAlignment="Left" VerticalAlignment="Center" Classes="Big"/>
+												<ctls:TplControl Source="{CompiledBinding Getter.Parameters}">
+													<ctls:TplControl.DataTemplate>
+														<geopad:ShapeShowCaseDataTemplate>
+															<geopad:ShapeShowCaseDataTemplate.ShapeShowcaseTemplate>
+																<DataTemplate DataType="shapes:Shape">
+																	<ctls:CheckedControl IsChecked="{CompiledBinding Selected, Mode=TwoWay}" IsPointerOver="{CompiledBinding PointerOver, Mode=OneWayToSource}">
+																		<TextBlock Text="{CompiledBinding Name}"></TextBlock>
+																	</ctls:CheckedControl>
+																</DataTemplate>
+															</geopad:ShapeShowCaseDataTemplate.ShapeShowcaseTemplate>
+														</geopad:ShapeShowCaseDataTemplate>
+													</ctls:TplControl.DataTemplate>
+												</ctls:TplControl>
+												<TextBlock Text=")" TextAlignment="Left" VerticalAlignment="Center" Classes="Big"/>
+											</StackPanel>
+											<TextBlock Text="{CompiledBinding Description}" Grid.Column="1" Grid.Row="1" Classes="Small"></TextBlock>
+										</Grid>
+									</StackPanel>
+								</ctls:CheckedControl>
+							</DataTemplate>
+						</geopad:ShapeListBoxDataTemplate.Common>
+					</geopad:ShapeListBoxDataTemplate>
+				</ListBox.ItemTemplate>
+			</ListBox>
+		</TabItem>
+		<TabItem>
+			<TabItem.Header>
+				<Svg Path="/Assets/geo.svg" Width="25" Height="25" Margin="0"></Svg>
+			</TabItem.Header>
+			<ItemsControl ItemsSource="{CompiledBinding Operations}">
+				<ItemsControl.ItemsPanel>
+					<ItemsPanelTemplate>
+						<StackPanel Orientation="Vertical"/>
+					</ItemsPanelTemplate>
+				</ItemsControl.ItemsPanel>
+				<ItemsControl.ItemTemplate>
+					<DataTemplate DataType="classes:HasNameStrList">
+						<StackPanel Orientation="Vertical">
+							<Expander Classes="NoBorderExpander" BorderThickness="0" IsExpanded="True" Width="{CompiledBinding $parent[StackPanel].Bounds.Width}" Padding="0" Background="Transparent">
+								<Expander.Header>
+									<TextBlock Text="{CompiledBinding Name }" Margin="0" Padding="0"/>
+								</Expander.Header>
+								<Border Padding="10,0" Background="Transparent">
+									<ItemsControl ItemsSource="{CompiledBinding .}">
+										<ItemsControl.ItemsPanel>
+											<ItemsPanelTemplate>
+												<WrapPanel Orientation="Horizontal" ItemSpacing="5" Background="White" Margin="0"/>
+											</ItemsPanelTemplate>
+										</ItemsControl.ItemsPanel>
+										<ItemsControl.ItemTemplate>
+											<DataTemplate>
+												<RadioButton Classes="GeoRadio">
+													<TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="{CompiledBinding .}" TextWrapping="Wrap" FontSize="11" TextAlignment="Center"></TextBlock>
+												</RadioButton>
+											</DataTemplate>
+										</ItemsControl.ItemTemplate>
+									</ItemsControl>
+								</Border>
+							</Expander>
+						</StackPanel>
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+		</TabItem>
+	</TabControl>
+		
+	
+</UserControl>
