@@ -6,18 +6,9 @@
 		xmlns:adn="clr-namespace:CsGrafeqApp.Addons"
 		xmlns:disp="clr-namespace:CsGrafeqApp.Controls.Displayers"
 		xmlns:geopad="clr-namespace:CsGrafeqApp.Addons.GeometryPad">
-
-  <!--
-    Additional resources 
-    Using Control Themes:
-         https://docs.avaloniaui.net/docs/basics/user-interface/styling/control-themes
-    Using Theme Variants:
-         https://docs.avaloniaui.net/docs/guides/styles-and-resources/how-to-use-theme-variants
-  -->
-  
   <Design.PreviewWith>
     <StackPanel Width="400" Spacing="10">      
-        <StackPanel Background="{DynamicResource SystemRegionBrush}">
+        <StackPanel Background="Transparent">
           <controls:DisplayerContainer>
 			  <disp:DisplayControl>
 				  <geopad:GeometryPad></geopad:GeometryPad>
@@ -31,11 +22,11 @@
     <Setter Property="Template">
       <ControlTemplate>
 		  <Panel>
-			  <Border Name="DisplayerCon" ZIndex="0">
+			  <Border Name="DisplayerCon" ZIndex="0" BorderThickness="0">
 				  <ContentPresenter Content="{TemplateBinding Displayer}"></ContentPresenter>
 			  </Border>
 			  <Grid ColumnDefinitions="300,4,*" ZIndex="1">
-				  <Border BorderThickness="1 0" BorderBrush="Gray" Grid.Column="0" Background="White"  DataContext="{TemplateBinding Displayer}" x:DataType="disp:Displayer">
+				  <Border BorderThickness="0 0,1,0" BorderBrush="Gray" Grid.Column="0" Background="White"  DataContext="{TemplateBinding Displayer}" x:DataType="disp:Displayer">
 					  <ListBox ItemsSource="{CompiledBinding Addons}" Name="OpListBox">
 						  <ListBox.ItemContainerTheme>
 							  <ControlTheme TargetType="ListBoxItem">
@@ -46,7 +37,7 @@
 						  </ListBox.ItemContainerTheme>
 						  <ListBox.ItemTemplate>
 							  <DataTemplate DataType="adn:Addon">
-								  <Expander Width="{CompiledBinding $parent[ListBoxItem].Bounds.Width}" Padding="0" Margin="0" Classes="OpExpander NoBorderExpander" BorderThickness="0" >
+								  <Expander Width="{CompiledBinding $parent[ListBoxItem].Bounds.Width}" Padding="0" Margin="0" Classes="NoBorderExpander" BorderThickness="0" >
 									  <Expander.Styles>
 										  <Style Selector="Expander.NoBorderExpander">
 											  <Style Selector="^ /template/ ToggleButton#ExpanderHeader">

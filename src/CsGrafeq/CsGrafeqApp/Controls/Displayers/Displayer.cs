@@ -20,6 +20,7 @@ using CsGrafeqApp.Classes;
 using CsGrafeqApp.Addons;
 using AddonPointerEventArgs = CsGrafeqApp.Addons.Addon.AddonPointerEventArgs;
 using AddonPointerWheelEventArgs = CsGrafeqApp.Addons.Addon.AddonPointerWheelEventArgs;
+using AddonPointerEventArgsBase= CsGrafeqApp.Addons.Addon.AddonPointerEventArgsBase;
 
 namespace CsGrafeqApp.Controls.Displayers
 {
@@ -85,7 +86,7 @@ namespace CsGrafeqApp.Controls.Displayers
             AvaPoint loc = e.GetPosition(this);
             var args = new AddonPointerEventArgs(loc.X, loc.Y, e.Properties, e.KeyModifiers);
             foreach (var addon in Addons)
-                if (addon.AddonPointerPressed(args) == Intercept)
+                if (addon.AddonPointerReleased(args) == Intercept)
                     return Intercept;
             return DoNext;
         }
@@ -95,6 +96,45 @@ namespace CsGrafeqApp.Controls.Displayers
             var args = new AddonPointerWheelEventArgs(loc.X, loc.Y, e.Properties, e.KeyModifiers,new Vec(e.Delta.X,e.Delta.Y));
             foreach (var addon in Addons)
                 if (addon.AddonPointerWheeled(args) == Intercept)
+                    return Intercept;
+            return DoNext;
+        }
+        protected bool CallAddonPointerTapped(TappedEventArgs e)
+        {
+            AvaPoint loc = e.GetPosition(this);
+            var args = new AddonPointerEventArgsBase(loc.X, loc.Y,e.KeyModifiers);
+            foreach (var addon in Addons)
+                if (addon.AddonPointerTapped(args) == Intercept)
+                    return Intercept;
+            return DoNext;
+        }
+        protected bool CallAddonPointerDoubleTapped(TappedEventArgs e)
+        {
+            AvaPoint loc = e.GetPosition(this);
+            var args = new AddonPointerEventArgsBase(loc.X, loc.Y,e.KeyModifiers);
+            foreach (var addon in Addons)
+                if (addon.AddonPointerDoubleTapped(args) == Intercept)
+                    return Intercept;
+            return DoNext;
+        }
+        protected bool CallAddonKeyDown(KeyEventArgs e)
+        {
+            foreach (var addon in Addons)
+                if (addon.AddonKeyDown(e) == Intercept)
+                    return Intercept;
+            return DoNext;
+        }
+        protected bool CallAddonKeyPress(KeyEventArgs e)
+        {
+            foreach (var addon in Addons)
+                if (addon.AddonKeyPress(e) == Intercept)
+                    return Intercept;
+            return DoNext;
+        }
+        protected bool CallAddonKeyUp(KeyEventArgs e)
+        {
+            foreach (var addon in Addons)
+                if (addon.AddonKeyUp(e) == Intercept)
                     return Intercept;
             return DoNext;
         }
@@ -123,7 +163,6 @@ namespace CsGrafeqApp.Controls.Displayers
         {
             if(!CanPerform)
                 return;
-            Console.WriteLine("Invalidate(addon)");
             if (Addons.Contains(addon))
             {
                 using (SKCanvas dc=new SKCanvas(addon.Bitmap))
@@ -139,7 +178,6 @@ namespace CsGrafeqApp.Controls.Displayers
         {
             if(!CanPerform)
                 return;
-            Console.WriteLine("Invalidate()");
             foreach(var i in Addons)
             {
                 using (SKCanvas dc = new SKCanvas(i.Bitmap))

@@ -30,58 +30,17 @@ namespace CsGrafeqApp.Shapes
                 i.Selected = false;
             }
         }
-        private readonly List<GeoPoint> SelectedPoints = new();
-        private readonly List<Line> SelectedLines = new();
-        private readonly List<Circle> SelectedCircles = new();
-        private readonly List<Polygon> SelectedPolygons = new();
-        private readonly List<Angle> SelectedAngles = new();
+        public void ClearSelected<T>() where T : GeoShape
+        {
+            foreach(var i in this)
+            {
+                if(i is T) 
+                    i.Selected = false;
+            }
+        }
         public new void Add(GeoShape geoShape)
         {
             geoShape.ShapeChanged += ShapeChanged;
-            switch (geoShape)
-            {
-                case GeoPoint pot:
-                    pot.SelectedChanged += (s, e) => {
-                        if (e)
-                            SelectedPoints.Add(pot);
-                        else
-                            SelectedPoints.Remove(pot);
-                    };
-                    break;
-                case Line l:
-                    l.SelectedChanged += (s, e) => {
-                        if (e)
-                            SelectedLines.Add(l);
-                        else
-                            SelectedLines.Remove(l);
-                    };
-                    break;
-                case Circle c:
-                    c.SelectedChanged += (s, e) => {
-                        if (e)
-                            SelectedCircles.Add(c);
-                        else
-                            SelectedCircles.Remove(c);
-                    };
-                    break;
-                case Polygon po:
-                    po.SelectedChanged += (s, e) => {
-                        if (e)
-                            SelectedPolygons.Add(po);
-                        else
-                            SelectedPolygons.Remove(po);
-                    };
-                    break;
-                case Angle a:
-                    a.SelectedChanged += (s, e) => {
-                        if (e)
-                            SelectedAngles.Add(a);
-                        else
-                            SelectedAngles.Remove(a);
-                    };
-                    break;
-
-            }
             if(geoShape is GeoPoint p)
                 AddPoint(p);
             else
@@ -215,6 +174,15 @@ namespace CsGrafeqApp.Shapes
         public IEnumerable<GeoShape?> GetElseShapes()
         {
             return ElseShapes.ToArray();
+        }
+
+        public IEnumerable<T> GetSelectedShapes<T>() where T : GeoShape
+        {
+            foreach (var i in this)
+            {
+                if(i is T t&&i.Selected)
+                    yield return t;
+            }
         }
     }
 }

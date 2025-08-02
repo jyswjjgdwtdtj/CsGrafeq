@@ -35,12 +35,17 @@ namespace CsGrafeqApp.Addons
             }
         }
         public abstract string Name { get; }
-        public string asdfasdf { get; } = "123";
         protected abstract void Render(SKCanvas dc, SKRect rect);
         internal void AddonRender(SKCanvas dc, SKRect rect)
         {
             if (IsLoaded.Value)
                 Render(dc, rect);
+        }
+        internal bool AddonKeyPress(KeyEventArgs e)
+        {
+            if (!IsLoaded.Value || !IsEnabled)
+                return DoNext;
+            return KeyPress(e);
         }
         internal bool AddonKeyDown(KeyEventArgs e)
         {
@@ -54,29 +59,43 @@ namespace CsGrafeqApp.Addons
                 return DoNext;
             return KeyUp(e);
         }
-        internal virtual bool AddonPointerMoved(AddonPointerEventArgs e)
+        internal bool AddonPointerMoved(AddonPointerEventArgs e)
         {
             if (!IsLoaded.Value || !IsEnabled)
                 return DoNext;
             return PointerMoved(e);
         }
-        internal virtual bool AddonPointerPressed(AddonPointerEventArgs e)
+        internal bool AddonPointerPressed(AddonPointerEventArgs e)
         {
             if (!IsLoaded.Value || !IsEnabled)
                 return DoNext;
             return PointerPressed(e);
         }
-        internal virtual bool AddonPointerReleased(AddonPointerEventArgs e)
+        internal bool AddonPointerReleased(AddonPointerEventArgs e)
         {
             if (!IsLoaded.Value || !IsEnabled)
                 return DoNext;
             return PointerReleased(e);
         }
-        internal virtual bool AddonPointerWheeled(AddonPointerWheelEventArgs e)
+        internal bool AddonPointerWheeled(AddonPointerWheelEventArgs e)
         {
             if (!IsLoaded.Value || !IsEnabled)
                 return DoNext;
             return PointerWheeled(e);
+        }
+
+        internal bool AddonPointerTapped(AddonPointerEventArgsBase e)
+        {
+            if (!IsLoaded.Value || !IsEnabled)
+                return DoNext;
+            return PointerTapped(e);
+        }
+
+        internal bool AddonPointerDoubleTapped(AddonPointerEventArgsBase e)
+        {
+            if (!IsLoaded.Value || !IsEnabled)
+                return DoNext;
+            return PointerDoubleTapped(e);
         }
         //true代表可继续传递
         //false代表拦截
@@ -86,8 +105,8 @@ namespace CsGrafeqApp.Addons
         protected virtual bool PointerReleased(AddonPointerEventArgs e) => DoNext;
         protected virtual bool PointerPressed(AddonPointerEventArgs e) => DoNext;
         protected virtual bool PointerMoved(AddonPointerEventArgs e) => DoNext;
-        protected virtual bool PointerClicked(AddonPointerEventArgs e) => DoNext;
-        protected virtual bool PointerDoubleClicked(AddonPointerEventArgs e) => DoNext;
+        protected virtual bool PointerTapped(AddonPointerEventArgsBase e) => DoNext;
+        protected virtual bool PointerDoubleTapped(AddonPointerEventArgsBase e) => DoNext;
         protected virtual bool PointerWheeled(AddonPointerWheelEventArgs e) => DoNext;
         private class OnceLock
         {
@@ -101,20 +120,28 @@ namespace CsGrafeqApp.Addons
                 _Value=true;
             }
         }
-        public class AddonPointerEventArgs : EventArgs
+        public class AddonPointerEventArgsBase : EventArgs
         {
             public readonly double X, Y;
-            public readonly PointerPointProperties Properties;
             public readonly KeyModifiers modifiers;
-            public AddonPointerEventArgs(double x, double y, PointerPointProperties properties, KeyModifiers modifiers)
+            public AddonPointerEventArgsBase(double x, double y, KeyModifiers modifiers)
             {
                 X = x;
                 Y = y;
-                Properties= properties;
                 this.modifiers = modifiers;
             }
 
             public Point Location => new Point(X,Y);
+        }
+        public class AddonPointerEventArgs : AddonPointerEventArgsBase
+        {
+            public readonly double X, Y;
+            public readonly PointerPointProperties Properties;
+            public readonly KeyModifiers modifiers;
+            public AddonPointerEventArgs(double x, double y, PointerPointProperties properties, KeyModifiers modifiers):base(x,y,modifiers)
+            {
+                Properties= properties;
+            }
         }
         public class AddonPointerWheelEventArgs : AddonPointerEventArgs
         {

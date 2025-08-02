@@ -18,11 +18,17 @@ namespace CsGrafeqApp.Controls.Displayers
     public delegate void RenderHandler(SKCanvas dc,SKRect bounds);
     public class DisplayControl:CartesianDisplayer
     {
+        public DisplayControl()
+        {
+            AddHandler(TappedEvent,(_,e)=>OnPointerTapped(e));
+            AddHandler(DoubleTappedEvent,(_,e)=>OnPointerDoubleTapped(e));
+        }
         private PointL MouseDownPos = new PointL() { X = 0, Y = 0 };
         private PointL MouseDownZeroPos = new PointL() { X = 0, Y = 0 };
         private PointL LastZeroPos;
         protected override void OnPointerPressed(PointerPressedEventArgs e)
         {
+            this.Focus();
             StopWheeling();
             if (CallAddonPointerPressed(e) == DoNext)
             {
@@ -99,6 +105,14 @@ namespace CsGrafeqApp.Controls.Displayers
                 InvalidateVisual();
             }
         }
+        protected virtual void OnPointerTapped(TappedEventArgs e)
+        {
+            CallAddonPointerTapped(e);
+        }
+        protected virtual void OnPointerDoubleTapped(TappedEventArgs e)
+        {
+            CallAddonPointerDoubleTapped(e);
+        }
         private void RenderMovedPlace(SKCanvas dc, RenderHandler rm)
         {
             float width = (float)Bounds.Width;
@@ -140,6 +154,23 @@ namespace CsGrafeqApp.Controls.Displayers
                 {
                     rm.Invoke(dc,CreateSKRectWH(0, 0, width, (int)(_Zero.Y - LastZeroPos.Y)));
                 }
+            }
+        }
+
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            Console.WriteLine("KeyDown");
+            if (CallAddonKeyDown(e) == DoNext)
+            {
+                
+            }
+        }
+
+        protected override void OnKeyUp(KeyEventArgs e)
+        {
+            if (CallAddonKeyUp(e) == DoNext)
+            {
+                
             }
         }
     }

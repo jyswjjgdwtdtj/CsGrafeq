@@ -76,7 +76,7 @@
 			<Setter Property="GroupName" Value="GeoRadio"/>
 			<Setter Property="Template">
 				<ControlTemplate>
-					<ContentPresenter Content="{TemplateBinding Content}"></ContentPresenter>
+					<ContentPresenter Content="{TemplateBinding Content}" DataContext="{TemplateBinding DataContext}"></ContentPresenter>
 				</ControlTemplate>
 			</Setter>
 			<Style Selector="^ /template/ ContentPresenter">
@@ -101,7 +101,9 @@
 			<TabItem.Header>
 				<Svg Path="/Assets/calc.svg" Width="25" Height="25" Margin="0"></Svg>
 			</TabItem.Header>
-			<ListBox ItemsSource="{CompiledBinding Shapes}"  Padding="0" Margin="0" Name="ShapeListBox" Background="White" SelectionMode="Multiple">
+			<Panel>
+				<TextBlock Text="No Shape" ZIndex="0" TextAlignment="Center" HorizontalAlignment="Center" FontSize="20" Foreground="Black"></TextBlock>
+				<ListBox ItemsSource="{CompiledBinding Shapes}"  Padding="0" Margin="0" Name="ShapeListBox" Background="White" SelectionMode="Multiple" ZIndex="1">
 				<ListBox.ItemContainerTheme>
 					<ControlTheme TargetType="ListBoxItem">
 						<Setter Property="Margin" Value="0" />
@@ -233,6 +235,7 @@
 					</geopad:ShapeListBoxDataTemplate>
 				</ListBox.ItemTemplate>
 			</ListBox>
+			</Panel>
 		</TabItem>
 		<TabItem>
 			<TabItem.Header>
@@ -260,8 +263,8 @@
 										</ItemsControl.ItemsPanel>
 										<ItemsControl.ItemTemplate>
 											<DataTemplate>
-												<RadioButton Classes="GeoRadio">
-													<TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="{CompiledBinding .}" TextWrapping="Wrap" FontSize="11" TextAlignment="Center"></TextBlock>
+												<RadioButton Classes="GeoRadio" IsCheckedChanged="RadioButtonChecked" Name="{CompiledBinding .}">
+													<TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap" FontSize="11" TextAlignment="Center" Name="RadioText" Text="{CompiledBinding .}"></TextBlock>
 												</RadioButton>
 											</DataTemplate>
 										</ItemsControl.ItemTemplate>

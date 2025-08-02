@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.13.35913.81
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Publics", "Publics\Publics.csproj", "{148A9B84-911E-46E2-A2A9-0EAB7F2B1D91}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsGrafeqApp", "CsGrafeqApp\CsGrafeqApp.csproj", "{0833545A-8854-45C0-A92C-494FA98E3A54}"
 EndProject
 Global
@@ -13,10 +11,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{148A9B84-911E-46E2-A2A9-0EAB7F2B1D91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{148A9B84-911E-46E2-A2A9-0EAB7F2B1D91}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{148A9B84-911E-46E2-A2A9-0EAB7F2B1D91}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{148A9B84-911E-46E2-A2A9-0EAB7F2B1D91}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0833545A-8854-45C0-A92C-494FA98E3A54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0833545A-8854-45C0-A92C-494FA98E3A54}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0833545A-8854-45C0-A92C-494FA98E3A54}.Release|Any CPU.ActiveCfg = Release|Any CPU

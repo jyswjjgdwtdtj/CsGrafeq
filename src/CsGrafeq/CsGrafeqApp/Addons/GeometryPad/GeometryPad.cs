@@ -45,7 +45,9 @@ namespace CsGrafeqApp.Addons.GeometryPad
             Shapes.OnShapeChanged += () =>
             {
                 Owner?.Invalidate(this);
+                Console.WriteLine(123);
             };
+            #if DEBUG
             var p1 = new GeoPoint(new PointGetter_FromLocation((1, 3)));
             var p2 = new GeoPoint(new PointGetter_FromLocation((3, 4)));
             var p3 = new GeoPoint(new PointGetter_FromLocation((6, 7)));
@@ -55,20 +57,21 @@ namespace CsGrafeqApp.Addons.GeometryPad
             Shapes.Add(new GeoPolygon(new PolygonGetter(p1,p2,p3)));
             Shapes.Add(new Angle(new AngleGetter_FromThreePoint(p1, p2, p3)));
             Shapes.Add(new Straight(new LineGetter_Connected(p1,p2)));
+            #endif
         }
         public void SetAction(string geoPadAction)
         {
             if(GeoPadAction==geoPadAction)
                 return;
-            
+            GeoPadAction=geoPadAction;
+            ClearSelect();
         }
 
-        protected AvaPoint DownPoint,MovePoint;
+        protected AvaPoint DownPoint=new AvaPoint(-1,-1),MovePoint=new(-1,-1);
         protected override bool PointerPressed(AddonPointerEventArgs e)
         {
-            DownPoint = new AvaPoint(e.X,e.Y);
-            
-            if (GeoPadAction != "Choose")
+            DownPoint = e.Location;
+            if (GeoPadAction != "Select")
             {
                 MovingPoint = GetShape<GeoPoint>(DownPoint);
                 if(MovingPoint!=null)
@@ -85,13 +88,13 @@ namespace CsGrafeqApp.Addons.GeometryPad
         protected override bool PointerMoved(AddonPointerEventArgs e)
         {
             Owner.Suspend();
-            MovePoint=new AvaPoint(e.X,e.Y);
-            if (GeoPadAction == "Choose"&&DownPoint!=new AvaPoint(-1,-1))
+            MovePoint=e.Location;
+            if (GeoPadAction == "Select"&&DownPoint!=new AvaPoint(-1,-1))
             {
+                Owner.Resume(false);
                 Owner.Invalidate(this);
                 return Intercept;
             }
-
             if (MovingPoint == null)
             {
                 Owner.Resume(false);
@@ -103,7 +106,7 @@ namespace CsGrafeqApp.Addons.GeometryPad
                     ClearSelect();
                 if(MovingPoint.PointGetter is PointGetter_Movable mpg)
                 {
-                    mpg.SetControlPoint(new Vec(Owner.PixelToMathX(e.X), Owner.PixelToMathY(e.Y)));
+                    mpg.SetControlPoint(Owner.PixelToMath(MovePoint));
                     MovingPoint.RefreshValues();
                 }
                 Owner.Resume();
@@ -115,10 +118,10 @@ namespace CsGrafeqApp.Addons.GeometryPad
 
         protected override bool PointerReleased(AddonPointerEventArgs e)
         {
+            Owner.Suspend();
             DisplayControl disp=(Owner as DisplayControl)!;
-            if (GeoPadAction == "Choose")
+            if (GeoPadAction == "Select")
             {
-                Owner.Invalidate(this);
                 var rect = RegulateRectangle(new AvaRect(DownPoint, new AvaSize(MovePoint.X - DownPoint.X, MovePoint.Y - DownPoint.Y)));
                 var mathrectloc = Owner.PixelToMath(new AvaPoint(rect.Left,rect.Top+rect.Height));
                 var mathrectsize = new Vec(((double)rect.Width),((double)rect.Height))/disp.UnitLength;
@@ -173,23 +176,420 @@ namespace CsGrafeqApp.Addons.GeometryPad
                                     c.Selected = true;
                             }
                             break;
+                        case Polygon p:
+                        {
+                            foreach (var point in p.Locations)
+                            {
+                                Vec v=point-mathrectloc;
+                                if (InRange(0, mathrectsize.X, v.X) && InRange(0, mathrectsize.Y, v.Y))
+                                {
+                                    p.Selected = true;
+                                }
+                                break;
+                            }
+                        }
+                            break;
+                        case Angle a:
+                        {
+                            Vec v=a.AngleData.AnglePoint-mathrectloc;
+                            if (InRange(0, mathrectsize.X, v.X) && InRange(0, mathrectsize.Y, v.Y))
+                            {
+                                a.Selected = true;
+                            }
+                        }
+                            break;
                     }
                 }
+                Owner.Resume();
                 return Intercept;
             }
+
             if (MovingPoint == null)
+            {
+                Owner.Resume();
                 return DoNext;
+            }
             if(e.Location!=DownPoint)
                 ClearSelect();
             (MovingPoint.PointGetter as PointGetter_Movable)?.SetControlPoint(MovingPoint.Location);
             MovingPoint = null;
-            Owner.Invalidate(this);
             DownPoint = new AvaPoint(-1, -1);
+            Owner.Resume();
             return Intercept;
         }
+
+        protected override bool PointerTapped(AddonPointerEventArgsBase e)
+        {
+            Owner.Suspend();
+            if (GeoPadAction == "Put")
+            {
+                ClearSelect();
+                PutPoint(e.Location);
+                Owner.Resume();
+                return Intercept;
+            }
+            GeoPoint? first =Shapes.GetSelectedShapes<GeoPoint>().FirstOrDefault();
+            if (TryGetShape<GeoPoint>(e.Location, out var point))
+            {
+                point.Selected=!point.Selected;
+            }
+            else if (TryGetShape<GeoLine>(e.Location, out var line))
+            {
+                line.Selected = !line.Selected;
+            }
+            else if (TryGetShape<GeoCircle>(e.Location, out var circle))
+            {
+                circle.Selected = !circle.Selected; 
+            }
+            else if (GeoPadAction != "Move" && GeoPadAction != "Select")
+            {
+                PutPoint(e.Location).Selected = true;
+            }
+            GeoPoint[] SPoints = Shapes.GetSelectedShapes<GeoPoint>().ToArray();
+            GeoLine[] SLines = Shapes.GetSelectedShapes<GeoLine>().ToArray();
+            GeoCircle[] SCircles = Shapes.GetSelectedShapes<GeoCircle>().ToArray();
+            GeoPolygon[] SPolygons = Shapes.GetSelectedShapes<GeoPolygon>().ToArray();
+            int plen = SPoints.Length;
+            int llen = SLines.Length;
+            int clen = SCircles.Length;
+            switch (GeoPadAction)
+            {
+                case "Select":
+                case "Move":
+                    break;
+                case "Put":
+                {
+                    ClearSelect();
+                }
+                    break;
+                case "Middle":
+                {
+                    if ((plen == 2) && (llen == 0) && (clen == 0))
+                    {
+                        GeoPoint newpoint = new GeoPoint(new PointGetter_MiddlePoint(SPoints[0], SPoints[1]));
+                        Shapes.Add(newpoint);
+                        ClearSelect();
+                    }
+                    else if (plen == 0 && llen == 1 && clen == 0)
+                    {
+                        if (SLines[0] is Segment)
+                        {
+                            GeoPoint newpoint = new GeoPoint(new PointGetter_MiddlePoint(
+                                new GeoPoint(new PointGetter_EndOfLine(SLines[0], true)),
+                                new GeoPoint(new PointGetter_EndOfLine(SLines[0], false))
+                            ));
+                            Shapes.Add(newpoint);
+                            ClearSelect();
+                        }
+                    }
+                    ClearSelect<GeoLine>();
+                    ClearSelect<GeoCircle>();
+                    if (plen >= 2)
+                        ClearSelect<GeoPoint>();
+                }
+                    break;
+                case "Median Center":
+                {
+                    if (plen == 3 && llen == 0 && clen == 0)
+                    {
+                        GeoPoint newpoint = new GeoPoint(new PointGetter_MedianCenter(SPoints[0], SPoints[1],
+                            SPoints[2]));
+                        Shapes.Add(newpoint);
+                        ClearSelect<GeoPoint>();
+                    }
+                    ClearSelect<GeoLine>();
+                    ClearSelect<GeoCircle>();
+                    if (plen >= 3)
+                        ClearSelect<GeoPoint>();
+                }
+                    break;
+                case "In Center":
+                {
+                    if (plen == 3 && llen == 0 && clen == 0)
+                    {
+                        GeoPoint newpoint = new GeoPoint(new PointGetter_InCenter(SPoints[0], SPoints[1],
+                            SPoints[2]));
+                        Shapes.Add(newpoint);
+                        ClearSelect<GeoPoint>();
+                    }
+                    ClearSelect<GeoLine>();
+                    ClearSelect<GeoCircle>();
+                    if (plen >= 3)
+                        ClearSelect<GeoPoint>();
+                }
+                    break;
+                case "Out Center":
+                {
+                    if (plen == 3 && llen == 0 && clen == 0)
+                    {
+                        GeoPoint newpoint = new GeoPoint(new PointGetter_OutCenter(SPoints[0], SPoints[1],
+                            SPoints[2]));
+                        Shapes.Add(newpoint);
+                        ClearSelect<GeoPoint>();
+                    }
+                    ClearSelect<GeoLine>();
+                    ClearSelect<GeoCircle>();
+                    if (plen >= 3)
+                        ClearSelect<GeoPoint>();
+                }
+                    break;
+                case "Ortho Center":
+                {
+                    if (plen == 3 && llen == 0 && clen == 0)
+                    {
+                        GeoPoint newpoint = new GeoPoint(new PointGetter_OrthoCenter(SPoints[0], SPoints[1],
+                            SPoints[2]));
+                        Shapes.Add(newpoint);
+                        ClearSelect<GeoPoint>();
+                    }
+                    ClearSelect<GeoLine>();
+                    ClearSelect<GeoCircle>();
+                    if (plen >= 3)
+                        ClearSelect<GeoPoint>();
+                }
+                    break;
+                case "Axial Symmetry":
+                {
+                    if (plen == 1 && llen == 1 && clen == 0)
+                    {
+                        GeoPoint newpoint =
+                            new GeoPoint(new PointGetter_AxialSymmetryPoint(SPoints[0], SLines[0]));
+                        Shapes.Add(newpoint);
+                        ClearSelect();
+                    }
+                    if (plen > 1)
+                        ClearSelect<GeoPoint>();
+                    if (llen > 1)
+                        ClearSelect<GeoLine>();
+                    ClearSelect<Circle>();
+                }
+                    break;
+                case "Nearest":
+                {
+                    if (plen == 1 && llen == 1 && clen == 0)
+                    {
+                        GeoPoint newpoint =
+                            new GeoPoint(new PointGetter_NearestPointOnLine(SLines[0], SPoints[0]));
+                        Shapes.Add(newpoint);
+                        ClearSelect();
+                    }
+                    if (plen > 1)
+                        ClearSelect<GeoPoint>();
+                    if (llen > 1)
+                        ClearSelect<GeoLine>();
+                    ClearSelect<Circle>();
+                }
+                    break;
+                case "Straight":
+                {
+                    if (plen == 2 && llen == 0 && clen == 0)
+                    {
+                        var line = new Straight(new LineGetter_Connected(SPoints[0],SPoints[1]));
+                        Shapes.Add(line);
+                        ClearSelect();
+                    }
+                    if (plen > 2)
+                        ClearSelect<GeoPoint>();
+                    ClearSelect<GeoLine>();
+                    ClearSelect<GeoCircle>();
+                }
+                    break;
+                case "Segment":
+                {
+                    if (plen == 2 && llen == 0 && clen == 0)
+                    {
+                        var line = new Segment(new LineGetter_Segment(SPoints[0], SPoints[1]));
+                        Shapes.Add(line);
+                        ClearSelect();
+                    }
+                    if (plen > 2)
+                        ClearSelect<GeoPoint>();
+                    ClearSelect<GeoLine>();
+                    ClearSelect<GeoCircle>();
+                }
+                    break;
+                case "Half":
+                {
+                    if (plen == 2 && llen == 0 && clen == 0)
+                    {
+                        var line = new GeoHalf(new LineGetter_Half(SPoints[0], SPoints[1]));
+                        Shapes.Add(line);
+                        ClearSelect();
+                    }
+                    if (plen > 2)
+                        ClearSelect<GeoPoint>();
+                    ClearSelect<GeoLine>();
+                    ClearSelect<GeoCircle>();
+                }
+                    break;
+                case "Vertical":
+                {
+                    if (plen == 1 && llen == 1 && clen == 0)
+                    {
+                        var line = new Straight(new LineGetter_Vertical(SLines[0],SPoints[0]));
+                        Shapes.Add(line);
+                        ClearSelect();
+                    }
+                    if (plen > 1)
+                        ClearSelect<GeoPoint>();
+                    if (llen > 1)
+                        ClearSelect<GeoLine>();
+                    ClearSelect<Circle>();
+                }
+                    break;
+                case "Parallel":
+                {
+                    if (plen == 1 && llen == 1 && clen == 0)
+                    {
+                        var line = new Straight(new LineGetter_Parallel(SLines[0],SPoints[0]));
+                        Shapes.Add(line);
+                        ClearSelect();
+                    }
+                    if (plen > 1)
+                        ClearSelect<GeoPoint>();
+                    if (llen > 1)
+                        ClearSelect<GeoLine>();
+                    ClearSelect<Circle>();
+                }
+                    break;
+                case "Perpendicular Bisector":
+                {
+                    if ((plen == 2) && (llen == 0) && (clen == 0))
+                    {
+                        var line = new Straight(new LineGetter_PerpendicularBisector(SPoints[0],SPoints[1]));
+                        Shapes.Add(line);
+                        ClearSelect();
+                    }
+                    else if (plen == 0 && llen == 1 && clen == 0)
+                    {
+                        if (SLines[0] is Segment)
+                        {
+                            var line = new Straight(new LineGetter_PerpendicularBisector(
+                                new GeoPoint(new PointGetter_EndOfLine(SLines[0], true)),
+                                new GeoPoint(new PointGetter_EndOfLine(SLines[0], false))));
+                            Shapes.Add(line);
+                            ClearSelect();
+                        }
+                    }
+
+                    ClearSelect<Circle>();
+                    ClearSelect<GeoLine>();
+                    if (plen > 2)
+                        ClearSelect<GeoPoint>();
+                }
+                    break;
+                case "Three Points":
+                {
+                    if (plen == 3 && llen == 0 && clen == 0)
+                    {
+                        Circle circle = new Circle(new CircleGetter_FromThreePoint(SPoints[0], SPoints[1],
+                            SPoints[2]));
+                        Shapes.Add(circle);
+                        ClearSelect<GeoPoint>();
+                    }
+
+                    ClearSelect<Circle>();
+                    ClearSelect<GeoLine>();
+                    if (plen > 3)
+                        ClearSelect<GeoPoint>();
+                }
+                    break;
+                case "Center and Point":
+                {
+                    if (plen == 2 && llen == 0 && clen == 0)
+                    {
+                        Circle circle =
+                            new Circle(new CircleGetter_FromCenterAndPoint(SPoints[0], SPoints[1]));
+                        Shapes.Add(circle);
+                        ClearSelect<GeoPoint>();
+                    }
+                    ClearSelect<Circle>();
+                    ClearSelect<GeoLine>();
+                    if (plen > 2)
+                        ClearSelect<GeoPoint>();
+                }
+                    break;
+                case "Polygon":
+                {
+                    if (llen == 0 && clen == 0 && plen > 2)
+                    {
+                        if (TryGetShape<GeoPoint>(e.Location,out GeoPoint p)&&first==p)
+                        {
+                            Polygon polygon = new Polygon(new PolygonGetter(first,SPoints));
+                            Shapes.Add(polygon);
+                            ClearSelect();
+                        }
+                    }
+                    ClearSelect<Circle>();
+                    ClearSelect<GeoLine>();
+                }
+                    break;
+                case "Angle":
+                {
+                    if (plen == 3 && llen == 0 && clen == 0)
+                    {
+                        Angle angle = new Angle(new AngleGetter_FromThreePoint(SPoints[0], SPoints[1], SPoints[2]));
+                        Shapes.Add(angle);
+                        ClearSelect<GeoPoint>();
+                    }
+                    ClearSelect<Circle>();
+                    ClearSelect<GeoLine>();
+                    if (plen > 3)
+                        ClearSelect<GeoPoint>();
+                }
+                    break;
+                default:
+                    Console.WriteLine(GeoPadAction);
+                    Owner.Resume();
+                    return DoNext;
+            }
+            Owner.Resume();
+            return Intercept;
+        }
+
+        protected override bool KeyDown(KeyEventArgs e)
+        {
+            bool res=DoNext;
+            switch (e.Key)
+            {
+                case Key.Delete:
+                {
+                    foreach (var shape in Shapes)
+                    {
+                        if (shape.Selected)
+                        {
+                            Shapes.Remove(shape);
+                            res &= Intercept;
+                        }
+                    }
+                }
+                    break;
+                case Key.Tab:
+                {
+                    foreach (var shape in Shapes)
+                    {
+                        if (shape.Selected)
+                        {
+                            shape.Selected = false;
+                            foreach (var subshape in shape.SubShapes)
+                            {
+                                subshape.Selected = true;
+                            }
+                        }
+                    }
+                }
+                    break;
+            }
+            return res; 
+        }
+
         public void ClearSelect()
         {
             Shapes.ClearSelected();
+        }
+        public void ClearSelect<T>() where T : GeoShape
+        {
+            Shapes.ClearSelected<T>();
         }
         public override Displayer? Owner { 
             get =>base.Owner;
@@ -204,6 +604,12 @@ namespace CsGrafeqApp.Addons.GeometryPad
         protected override void Render(SKCanvas dc, SKRect rect)
         {
             RenderShapes(dc, rect);
+            if (GeoPadAction == "Select"&&DownPoint!=new AvaPoint(-1,-1))
+            {
+                var selrect =RegulateRectangle( new Rect(DownPoint, new AvaSize(MovePoint.X - DownPoint.X, MovePoint.Y - DownPoint.Y)));
+                dc.DrawRect(selrect.ToSKRect(),FilledTpMedian);
+                dc.DrawRect(selrect.ToSKRect(),StrokeMedian);
+            }
         }
         private void RenderShapes(SKCanvas dc,SKRect rect)
         {
@@ -409,10 +815,13 @@ namespace CsGrafeqApp.Addons.GeometryPad
             List<(double,Shape)> shapes = new List<(double,Shape)> ();
             foreach (var s in Shapes)
             {
-                double dist = (s.HitTest(mathcursor)*disp.UnitLength).GetLength();
-                if (dist<5)
+                if (s is Line || s is Circle)
                 {
-                    shapes.Add((dist,s));
+                    double dist = (s.HitTest(mathcursor)*disp.UnitLength).GetLength();
+                    if (dist<5)
+                    {
+                        shapes.Add((dist,s));
+                    }
                 }
             }
             (double,Shape)[] ss=shapes.OrderBy(key => key.Item1).ToArray();
@@ -459,6 +868,7 @@ namespace CsGrafeqApp.Addons.GeometryPad
                     return null;
                 }
             }
+            Shapes.Add(newpoint);
             return newpoint;
         }
 
@@ -488,12 +898,6 @@ namespace CsGrafeqApp.Addons.GeometryPad
                 }
             }
             return target;
-        }
-
-        public void AddShape(Shape shape)
-        {
-            Shapes.Add(shape);
-            Owner.Invalidate(this);
         }
 
     }

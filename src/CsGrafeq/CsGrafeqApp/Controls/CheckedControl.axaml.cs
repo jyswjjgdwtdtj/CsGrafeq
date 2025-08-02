@@ -10,6 +10,12 @@ namespace CsGrafeqApp.Controls;
 [PseudoClasses(":checked")]
 public class CheckedControl : TemplatedControl
 {
+    static CheckedControl()
+    {
+        AffectsArrange<CheckedControl>(IsCheckedProperty,ContentProperty);
+        AffectsMeasure<CheckedControl>(IsCheckedProperty,ContentProperty);
+        AffectsRender<CheckedControl>(IsCheckedProperty,ContentProperty);
+    }
     public static readonly DirectProperty<CheckedControl, bool> IsCheckedProperty = AvaloniaProperty.RegisterDirect<CheckedControl, bool>(nameof(IsChecked), o => o.IsChecked, (o, v) => o.IsChecked = v);
     public static readonly DirectProperty<CheckedControl, Control?> ContentProperty = AvaloniaProperty.RegisterDirect<CheckedControl, Control?>(nameof(Content), o => o.Content, (o, v) => o.Content = v);
     public bool IsChecked
@@ -30,6 +36,12 @@ public class CheckedControl : TemplatedControl
             if (e.Properties.IsLeftButtonPressed)
             {
                 IsChecked = !IsChecked;
+            }
+        };
+        PropertyChanged += (s, e) =>
+        {
+            if (e.Property == IsCheckedProperty)
+            {
                 PseudoClasses.Set(":checked", IsChecked);
             }
         };

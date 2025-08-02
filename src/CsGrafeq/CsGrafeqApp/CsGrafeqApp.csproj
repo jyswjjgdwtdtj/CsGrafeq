@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<OutputType Condition="'$(Configuration.toUpper())' != 'DEBUG'">WinExe</OutputType>
+		<OutputType Condition="'$(Configuration.toUpper())' != 'DEBUG'">Exe</OutputType>
 		<OutputType Condition="'$(Configuration.toUpper())' == 'DEBUG'">Exe</OutputType>
 		<TargetFramework>net9.0</TargetFramework>
 		<InvariantGlobalization>true</InvariantGlobalization>
 		<Nullable>enable</Nullable>
-		<PublishAot>false</PublishAot>
+		<PublishAot>true</PublishAot>
 		<PublishTrimmed>true</PublishTrimmed>
 		<SelfContained>true</SelfContained>
 		<AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
@@ -51,9 +51,6 @@
 	  <Compile Remove="DataTemplate\**" />
 	  <EmbeddedResource Remove="DataTemplate\**" />
 	  <None Remove="DataTemplate\**" />
-	</ItemGroup>
-	<ItemGroup>
-	  <ProjectReference Include="..\Publics\Publics.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Compile Update="Controls\CheckedControl.axaml.cs">

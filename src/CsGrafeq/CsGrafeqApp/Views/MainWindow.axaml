@@ -6,7 +6,7 @@
         xmlns:views="clr-namespace:CsGrafeqApp.Views"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="CsGrafeqApp.Views.MainWindow"
-        Icon="/Assets/avalonia-logo.ico"
-        Title="CsGrafeqApp">
+        Icon="/Assets/GeoIcon.ico"
+        Title="CsGrafeq">
         <views:MainView />
 </Window>

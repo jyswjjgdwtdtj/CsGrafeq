@@ -41,7 +41,7 @@ namespace CsGrafeqApp.Shapes
                 int wn = 0;
                 Vec p1, p2;
                 Vec v1, v2;
-                for (int i = 1, j = len; i < len; j = i++)
+                for (int i = 0, j = len-1; i < len-1; j = i++)
                 {
                     p1 = Locations[i];
                     p2 = Locations[j];

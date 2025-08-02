@@ -124,20 +124,21 @@ namespace CsGrafeqApp.Shapes.ShapeGetter
     public class LineGetter_PerpendicularBisector : LineGetter_TwoPoint
     {
         public override string ActionName => "PerpendicularBisector";
-        public LineGetter_PerpendicularBisector(Point p1,Point p2) : base(p1, p1) { }
+        public LineGetter_PerpendicularBisector(Point p1,Point p2) : base(p1, p2) { }
         public override TwoPoint GetLine()
         {
             Vec RealPoint1 = Point1.Location;
             Vec RealPoint2 = Point2.Location;
-            Vec MiddlePoint = (RealPoint1 + RealPoint2) / 2;
-            Vec P2;
+            Vec MiddlePoint = (RealPoint1+RealPoint2)/2;
+            Vec p1 = MiddlePoint;
+            Vec p2;
             double k = (RealPoint1.Y - RealPoint2.Y) / (RealPoint1.X - RealPoint2.X);
-            double theta = Math.Atan2(-1 / k, 1);
+            double theta = (Math.Atan2(-1 / k, 1));
             if (RealPoint1.Y - RealPoint2.Y > 0)
-                P2 = new Vec(MiddlePoint.X + Math.Cos(theta), MiddlePoint.Y - Math.Cos(theta) / k);
+                p2 = new Vec(p1.X + (Math.Cos(theta)), p1.Y - (Math.Cos(theta)) / k);
             else
-                P2 = new Vec(MiddlePoint.X - Math.Cos(theta), MiddlePoint.Y + Math.Cos(theta) / k);
-            return new TwoPoint(MiddlePoint,P2);
+                p2 = new Vec(p1.X - (Math.Cos(theta)), p1.Y + (Math.Cos(theta)) / k);
+            return new TwoPoint(p1, p2);
         }
     }
     public class LineGetter_AngleBisector : LineGetter

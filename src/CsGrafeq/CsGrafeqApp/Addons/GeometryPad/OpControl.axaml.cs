@@ -18,8 +18,8 @@ public partial class OpControl : UserControl
     public ShapeList Shapes { get; init; }
     internal static HasNameStrList EditAction { get; } = new("Edit") { "Move", "Select" };
     internal static HasNameStrList LineAction { get; } = new("Line") { "Straight", "Half", "Segment", "Vertical", "Parallel", "Perpendicular Bisector", "Fitted" };
-    internal static HasNameStrList PointAction { get; } = new("Point") { "Put Point", "Middle", "Median Center", "Out Center", "In Center", "Ortho Center", "Axial Symmetry", "Nearest" };
-    internal static HasNameStrList PolygonAction { get; }= new ("Polygon") {"Three Points","Center and Point"};
+    internal static HasNameStrList PointAction { get; } = new("Point") { "Put", "Middle", "Median Center", "Out Center", "In Center", "Ortho Center", "Axial Symmetry", "Nearest" };
+    internal static HasNameStrList PolygonAction { get; }= new ("Polygon") {"Polygon"};
     internal static HasNameStrList CircleAction { get; }= new ("Circle") {"Three Points","Center and Point"};
 
     internal readonly static DirectProperty<OpControl, AvaloniaList<HasNameStrList>> NameStrListProperty =
@@ -72,5 +72,19 @@ public partial class OpControl : UserControl
             }
         }
 
+    }
+
+    public void RadioButtonChecked(object sender, RoutedEventArgs e)
+    {
+        if (sender is RadioButton rb)
+        {
+            if(rb.IsChecked == true)
+                SetAction(rb.Name);
+        }
+    }
+
+    public void DeleteBtnClicked(object sender, RoutedEventArgs e)
+    {
+        Button button = sender as Button;
     }
 }
