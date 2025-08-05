@@ -5,8 +5,8 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using Avalonia.Markup.Xaml;
-using CsGrafeqApp.Classes;
-using CsGrafeqApp.Shapes;
+using CsGrafeq.Shapes;
+using CsGrafeq.Collections;
 using System;
 using System.Collections.Generic;
 

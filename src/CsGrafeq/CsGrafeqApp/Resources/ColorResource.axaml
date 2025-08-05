@@ -1,0 +1,12 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Color x:Key="Median">#00b89f</Color>
+    <Color x:Key="Light">#88ffcc</Color>
+    <Color x:Key="Dark">Teal</Color>
+    <SolidColorBrush x:Key="HTMedianBrush" Color="{DynamicResource Median}" Opacity="0.3"></SolidColorBrush>
+    <SolidColorBrush x:Key="HTLightBrush" Color="{DynamicResource Light}" Opacity="0.3"></SolidColorBrush>
+    <SolidColorBrush x:Key="MedianBrush" Color="{DynamicResource Median}"></SolidColorBrush>
+    <SolidColorBrush x:Key="LightBrush" Color="{DynamicResource Light}"></SolidColorBrush>
+    <SolidColorBrush x:Key="HTDarkBrush" Color="{DynamicResource Dark}" Opacity="0.3"></SolidColorBrush>
+    <SolidColorBrush x:Key="DarkBrush" Color="{DynamicResource Dark}"></SolidColorBrush>
+</ResourceDictionary>

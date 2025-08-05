@@ -1,10 +1,10 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using CsGrafeqApp.Classes;
 using CsGrafeqApp.Controls.Displayers;
 using SkiaSharp;
 using System;
+using CsGrafeq;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

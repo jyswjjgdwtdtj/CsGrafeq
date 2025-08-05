@@ -18,20 +18,6 @@
 	</Design.PreviewWith>
 
 	<ControlTheme x:Key="{x:Type controls:CheckedControl}" TargetType="controls:CheckedControl">
-		<ControlTheme.Resources>
-			<SolidColorBrush x:Key="Median" Color="#5a00b89f"></SolidColorBrush>
-			<SolidColorBrush x:Key="Light" Color="#5a88ffcc"></SolidColorBrush>
-			<valueconv:BoolToBrush x:Key="BoolToBrush1">
-				<valueconv:BoolToBrush.Brush1>
-					<SolidColorBrush Color="#5a00b89f"></SolidColorBrush>
-				</valueconv:BoolToBrush.Brush1>
-			</valueconv:BoolToBrush>
-			<valueconv:BoolToBrush x:Key="BoolToBrush2">
-				<valueconv:BoolToBrush.Brush1>
-					<SolidColorBrush Color="#5a88ffcc"></SolidColorBrush>
-				</valueconv:BoolToBrush.Brush1>
-			</valueconv:BoolToBrush>
-		</ControlTheme.Resources>
 		<Style Selector="^ /template/ Border#Container">
 			<Setter Property="Background" Value="Transparent"></Setter>
 			<Setter Property="Transitions">
@@ -41,10 +27,10 @@
 			</Setter>
 		</Style>
 		<Style Selector="^:pointerover /template/ Border#Container">
-			<Setter Property="Background" Value="{StaticResource Light}"></Setter>
+			<Setter Property="Background" Value="{DynamicResource HTLightBrush}"></Setter>
 		</Style>
 		<Style Selector="^:checked /template/ Border#Container">
-			<Setter Property="Background" Value="{StaticResource Median}"></Setter>
+			<Setter Property="Background" Value="{DynamicResource HTMedianBrush}"></Setter>
 		</Style>
 		<Setter Property="Template">
 			<ControlTemplate>

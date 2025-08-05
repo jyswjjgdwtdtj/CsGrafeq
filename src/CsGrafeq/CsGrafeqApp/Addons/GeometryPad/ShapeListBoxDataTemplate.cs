@@ -1,7 +1,7 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using CsGrafeqApp.Shapes;
-using CsGrafeqApp.Shapes.ShapeGetter;
+using CsGrafeq.Shapes;
+using CsGrafeq.Shapes.ShapeGetter;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +22,7 @@ namespace CsGrafeqApp.Addons.GeometryPad
         public required IDataTemplate? Common { get; set; }
         public Control? Build(object? param)
         {
-            if (param is Shapes.Shape item)
+            if (param is Shape item)
             {
                 switch (item)
                 {
@@ -39,6 +39,8 @@ namespace CsGrafeqApp.Addons.GeometryPad
                     case Polygon _:
                     case Angle _:
                         return Common?.Build(param);
+                    case ImplicitFunction _:
+                        return IsFunction?.Build(param);
                 }
 
             }
@@ -47,7 +49,7 @@ namespace CsGrafeqApp.Addons.GeometryPad
 
         public bool Match(object? data)
         {
-            return data is Shapes.Shape;
+            return data is Shape;
         }
     }
 }

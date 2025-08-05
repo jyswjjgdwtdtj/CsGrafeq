@@ -10,15 +10,24 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CsGrafeqApp.Views.MainView"
              x:DataType="vm:MainViewModel">
-  <Design.DataContext>
-    <!-- This only sets the DataContext for the previewer in an IDE,
-         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-	  <vm:MainViewModel />
-  </Design.DataContext>
-	<ctls:DisplayerContainer>
-		<disp:DisplayControl>
-			<geopad:GeometryPad>
-			</geopad:GeometryPad>
-		</disp:DisplayControl>
-	</ctls:DisplayerContainer>
+	<Grid RowDefinitions="25,*">
+		<Menu Grid.Row="0">
+			<MenuItem Header="_File">
+				
+				<MenuItem Header="_Open..."/>
+				<Separator/>
+				<MenuItem Header="_Exit"/>
+			</MenuItem>
+			<MenuItem Header="_Edit">
+				<MenuItem Header="Copy"/>
+				<MenuItem Header="Paste"/>
+			</MenuItem>
+		</Menu>
+		<ctls:DisplayerContainer Grid.Row="1">
+			<disp:DisplayControl>
+				<geopad:GeometryPad>
+				</geopad:GeometryPad>
+			</disp:DisplayControl>
+		</ctls:DisplayerContainer>
+	</Grid>
 </UserControl>

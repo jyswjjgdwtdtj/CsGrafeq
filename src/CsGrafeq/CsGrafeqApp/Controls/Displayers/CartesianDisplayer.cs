@@ -9,8 +9,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using static CsGrafeqApp.Controls.SkiaEx;
-using static CsGrafeqApp.ExtensionMethods;
-using static CsGrafeqApp.InternalMath;
 using AvaPoint = Avalonia.Point;
 using AvaSize = Avalonia.Size;
 
@@ -37,19 +35,21 @@ namespace CsGrafeqApp.Controls.Displayers
         public override double MathToPixelY(double d)=> _Zero.Y + -d * _UnitLength;
         public override double PixelToMathX(double d)=> (d - _Zero.X) / _UnitLength;
         public override double PixelToMathY(double d)=> -(d - _Zero.Y) / _UnitLength;
+        
+        //不敢动………………
         protected void RenderAxisLine(SKCanvas dc)
         {
             double width = Bounds.Width;
             double height = Bounds.Height;
             //y
-            if (InRange(ValidRect.Left, ValidRect.Right, _Zero.X))
+            if (RangeIn(ValidRect.Left, ValidRect.Right, _Zero.X))
             {
                 if (DrawAxisGrid && !DrawAxisLine)
                     dc.DrawLine(new SKPoint(_Zero.X, (float)ValidRect.Top), new SKPoint(_Zero.X, (float)ValidRect.Bottom), FilledGray1);
                 else if (DrawAxisLine)
                     dc.DrawLine(new SKPoint(_Zero.X, (float)ValidRect.Top), new SKPoint(_Zero.X, (float)ValidRect.Bottom), MouseOnYAxis ? FilledBlue : FilledBlack);
             }
-            if (InRange(0, height, _Zero.Y))
+            if (RangeIn(0, height, _Zero.Y))
             {
                 if (DrawAxisGrid && !DrawAxisLine)
                     dc.DrawLine(new SKPoint((float)ValidRect.Left, _Zero.Y), new SKPoint((float)ValidRect.Right, _Zero.Y), FilledGray1);
@@ -58,17 +58,17 @@ namespace CsGrafeqApp.Controls.Displayers
             }
             if (!DrawAxisGrid)
                 return;
-            int zsX = (int)Math.Floor(Math.Log(350 / _UnitLength, 10));
-            int zsY = (int)Math.Floor(Math.Log(350 / _UnitLength, 10));
-            double addnumX = Math.Pow(10, zsX);
-            double addnumY = Math.Pow(10, zsY);
-            decimal addnumDX = (decimal)Math.Pow(10, zsX);
-            decimal addnumDY = (decimal)Math.Pow(10, zsY);
+            int zsX = (int)Floor(Log(350 / _UnitLength, 10));
+            int zsY = (int)Floor(Log(350 / _UnitLength, 10));
+            double addnumX = Pow(10D, zsX);
+            double addnumY = Pow(10D, zsY);
+            decimal addnumDX = Pow(10M, zsX);
+            decimal addnumDY = Pow(10M, zsY);
             double p = RangeTo(-3, height - TextFont.Size + 1, _Zero.Y);
             SKPaint targetPen;
-            for (double i = Math.Min(_Zero.X - addnumX * _UnitLength, MathToPixelX(Round(PixelToMathX(ValidRect.Right), -zsX))); i > ValidRect.Left; i -= addnumX * _UnitLength)
+            for (double i = Min(_Zero.X - addnumX * _UnitLength, MathToPixelX(RoundTen(PixelToMathX(ValidRect.Right), -zsX))); i > ValidRect.Left; i -= addnumX * _UnitLength)
             {
-                decimal num = Round((decimal)PixelToMathX(i), -zsX);
+                decimal num = RoundTen((decimal)PixelToMathX(i), -zsX);
                 if (num % (10 * addnumDX) == 0) { targetPen = FilledGray2; } else { targetPen = FilledGray1; }
                 dc.DrawLine(
                     (float)i, 0,
@@ -76,9 +76,9 @@ namespace CsGrafeqApp.Controls.Displayers
                     targetPen
                 );
             }
-            for (double i = Math.Max(_Zero.X + addnumX * _UnitLength, MathToPixelX(Round(PixelToMathX(ValidRect.Left), -zsX))); i < ValidRect.Right; i += addnumX * _UnitLength)
+            for (double i = Max(_Zero.X + addnumX * _UnitLength, MathToPixelX(RoundTen(PixelToMathX(ValidRect.Left), -zsX))); i < ValidRect.Right; i += addnumX * _UnitLength)
             {
-                decimal num = Round((decimal)PixelToMathX(i), -zsX);
+                decimal num = RoundTen((decimal)PixelToMathX(i), -zsX);
                 if (num % (10 * addnumDX) == 0) { targetPen = FilledGray2; } else { targetPen = FilledGray1; }
                 dc.DrawLine(
                     (float)i, 0,
@@ -86,9 +86,9 @@ namespace CsGrafeqApp.Controls.Displayers
                     targetPen
                 );
             }
-            for (double i = Math.Min(_Zero.Y - addnumY * _UnitLength, MathToPixelY(Round(PixelToMathY(ValidRect.Bottom), -zsY))); i > ValidRect.Top; i -= addnumY * _UnitLength)
+            for (double i = Min(_Zero.Y - addnumY * _UnitLength, MathToPixelY(RoundTen(PixelToMathY(ValidRect.Bottom), -zsY))); i > ValidRect.Top; i -= addnumY * _UnitLength)
             {
-                decimal num = Round((decimal)PixelToMathY(i), -zsY);
+                decimal num = RoundTen((decimal)PixelToMathY(i), -zsY);
                 if (num % (10 * addnumDY) == 0) { targetPen = FilledGray2; } else { targetPen = FilledGray1; }
                 dc.DrawLine(
                     0, (float)i,
@@ -96,9 +96,9 @@ namespace CsGrafeqApp.Controls.Displayers
                     targetPen
                 );
             }
-            for (double i = Math.Max(_Zero.Y + addnumY * _UnitLength, MathToPixelY(Round(PixelToMathY(ValidRect.Top), -zsY))); i < ValidRect.Bottom; i += addnumY * _UnitLength)
+            for (double i =Max(_Zero.Y + addnumY * _UnitLength, MathToPixelY(RoundTen(PixelToMathY(ValidRect.Top), -zsY))); i < ValidRect.Bottom; i += addnumY * _UnitLength)
             {
-                decimal num = Round((decimal)PixelToMathY(i), -zsY);
+                decimal num = RoundTen((decimal)PixelToMathY(i), -zsY);
                 if (num % (10 * addnumDY) == 0) { targetPen = FilledGray2; } else { targetPen = FilledGray1; }
                 dc.DrawLine(
                     0, (float)i,
@@ -113,32 +113,32 @@ namespace CsGrafeqApp.Controls.Displayers
                 return;
             double width = Bounds.Width;
             double height = Bounds.Height;
-            int zsX = (int)Math.Floor(Math.Log(350 / _UnitLength, 10));
-            int zsY = (int)Math.Floor(Math.Log(350 / _UnitLength, 10));
-            double addnumX = Math.Pow(10, zsX);
-            double addnumY = Math.Pow(10, zsY);
-            decimal addnumDX = (decimal)Math.Pow(10, zsX);
-            decimal addnumDY = (decimal)Math.Pow(10, zsY);
+            int zsX = (int)Floor(Log(350 / _UnitLength, 10));
+            int zsY = (int)Floor(Log(350 / _UnitLength, 10));
+            double addnumX = Pow(10D, zsX);
+            double addnumY = Pow(10D, zsY);
+            decimal addnumDX = Pow(10M, zsX);
+            decimal addnumDY = Pow(10M, zsY);
             double p = RangeTo(-3, height - TextFont.Size + 1, _Zero.Y);
             float fff = 1f / 4f * TextFont.Size;
-            for (double i = Math.Min(_Zero.X - addnumX * _UnitLength, MathToPixelX(Round(PixelToMathX(width), -zsX))); i > 0; i -= addnumX * _UnitLength)
+            for (double i = Min(_Zero.X - addnumX * _UnitLength, MathToPixelX(RoundTen(PixelToMathX(ValidRect.Right), -zsX))); i > ValidRect.Left; i -= addnumX * _UnitLength)
             {
-                decimal num = Round((decimal)PixelToMathX(i), -zsX);
+                decimal num = RoundTen((decimal)PixelToMathX(i), -zsX);
                 dc.DrawText(num.ToString(), new SKPoint((float)(i - num.ToString().Length * fff - 2), (float)p + TextFont.Size), SKTextAlign.Left, TextFont, FilledBlack);
             }
-            for (double i = Math.Max(_Zero.X + addnumX * _UnitLength, MathToPixelX(Round(PixelToMathX(0), -zsX))); i < width; i += addnumX * _UnitLength)
+            for (double i = Max(_Zero.X + addnumX * _UnitLength, MathToPixelX(RoundTen(PixelToMathX(ValidRect.Left), -zsX))); i < ValidRect.Right; i += addnumX * _UnitLength)
             {
-                decimal num = Round((decimal)PixelToMathX(i), -zsX);
+                decimal num = RoundTen((decimal)PixelToMathX(i), -zsX);
                 dc.DrawText(num.ToString(), new SKPoint((float)(i - num.ToString().Length * fff - 2), (float)p + TextFont.Size), SKTextAlign.Left, TextFont, FilledBlack);
             }
-            for (double i = Math.Min(_Zero.Y - addnumY * _UnitLength, MathToPixelY(Round(PixelToMathY(height), -zsY))); i > 0; i -= addnumY * _UnitLength)
+            for (double i = Min(_Zero.Y - addnumY * _UnitLength, MathToPixelY(RoundTen(PixelToMathY(ValidRect.Bottom), -zsY))); i > ValidRect.Top; i -= addnumY * _UnitLength)
             {
-                decimal num = Round((decimal)PixelToMathY(i), -zsY);
+                decimal num = RoundTen((decimal)PixelToMathY(i), -zsY);
                 if (ValidRect.Left+ 3 > _Zero.X)
                 {
                     dc.DrawText(num.ToString(), new SKPoint((float)ValidRect.Left + 3, (float)(i + 4)), SKTextAlign.Left, TextFont, FilledBlack);
                 }
-                else if (_Zero.X + num.ToString().Length * TextFont.Size / 2 > width - 3)
+                else if (_Zero.X + num.ToString().Length * TextFont.Size / 2 > ValidRect.Right - 3)
                 {
                     dc.DrawText(num.ToString(), new SKPoint((float)width - num.ToString().Length * TextFont.Size / 2 - 5, (float)(i + 4)), SKTextAlign.Left, TextFont, FilledBlack);
                 }
@@ -147,14 +147,14 @@ namespace CsGrafeqApp.Controls.Displayers
                     dc.DrawText(num.ToString(), new SKPoint(_Zero.X, (float)(i + 4)), SKTextAlign.Left, TextFont, FilledBlack);
                 }
             }
-            for (double i = Math.Max(_Zero.Y + addnumY * _UnitLength, MathToPixelY(Round(PixelToMathY(0), -zsY))); i < height; i += addnumY * _UnitLength)
+            for (double i =Max(_Zero.Y + addnumY * _UnitLength, MathToPixelY(RoundTen(PixelToMathY(ValidRect.Top), -zsY))); i < ValidRect.Bottom; i += addnumY * _UnitLength)
             {
-                decimal num = Round((decimal)PixelToMathY(i), -zsY);
+                decimal num = RoundTen((decimal)PixelToMathY(i), -zsY);
                 if (ValidRect.Left + 3 > _Zero.X)
                 {
                     dc.DrawText(num.ToString(), new SKPoint((float)ValidRect.Left + 3, (float)(i + 4)), SKTextAlign.Left, TextFont, FilledBlack);
                 }
-                else if (_Zero.X + num.ToString().Length * TextFont.Size / 2 > width - 3)
+                else if (_Zero.X + num.ToString().Length * TextFont.Size / 2 > ValidRect.Right - 3)
                 {
                     dc.DrawText(num.ToString(), new SKPoint((float)width - num.ToString().Length * TextFont.Size / 2 - 5, (float)(i + 4)), SKTextAlign.Left, TextFont, FilledBlack);
                 }
@@ -206,7 +206,6 @@ namespace CsGrafeqApp.Controls.Displayers
         private SKBitmap PreviousBuffer=new SKBitmap();
         protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
         {
-            Console.WriteLine("Changed");
             if (CallAddonPointerWheeled(e) == DoNext)
             {
                 if (!WheelingStopWatch.IsRunning)
@@ -221,7 +220,7 @@ namespace CsGrafeqApp.Controls.Displayers
                 var bzero = _Zero;
                 double times_x = (_Zero.X - x) / _UnitLength;
                 double times_y = (_Zero.Y - y) / _UnitLength;
-                double delta = Math.Pow(1.04, e.Delta.Y);
+                double delta = Pow(1.04, e.Delta.Y);
                 _UnitLength *= delta;
                 _UnitLength *= delta;
                 _UnitLength = RangeTo(0.01, 1000000, _UnitLength);

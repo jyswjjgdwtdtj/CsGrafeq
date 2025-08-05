@@ -16,11 +16,12 @@ using System.Threading;
 using AvaPoint = Avalonia.Point;
 using AvaRect = Avalonia.Rect;
 using System.Diagnostics;
-using CsGrafeqApp.Classes;
+using CsGrafeq;
 using CsGrafeqApp.Addons;
 using AddonPointerEventArgs = CsGrafeqApp.Addons.Addon.AddonPointerEventArgs;
 using AddonPointerWheelEventArgs = CsGrafeqApp.Addons.Addon.AddonPointerWheelEventArgs;
 using AddonPointerEventArgsBase= CsGrafeqApp.Addons.Addon.AddonPointerEventArgsBase;
+using static System.Math;
 
 namespace CsGrafeqApp.Controls.Displayers
 {
@@ -203,13 +204,21 @@ namespace CsGrafeqApp.Controls.Displayers
             }
             CompoundBuffer();
         }
+
+        public void InvalidateBuffer()
+        {
+            if(!CanPerform)
+                return;
+            CompoundBuffer();
+            InvalidateVisual();
+        }
         private void ChildrenChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             foreach(var adn in Addons)
             {
                 if (adn.Owner == null)
                 {
-                    adn.Bitmap = new SKBitmap((int)Math.Max(Bounds.Width, 1), (int)Math.Max(Bounds.Height, 1));
+                    adn.Bitmap = new SKBitmap((int)Max(Bounds.Width, 1), (int)Max(Bounds.Height, 1));
                     adn.Owner = this;
                     Invalidate(adn);
                 }

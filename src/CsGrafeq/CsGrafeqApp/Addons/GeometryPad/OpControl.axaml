@@ -3,20 +3,17 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:geopad="clr-namespace:CsGrafeqApp.Addons.GeometryPad;assembly=CsGrafeqApp"
-			 xmlns:ctls="clr-namespace:CsGrafeqApp.Controls"
-			 xmlns:shapes="clr-namespace:CsGrafeqApp.Shapes"
-			 xmlns:getter="clr-namespace:CsGrafeqApp.Shapes.ShapeGetter"
+			 xmlns:ctls="clr-namespace:CsGrafeqApp.Controls;assembly=CsGrafeqApp"
+			 xmlns:shapes="clr-namespace:CsGrafeq.Shapes;assembly=CsGrafeq"
+			 xmlns:getter="clr-namespace:CsGrafeq.Shapes.ShapeGetter;assembly=CsGrafeq"
+             xmlns:grafeqcollectios="clr-namespace:CsGrafeq.Collections;assembly=CsGrafeq"
+             xmlns:grafeq="clr-namespace:CsGrafeq;assembly=CsGrafeq"
 			 xmlns:system="clr-namespace:System"
 			 xmlns:avacol="clr-namespace:Avalonia.Collections"
-			 xmlns:classes="clr-namespace:CsGrafeqApp.Classes"
 			 xmlns:collections="clr-namespace:Avalonia.Collections;assembly=Avalonia.Base"
 			 mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CsGrafeqApp.Addons.GeometryPad.OpControl"
 			 x:DataType="geopad:OpControl">
-	<UserControl.Resources>
-		<SolidColorBrush x:Key="Median" Color="#5a00b89f"></SolidColorBrush>
-		<SolidColorBrush x:Key="Light" Color="#5a88ffcc"></SolidColorBrush>
-	</UserControl.Resources>
 	<UserControl.Styles>
 		<Style Selector="Expander.NoBorderExpander">
 			<Style Selector="^ /template/ ToggleButton#ExpanderHeader">
@@ -71,8 +68,6 @@
 		<Style Selector="RadioButton.GeoRadio">
 			<Setter Property="Width" Value="45"></Setter>
 			<Setter Property="Height" Value="45"></Setter>
-			<Setter Property="BorderThickness" Value="1"></Setter>
-			<Setter Property="BorderBrush" Value="{StaticResource Median}"/>
 			<Setter Property="GroupName" Value="GeoRadio"/>
 			<Setter Property="Template">
 				<ControlTemplate>
@@ -89,10 +84,35 @@
 				<Setter Property="CornerRadius" Value="5"></Setter>
 			</Style>
 			<Style Selector="^:pointerover /template/ ContentPresenter">
-				<Setter	Property="Background" Value="{StaticResource Light}"></Setter>
+				<Setter	Property="Background" Value="{DynamicResource HTLightBrush}"></Setter>
 			</Style>
 			<Style Selector="^:checked /template/ ContentPresenter">
-				<Setter	Property="Background" Value="{StaticResource Median}"></Setter>
+				<Setter	Property="Background" Value="{DynamicResource HTMedianBrush}"></Setter>
+			</Style>
+		</Style>
+		<Style Selector="CheckBox.VisibleCheckBox">
+			<Setter Property="Template">
+				<ControlTemplate>
+					<Border BorderThickness="0">
+						<Panel>
+							<Ellipse Width="20" Height="20" Stroke="{DynamicResource DarkBrush}" VerticalAlignment="Center" HorizontalAlignment="Center" StrokeThickness="1" Fill="White">
+							</Ellipse>
+							<Ellipse Width="14" Height="14" VerticalAlignment="Center" HorizontalAlignment="Center" Name="PART_InnerCircle">
+							</Ellipse>
+						</Panel>
+					</Border>
+				</ControlTemplate>
+			</Setter>
+			<Style Selector="^ /template/ Ellipse#PART_InnerCircle">
+				<Setter Property="Fill" Value="{DynamicResource HTLightBrush}"></Setter>
+				<Setter Property="Transitions">
+					<Transitions>
+						<BrushTransition Property="Fill" Duration="0:0:0.1"></BrushTransition>
+					</Transitions>
+				</Setter>
+			</Style>
+			<Style Selector="^:checked /template/ Ellipse#PART_InnerCircle">
+				<Setter Property="Fill" Value="{DynamicResource HTDarkBrush}"></Setter>
 			</Style>
 		</Style>
 	</UserControl.Styles>
@@ -124,7 +144,7 @@
 							<DataTemplate DataType="shapes:Point">
 								<ctls:CheckedControl IsChecked="{CompiledBinding Selected, Mode=TwoWay}" IsPointerOver="{CompiledBinding PointerOver, Mode=OneWayToSource}">
 									<StackPanel Orientation="Horizontal" Background="Transparent" Margin="5" VerticalAlignment="Center" Grid.Column="0" Grid.Row="0">
-										<CheckBox IsChecked="{CompiledBinding Visible,Mode=TwoWay}"/>
+										<CheckBox IsChecked="{CompiledBinding Visible,Mode=TwoWay}" Classes="VisibleCheckBox"/>
 										<Grid ColumnDefinitions="Auto,Auto" RowDefinitions="Auto,Auto" VerticalAlignment="Center">
 											<TextBox Text="{CompiledBinding Name,Mode=TwoWay}"  Classes="CommonTextBox Big" Grid.Column="0" Grid.Row="0" Height="20" Margin="0"/>
 											<StackPanel Orientation="Horizontal" Background="Transparent" Margin="0,5" VerticalAlignment="Center" Grid.Column="1" Grid.Row="0">
@@ -135,7 +155,7 @@
 													<ctls:TplControl.DataTemplate>
 														<geopad:ShapeShowCaseDataTemplate>
 															<geopad:ShapeShowCaseDataTemplate.ShapeShowcaseTemplate>
-																<DataTemplate DataType="shapes:Shape">
+																<DataTemplate DataType="shapes:GeometryShape">
 																	<ctls:CheckedControl IsChecked="{CompiledBinding Selected, Mode=TwoWay}" IsPointerOver="{CompiledBinding PointerOver, Mode=OneWayToSource}">
 																		<TextBlock Text="{CompiledBinding Name}"></TextBlock>
 																	</ctls:CheckedControl>
@@ -162,7 +182,7 @@
 							<DataTemplate DataType="shapes:Point">
 								<ctls:CheckedControl IsChecked="{CompiledBinding Selected, Mode=TwoWay}" IsPointerOver="{CompiledBinding PointerOver, Mode=OneWayToSource}">
 									<StackPanel Orientation="Horizontal" Background="Transparent" Margin="5" VerticalAlignment="Center" Grid.Column="0" Grid.Row="0">
-										<CheckBox IsChecked="{CompiledBinding Visible,Mode=TwoWay}"/>
+										<CheckBox IsChecked="{CompiledBinding Visible,Mode=TwoWay}" Classes="VisibleCheckBox"/>
 										<Grid ColumnDefinitions="Auto,Auto" RowDefinitions="Auto,Auto" VerticalAlignment="Center">
 											<TextBox Text="{CompiledBinding Name,Mode=TwoWay}"  Classes="CommonTextBox Big" Grid.Column="0" Grid.Row="0" Height="20" Margin="0"/>
 											<StackPanel Orientation="Horizontal" Background="Transparent" Margin="0,5" VerticalAlignment="Center" Grid.Column="1" Grid.Row="0">
@@ -189,7 +209,7 @@
 							<DataTemplate DataType="shapes:Point">
 								<ctls:CheckedControl IsChecked="{CompiledBinding Selected, Mode=TwoWay}" IsPointerOver="{CompiledBinding PointerOver, Mode=OneWayToSource}">
 									<StackPanel Orientation="Horizontal" Background="Transparent" Margin="5" VerticalAlignment="Center">
-										<CheckBox IsChecked="{CompiledBinding Visible,Mode=TwoWay}"/>
+										<CheckBox IsChecked="{CompiledBinding Visible,Mode=TwoWay}" Classes="VisibleCheckBox"/>
 										<TextBox Text="{CompiledBinding Name,Mode=TwoWay}"  Classes="CommonTextBox Big" KeyDown="TextBoxKeyDown"/>
 										<TextBlock Text="=Point(" TextAlignment="Left" VerticalAlignment="Center" Classes="Big"/>
 										<TextBox Text="{CompiledBinding  LocationX,Mode=TwoWay}"  Classes="CommonTextBox Big" LostFocus="TextBoxLostFocus" KeyDown="TextBoxKeyDown"/>
@@ -201,10 +221,10 @@
 							</DataTemplate>
 						</geopad:ShapeListBoxDataTemplate.IsLocationPoint>
 						<geopad:ShapeListBoxDataTemplate.Common>
-							<DataTemplate DataType="shapes:Shape">
+							<DataTemplate DataType="shapes:GeometryShape">
 								<ctls:CheckedControl IsChecked="{CompiledBinding Selected, Mode=TwoWay}" IsPointerOver="{CompiledBinding PointerOver, Mode=OneWayToSource}">
 									<StackPanel Orientation="Horizontal" Background="Transparent" Margin="5" VerticalAlignment="Center" Grid.Column="0" Grid.Row="0">
-										<CheckBox IsChecked="{CompiledBinding Visible,Mode=TwoWay}"/>
+										<CheckBox IsChecked="{CompiledBinding Visible,Mode=TwoWay}" Classes="VisibleCheckBox"/>
 										<Grid ColumnDefinitions="Auto,Auto" RowDefinitions="Auto,Auto" VerticalAlignment="Center">
 											<TextBox Text="{CompiledBinding Name,Mode=TwoWay}"  Classes="CommonTextBox Big" Grid.Column="0" Grid.Row="0" Height="20" Margin="0"/>
 											<StackPanel Orientation="Horizontal" Background="Transparent" Margin="0,5" VerticalAlignment="Center" Grid.Column="1" Grid.Row="0">
@@ -215,7 +235,7 @@
 													<ctls:TplControl.DataTemplate>
 														<geopad:ShapeShowCaseDataTemplate>
 															<geopad:ShapeShowCaseDataTemplate.ShapeShowcaseTemplate>
-																<DataTemplate DataType="shapes:Shape">
+																<DataTemplate DataType="shapes:GeometryShape">
 																	<ctls:CheckedControl IsChecked="{CompiledBinding Selected, Mode=TwoWay}" IsPointerOver="{CompiledBinding PointerOver, Mode=OneWayToSource}">
 																		<TextBlock Text="{CompiledBinding Name}"></TextBlock>
 																	</ctls:CheckedControl>
@@ -232,6 +252,14 @@
 								</ctls:CheckedControl>
 							</DataTemplate>
 						</geopad:ShapeListBoxDataTemplate.Common>
+						<geopad:ShapeListBoxDataTemplate.IsFunction>
+							<DataTemplate DataType="shapes:ImplicitFunction">
+								<StackPanel Orientation="Horizontal" Background="Transparent" Margin="5" VerticalAlignment="Center">
+									<CheckBox IsChecked="{CompiledBinding Visible,Mode=TwoWay}" Classes="VisibleCheckBox"/>
+									<TextBox Text="{CompiledBinding Expression,Mode=TwoWay}"  Classes="CommonTextBox Big" KeyDown="TextBoxKeyDown"/>
+								</StackPanel>
+							</DataTemplate>
+						</geopad:ShapeListBoxDataTemplate.IsFunction>
 					</geopad:ShapeListBoxDataTemplate>
 				</ListBox.ItemTemplate>
 			</ListBox>
@@ -241,40 +269,42 @@
 			<TabItem.Header>
 				<Svg Path="/Assets/geo.svg" Width="25" Height="25" Margin="0"></Svg>
 			</TabItem.Header>
-			<ItemsControl ItemsSource="{CompiledBinding Operations}">
-				<ItemsControl.ItemsPanel>
-					<ItemsPanelTemplate>
-						<StackPanel Orientation="Vertical"/>
-					</ItemsPanelTemplate>
-				</ItemsControl.ItemsPanel>
-				<ItemsControl.ItemTemplate>
-					<DataTemplate DataType="classes:HasNameStrList">
-						<StackPanel Orientation="Vertical">
-							<Expander Classes="NoBorderExpander" BorderThickness="0" IsExpanded="True" Width="{CompiledBinding $parent[StackPanel].Bounds.Width}" Padding="0" Background="Transparent">
-								<Expander.Header>
-									<TextBlock Text="{CompiledBinding Name }" Margin="0" Padding="0"/>
-								</Expander.Header>
-								<Border Padding="10,0" Background="Transparent">
-									<ItemsControl ItemsSource="{CompiledBinding .}">
-										<ItemsControl.ItemsPanel>
-											<ItemsPanelTemplate>
-												<WrapPanel Orientation="Horizontal" ItemSpacing="5" Background="White" Margin="0"/>
-											</ItemsPanelTemplate>
-										</ItemsControl.ItemsPanel>
-										<ItemsControl.ItemTemplate>
-											<DataTemplate>
-												<RadioButton Classes="GeoRadio" IsCheckedChanged="RadioButtonChecked" Name="{CompiledBinding .}">
-													<TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap" FontSize="11" TextAlignment="Center" Name="RadioText" Text="{CompiledBinding .}"></TextBlock>
-												</RadioButton>
-											</DataTemplate>
-										</ItemsControl.ItemTemplate>
-									</ItemsControl>
-								</Border>
-							</Expander>
-						</StackPanel>
-					</DataTemplate>
-				</ItemsControl.ItemTemplate>
-			</ItemsControl>
+			<ScrollViewer>
+				<ItemsControl ItemsSource="{CompiledBinding Operations}">
+					<ItemsControl.ItemsPanel>
+						<ItemsPanelTemplate>
+							<VirtualizingStackPanel Orientation="Vertical"/>
+						</ItemsPanelTemplate>
+					</ItemsControl.ItemsPanel>
+					<ItemsControl.ItemTemplate>
+						<DataTemplate DataType="grafeqcollectios:HasNameStrList">
+							<StackPanel Orientation="Vertical">
+								<Expander Classes="NoBorderExpander" BorderThickness="0" IsExpanded="True" Width="{CompiledBinding $parent[StackPanel].Bounds.Width}" Padding="0" Background="Transparent">
+									<Expander.Header>
+										<TextBlock Text="{CompiledBinding Name }" Margin="0" Padding="0"/>
+									</Expander.Header>
+									<Border Padding="10,0" Background="Transparent">
+										<ItemsControl ItemsSource="{CompiledBinding .}">
+											<ItemsControl.ItemsPanel>
+												<ItemsPanelTemplate>
+													<WrapPanel Orientation="Horizontal" ItemSpacing="5" Background="White" Margin="0"/>
+												</ItemsPanelTemplate>
+											</ItemsControl.ItemsPanel>
+											<ItemsControl.ItemTemplate>
+												<DataTemplate>
+													<RadioButton Classes="GeoRadio" IsCheckedChanged="RadioButtonChecked" Name="{CompiledBinding .}">
+														<TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap" FontSize="11" TextAlignment="Center" Name="RadioText" Text="{CompiledBinding .}" FontFamily="Microsofr Yahei UI"></TextBlock>
+													</RadioButton>
+												</DataTemplate>
+											</ItemsControl.ItemTemplate>
+										</ItemsControl>
+									</Border>
+								</Expander>
+							</StackPanel>
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+			</ScrollViewer>
 		</TabItem>
 	</TabControl>
 		

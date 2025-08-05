@@ -9,10 +9,11 @@
 				<ResourceInclude Source="/Controls/CheckedControl.axaml"/>
 				<ResourceInclude Source="/Controls/DisplayerContainer.axaml"/>
 				<ResourceInclude Source="/Controls/ShowSource.axaml"/>
+				<ResourceInclude Source="/Resources/ColorResource.axaml"/>
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
 	</Application.Resources>
     <Application.Styles>
-        <FluentTheme />
+        <FluentTheme></FluentTheme>
     </Application.Styles>
 </Application>

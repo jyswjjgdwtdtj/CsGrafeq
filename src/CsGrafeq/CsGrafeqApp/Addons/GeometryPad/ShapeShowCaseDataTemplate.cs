@@ -1,13 +1,13 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using Avalonia.Media;
-
+using Avalonia;
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Avalonia.Media;
 
 namespace CsGrafeqApp.Addons.GeometryPad
 {
@@ -16,7 +16,7 @@ namespace CsGrafeqApp.Addons.GeometryPad
         public required IDataTemplate? ShapeShowcaseTemplate { get; set; }
         public Control? Build(object? param)
         {
-            if (param is Shapes.Shape[] item)
+            if (param is GeoShape[] item)
             {
                 StackPanel stack = new StackPanel();
                 Control[] ctls = new Control[item.Length*3-1];
@@ -43,7 +43,7 @@ namespace CsGrafeqApp.Addons.GeometryPad
 
         public bool Match(object? data)
         {
-            return data is Shapes.Shape[];
+            return data is GeoShape[];
         }
     }
 }

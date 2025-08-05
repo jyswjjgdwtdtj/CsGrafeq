@@ -9,9 +9,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static CsGrafeqApp.Controls.SkiaEx;
-using static CsGrafeqApp.ExtensionMethods;
 using AvaPoint = Avalonia.Point;
 using AvaRect = Avalonia.Rect;
+using CsGrafeq;
+using static CsGrafeq.Math;
+using static System.Math;
 
 namespace CsGrafeqApp.Controls.Displayers
 {
@@ -52,8 +54,8 @@ namespace CsGrafeqApp.Controls.Displayers
             {
                 AvaPoint current = e.GetPosition(this);
                 bool l = MouseOnYAxis, ll = MouseOnXAxis;
-                MouseOnYAxis = Math.Abs(current.X - _Zero.X) < 3;
-                MouseOnXAxis = Math.Abs(current.Y - _Zero.Y) < 3;
+                MouseOnYAxis = Abs(current.X - _Zero.X) < 3;
+                MouseOnXAxis = Abs(current.Y - _Zero.Y) < 3;
                 if (e.Properties.IsLeftButtonPressed)
                 {//移动零点
                     var newZero = new PointL()
@@ -159,7 +161,6 @@ namespace CsGrafeqApp.Controls.Displayers
 
         protected override void OnKeyDown(KeyEventArgs e)
         {
-            Console.WriteLine("KeyDown");
             if (CallAddonKeyDown(e) == DoNext)
             {
                 

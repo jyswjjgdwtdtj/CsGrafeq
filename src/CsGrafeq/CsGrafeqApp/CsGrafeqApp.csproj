@@ -5,7 +5,8 @@
 		<TargetFramework>net9.0</TargetFramework>
 		<InvariantGlobalization>true</InvariantGlobalization>
 		<Nullable>enable</Nullable>
-		<PublishAot>true</PublishAot>
+		<PublishReadyToRun>true</PublishReadyToRun>
+		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
 		<PublishTrimmed>true</PublishTrimmed>
 		<SelfContained>true</SelfContained>
 		<AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
@@ -38,6 +39,7 @@
 		<PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.2" />
 		<!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
 		<PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.2" />
+		<PackageReference Include="Classic.Avalonia.Theme" Version="11.3.0" />
 		<!--Condition below is needed to generate macOS App only.-->
 		<PackageReference Include="Dotnet.Bundle" Version="0.9.13" Condition="$(RuntimeIdentifier.StartsWith('osx'))" />
 		<PackageReference Include="SkiaSharp" Version="3.119.0" />
@@ -56,5 +58,8 @@
 	  <Compile Update="Controls\CheckedControl.axaml.cs">
 	    <DependentUpon>CheckedControl.axaml</DependentUpon>
 	  </Compile>
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\CsGrafeq\CsGrafeq.csproj" />
 	</ItemGroup>
 </Project>

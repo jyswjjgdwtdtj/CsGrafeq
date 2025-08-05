@@ -1,6 +1,5 @@
 ﻿using Avalonia;
 using CsGrafeqApp.Controls;
-using Publics;
 using SkiaSharp;
 using System;
 using System.Collections.Generic;
@@ -10,23 +9,20 @@ using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Input;
 using static CsGrafeqApp.Controls.SkiaEx;
-using static CsGrafeqApp.Shapes.GeometryMath;
+using static CsGrafeq.Shapes.GeometryMath;
 using AvaPoint = Avalonia.Point;
 using AvaRect = Avalonia.Rect;
 using AvaSize = Avalonia.Size;
-using GeoCircle = CsGrafeqApp.Shapes.Circle;
-using GeoLine = CsGrafeqApp.Shapes.Line;
-using GeoLineSegment = CsGrafeqApp.Shapes.Segment;
-using GeoPoint = CsGrafeqApp.Shapes.Point;
-using GeoPolygon = CsGrafeqApp.Shapes.Polygon;
-using GeoShape = CsGrafeqApp.Shapes.Shape;
-using GeoHalf = CsGrafeqApp.Shapes.Half;
-using CsGrafeqApp.Shapes;
-using CsGrafeqApp.Shapes.ShapeGetter;
-using CsGrafeqApp.Classes;
+using GeoHalf = CsGrafeq.Shapes.Half;
+using CsGrafeq.Shapes;
+using CsGrafeq.Shapes.ShapeGetter;
 using CsGrafeqApp.Controls.Displayers;
-using static CsGrafeqApp.Shapes.GeometryMath;
-using static CsGrafeqApp.InternalMath;
+using ReactiveUI;
+using CsGrafeq;
+using CsGrafeq.TupperInterval;
+using static CsGrafeqApp.AvaloniaMath;
+using static CsGrafeq.Math;
+using static System.Math;
 
 namespace CsGrafeqApp.Addons.GeometryPad
 {
@@ -37,6 +33,7 @@ namespace CsGrafeqApp.Addons.GeometryPad
         internal string GeoPadAction = "Move";
         public GeometryPad()
         {
+            CsGrafeq.TupperInterval.Compiler.Compiler.DynamicTest();
             OperationControl = new OpControl(Shapes, SetAction);
             Shapes.CollectionChanged += (s, e) =>
             {
@@ -45,7 +42,6 @@ namespace CsGrafeqApp.Addons.GeometryPad
             Shapes.OnShapeChanged += () =>
             {
                 Owner?.Invalidate(this);
-                Console.WriteLine(123);
             };
             #if DEBUG
             var p1 = new GeoPoint(new PointGetter_FromLocation((1, 3)));
@@ -57,6 +53,7 @@ namespace CsGrafeqApp.Addons.GeometryPad
             Shapes.Add(new GeoPolygon(new PolygonGetter(p1,p2,p3)));
             Shapes.Add(new Angle(new AngleGetter_FromThreePoint(p1, p2, p3)));
             Shapes.Add(new Straight(new LineGetter_Connected(p1,p2)));
+            Shapes.Add(new ImplicitFunction(){Expression = "y=x+1"});
             #endif
         }
         public void SetAction(string geoPadAction)
@@ -70,16 +67,16 @@ namespace CsGrafeqApp.Addons.GeometryPad
         protected AvaPoint DownPoint=new AvaPoint(-1,-1),MovePoint=new(-1,-1);
         protected override bool PointerPressed(AddonPointerEventArgs e)
         {
-            DownPoint = e.Location;
-            if (GeoPadAction != "Select")
+            if (GeoPadAction == "Select")
             {
-                MovingPoint = GetShape<GeoPoint>(DownPoint);
-                if(MovingPoint!=null)
-                    return Intercept;
+                DownPoint = e.Location;
+                ClearSelect();
             }
             else
             {
-                ClearSelect();
+                MovingPoint = GetShape<GeoPoint>(e.Location);
+                if(MovingPoint!=null)
+                    return Intercept;
             }
             MovingPoint = null;
             return DoNext;
@@ -133,7 +130,7 @@ namespace CsGrafeqApp.Addons.GeometryPad
                         case GeoPoint p:
                             {
                                 Vec v = p.Location - mathrectloc;
-                                if (InRange(0, mathrectsize.X, v.X) && InRange(0, mathrectsize.Y, v.Y))
+                                if (RangeIn(0, mathrectsize.X, v.X) && RangeIn(0, mathrectsize.Y, v.Y))
                                     p.Selected = true;
                             }
                             break;
@@ -156,7 +153,7 @@ namespace CsGrafeqApp.Addons.GeometryPad
                                 
                                 if (!(vs.Item1.IsInvalid() && vs.Item2.IsInvalid()))
                                     l.Selected = true;
-                                else if (InRange(mathrectloc.X, mathrectloc.X + mathrectsize.X, ((l.Current.Point1 + l.Current.Point2) / 2).X) && InRange(mathrectloc.Y, mathrectloc.Y + mathrectsize.Y, ((l.Current.Point1 + l.Current.Point2) / 2).Y))
+                                else if (RangeIn(mathrectloc.X, mathrectloc.X + mathrectsize.X, ((l.Current.Point1 + l.Current.Point2) / 2).X) && RangeIn(mathrectloc.Y, mathrectloc.Y + mathrectsize.Y, ((l.Current.Point1 + l.Current.Point2) / 2).Y))
                                 {
                                     l.Selected = true;
                                 }
@@ -167,11 +164,11 @@ namespace CsGrafeqApp.Addons.GeometryPad
                                 var o = mathrectloc + mathrectsize / 2;
                                 var cc = c.InnerCircle.Center - o;
                                 o = mathrectsize / 2;
-                                cc.X = Math.Abs(cc.X);
-                                cc.Y=Math.Abs(cc.Y);
+                                cc.X = Abs(cc.X);
+                                cc.Y=Abs(cc.Y);
                                 var bc = cc - o;
-                                bc.X = Math.Max(bc.X, 0);
-                                bc.Y=Math.Max(bc.Y, 0);
+                                bc.X = Max(bc.X, 0);
+                                bc.Y=Max(bc.Y, 0);
                                 if (bc.GetLength() <= c.InnerCircle.Radius)
                                     c.Selected = true;
                             }
@@ -181,7 +178,7 @@ namespace CsGrafeqApp.Addons.GeometryPad
                             foreach (var point in p.Locations)
                             {
                                 Vec v=point-mathrectloc;
-                                if (InRange(0, mathrectsize.X, v.X) && InRange(0, mathrectsize.Y, v.Y))
+                                if (RangeIn(0, mathrectsize.X, v.X) && RangeIn(0, mathrectsize.Y, v.Y))
                                 {
                                     p.Selected = true;
                                 }
@@ -192,7 +189,7 @@ namespace CsGrafeqApp.Addons.GeometryPad
                         case Angle a:
                         {
                             Vec v=a.AngleData.AnglePoint-mathrectloc;
-                            if (InRange(0, mathrectsize.X, v.X) && InRange(0, mathrectsize.Y, v.Y))
+                            if (RangeIn(0, mathrectsize.X, v.X) && RangeIn(0, mathrectsize.Y, v.Y))
                             {
                                 a.Selected = true;
                             }
@@ -554,7 +551,7 @@ namespace CsGrafeqApp.Addons.GeometryPad
             {
                 case Key.Delete:
                 {
-                    foreach (var shape in Shapes)
+                    foreach (var shape in Shapes.GetSelectedShapes<GeometryShape>())
                     {
                         if (shape.Selected)
                         {
@@ -566,7 +563,7 @@ namespace CsGrafeqApp.Addons.GeometryPad
                     break;
                 case Key.Tab:
                 {
-                    foreach (var shape in Shapes)
+                    foreach (var shape in Shapes.GetSelectedShapes<GeometryShape>())
                     {
                         if (shape.Selected)
                         {
@@ -640,21 +637,21 @@ namespace CsGrafeqApp.Addons.GeometryPad
                                 GetIntersectionLSAndSL(LB, LT, v1, v2)
                             );
                             if (s.Selected)
-                                dc.DrawLine(Owner.MathToPixelSK(vs.Item1), Owner.MathToPixelSK(vs.Item2), FilledMedian);
+                                dc.DrawLine(Owner.MathToPixelSK(vs.Item1), Owner.MathToPixelSK(vs.Item2), ShadowFilledMedian);
                             else if(s.PointerOver)
-                                dc.DrawLine(Owner.MathToPixelSK(vs.Item1), Owner.MathToPixelSK(vs.Item2), UnshadyFilledMedian);
+                                dc.DrawLine(Owner.MathToPixelSK(vs.Item1), Owner.MathToPixelSK(vs.Item2), FilledMedian);
                             else
                                 dc.DrawLine(Owner.MathToPixelSK(vs.Item1), Owner.MathToPixelSK(vs.Item2), FilledBlack);
                         }
                         break;
-                    case GeoLineSegment s:
+                    case GeoSegment s:
                         {
                             Vec v1 = s.Current.Point1;
                             Vec v2 = s.Current.Point2;
                             if (s.Selected)
-                                dc.DrawLine(Owner.MathToPixelSK(v1), Owner.MathToPixelSK(v2), FilledMedian);
+                                dc.DrawLine(Owner.MathToPixelSK(v1), Owner.MathToPixelSK(v2), ShadowFilledMedian);
                             else if (s.PointerOver)
-                                dc.DrawLine(Owner.MathToPixelSK(v1), Owner.MathToPixelSK(v2), UnshadyFilledMedian);
+                                dc.DrawLine(Owner.MathToPixelSK(v1), Owner.MathToPixelSK(v2), FilledMedian);
                             else
                                 dc.DrawLine(Owner.MathToPixelSK(v1), Owner.MathToPixelSK(v2), FilledBlack);
                         }
@@ -672,22 +669,22 @@ namespace CsGrafeqApp.Addons.GeometryPad
                             Vec p;
                             if (v1.X == v2.X)
                             {
-                                if ((vs.Item1.Y - v1.Y) / Math.Sign(v2.Y - v1.Y) > (vs.Item2.Y - v1.Y) / Math.Sign(v2.Y - v1.Y))
+                                if ((vs.Item1.Y - v1.Y) / Sign(v2.Y - v1.Y) > (vs.Item2.Y - v1.Y) / Sign(v2.Y - v1.Y))
                                     p = vs.Item1;
                                 else
                                     p = vs.Item2;
                             }
                             else
                             {
-                                if ((vs.Item1.X - v1.X) / Math.Sign(v2.X - v1.X) > (vs.Item2.X - v1.X) / Math.Sign(v2.X - v1.X))
+                                if ((vs.Item1.X - v1.X) / Sign(v2.X - v1.X) > (vs.Item2.X - v1.X) / Sign(v2.X - v1.X))
                                     p = vs.Item1;
                                 else
                                     p = vs.Item2;
                             }
                             if (h.Selected)
-                                dc.DrawLine(Owner.MathToPixelSK(v1), Owner.MathToPixelSK(p), FilledMedian);
+                                dc.DrawLine(Owner.MathToPixelSK(v1), Owner.MathToPixelSK(p), ShadowFilledMedian);
                             else if (h.Selected)
-                                dc.DrawLine(Owner.MathToPixelSK(v1), Owner.MathToPixelSK(p), UnshadyFilledMedian);
+                                dc.DrawLine(Owner.MathToPixelSK(v1), Owner.MathToPixelSK(p), FilledMedian);
                             else
                                 dc.DrawLine(Owner.MathToPixelSK(v1), Owner.MathToPixelSK(p), FilledBlack);
 
@@ -708,12 +705,12 @@ namespace CsGrafeqApp.Addons.GeometryPad
                                 if (polygon.Selected)
                                 {
                                     dc.DrawPath(path, FilledTpMedian);
-                                    dc.DrawPath(path, StrokeMedian);
+                                    dc.DrawPath(path, ShadowStrokeMedian);
                                 }
                                 else if (polygon.PointerOver)
                                 {
                                     dc.DrawPath(path, FilledTpMedian);
-                                    dc.DrawPath(path, UnshadyStrokeMedian);
+                                    dc.DrawPath(path, StrokeMedian);
                                 }
                                 else
                                 {
@@ -724,9 +721,9 @@ namespace CsGrafeqApp.Addons.GeometryPad
                             else
                             {
                                 if (polygon.Selected)
-                                    dc.DrawPath(path, StrokeMedian);
+                                    dc.DrawPath(path, ShadowStrokeMedian);
                                 else if (polygon.PointerOver)
-                                    dc.DrawPath(path, UnshadyStrokeMedian);
+                                    dc.DrawPath(path, StrokeMedian);
                                 else
                                     dc.DrawPath(path, StrokeBlack);
 
@@ -739,9 +736,9 @@ namespace CsGrafeqApp.Addons.GeometryPad
                             SKPoint pf = Owner.MathToPixelSK(cs.Center);
                             SKSize s = new SKSize((float)(cs.Radius * UnitLength), (float)(cs.Radius * UnitLength));
                             if (circle.Selected)
-                                dc.DrawOval(pf, s, StrokeMedian);
+                                dc.DrawOval(pf, s, ShadowStrokeMedian);
                             if (circle.PointerOver)
-                                dc.DrawOval(pf, s, UnshadyStrokeMedian);
+                                dc.DrawOval(pf, s, StrokeMedian);
                             else
                                 dc.DrawOval(pf, s, StrokeBlack);
                         }
@@ -750,20 +747,20 @@ namespace CsGrafeqApp.Addons.GeometryPad
                         {
                             var angle = ang.AngleData;
                             SKPoint pf = Owner.MathToPixelSK(angle.AnglePoint);
-                            double arg1 = (Owner.MathToPixel(angle.Point1).Sub(Owner.MathToPixel(angle.AnglePoint)).Arg() / Math.PI * 180).Mod(360);
-                            double arg2 = (Owner.MathToPixel(angle.Point2).Sub(Owner.MathToPixel(angle.AnglePoint)).Arg() / Math.PI * 180).Mod(360);
+                            double arg1 = PosMod(Owner.MathToPixel(angle.Point1).Sub(Owner.MathToPixel(angle.AnglePoint)).Arg() / PI * 180,360);
+                            double arg2 = PosMod(Owner.MathToPixel(angle.Point2).Sub(Owner.MathToPixel(angle.AnglePoint)).Arg() / PI * 180,360);
                             double aa = angle.Angle;
                             double a = arg2 - arg1;
-                            a = a.Mod(360);
+                            a = PosMod(a, 360);
                             if (a > 180)
                                 a -= 360;
                             if (ang.Selected)
-                                dc.DrawArc(CreateSKRectWH(pf.X - 20, pf.Y - 20, 40, 40), (float)arg1, (float)a, true, StrokeMedian);
+                                dc.DrawArc(CreateSKRectWH(pf.X - 20, pf.Y - 20, 40, 40), (float)arg1, (float)a, true, ShadowStrokeMedian);
                             else if (ang.PointerOver)
-                                dc.DrawArc(CreateSKRectWH(pf.X - 20, pf.Y - 20, 40, 40), (float)arg1, (float)a, true, UnshadyStrokeMedian);
+                                dc.DrawArc(CreateSKRectWH(pf.X - 20, pf.Y - 20, 40, 40), (float)arg1, (float)a, true, StrokeMedian);
                             else
                                 dc.DrawArc(CreateSKRectWH(pf.X - 20, pf.Y - 20, 40, 40), (float)arg1, (float)a, true, StrokeBlack);
-                            dc.DrawBubble($"{Math.Abs(aa).ToString("0.00")}°", pf.OffSetBy(2, 2 - 20));
+                            dc.DrawBubble($"{Abs(aa).ToString("0.00")}°", pf.OffSetBy(2, 2 - 20));
                         }
                         break;
                 }
@@ -815,12 +812,15 @@ namespace CsGrafeqApp.Addons.GeometryPad
             List<(double,Shape)> shapes = new List<(double,Shape)> ();
             foreach (var s in Shapes)
             {
-                if (s is Line || s is Circle)
+                if (s is GeometryShape geoshape)
                 {
-                    double dist = (s.HitTest(mathcursor)*disp.UnitLength).GetLength();
-                    if (dist<5)
+                    if (geoshape is Line || geoshape is Circle)
                     {
-                        shapes.Add((dist,s));
+                        double dist = (geoshape.HitTest(mathcursor)*disp.UnitLength).GetLength();
+                        if (dist<5)
+                        {
+                            shapes.Add((dist,s));
+                        }
                     }
                 }
             }
@@ -872,12 +872,12 @@ namespace CsGrafeqApp.Addons.GeometryPad
             return newpoint;
         }
 
-        public bool TryGetShape<T>(AvaPoint Location, out T shape) where T : Shape
+        public bool TryGetShape<T>(AvaPoint Location, out T shape) where T : GeometryShape
         {
             shape=GetShape<T>(Location);
             return shape != null;
         }
-        public T? GetShape<T>(AvaPoint Location) where T : GeoShape
+        public T? GetShape<T>(AvaPoint Location) where T : GeometryShape
         {
             DisplayControl disp=(Owner as DisplayControl)!;
             Vec v = Owner!.PixelToMath(Location);
