@@ -3,31 +3,29 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:CsGrafeqApp.ViewModels"
-			 xmlns:ctls="clr-namespace:CsGrafeqApp.Controls"
-			 xmlns:disp="clr-namespace:CsGrafeqApp.Controls.Displayers"
-			 xmlns:geopad="clr-namespace:CsGrafeqApp.Addons.GeometryPad"
-			 xmlns:system="clr-namespace:System"
+             xmlns:ctls="clr-namespace:CsGrafeqApp.Controls"
+             xmlns:disp="clr-namespace:CsGrafeqApp.Controls.Displayers"
+             xmlns:geopad="clr-namespace:CsGrafeqApp.Addons.GeometryPad"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CsGrafeqApp.Views.MainView"
              x:DataType="vm:MainViewModel">
-	<Grid RowDefinitions="25,*">
-		<Menu Grid.Row="0">
-			<MenuItem Header="_File">
-				
-				<MenuItem Header="_Open..."/>
-				<Separator/>
-				<MenuItem Header="_Exit"/>
-			</MenuItem>
-			<MenuItem Header="_Edit">
-				<MenuItem Header="Copy"/>
-				<MenuItem Header="Paste"/>
-			</MenuItem>
-		</Menu>
-		<ctls:DisplayerContainer Grid.Row="1">
-			<disp:DisplayControl>
-				<geopad:GeometryPad>
-				</geopad:GeometryPad>
-			</disp:DisplayControl>
-		</ctls:DisplayerContainer>
-	</Grid>
+    <Grid RowDefinitions="25,*">
+        <Menu Grid.Row="0">
+            <MenuItem Header="_File">
+
+                <MenuItem Header="_Open..." />
+                <Separator />
+                <MenuItem Header="_Exit" />
+            </MenuItem>
+            <MenuItem Header="_Edit">
+                <MenuItem Header="Copy" />
+                <MenuItem Header="Paste" />
+            </MenuItem>
+        </Menu>
+        <ctls:DisplayerContainer Grid.Row="1">
+            <disp:DisplayControl>
+                <geopad:GeometryPad />
+            </disp:DisplayControl>
+        </ctls:DisplayerContainer>
+    </Grid>
 </UserControl>

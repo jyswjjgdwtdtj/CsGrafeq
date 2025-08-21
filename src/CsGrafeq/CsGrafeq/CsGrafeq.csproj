@@ -15,7 +15,6 @@
 
     <ItemGroup>
         <PackageReference Include="ReactiveUI" Version="20.4.1"/>
-        <TrimmerRootAssembly Include="CsGrafeq"/>
     </ItemGroup>
 
 </Project>

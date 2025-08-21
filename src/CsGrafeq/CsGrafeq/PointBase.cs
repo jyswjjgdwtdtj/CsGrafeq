@@ -3,6 +3,8 @@ global using PointI = CsGrafeq.PointBase<int>;
 global using PointF = CsGrafeq.PointBase<float>;
 global using PointD = CsGrafeq.PointBase<decimal>;
 using System.Numerics;
+using System;
+using sysMath=System.Math;
 
 namespace CsGrafeq;
 
@@ -61,7 +63,10 @@ public struct PointBase<T> where T : INumber<T>
     {
         return $"{{{X},{Y}}}";
     }
-
+/// <summary>
+/// 曼哈顿距离
+/// </summary>
+    public T Length => T.Abs(X)+T.Abs(Y);
     public static implicit operator PointBase<T>((T, T) TTuple)
     {
         return new PointBase<T>(TTuple.Item1, TTuple.Item2);

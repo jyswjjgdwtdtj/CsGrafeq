@@ -1,5 +1,5 @@
 using System.Numerics;
-
+using sysMath = System.Math;
 namespace CsGrafeq;
 
 public static class Math
@@ -61,5 +61,48 @@ public static class Math
         if (target.CompareTo(max) > 0)
             return max;
         return target;
+    }
+    public static double NumMod(double a, double b)
+    {
+        return a - sysMath.Floor(a / b) * b;
+    }
+    public static (double, double) GetMinMax4(double n1, double n2, double n3, double n4)
+    {
+        var minnum = n1;
+        var maxnum = n1;
+        minnum = minnum < n2 ? minnum : n2;
+        maxnum = maxnum > n2 ? maxnum : n2;
+        minnum = minnum < n3 ? minnum : n3;
+        maxnum = maxnum > n3 ? maxnum : n3;
+        minnum = minnum < n4 ? minnum : n4;
+        maxnum = maxnum > n4 ? maxnum : n4;
+        //若出现NaN 则应当使用以下代码
+        /*minnum = Math.Min(minnum, n2);
+        maxnum = Math.Max(maxnum, n2);
+        minnum = Math.Min(minnum, n3);
+        maxnum = Math.Max(maxnum, n3);
+        minnum = Math.Min(minnum, n4);
+        maxnum = Math.Max(maxnum, n4);*/
+        return (minnum, maxnum);
+    }
+    public static double DoubleMedian(double t1, double t2, double t3)
+    {
+        if ((t1 - t2) * (t2 - t3) > 0) return t2;
+        if ((t2 - t1) * (t1 - t3) > 0) return t1;
+        return t3;
+    }
+    public static int GCD(int a, int b)
+    {
+        return a == 0 || b == 0 ? 0 : GCDForInt(a, b);
+    }
+
+    private static int GCDForInt(int a, int b)
+    {
+        return b == 0 ? sysMath.Abs(a) : GCDForInt(b, a % b);
+    }
+
+    public static int LCM(int a, int b)
+    {
+        return a == 0 || b == 0 ? 0 : a * b / GCDForInt(a, b);
     }
 }
