@@ -16,7 +16,9 @@ AOT(Ahead Of Time), no .Net Runtime environment required.
 5.Add trackbar to set value of variables\
 
 ## Example
-
+![image](Example/1.bmp)
+![image](Example/2.bmp)
+![image](Example/3.bmp)
 These are the screenshot from old version.\
 ![image](OldVersion/ExampleImage/1-1.jpg)
 ![image](OldVersion/ExampleImage/1-2.jpg)
@@ -26,4 +28,4 @@ These are the screenshot from old version.\
 ![image](OldVersion/ExampleImage/1-6.jpg)
 ![image](OldVersion/ExampleImage/1-7.jpg)
 ![image](OldVersion/ExampleImage/1-8.jpg)\
-[See More](OldVersion/Example.md) \
+[See More](OldVersion/Example.md) 
