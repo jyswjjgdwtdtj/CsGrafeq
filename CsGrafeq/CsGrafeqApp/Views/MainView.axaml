@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:CsGrafeqApp.ViewModels"
+             xmlns:ctls="clr-namespace:CsGrafeqApp.Controls"
+             xmlns:disp="clr-namespace:CsGrafeqApp.Controls.Displayers"
+             xmlns:geopad="clr-namespace:CsGrafeqApp.Addons.GeometryPad"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="CsGrafeqApp.Views.MainView"
+             x:DataType="vm:MainViewModel">
+    <Grid RowDefinitions="25,*">
+        <Menu Grid.Row="0">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Exit" Click="ExitClicked" />
+            </MenuItem>
+            <MenuItem Header="_Edit">
+            </MenuItem>
+        </Menu>
+        <ctls:DisplayerContainer Grid.Row="1">
+            <disp:DisplayControl>
+                <geopad:GeometryPad />
+            </disp:DisplayControl>
+        </ctls:DisplayerContainer>
+    </Grid>
+</UserControl>

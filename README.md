@@ -1,25 +1,29 @@
 ﻿# CsGrafeq
+
 ## Description
-A geometry sketchpad that supports implicit function drawing and geometry drawing 
 
-The implicit function plotting part of the sketchpad can draw implicit functions with 2 variables \
-It's an open source alternative to Grafeq. \
-It is based on Reliable Two-Dimensional Graphing Methods for Mathematical Formulae with Two Free Variables by Jeff Tupper of University of Toronto, SIGGRAPH 2001. \
-It implements the Jeff Tupper's algorithms before Branch Cut Tracking or Algorithm 3.2. 
+CsGrafeq is a geometry sketchpad. For the sake of performance and multi-platform, implicit function plotting is temporarily not supported in CsGrafeq. 
+[Project](./OldVersion/README.md) in old version folder is for implicit function plotting. Implicit function plotting will be added to CsGrafeq in future.
 
-The sketchpad uses GDI+ to render images on the screen, so there is no need to get any dependency.
+## Features
+AOT(Ahead Of Time), no .Net Runtime environment required.
 
+## Future
+1.Add implicit function supports\
+2.Add ctrl+z "undo"\
+3.Add ctrl+s "save"\
+4.Add variable\
+5.Add trackbar to set value of variables\
 
 ## Example
 
-[See More](Example.md) \
-![image](ExampleImage/Geometry.gif)
-![image](ExampleImage/1-1.jpg)
-![image](ExampleImage/1-2.jpg)
-![image](ExampleImage/1-3.jpg)
-![image](ExampleImage/1-4.jpg)
-![image](ExampleImage/1-5.jpg)
-![image](ExampleImage/1-6.jpg)
-![image](ExampleImage/1-7.jpg)
-![image](ExampleImage/1-8.jpg)\
-[See More](Example.md)
+These are the screenshot from old version.\
+![image](OldVersion/ExampleImage/1-1.jpg)
+![image](OldVersion/ExampleImage/1-2.jpg)
+![image](OldVersion/ExampleImage/1-3.jpg)
+![image](OldVersion/ExampleImage/1-4.jpg)
+![image](OldVersion/ExampleImage/1-5.jpg)
+![image](OldVersion/ExampleImage/1-6.jpg)
+![image](OldVersion/ExampleImage/1-7.jpg)
+![image](OldVersion/ExampleImage/1-8.jpg)\
+[See More](OldVersion/Example.md) \
