@@ -1,9 +1,11 @@
-﻿# CsGrafeq
+﻿[English](README.md)|[中文](README_ZH.md)
+# CsGrafeq
 
 ## Description
 
-CsGrafeq is a geometry sketchpad. For the sake of performance and multi-platform, implicit function plotting is temporarily not supported in CsGrafeq. 
-[Project](./OldVersion/README.md) in old version folder is for implicit function plotting. Implicit function plotting will be added to CsGrafeq in future.
+CsGrafeq is a geometry sketchpad. For the sake of performance and multi-platform, implicit function plotting is temporarily not supported in CsGrafeq. \
+[Project](./OldVersion/README.md) in old version folder is for implicit function plotting. Implicit function plotting will be added to CsGrafeq in future.\
+The project is already compiled to [Publish](./Publish) folder. You also can [download]("https://wwzt.lanzoul.com/is26E349oheh") directly.
 
 ## Features
 AOT(Ahead Of Time), no .Net Runtime environment required.
