@@ -34,6 +34,7 @@ public class CheckedControl : TemplatedControl
         {
             this.GetFocus();
             if (e.Properties.IsLeftButtonPressed) IsChecked = !IsChecked;
+            e.Handled = true;
         };
         PropertyChanged += (s, e) =>
         {

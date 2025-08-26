@@ -40,5 +40,5 @@ public class ImplicitFunction : Shape
         }
     } = "";
 
-    protected override string TypeName => "ImplicitFunction";
+    public override string TypeName => "ImplicitFunction";
 }

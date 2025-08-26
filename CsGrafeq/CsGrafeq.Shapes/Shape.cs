@@ -44,7 +44,7 @@ public abstract class Shape : ReactiveObject
         set => this.RaiseAndSetIfChanged(ref field, value);
     } = "";
 
-    protected abstract string TypeName { get; }
+    public abstract string TypeName { get; }
     public string Type => TypeName + ":";
     
     public string Description

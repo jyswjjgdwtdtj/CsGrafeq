@@ -42,4 +42,16 @@ public static class Extension
     {
         Dispatcher.UIThread.Post(() => { control.Focus(); }, DispatcherPriority.Loaded);
     }
+
+    internal static bool ArrayEqual<T>(T[] array1, T[] array2) where T : class
+    {
+        if(array1.Length != array2.Length)
+            return false;
+        for (int i = 0; i < array1.Length; i++)
+        {
+            if(Object.ReferenceEquals(array1[i], array2[i]))
+                return false;
+        }
+        return true;
+    }
 }

@@ -1,5 +1,7 @@
+using ReactiveUI;
+
 namespace CsGrafeq.Shapes.ShapeGetter;
 
-public class Getter
+public class Getter:ReactiveObject
 {
 }

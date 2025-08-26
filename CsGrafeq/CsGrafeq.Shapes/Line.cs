@@ -17,7 +17,7 @@ public abstract class Line : GeometryShape
         RefreshValues();
     }
 
-    protected override string TypeName => "Line";
+    public override string TypeName => "Line";
 
     public override LineGetter Getter => LineGetter;
     public TwoPoint LineData => Current;
@@ -45,7 +45,7 @@ public class Segment : Line
     {
     }
 
-    protected override string TypeName => "Segment";
+    public override string TypeName => "Segment";
     public override void RefreshValues()
     {
         Current = LineGetter.GetLine();
@@ -65,7 +65,7 @@ public class Half : Line
     {
     }
 
-    protected override string TypeName => "Half";
+    public override string TypeName => "Half";
 
     public override bool CheckIsValid(Vec vec)
     {
@@ -79,7 +79,7 @@ public class Straight : Line
     {
     }
 
-    protected override string TypeName => "Straight";
+    public override string TypeName => "Straight";
 
     public override bool CheckIsValid(Vec vec)
     {

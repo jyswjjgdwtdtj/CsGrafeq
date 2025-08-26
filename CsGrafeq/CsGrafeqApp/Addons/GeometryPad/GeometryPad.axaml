@@ -41,6 +41,8 @@
             <Setter Property="AcceptsReturn" Value="False" />
             <Setter Property="MinWidth" Value="30" />
             <Setter Property="Width" Value="NaN" />
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
             <Setter Property="BorderThickness" Value="0" />
 
         </Style>
@@ -146,7 +148,7 @@
                         </ItemsControl.ItemContainerTheme>
                         <ItemsControl.ItemTemplate>
                             <geopad:ShapeListBoxDataTemplate>
-                                <geopad:ShapeListBoxDataTemplate.IsCommonPoint>
+                                <geopad:ShapeListBoxDataTemplate.IsPoint>
                                     <DataTemplate DataType="shapes:Point">
                                         <ctls:CheckedControl
                                             IsChecked="{CompiledBinding Selected, Mode=TwoWay}"
@@ -156,168 +158,188 @@
                                                 <CheckBox
                                                     IsChecked="{CompiledBinding Visible,Mode=TwoWay}"
                                                     Classes="VisibleCheckBox" DockPanel.Dock="Left"
-                                                    VerticalAlignment="Center" />
-                                                <Grid ColumnDefinitions="Auto,Auto"
-                                                      RowDefinitions="Auto,Auto"
-                                                      VerticalAlignment="Center">
-                                                    <TextBox Text="{CompiledBinding Name,Mode=TwoWay}"
-                                                             Classes="CommonTextBox Big"
-                                                             Grid.Column="0" Grid.Row="0" Height="20"
-                                                             Margin="0" />
-                                                    <StackPanel Orientation="Horizontal"
-                                                                Background="Transparent" Margin="0,5"
-                                                                VerticalAlignment="Center" Grid.Column="1"
-                                                                Grid.Row="0">
-                                                        <TextBlock Text="=" TextAlignment="Left"
-                                                                   VerticalAlignment="Center" Classes="Big" />
-                                                        <TextBlock
-                                                            Text="{CompiledBinding Getter.ActionName}"
-                                                            TextAlignment="Left"
-                                                            VerticalAlignment="Center" Classes="Big" />
-                                                        <TextBlock Text="(" TextAlignment="Left"
-                                                                   VerticalAlignment="Center" Classes="Big" />
-                                                        <ContentControl
-                                                            Content="{CompiledBinding Getter.Parameters}">
-                                                            <ContentControl.ContentTemplate>
-                                                                <geopad:ShapeShowCaseDataTemplate>
-                                                                    <geopad:ShapeShowCaseDataTemplate.ShapeShowcaseTemplate>
-                                                                        <DataTemplate
-                                                                            DataType="shapes:GeometryShape">
+                                                    VerticalAlignment="Center" Margin="5"/>
+                                                <ContentControl
+                                                    x:DataType="shapes:Point">
+                                                    <ContentControl.Content>
+                                                        <MultiBinding Converter="{StaticResource PGToPGAN}">
+                                                            <CompiledBinding Path="PointGetter"></CompiledBinding>
+                                                            <CompiledBinding Path="Name"></CompiledBinding>
+                                                        </MultiBinding>
+                                                    </ContentControl.Content>
+                                                    <ContentControl.ContentTemplate>
+                                                        <geopad:PointGetterDataTemplate>
+                                                            <geopad:PointGetterDataTemplate.IsCommon>
+                                                                <DataTemplate DataType="geopad:PointGetterAndName">
+                                                                    <Grid ColumnDefinitions="Auto,Auto"
+                                                                          RowDefinitions="Auto,Auto"
+                                                                          VerticalAlignment="Center">
+                                                                        <TextBox
+                                                                            Text="{CompiledBinding Name,Mode=TwoWay}"
+                                                                            Classes="CommonTextBox Big"
+                                                                            Grid.Column="0" Grid.Row="0" Height="20"
+                                                                            Margin="0" />
+                                                                        <StackPanel Orientation="Horizontal"
+                                                                            Background="Transparent" Margin="0,5"
+                                                                            VerticalAlignment="Center" Grid.Column="1"
+                                                                            Grid.Row="0">
+                                                                            <TextBlock Text="=" TextAlignment="Left"
+                                                                                VerticalAlignment="Center"
+                                                                                Classes="Big" />
+                                                                            <TextBlock
+                                                                                Text="{CompiledBinding PointGetter.ActionName}"
+                                                                                TextAlignment="Left"
+                                                                                VerticalAlignment="Center"
+                                                                                Classes="Big" />
+                                                                            <TextBlock Text="(" TextAlignment="Left"
+                                                                                VerticalAlignment="Center"
+                                                                                Classes="Big" />
+                                                                            <ContentControl
+                                                                                Content="{CompiledBinding PointGetter.Parameters}">
+                                                                                <ContentControl.ContentTemplate>
+                                                                                    <geopad:ShapeShowCaseDataTemplate>
+                                                                                        <geopad:ShapeShowCaseDataTemplate.ShapeShowcaseTemplate>
+                                                                                            <DataTemplate
+                                                                                                DataType="shapes:GeometryShape">
+                                                                                                <ctls:CheckedControl
+                                                                                                    IsChecked="{CompiledBinding Selected, Mode=TwoWay}"
+                                                                                                    IsOver="{CompiledBinding PointerOver, Mode=OneWayToSource}"
+                                                                                                    Color="{DynamicResource MedianUint}">
+                                                                                                    <TextBlock
+                                                                                                        Text="{CompiledBinding Name}" />
+                                                                                                </ctls:CheckedControl>
+                                                                                            </DataTemplate>
+                                                                                        </geopad:ShapeShowCaseDataTemplate.ShapeShowcaseTemplate>
+                                                                                    </geopad:ShapeShowCaseDataTemplate>
+                                                                                </ContentControl.ContentTemplate>
+                                                                            </ContentControl>
+                                                                            <TextBlock Text=")" TextAlignment="Left"
+                                                                                VerticalAlignment="Center"
+                                                                                Classes="Big" />
+                                                                        </StackPanel>
+                                                                        <StackPanel Orientation="Horizontal"
+                                                                            Background="Transparent" Margin="5"
+                                                                            VerticalAlignment="Center" Grid.Column="1"
+                                                                            Grid.Row="1"
+                                                                            DataContext="{CompiledBinding PointGetter}">
+                                                                            <TextBlock Text="=(" TextAlignment="Left"
+                                                                                VerticalAlignment="Center"
+                                                                                Classes="Small" />
+                                                                            <TextBlock
+                                                                                Text="{CompiledBinding  PointX,Mode=TwoWay}"
+                                                                                Classes="CommonTextBox Small"
+                                                                                x:DataType="getter:PointGetter_Movable" />
+                                                                            <TextBlock Text="," TextAlignment="Left"
+                                                                                VerticalAlignment="Center"
+                                                                                Classes="Small" />
+                                                                            <TextBlock
+                                                                                Text="{CompiledBinding  PointY,Mode=TwoWay}"
+                                                                                Classes="CommonTextBox Small"
+                                                                                x:DataType="getter:PointGetter_Movable" />
+                                                                            <TextBlock Text=")" TextAlignment="Left"
+                                                                                VerticalAlignment="Center"
+                                                                                Classes="Small" />
+                                                                        </StackPanel>
+                                                                    </Grid>
+                                                                </DataTemplate>
+                                                            </geopad:PointGetterDataTemplate.IsCommon>
+                                                            <geopad:PointGetterDataTemplate.IsLocation>
+                                                                <DataTemplate DataType="geopad:PointGetterAndName">
+                                                                    <StackPanel Orientation="Horizontal"
+                                                                        DataContext="{CompiledBinding PointGetter}">
+                                                                        <TextBlock Text="=Point(" TextAlignment="Left"
+                                                                            VerticalAlignment="Center" Classes="Big" />
+                                                                        <TextBox
+                                                                            Text="{CompiledBinding  PointX,Mode=TwoWay}"
+                                                                            Classes="CommonTextBox Big"
+                                                                            KeyDown="TextBoxKeyDown"
+                                                                            LostFocus="TextBoxLostFocus"
+                                                                            x:DataType="getter:PointGetter_Movable"/>
+                                                                        <TextBlock Text="," TextAlignment="Left"
+                                                                            VerticalAlignment="Center" Classes="Big" />
+                                                                        <TextBox
+                                                                            Text="{CompiledBinding  PointY,Mode=TwoWay}"
+                                                                            Classes="CommonTextBox Big"
+                                                                            KeyDown="TextBoxKeyDown"
+                                                                            LostFocus="TextBoxLostFocus"
+                                                                            x:DataType="getter:PointGetter_Movable" />
+                                                                        <TextBlock Text=")" TextAlignment="Left"
+                                                                            VerticalAlignment="Center" Classes="Big" />
+                                                                    </StackPanel>
+                                                                </DataTemplate>
+                                                            </geopad:PointGetterDataTemplate.IsLocation>
+                                                            <geopad:PointGetterDataTemplate.IsOnShape>
+                                                                <DataTemplate DataType="geopad:PointGetterAndName">
+                                                                    <Grid ColumnDefinitions="Auto,Auto"
+                                                                          RowDefinitions="Auto,Auto"
+                                                                          VerticalAlignment="Center">
+                                                                        <TextBox
+                                                                            Text="{CompiledBinding Name,Mode=TwoWay}"
+                                                                            Classes="CommonTextBox Big"
+                                                                            Grid.Column="0" Grid.Row="0" Height="20"
+                                                                            Margin="0" />
+                                                                        <StackPanel Orientation="Horizontal"
+                                                                            Background="Transparent" Margin="0,5"
+                                                                            VerticalAlignment="Center" Grid.Column="1"
+                                                                            Grid.Row="0" DataContext="{CompiledBinding PointGetter}">
+                                                                            <TextBlock Text="=Controlled("
+                                                                                TextAlignment="Left"
+                                                                                VerticalAlignment="Center"
+                                                                                Classes="Big" />
+                                                                            <TextBox
+                                                                                Text="{CompiledBinding  PointX,Mode=TwoWay}"
+                                                                                Classes="CommonTextBox Big"
+                                                                                KeyDown="TextBoxKeyDown"
+                                                                                LostFocus="TextBoxLostFocus"
+                                                                                x:DataType="getter:PointGetter_Movable" />
+                                                                            <TextBlock Text="," TextAlignment="Left"
+                                                                                VerticalAlignment="Center"
+                                                                                Classes="Big" />
+                                                                            <TextBox
+                                                                                Text="{CompiledBinding  PointY,Mode=TwoWay}"
+                                                                                Classes="CommonTextBox Big"
+                                                                                KeyDown="TextBoxKeyDown"
+                                                                                LostFocus="TextBoxLostFocus"
+                                                                                x:DataType="getter:PointGetter_Movable" />
+                                                                            <TextBlock Text=")" TextAlignment="Left"
+                                                                                VerticalAlignment="Center"
+                                                                                Classes="Big" />
+                                                                        </StackPanel>
+                                                                        <StackPanel
+                                                                            DataContext="{CompiledBinding PointGetter}"
+                                                                            Orientation="Horizontal"
+                                                                            Background="Transparent" Margin="5"
+                                                                            VerticalAlignment="Center" Grid.Column="1"
+                                                                            Grid.Row="1">
+                                                                            <TextBlock Text="On " TextAlignment="Left"
+                                                                                VerticalAlignment="Center"
+                                                                                Classes="Small" />
+                                                                            <TextBlock
+                                                                                Text="{CompiledBinding On.TypeName,Mode=TwoWay,DataType=getter:PointGetter_Movable}"
+                                                                                Classes="CommonTextBox Small" />
+                                                                            <TextBlock Text=" " TextAlignment="Left"
+                                                                                VerticalAlignment="Center"
+                                                                                Classes="Small" />
                                                                             <ctls:CheckedControl
-                                                                                IsChecked="{CompiledBinding Selected, Mode=TwoWay}"
-                                                                                IsOver="{CompiledBinding PointerOver, Mode=OneWayToSource}"
-                                                                                Color="{DynamicResource MedianUint}">
+                                                                                IsChecked="{CompiledBinding On.Selected, Mode=TwoWay,DataType=getter:PointGetter_Movable}"
+                                                                                IsOver="{CompiledBinding On.PointerOver, Mode=OneWayToSource,DataType=getter:PointGetter_Movable}"
+                                                                                Color="{CompiledBinding On.Color,DataType=getter:PointGetter_Movable}">
                                                                                 <TextBlock
-                                                                                    Text="{CompiledBinding Name}" />
+                                                                                    Text="{CompiledBinding On.Name,DataType=getter:PointGetter_Movable}"
+                                                                                    VerticalAlignment="Center"
+                                                                                    Classes="Small" />
                                                                             </ctls:CheckedControl>
-                                                                        </DataTemplate>
-                                                                    </geopad:ShapeShowCaseDataTemplate.ShapeShowcaseTemplate>
-                                                                </geopad:ShapeShowCaseDataTemplate>
-                                                            </ContentControl.ContentTemplate>
-                                                        </ContentControl>
-                                                        <TextBlock Text=")" TextAlignment="Left"
-                                                                   VerticalAlignment="Center" Classes="Big" />
-                                                    </StackPanel>
-                                                    <StackPanel Orientation="Horizontal"
-                                                                Background="Transparent" Margin="5"
-                                                                VerticalAlignment="Center" Grid.Column="1"
-                                                                Grid.Row="1">
-                                                        <TextBlock Text="=(" TextAlignment="Left"
-                                                                   VerticalAlignment="Center" Classes="Small" />
-                                                        <TextBlock
-                                                            Text="{CompiledBinding  LocationX,Mode=TwoWay}"
-                                                            Classes="CommonTextBox Small" />
-                                                        <TextBlock Text="," TextAlignment="Left"
-                                                                   VerticalAlignment="Center" Classes="Small" />
-                                                        <TextBlock
-                                                            Text="{CompiledBinding  LocationY,Mode=TwoWay}"
-                                                            Classes="CommonTextBox Small" />
-                                                        <TextBlock Text=")" TextAlignment="Left"
-                                                                   VerticalAlignment="Center" Classes="Small" />
-                                                    </StackPanel>
-                                                </Grid>
+                                                                        </StackPanel>
+                                                                    </Grid>
+                                                                </DataTemplate>
+                                                            </geopad:PointGetterDataTemplate.IsOnShape>
+                                                        </geopad:PointGetterDataTemplate>
+                                                    </ContentControl.ContentTemplate>
+                                                </ContentControl>
                                             </DockPanel>
                                         </ctls:CheckedControl>
                                     </DataTemplate>
-                                </geopad:ShapeListBoxDataTemplate.IsCommonPoint>
-                                <geopad:ShapeListBoxDataTemplate.IsOnShapePoint>
-                                    <DataTemplate DataType="shapes:Point">
-                                        <ctls:CheckedControl
-                                            IsChecked="{CompiledBinding Selected, Mode=TwoWay}"
-                                            IsOver="{CompiledBinding PointerOver, Mode=OneWayToSource}"
-                                            Color="{CompiledBinding Color}">
-                                            <StackPanel Orientation="Horizontal"
-                                                        Background="Transparent" Margin="5"
-                                                        VerticalAlignment="Center">
-                                                <CheckBox
-                                                    IsChecked="{CompiledBinding Visible,Mode=TwoWay}"
-                                                    Classes="VisibleCheckBox" />
-                                                <Grid ColumnDefinitions="Auto,Auto"
-                                                      RowDefinitions="Auto,Auto"
-                                                      VerticalAlignment="Center">
-                                                    <TextBox Text="{CompiledBinding Name,Mode=TwoWay}"
-                                                             Classes="CommonTextBox Big"
-                                                             Grid.Column="0" Grid.Row="0" Height="20"
-                                                             Margin="0" />
-                                                    <StackPanel Orientation="Horizontal"
-                                                                Background="Transparent" Margin="0,5"
-                                                                VerticalAlignment="Center" Grid.Column="1"
-                                                                Grid.Row="0">
-                                                        <TextBlock Text="=Controled("
-                                                                   TextAlignment="Left"
-                                                                   VerticalAlignment="Center" Classes="Big" />
-                                                        <TextBox
-                                                            Text="{CompiledBinding  LocationX,Mode=TwoWay}"
-                                                            Classes="CommonTextBox Big" KeyDown="TextBoxKeyDown"
-                                                            LostFocus="TextBoxLostFocus" />
-                                                        <TextBlock Text="," TextAlignment="Left"
-                                                                   VerticalAlignment="Center" Classes="Big" />
-                                                        <TextBox
-                                                            Text="{CompiledBinding  LocationY,Mode=TwoWay}"
-                                                            Classes="CommonTextBox Big" KeyDown="TextBoxKeyDown"
-                                                            LostFocus="TextBoxLostFocus" />
-                                                        <TextBlock Text=")" TextAlignment="Left"
-                                                                   VerticalAlignment="Center" Classes="Big" />
-                                                    </StackPanel>
-                                                    <StackPanel DataContext="{CompiledBinding Getter}"
-                                                                Orientation="Horizontal"
-                                                                Background="Transparent" Margin="5"
-                                                                VerticalAlignment="Center" Grid.Column="1"
-                                                                Grid.Row="1">
-                                                        <TextBlock Text="On " TextAlignment="Left"
-                                                                   VerticalAlignment="Center" Classes="Small" />
-                                                        <TextBlock
-                                                            Text="{CompiledBinding On.TypeName,Mode=TwoWay,DataType=getter:PointGetter_Movable}"
-                                                            Classes="CommonTextBox Small" />
-                                                        <TextBlock Text=" " TextAlignment="Left"
-                                                                   VerticalAlignment="Center" Classes="Small" />
-                                                        <ctls:CheckedControl
-                                                            IsChecked="{CompiledBinding On.Selected, Mode=TwoWay,DataType=getter:PointGetter_Movable}"
-                                                            IsOver="{CompiledBinding On.PointerOver, Mode=OneWayToSource,DataType=getter:PointGetter_Movable}"
-                                                            Color="{CompiledBinding On.Color,DataType=getter:PointGetter_Movable}">
-                                                            <TextBlock
-                                                                Text="{CompiledBinding On.Name,DataType=getter:PointGetter_Movable}"
-                                                                VerticalAlignment="Center"
-                                                                Classes="Small" />
-                                                        </ctls:CheckedControl>
-                                                    </StackPanel>
-                                                </Grid>
-                                            </StackPanel>
-                                        </ctls:CheckedControl>
-                                    </DataTemplate>
-                                </geopad:ShapeListBoxDataTemplate.IsOnShapePoint>
-                                <geopad:ShapeListBoxDataTemplate.IsLocationPoint>
-                                    <DataTemplate DataType="shapes:Point">
-                                        <ctls:CheckedControl
-                                            IsChecked="{CompiledBinding Selected, Mode=TwoWay}"
-                                            IsOver="{CompiledBinding PointerOver, Mode=OneWayToSource}"
-                                            Color="{CompiledBinding Color}">
-                                            <StackPanel Orientation="Horizontal"
-                                                        Background="Transparent" Margin="5"
-                                                        VerticalAlignment="Center">
-                                                <CheckBox
-                                                    IsChecked="{CompiledBinding Visible,Mode=TwoWay}"
-                                                    Classes="VisibleCheckBox" />
-                                                <TextBox Text="{CompiledBinding Name,Mode=TwoWay}"
-                                                         Classes="CommonTextBox Big" KeyDown="TextBoxKeyDown" />
-                                                <TextBlock Text="=Point(" TextAlignment="Left"
-                                                           VerticalAlignment="Center" Classes="Big" />
-                                                <TextBox
-                                                    Text="{CompiledBinding  LocationX,Mode=TwoWay}"
-                                                    Classes="CommonTextBox Big" KeyDown="TextBoxKeyDown"
-                                                    LostFocus="TextBoxLostFocus" />
-                                                <TextBlock Text="," TextAlignment="Left"
-                                                           VerticalAlignment="Center" Classes="Big" />
-                                                <TextBox
-                                                    Text="{CompiledBinding  LocationY,Mode=TwoWay}"
-                                                    Classes="CommonTextBox Big" KeyDown="TextBoxKeyDown"
-                                                    LostFocus="TextBoxLostFocus" />
-                                                <TextBlock Text=")" TextAlignment="Left"
-                                                           VerticalAlignment="Center" Classes="Big" />
-                                            </StackPanel>
-                                        </ctls:CheckedControl>
-                                    </DataTemplate>
-                                </geopad:ShapeListBoxDataTemplate.IsLocationPoint>
+                                </geopad:ShapeListBoxDataTemplate.IsPoint>
                                 <geopad:ShapeListBoxDataTemplate.Common>
                                     <DataTemplate DataType="shapes:GeometryShape">
                                         <ctls:CheckedControl
@@ -359,7 +381,7 @@
                                                                             <ctls:CheckedControl
                                                                                 IsChecked="{CompiledBinding Selected, Mode=TwoWay}"
                                                                                 IsOver="{CompiledBinding PointerOver, Mode=OneWayToSource}"
-                                                                                Color="{StaticResource MedianUint}">
+                                                                                Color="{CompiledBinding Color}">
                                                                                 <TextBlock
                                                                                     Text="{CompiledBinding Name}" />
                                                                             </ctls:CheckedControl>

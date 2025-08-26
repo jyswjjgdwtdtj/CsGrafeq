@@ -55,7 +55,7 @@ public partial class GeometryPad : Addon
         Shapes.Add(new GeoPolygon(new PolygonGetter([p1, p2, p3])));
         Shapes.Add(new Angle(new AngleGetter_FromThreePoint(p1, p2, p3)));
         Shapes.Add(new Straight(new LineGetter_Connected(p1, p2)));
-        Shapes.Add(new Circle(new CircleGetter_FromCenterAndPoint(p1,p2)));
+        Shapes.Add(new Circle(new CircleGetter_FromCenterAndPoint(p1, p2)));
 #endif
         InitializeComponent();
     }
@@ -131,9 +131,8 @@ public partial class GeometryPad : Addon
             if (rb.IsChecked == true)
             {
                 SetAction(rb.Name);
-                Owner.Owner.MsgBox(new TextBlock(){Text=GeoPadAction.Description});
+                Owner.Owner.MsgBox(new TextBlock { Text = GeoPadAction.Description });
             }
-        
     }
 
     public void SetAction(string geoPadAction)
@@ -155,8 +154,7 @@ public partial class GeometryPad : Addon
         else
         {
             MovingPoint = GetShape<GeoPoint>(e.Location);
-            if (MovingPoint != null)
-                return Intercept;
+            if (MovingPoint != null) return Intercept;
         }
 
         MovingPoint = null;
@@ -185,12 +183,22 @@ public partial class GeometryPad : Addon
         {
             if (PointerMovedPos != PointerReleasedPos)
                 Shapes.ClearSelected();
-            if (MovingPoint.PointGetter is PointGetter_Movable mpg)
+            var previous = MovingPoint.PointGetter;
+            if (e.KeyModifiers.HasFlag(KeyModifiers.Control))
             {
-                mpg.SetControlPoint(Owner.PixelToMath(PointerMovedPos));
-                MovingPoint.RefreshValues();
+                var getter = GetNewPointGetterFromLocation(e.Location);
+                if (getter != null)
+                    if (getter.GetType() != previous.GetType() ||
+                        !Extension.ArrayEqual(getter.Parameters, previous.Parameters))
+                    {
+                        MovingPoint.PointGetter = getter;
+                        getter.AddToChangeEvent(MovingPoint.RefreshValues, MovingPoint);
+                    }
             }
 
+            if (MovingPoint.PointGetter is PointGetter_Movable)
+                (MovingPoint.PointGetter as PointGetter_Movable)?.SetControlPoint(Owner.PixelToMath(PointerMovedPos));
+            MovingPoint.RefreshValues();
             Owner.Resume();
             return Intercept;
         }
@@ -611,9 +619,11 @@ public partial class GeometryPad : Addon
                         Shapes.Add(polygon);
                         Shapes.ClearSelected();
                     }
-                else if(plen<=2&&selectfirst)
-                    Shapes.ClearSelected<GeoPoint>();
-                }
+                    else if (plen <= 2 && selectfirst)
+                    {
+                        Shapes.ClearSelected<GeoPoint>();
+                    }
+            }
                 break;
             case "Fitted":
             {
@@ -672,33 +682,32 @@ public partial class GeometryPad : Addon
                 foreach (var shape in Shapes.GetSelectedShapes<GeometryShape>().ToArray())
                     if (shape.Selected)
                     {
-                            res &= Intercept;
-                            shape.Selected = false;
+                        res &= Intercept;
+                        shape.Selected = false;
                         foreach (var subshape in shape.SubShapes) subshape.Selected = true;
                     }
             }
                 break;
             case Key.A:
+            {
+                if (e.KeyModifiers == KeyModifiers.Control)
                 {
-                    if (e.KeyModifiers == KeyModifiers.Control)
-                    {
-                        res &= Intercept;
-                        foreach (var shape in Shapes.OfType<GeometryShape>().ToArray())
-                            shape.Selected = true;
-                    }
+                    res &= Intercept;
+                    foreach (var shape in Shapes.OfType<GeometryShape>().ToArray())
+                        shape.Selected = true;
                 }
+            }
                 break;
             case Key.B:
+            {
+                if (e.KeyModifiers == KeyModifiers.Control)
                 {
-                    if (e.KeyModifiers == KeyModifiers.Control)
-                    {
-                        res &= Intercept;
-                        foreach (var shape in Shapes.OfType<GeometryShape>().ToArray())
-                            shape.Selected = false;
-                    }
+                    res &= Intercept;
+                    foreach (var shape in Shapes.OfType<GeometryShape>().ToArray())
+                        shape.Selected = false;
                 }
+            }
                 break;
-
         }
 
         if (res == Intercept) Owner.Invalidate();
@@ -767,7 +776,8 @@ public partial class GeometryPad : Addon
                         else
                             dc.DrawLine(MathToPixelSK(vs.Item1), MathToPixelSK(vs.Item2), PaintMain);
 
-                        dc.DrawBubble($"Straight:{s.Name}",MathToPixelSK((s.Current.Point1+s.Current.Point2)/2),BubbleBack,PaintMain);
+                        dc.DrawBubble($"Straight:{s.Name}", MathToPixelSK((s.Current.Point1 + s.Current.Point2) / 2),
+                            BubbleBack, PaintMain);
                     }
                         break;
                     case GeoSegment s:
@@ -779,8 +789,9 @@ public partial class GeometryPad : Addon
                         else
                             dc.DrawLine(MathToPixelSK(v1), MathToPixelSK(v2), PaintMain);
 
-                        dc.DrawBubble($"Segment:{s.Name}", MathToPixelSK((s.Current.Point1 + s.Current.Point2) / 2), BubbleBack, PaintMain);
-                        }
+                        dc.DrawBubble($"Segment:{s.Name}", MathToPixelSK((s.Current.Point1 + s.Current.Point2) / 2),
+                            BubbleBack, PaintMain);
+                    }
                         break;
                     case GeoHalf h:
                     {
@@ -813,7 +824,8 @@ public partial class GeometryPad : Addon
                         else
                             dc.DrawLine(MathToPixelSK(v1), MathToPixelSK(p), PaintMain);
 
-                        dc.DrawBubble($"Half:{h.Name}", MathToPixelSK((h.Current.Point1 + h.Current.Point2) / 2), BubbleBack, PaintMain);
+                        dc.DrawBubble($"Half:{h.Name}", MathToPixelSK((h.Current.Point1 + h.Current.Point2) / 2),
+                            BubbleBack, PaintMain);
                     }
                         break;
                     case GeoPolygon polygon:
@@ -844,8 +856,11 @@ public partial class GeometryPad : Addon
                             else
                                 dc.DrawPath(path, StrokeMain);
                         }
-                        dc.DrawBubble($"Polygon:{polygon.Name}", MathToPixelSK((polygon.Locations[0] + polygon.Locations[1]) / 2)-new SKPoint(0,20), BubbleBack, PaintMain);
-                        }
+
+                        dc.DrawBubble($"Polygon:{polygon.Name}",
+                            MathToPixelSK((polygon.Locations[0] + polygon.Locations[1]) / 2) - new SKPoint(0, 20),
+                            BubbleBack, PaintMain);
+                    }
                         break;
                     case GeoCircle circle:
                     {
@@ -857,9 +872,10 @@ public partial class GeometryPad : Addon
                         else
                             dc.DrawOval(pf, s, StrokeMain);
 
-                        double r2= cs.Radius * Sqrt(2) / 2;
-                        dc.DrawBubble($"Circle:{circle.Name}", MathToPixelSK(circle.InnerCircle.Center+new Vec(-r2,r2)), BubbleBack, PaintMain);
-                        }
+                        var r2 = cs.Radius * Sqrt(2) / 2;
+                        dc.DrawBubble($"Circle:{circle.Name}",
+                            MathToPixelSK(circle.InnerCircle.Center + new Vec(-r2, r2)), BubbleBack, PaintMain);
+                    }
                         break;
                     case Angle ang:
                     {
@@ -900,7 +916,7 @@ public partial class GeometryPad : Addon
                 StrokePaint.Color = new SKColor(p.Color).WithAlpha(255);
                 var index = 0;
                 var loc = MathToPixelSK(p.Location);
-                dc.DrawBubble("Point:" + (p.Name), loc.OffSetBy(2, 2 + 20 * index++),BubbleBack, PaintMain);
+                dc.DrawBubble("Point:" + p.Name, loc.OffSetBy(2, 2 + 20 * index++), BubbleBack, PaintMain);
                 if (p == MovingPoint)
                 {
                     dc.DrawOval(loc, new SKSize(4, 4), FilledMedian);
@@ -1006,7 +1022,17 @@ public partial class GeometryPad : Addon
         }
     }*/
 
-    public GeoPoint PutPoint(AvaPoint Location)
+    public GeoPoint? PutPoint(AvaPoint Location)
+    {
+        var getter = GetNewPointGetterFromLocation(Location);
+        if (getter is null)
+            return null;
+        var p = new Point(getter);
+        Shapes.Add(p);
+        return p;
+    }
+
+    protected PointGetter? GetNewPointGetterFromLocation(AvaPoint Location)
     {
         var disp = (Owner as DisplayControl)!;
         var mathcursor = PixelToMath(Location);
@@ -1019,54 +1045,42 @@ public partial class GeometryPad : Addon
             }
 
         var ss = shapes.OrderBy(key => key.Item1).ToArray();
-        GeoPoint newpoint;
-        if (ss.Length == 0)
-        {
-            newpoint = new GeoPoint(new PointGetter_FromLocation(PixelToMath(Location)));
-        }
-        else if (ss.Length == 1)
+        if (ss.Length == 0) return new PointGetter_FromLocation(PixelToMath(Location));
+
+        if (ss.Length == 1)
         {
             var shape = ss[0].Item2;
             if (shape is GeoCircle)
-                newpoint = new GeoPoint(new PointGetter_OnCircle((Circle)shape, PixelToMath(Location)));
-            else if (shape is GeoLine)
-                newpoint = new GeoPoint(new PointGetter_OnLine((Line)shape, PixelToMath(Location)));
-            else
-                newpoint = new GeoPoint(new PointGetter_FromLocation(PixelToMath(Location)));
-        }
-        else
-        {
-            var s1 = ss[0].Item2;
-            var s2 = ss[1].Item2;
-            if (s1 is Line && s2 is Line)
-            {
-                newpoint = new GeoPoint(new PointGetter_FromTwoLine(s1 as Line, s2 as Line));
-            }
-            else if (s1 is Line l1 && s2 is Circle c1)
-            {
-                Vec v1, v2;
-                (v1, v2) = GetPointFromCircleAndLine(l1.Current.Point1, l1.Current.Point2, c1.InnerCircle.Center,
-                    c1.InnerCircle.Radius);
-                newpoint = new GeoPoint(new PointGetter_FromLineAndCircle(l1, c1,
-                    (MathToPixel(v1) - Location).GetLength() < (MathToPixel(v2) - Location).GetLength()));
-            }
-            else if (s1 is Circle c2 && s2 is Line l2)
-            {
-                Vec v1, v2;
-                (v1, v2) = GetPointFromCircleAndLine(l2.Current.Point1, l2.Current.Point2, c2.InnerCircle.Center,
-                    c2.InnerCircle.Radius);
-                newpoint = new GeoPoint(new PointGetter_FromLineAndCircle(l2, c2,
-                    (MathToPixel(v1) - Location).GetLength() < (MathToPixel(v2) - Location).GetLength()));
-            }
-            else
-            {
-                //暂不支持
-                return null;
-            }
+                return new PointGetter_OnCircle((Circle)shape, PixelToMath(Location));
+            if (shape is GeoLine)
+                return new PointGetter_OnLine((Line)shape, PixelToMath(Location));
+            return new PointGetter_FromLocation(PixelToMath(Location));
         }
 
-        Shapes.Add(newpoint);
-        return newpoint;
+        var s1 = ss[0].Item2;
+        var s2 = ss[1].Item2;
+        if (s1 is Line && s2 is Line) return new PointGetter_FromTwoLine(s1 as Line, s2 as Line);
+
+        if (s1 is Line l1 && s2 is Circle c1)
+        {
+            Vec v1, v2;
+            (v1, v2) = GetPointFromCircleAndLine(l1.Current.Point1, l1.Current.Point2, c1.InnerCircle.Center,
+                c1.InnerCircle.Radius);
+            return new PointGetter_FromLineAndCircle(l1, c1,
+                (MathToPixel(v1) - Location).GetLength() < (MathToPixel(v2) - Location).GetLength());
+        }
+
+        if (s1 is Circle c2 && s2 is Line l2)
+        {
+            Vec v1, v2;
+            (v1, v2) = GetPointFromCircleAndLine(l2.Current.Point1, l2.Current.Point2, c2.InnerCircle.Center,
+                c2.InnerCircle.Radius);
+            return new PointGetter_FromLineAndCircle(l2, c2,
+                (MathToPixel(v1) - Location).GetLength() < (MathToPixel(v2) - Location).GetLength());
+        }
+
+        //暂不支持
+        return null;
     }
 
     public bool TryGetShape<T>(AvaPoint Location, out T shape) where T : GeometryShape

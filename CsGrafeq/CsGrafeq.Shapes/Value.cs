@@ -13,7 +13,7 @@ public sealed class Value<T> : Shape
     }
 
 
-    protected override string TypeName { get; } = typeof(T).GetType().Name;
+    public override string TypeName { get; } = typeof(T).GetType().Name;
 
     public override void InvokeEvent()
     {

@@ -1,4 +1,5 @@
-﻿using static CsGrafeq.Shapes.GeometryMath;
+﻿using ReactiveUI;
+using static CsGrafeq.Shapes.GeometryMath;
 using static CsGrafeq.Math;
 using static System.Math;
 
@@ -130,35 +131,50 @@ public class PointGetter_AxialSymmetryPoint : PointGetter
 
 public abstract class PointGetter_Movable : PointGetter
 {
-    protected Vec ControlPoint;
     public bool Movable = true;
+
+    protected Vec CurrentPoint;
     public virtual GeometryShape? On => null;
 
     public double PointX
     {
-        get => ControlPoint.X;
-        set => SetControlPoint(new Vec(value, ControlPoint.Y));
+        get
+        {
+            Console.WriteLine(123);
+            return CurrentPoint.X;
+        }
+        set
+        {
+            CurrentPoint=SetPointX(value, CurrentPoint);
+            this.RaisePropertyChanged(nameof(PointX));
+        }
     }
 
     public double PointY
     {
-        get => ControlPoint.Y;
-        set => SetControlPoint(new Vec(ControlPoint.X, value));
+        get => CurrentPoint.Y;
+        set
+        {
+            CurrentPoint=SetPointY(value, CurrentPoint);
+            this.RaisePropertyChanged(nameof(PointY));
+        }
     }
 
     public virtual void SetControlPoint(Vec controlPoint)
     {
-        ControlPoint = controlPoint;
+        CurrentPoint=controlPoint;
+        this.RaisePropertyChanged(nameof(PointX));
+        this.RaisePropertyChanged(nameof(PointY));
     }
 
-    public virtual void SetControlX(double x)
+    public virtual Vec SetPointX(double x,Vec previous)
     {
-        ControlPoint.X = x;
+        return new Vec(x,previous.Y);
     }
 
-    public virtual void SetControlY(double y)
+    public virtual Vec SetPointY(double y,Vec previous)
     {
-        ControlPoint.Y = y;
+        return new Vec(previous.X,y);
     }
 }
 
@@ -183,8 +199,9 @@ public class PointGetter_OnLine : PointGetter_Movable
             Line.Current.Point1.Y + ratio * (Line.Current.Point2.Y - Line.Current.Point1.Y));
     }
 
-    protected void SetRatio(Vec p)
+    protected double SetRatio(Vec p)
     {
+        double ratio;
         if (Line.Current.Point1.X != Line.Current.Point2.X)
             ratio = (p.X - Line.Current.Point1.X) / (Line.Current.Point2.X - Line.Current.Point1.X);
         else if (Line.Current.Point1.Y != Line.Current.Point2.Y)
@@ -195,68 +212,74 @@ public class PointGetter_OnLine : PointGetter_Movable
             ratio = RangeTo(0, double.PositiveInfinity, ratio);
         else if (Line is Segment)
             ratio = RangeTo(0, 1, ratio);
+        return ratio;
     }
 
-    public override void SetControlX(double x)
+    public override Vec SetPointX(double x,Vec previous)
     {
         //aX+bY+c=0
-        var p = ControlPoint;
+        var p = previous;
         var (a, b, c) = Line.Current.GetNormal();
         if (b == 0)
         {
             p.X = c / a;
-            return;
+            return p;
         }
 
         if (a == 0)
         {
             p.Y = c / b;
             p.X = x;
-            return;
+            return p;
         }
 
         p.X = x;
         p.Y = -a / b * x - c / b;
-        SetRatio(p);
+        ratio=SetRatio(p);
+        return p;
     }
 
-    public override void SetControlY(double y)
+    public override Vec SetPointY(double y,Vec previous)
     {
         //aX+bY+c=0
-        var p = ControlPoint;
+        var p = previous;
         var (a, b, c) = Line.Current.GetNormal();
         if (a == 0)
         {
             p.Y = c / b;
-            return;
+            return p;
         }
 
         if (b == 0)
         {
             p.X = c / a;
             p.Y = y;
-            return;
+            return p;
         }
 
         p.Y = y;
         p.X = -b / a * y - c / a;
-        SetRatio(p);
+        ratio=SetRatio(p);
+        return p;
     }
 
     public override void SetControlPoint(Vec controlPoint)
     {
         base.SetControlPoint(controlPoint);
-        var p = InternalGetPoint();
-        SetRatio(p);
+        var p = InternalGetPoint(controlPoint);
+        ratio=SetRatio(p);
+        CurrentPoint = p;
+        this.RaisePropertyChanged(nameof(PointX));
+        this.RaisePropertyChanged(nameof(PointY));
     }
 
-    private Vec InternalGetPoint()
+    private Vec InternalGetPoint(Vec controlPoint)
     {
         var v1 = Line.Current.Point1;
         var v2 = Line.Current.Point2;
         var dx = v2.X - v1.X;
         var dy = v2.Y - v1.Y;
-        var t = ((ControlPoint.X - v1.X) * dx + (ControlPoint.Y - v1.Y) * dy) / (dx * dx + dy * dy);
+        var t = ((controlPoint.X - v1.X) * dx + (controlPoint.Y - v1.Y) * dy) / (dx * dx + dy * dy);
         return new Vec(v1.X + t * dx, v1.Y + t * dy);
     }
 
@@ -288,12 +311,13 @@ public class PointGetter_OnCircle : PointGetter_Movable
             Circle.InnerCircle.Center.Y + Sin(theta) * Circle.InnerCircle.Radius);
     }
 
-    public override void SetControlPoint(Vec controlPoint)
+    public override  void SetControlPoint(Vec controlPoint)
     {
         if ((controlPoint - Circle.InnerCircle.Center).GetLength() == 0)
             theta = 0;
         else
             theta = (controlPoint - Circle.InnerCircle.Center).Arg2();
+        CurrentPoint=GetPoint();
     }
 
     public override void AddToChangeEvent(ShapeChangedHandler handler, GeometryShape subShape)
@@ -307,7 +331,7 @@ public class PointGetter_FromLocation : PointGetter_Movable
 {
     public PointGetter_FromLocation(Vec location)
     {
-        ControlPoint = location;
+        SetControlPoint(location);
     }
 
     public override string ActionName => "";
@@ -316,7 +340,7 @@ public class PointGetter_FromLocation : PointGetter_Movable
 
     public override Vec GetPoint()
     {
-        return ControlPoint;
+        return CurrentPoint;
     }
 
     public static implicit operator PointGetter_FromLocation(Vec f)

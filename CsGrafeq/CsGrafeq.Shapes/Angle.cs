@@ -16,7 +16,7 @@ public class Angle : GeometryShape
     }
 
     public override GeometryGetter Getter => AngleGetter;
-    protected override string TypeName => "Angle";
+    public override string TypeName => "Angle";
 
     public override void RefreshValues()
     {

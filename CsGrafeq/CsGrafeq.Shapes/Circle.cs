@@ -14,7 +14,7 @@ public class Circle : FilledShape
         RefreshValues();
     }
 
-    protected override string TypeName => "Circle";
+    public override string TypeName => "Circle";
     public double Radius => InnerCircle.Radius;
     public double LocY => InnerCircle.Center.Y;
     public double LocX => InnerCircle.Center.X;

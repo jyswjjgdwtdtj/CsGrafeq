@@ -160,14 +160,14 @@ public abstract class Addon : UserControl
 
     public class AddonPointerEventArgsBase : EventArgs
     {
-        public readonly KeyModifiers modifiers;
+        public readonly KeyModifiers KeyModifiers;
         public readonly double X, Y;
 
         public AddonPointerEventArgsBase(double x, double y, KeyModifiers modifiers)
         {
             X = x;
             Y = y;
-            this.modifiers = modifiers;
+            KeyModifiers = modifiers;
         }
 
         public Point Location => new(X, Y);
@@ -175,7 +175,6 @@ public abstract class Addon : UserControl
 
     public class AddonPointerEventArgs : AddonPointerEventArgsBase
     {
-        public readonly KeyModifiers modifiers;
         public readonly PointerPointProperties Properties;
         public readonly double X, Y;
 

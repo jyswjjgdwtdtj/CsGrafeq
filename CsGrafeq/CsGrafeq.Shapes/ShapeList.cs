@@ -81,15 +81,25 @@ public class ShapeList : ObservableCollection<Shape>
         if (index < 0)
             return "";
         sb.Clear();
-        if (index == 0)
+        if (index<26)
+        {
+            return ((char)('A' + index)).ToString();
+        }
+        index -= 26;
+        if(index==0)
             return "A";
         while (index != 0)
         {
             var remainder = index % 26;
             sb.Insert(0, (char)('A' + remainder));
+            index-=remainder;
             index /= 26;
         }
 
+        if (sb.Length == 1)
+        {
+            sb.Insert(0, 'A');
+        }
         return sb.ToString();
     }
 

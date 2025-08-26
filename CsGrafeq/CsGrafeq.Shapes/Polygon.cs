@@ -16,7 +16,7 @@ public class Polygon : FilledShape
         RefreshValues();
     }
 
-    protected override string TypeName => "Polygon";
+    public override string TypeName => "Polygon";
     public override PolygonGetter Getter => PolygonGetter;
     public override void RefreshValues()
     {
