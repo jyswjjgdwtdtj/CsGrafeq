@@ -1,9 +1,11 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Text;
 
 namespace CsGrafeq.Shapes;
 
-public class ShapeList : ObservableCollection<Shape>
+public class ShapeList:ObservableCollection<Shape>
 {
     private static readonly StringBuilder sb = new();
     private int index = 0;
@@ -30,7 +32,7 @@ public class ShapeList : ObservableCollection<Shape>
             i.Selected = false;
     }
 
-    public new void Add(Shape shape)
+    public void Add(Shape shape)
     {
         shape.ShapeChanged += ShapeChanged;
         if (shape is GeometryShape s)
@@ -39,7 +41,27 @@ public class ShapeList : ObservableCollection<Shape>
             AddNotGeometry(shape);
     }
 
-    public new void Remove(Shape shape)
+    public void Delete(Shape shape)
+    {
+        if (shape is GeometryShape s)
+        {
+            DeleteGeometry(s);
+        }
+        else
+        {
+            shape.IsDeleted = true;
+        }
+    }
+
+    private void DeleteGeometry(GeometryShape shape)
+    {
+        shape.IsDeleted = true;
+        foreach (var i in shape.SubShapes)
+        {
+            DeleteGeometry(i);
+        }
+    }
+    public void Remove(Shape shape)
     {
         if (shape is GeometryShape s)
             RemoveGeometry(s);
@@ -103,6 +125,11 @@ public class ShapeList : ObservableCollection<Shape>
         return sb.ToString();
     }
 
+    public IEnumerable<T> GetShapes<T>()
+    {
+        return this.OfType<T>();
+    }
+
     public static int GetIndexFromString(string str)
     {
         var res = 0;
@@ -121,8 +148,14 @@ public class ShapeList : ObservableCollection<Shape>
             yield return i;
     }
 
-    public IEnumerable<T> GetShape<T>() where T : Shape
+    public static IEnumerable<GeometryShape> GetAllChildren(GeometryShape shape)
     {
-        return this.OfType<T>();
+        if (!shape.IsDeleted)
+        {
+            yield return shape;
+            foreach (var s in shape.SubShapes)
+            foreach (var i in GetAllChildren(s)) 
+                yield return i;
+        }
     }
 }

@@ -35,7 +35,6 @@
                     </DockPanel>
                 </ControlTemplate>
             </Setter>
-
         </Style>
         <Style Selector="TextBox.CommonTextBox">
             <Setter Property="AcceptsReturn" Value="False" />
@@ -155,27 +154,13 @@
                                             Color="{CompiledBinding Color}">
                                             <ctls:CheckedControl.Flyout>
                                                 <Flyout ShowMode="Standard" Placement="BottomEdgeAlignedLeft">
-                                                    <Grid ColumnDefinitions="80,120" RowDefinitions="30,30,Auto"
+                                                    <Grid ColumnDefinitions="80,120" RowDefinitions="Auto"
                                                           RowSpacing="3">
                                                         <TextBlock Grid.Row="0" Grid.Column="0"
                                                                    VerticalAlignment="Center">
-                                                            Opacity:
-                                                        </TextBlock>
-                                                        <TextBlock Grid.Row="1" Grid.Column="0"
-                                                                   VerticalAlignment="Center">
-                                                            Thickness:
-                                                        </TextBlock>
-                                                        <TextBlock Grid.Row="2" Grid.Column="0"
-                                                                   VerticalAlignment="Center">
                                                             Color:
                                                         </TextBlock>
-                                                        <NumericUpDown Grid.Row="0" Grid.Column="1"
-                                                                       Value="{CompiledBinding Opacity}"
-                                                                       Increment="0.05" Minimum="0" Maximum="1" />
-                                                        <NumericUpDown Grid.Row="1" Grid.Column="1"
-                                                                       Value="{CompiledBinding Thickness}"
-                                                                       Increment="1" Minimum="1" Maximum="10" />
-                                                        <ColorPicker Grid.Column="1" Grid.Row="2" 
+                                                        <ColorPicker Grid.Column="1" Grid.Row="0" 
                                                                      Color="{CompiledBinding Color,Converter={StaticResource UIntToColor}}" 
                                                                      IsAlphaVisible="False" 
                                                                      IsAlphaEnabled="False" 
@@ -186,10 +171,13 @@
                                                 </Flyout>
                                             </ctls:CheckedControl.Flyout>
                                             <DockPanel LastChildFill="True">
-                                                <CheckBox
-                                                    IsChecked="{CompiledBinding Visible,Mode=TwoWay}"
-                                                    Classes="VisibleCheckBox" DockPanel.Dock="Left"
-                                                    VerticalAlignment="Center" Margin="5" />
+												<StackPanel DockPanel.Dock="Left">
+													<CheckBox
+														IsChecked="{CompiledBinding Visible,Mode=TwoWay}"
+														Classes="VisibleCheckBox" 
+														VerticalAlignment="Center" Margin="5" />
+													<TextBlock Text="{CompiledBinding IsDeleted}"></TextBlock>
+												</StackPanel>
                                                 <ContentControl
                                                     x:DataType="shapes:Point">
                                                     <ContentControl.Content>
@@ -276,26 +264,32 @@
                                                             </geopad:PointGetterDataTemplate.IsCommon>
                                                             <geopad:PointGetterDataTemplate.IsLocation>
                                                                 <DataTemplate DataType="geopad:PointGetterAndName">
-                                                                    <StackPanel Orientation="Horizontal"
-                                                                        DataContext="{CompiledBinding PointGetter}">
-                                                                        <TextBlock Text="=Point(" TextAlignment="Left"
-                                                                            VerticalAlignment="Center" Classes="Big" />
-                                                                        <TextBox
-                                                                            Text="{CompiledBinding  PointX,Mode=TwoWay}"
+                                                                    <StackPanel Orientation="Horizontal">
+																		<TextBox
+                                                                            Text="{CompiledBinding Name,Mode=TwoWay}"
                                                                             Classes="CommonTextBox Big"
-                                                                            KeyDown="TextBoxKeyDown"
-                                                                            LostFocus="TextBoxLostFocus"
-                                                                            x:DataType="getter:PointGetter_Movable" />
-                                                                        <TextBlock Text="," TextAlignment="Left"
-                                                                            VerticalAlignment="Center" Classes="Big" />
-                                                                        <TextBox
-                                                                            Text="{CompiledBinding  PointY,Mode=TwoWay}"
-                                                                            Classes="CommonTextBox Big"
-                                                                            KeyDown="TextBoxKeyDown"
-                                                                            LostFocus="TextBoxLostFocus"
-                                                                            x:DataType="getter:PointGetter_Movable" />
-                                                                        <TextBlock Text=")" TextAlignment="Left"
-                                                                            VerticalAlignment="Center" Classes="Big" />
+                                                                            Height="20"
+                                                                            Margin="0"/>
+																		<StackPanel Orientation="Horizontal" DataContext="{CompiledBinding PointGetter}">
+																			<TextBlock Text="=Point(" TextAlignment="Left"
+																				VerticalAlignment="Center" Classes="Big" />
+																			<TextBox
+																				Text="{CompiledBinding PointX,Mode=TwoWay}"
+																				Classes="CommonTextBox Big"
+																				KeyDown="TextBoxKeyDown"
+																				LostFocus="TextBoxLostFocus"
+																				x:DataType="getter:PointGetter_Movable" />
+																			<TextBlock Text="," TextAlignment="Left"
+																				VerticalAlignment="Center" Classes="Big" />
+																			<TextBox
+																				Text="{CompiledBinding  PointY,Mode=TwoWay}"
+																				Classes="CommonTextBox Big"
+																				KeyDown="TextBoxKeyDown"
+																				LostFocus="TextBoxLostFocus"
+																				x:DataType="getter:PointGetter_Movable" />
+																			<TextBlock Text=")" TextAlignment="Left"
+																				VerticalAlignment="Center" Classes="Big" />
+																		</StackPanel>
                                                                     </StackPanel>
                                                                 </DataTemplate>
                                                             </geopad:PointGetterDataTemplate.IsLocation>
@@ -378,11 +372,24 @@
                                             IsChecked="{CompiledBinding Selected, Mode=TwoWay}"
                                             IsOver="{CompiledBinding PointerOver, Mode=OneWayToSource}"
                                             Color="{CompiledBinding Color}">
-                                            <ctls:CheckedControl.ContextMenu>
-                                                <ContextMenu>
-                                                    <MenuItem Header="Change Color" Tag="{CompiledBinding .}" />
-                                                </ContextMenu>
-                                            </ctls:CheckedControl.ContextMenu>
+                                            <ctls:CheckedControl.Flyout>
+                                                <Flyout ShowMode="Standard" Placement="BottomEdgeAlignedLeft">
+                                                    <Grid ColumnDefinitions="80,120" RowDefinitions="Auto"
+                                                          RowSpacing="3">
+                                                        <TextBlock Grid.Row="0" Grid.Column="0"
+                                                                   VerticalAlignment="Center">
+                                                            Color:
+                                                        </TextBlock>
+                                                        <ColorPicker Grid.Column="1" Grid.Row="0" 
+                                                                     Color="{CompiledBinding Color,Converter={StaticResource UIntToColor}}" 
+                                                                     IsAlphaVisible="False" 
+                                                                     IsAlphaEnabled="False" 
+                                                                     IsAccentColorsVisible="False"
+                                                                     >
+                                                        </ColorPicker>
+                                                    </Grid>
+                                                </Flyout>
+                                            </ctls:CheckedControl.Flyout>
                                             <StackPanel Orientation="Horizontal"
                                                         Background="Transparent" Margin="5"
                                                         VerticalAlignment="Center">

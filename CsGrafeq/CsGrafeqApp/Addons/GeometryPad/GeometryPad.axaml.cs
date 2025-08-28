@@ -19,13 +19,14 @@ using AvaSize = Avalonia.Size;
 using GeoHalf = CsGrafeq.Shapes.Half;
 using static CsGrafeqApp.AvaloniaMath;
 using Math = System.Math;
+using CsGrafeq;
 
 namespace CsGrafeqApp.Addons.GeometryPad;
 
 public partial class GeometryPad : Addon
 {
     private readonly List<ActionData> Actions = new();
-    protected Func<Vec, AvaPoint> MathToPixel;
+    private Func<Vec, AvaPoint> MathToPixel;
     protected Func<Vec, SKPoint> MathToPixelSK;
     private GeoPoint? MovingPoint;
     protected Func<AvaPoint, Vec> PixelToMath;
@@ -33,8 +34,11 @@ public partial class GeometryPad : Addon
     protected Func<double, double> PixelToMathX, PixelToMathY, MathToPixelX, MathToPixelY;
     private AvaPoint PointerMovedPos;
     private AvaPoint PointerPressedPos;
-    private PointerPointProperties PointerProperties;
     private AvaPoint PointerReleasedPos;
+    private Vec PointerPressedMovingPointPos;
+    private PointerPointProperties PointerProperties;
+    private CommandManager CmdManager = new();
+
 
     public GeometryPad()
     {
@@ -48,9 +52,15 @@ public partial class GeometryPad : Addon
         Shapes.CollectionChanged += (s, e) => { Owner?.Invalidate(this); };
         Shapes.OnShapeChanged += () => { Owner?.Invalidate(this); };
 #if DEBUG
-        var p1 = new Point(new PointGetter_FromLocation((0, 0)));
-        Shapes.Add(p1);
-
+        AddShape(new Point(new PointGetter_FromLocation((0.5,0.5))));
+        AddShape(new Point(new PointGetter_FromLocation((1.5,0.5))));
+        AddShape(new Point(new PointGetter_FromLocation((2.5,0.5))));
+        AddShape(new Point(new PointGetter_FromLocation((3.5,0.5))));
+        AddShape(new Point(new PointGetter_FromLocation((4.5,0.5))));
+        AddShape(new Point(new PointGetter_FromLocation((5.5,0.5))));
+        AddShape(new Point(new PointGetter_FromLocation((6.5,0.5))));
+        AddShape(new Point(new PointGetter_FromLocation((7.5,0.5))));
+        AddShape(new Point(new PointGetter_FromLocation((8.5,0.5))));
 #endif
         InitializeComponent();
     }
@@ -81,6 +91,15 @@ public partial class GeometryPad : Addon
     }
 
     public override string Name => "GeometryPad";
+    public void SetAction(string geoPadAction)
+    {
+        if (GeoPadAction.Name == geoPadAction)
+            return;
+        GeoPadAction = Actions.Find(data => data.Name == geoPadAction);
+        Shapes.ClearSelected();
+    }
+
+    #region ControlAction
 
     public void TextBoxLostFocus(object? sender, RoutedEventArgs e)
     {
@@ -132,13 +151,9 @@ public partial class GeometryPad : Addon
             }
     }
 
-    public void SetAction(string geoPadAction)
-    {
-        if (GeoPadAction.Name == geoPadAction)
-            return;
-        GeoPadAction = Actions.Find(data => data.Name == geoPadAction);
-        Shapes.ClearSelected();
-    }
+    #endregion
+
+    #region PointerAction
 
     protected override bool PointerPressed(AddonPointerEventArgs e)
     {
@@ -151,7 +166,10 @@ public partial class GeometryPad : Addon
         else
         {
             MovingPoint = GetShape<GeoPoint>(e.Location);
-            if (MovingPoint != null) return Intercept;
+            if (MovingPoint != null) {
+                PointerPressedMovingPointPos = MovingPoint.Location;
+                return Intercept;
+            }
         }
 
         MovingPoint = null;
@@ -181,6 +199,8 @@ public partial class GeometryPad : Addon
             if (PointerMovedPos != PointerReleasedPos)
                 Shapes.ClearSelected();
             var previous = MovingPoint.PointGetter;
+            //这里怎么undo，怎么redo？？？ 谁看到代码给我提个issue帮帮我……
+            /*
             if (e.KeyModifiers.HasFlag(KeyModifiers.Control))
             {
                 var getter = GetNewPointGetterFromLocation(e.Location);
@@ -192,12 +212,11 @@ public partial class GeometryPad : Addon
                         getter.AddToChangeEvent(MovingPoint.RefreshValues, MovingPoint);
                     }
             }
-
+            */
             if (MovingPoint.PointGetter is PointGetter_FromLocation)
-            {
-                (MovingPoint.PointGetter as PointGetter_Movable)?.SetControlPoint(Owner.PixelToMath(FindNearestPointOnAxisLine(PointerMovedPos)));
-            }
-            else if(MovingPoint.PointGetter is PointGetter_Movable)
+                (MovingPoint.PointGetter as PointGetter_Movable)?.SetControlPoint(
+                    Owner.PixelToMath(FindNearestPointOnAxisLine(PointerMovedPos)));
+            else if (MovingPoint.PointGetter is PointGetter_Movable)
                 (MovingPoint.PointGetter as PointGetter_Movable)?.SetControlPoint(Owner.PixelToMath(PointerMovedPos));
             MovingPoint.RefreshValues();
             Owner.Resume();
@@ -300,7 +319,7 @@ public partial class GeometryPad : Addon
 
         if (PointerReleasedPos != PointerPressedPos)
             Shapes.ClearSelected();
-        (MovingPoint.PointGetter as PointGetter_Movable)?.SetControlPoint(MovingPoint.Location);
+        DoPointMove(MovingPoint,PointerPressedMovingPointPos, PixelToMath(PointerReleasedPos));
         MovingPoint = null;
         Owner.Resume();
         return Intercept;
@@ -382,7 +401,7 @@ public partial class GeometryPad : Addon
                 if (plen == 2 && llen == 0 && clen == 0)
                 {
                     var newpoint = new GeoPoint(new PointGetter_MiddlePoint(SPoints[0], SPoints[1]));
-                    Shapes.Add(newpoint);
+                    AddShape(newpoint);
                     Shapes.ClearSelected();
                 }
 
@@ -398,7 +417,7 @@ public partial class GeometryPad : Addon
                 {
                     var newpoint = new GeoPoint(new PointGetter_MedianCenter(SPoints[0], SPoints[1],
                         SPoints[2]));
-                    Shapes.Add(newpoint);
+                    AddShape(newpoint);
                     Shapes.ClearSelected<GeoPoint>();
                 }
 
@@ -414,7 +433,7 @@ public partial class GeometryPad : Addon
                 {
                     var newpoint = new GeoPoint(new PointGetter_InCenter(SPoints[0], SPoints[1],
                         SPoints[2]));
-                    Shapes.Add(newpoint);
+                    AddShape(newpoint);
                     Shapes.ClearSelected<GeoPoint>();
                 }
 
@@ -430,7 +449,7 @@ public partial class GeometryPad : Addon
                 {
                     var newpoint = new GeoPoint(new PointGetter_OutCenter(SPoints[0], SPoints[1],
                         SPoints[2]));
-                    Shapes.Add(newpoint);
+                    AddShape(newpoint);
                     Shapes.ClearSelected<GeoPoint>();
                 }
 
@@ -446,7 +465,7 @@ public partial class GeometryPad : Addon
                 {
                     var newpoint = new GeoPoint(new PointGetter_OrthoCenter(SPoints[0], SPoints[1],
                         SPoints[2]));
-                    Shapes.Add(newpoint);
+                    AddShape(newpoint);
                     Shapes.ClearSelected<GeoPoint>();
                 }
 
@@ -462,7 +481,7 @@ public partial class GeometryPad : Addon
                 {
                     var newpoint =
                         new GeoPoint(new PointGetter_AxialSymmetryPoint(SPoints[0], SLines[0]));
-                    Shapes.Add(newpoint);
+                    AddShape(newpoint);
                     Shapes.ClearSelected();
                 }
 
@@ -479,7 +498,7 @@ public partial class GeometryPad : Addon
                 {
                     var newpoint =
                         new GeoPoint(new PointGetter_NearestPointOnLine(SLines[0], SPoints[0]));
-                    Shapes.Add(newpoint);
+                    AddShape(newpoint);
                     Shapes.ClearSelected();
                 }
 
@@ -495,7 +514,7 @@ public partial class GeometryPad : Addon
                 if (plen == 2 && llen == 0 && clen == 0)
                 {
                     var line = new Straight(new LineGetter_Connected(SPoints[0], SPoints[1]));
-                    Shapes.Add(line);
+                    AddShape(line);
                     Shapes.ClearSelected();
                 }
 
@@ -508,7 +527,7 @@ public partial class GeometryPad : Addon
                 if (plen == 2 && llen == 0 && clen == 0)
                 {
                     var line = new Segment(new LineGetter_Segment(SPoints[0], SPoints[1]));
-                    Shapes.Add(line);
+                    AddShape(line);
                     Shapes.ClearSelected();
                 }
 
@@ -521,7 +540,7 @@ public partial class GeometryPad : Addon
                 if (plen == 2 && llen == 0 && clen == 0)
                 {
                     var line = new GeoHalf(new LineGetter_Half(SPoints[0], SPoints[1]));
-                    Shapes.Add(line);
+                    AddShape(line);
                     Shapes.ClearSelected();
                 }
 
@@ -534,7 +553,7 @@ public partial class GeometryPad : Addon
                 if (plen == 1 && llen == 1 && clen == 0)
                 {
                     var line = new Straight(new LineGetter_Vertical(SLines[0], SPoints[0]));
-                    Shapes.Add(line);
+                    AddShape(line);
                     Shapes.ClearSelected();
                 }
 
@@ -549,7 +568,7 @@ public partial class GeometryPad : Addon
                 if (plen == 1 && llen == 1 && clen == 0)
                 {
                     var line = new Straight(new LineGetter_Parallel(SLines[0], SPoints[0]));
-                    Shapes.Add(line);
+                    AddShape(line);
                     Shapes.ClearSelected();
                 }
 
@@ -564,7 +583,7 @@ public partial class GeometryPad : Addon
                 if (plen == 2 && llen == 0 && clen == 0)
                 {
                     var line = new Straight(new LineGetter_PerpendicularBisector(SPoints[0], SPoints[1]));
-                    Shapes.Add(line);
+                    AddShape(line);
                     Shapes.ClearSelected();
                 }
                 else if (plen == 0 && llen == 1 && clen == 0)
@@ -574,7 +593,7 @@ public partial class GeometryPad : Addon
                         var line = new Straight(new LineGetter_PerpendicularBisector(
                             new GeoPoint(new PointGetter_EndOfLine(SLines[0], true)),
                             new GeoPoint(new PointGetter_EndOfLine(SLines[0], false))));
-                        Shapes.Add(line);
+                        AddShape(line);
                         Shapes.ClearSelected();
                     }
                 }
@@ -589,7 +608,7 @@ public partial class GeometryPad : Addon
                 {
                     var circle = new Circle(new CircleGetter_FromThreePoint(SPoints[0], SPoints[1],
                         SPoints[2]));
-                    Shapes.Add(circle);
+                    AddShape(circle);
                     Shapes.ClearSelected<GeoPoint>();
                 }
 
@@ -603,7 +622,7 @@ public partial class GeometryPad : Addon
                 {
                     var circle =
                         new Circle(new CircleGetter_FromCenterAndPoint(SPoints[0], SPoints[1]));
-                    Shapes.Add(circle);
+                    AddShape(circle);
                     Shapes.ClearSelected<GeoPoint>();
                 }
 
@@ -617,7 +636,7 @@ public partial class GeometryPad : Addon
                     if (selectfirst)
                     {
                         var polygon = new Polygon(new PolygonGetter(SPoints));
-                        Shapes.Add(polygon);
+                        AddShape(polygon);
                         Shapes.ClearSelected();
                     }
                     else if (plen <= 2 && selectfirst)
@@ -632,7 +651,7 @@ public partial class GeometryPad : Addon
                     if (selectfirst)
                     {
                         var fitted = new Straight(new LineGetter_Fitted(SPoints));
-                        Shapes.Add(fitted);
+                        AddShape(fitted);
                         Shapes.ClearSelected();
                     }
             }
@@ -642,7 +661,7 @@ public partial class GeometryPad : Addon
                 if (plen == 3 && llen == 0 && clen == 0)
                 {
                     var angle = new Angle(new AngleGetter_FromThreePoint(SPoints[0], SPoints[1], SPoints[2]));
-                    Shapes.Add(angle);
+                    AddShape(angle);
                     Shapes.ClearSelected<GeoPoint>();
                 }
 
@@ -662,6 +681,10 @@ public partial class GeometryPad : Addon
         return Intercept;
     }
 
+    #endregion
+
+    #region KeyAction
+
     protected override bool KeyDown(KeyEventArgs e)
     {
         Owner.Suspend();
@@ -669,14 +692,20 @@ public partial class GeometryPad : Addon
         switch (e.Key)
         {
             case Key.Delete:
-            {
-                foreach (var shape in Shapes.GetSelectedShapes<GeometryShape>().ToArray())
-                    if (shape.Selected)
+                {
+                    List<GeometryShape> todelete = new();
+                    foreach (var shape in Shapes.GetSelectedShapes<GeometryShape>().ToArray())
+                        if (shape.Selected)
+                        {
+                            todelete.Add(shape);
+                            
+                            res &= Intercept;
+                        }
+                    if (todelete.Count > 0)
                     {
-                        Shapes.Remove(shape);
-                        res &= Intercept;
+                        DoGeoShapesDelete(todelete.ToArray());
                     }
-            }
+                }
                 break;
             case Key.Tab:
             {
@@ -709,6 +738,24 @@ public partial class GeometryPad : Addon
                 }
             }
                 break;
+            case Key.Z:
+                {
+                    if (e.KeyModifiers == KeyModifiers.Control)
+                    {
+                        CmdManager.UnDo();
+                        Console.WriteLine("UnDo");
+                    }
+                }
+                break;
+            case Key.Y:
+                {
+                    if (e.KeyModifiers == KeyModifiers.Control)
+                    {
+                        CmdManager.ReDo();
+                        Console.WriteLine("ReDo");
+                    }
+                }
+                break;
         }
 
         if (res == Intercept) Owner.Invalidate();
@@ -716,13 +763,17 @@ public partial class GeometryPad : Addon
         return res;
     }
 
+    #endregion
+
+    #region RenderAction
+
     protected override void Render(SKCanvas dc, SKRect rect)
     {
         rect.Intersect(Owner.ValidRect.ToSKRect());
         dc.Save();
         dc.ClipRect(rect);
         //RenderFunction(dc, new SKRectI((int)rect.Left, (int)rect.Top, (int)rect.Right, (int)rect.Bottom));
-        RenderShapes(dc, rect, Shapes.GetShape<GeometryShape>());
+        RenderShapes(dc, rect, Shapes.GetShapes<GeometryShape>());
         if (GeoPadAction.Name == "Select" && PointerProperties.IsLeftButtonPressed)
         {
             var selrect = RegulateRectangle(new AvaRect(PointerPressedPos,
@@ -747,11 +798,14 @@ public partial class GeometryPad : Addon
                StrokePaint = new() { IsStroke = true, IsAntialias = true },
                StrokeMain = new() { Color = cd.AxisPaintMain.Color, IsStroke = true, IsAntialias = true },
                PaintMain = new() { Color = cd.AxisPaintMain.Color, IsAntialias = true },
+               StrokePaintMain = new() { Color = cd.AxisPaintMain.Color, IsAntialias = true, IsStroke = true },
                BubbleBack = new() { Color = cd.AxisPaint1.Color.WithAlpha(90), IsAntialias = true })
         {
             foreach (var shape in shapes)
             {
                 if (shape is null)
+                    continue;
+                if (shape.IsDeleted)
                     continue;
                 if (!shape.Visible)
                     continue;
@@ -773,9 +827,9 @@ public partial class GeometryPad : Addon
                             GetIntersectionLSAndSL(LB, LT, v1, v2)
                         );
                         if (s.Selected)
-                            dc.DrawLine(MathToPixelSK(vs.Item1), MathToPixelSK(vs.Item2), FilledPaint);
+                            dc.DrawLine(MathToPixelSK(vs.Item1), MathToPixelSK(vs.Item2), StrokePaint);
                         else
-                            dc.DrawLine(MathToPixelSK(vs.Item1), MathToPixelSK(vs.Item2), PaintMain);
+                            dc.DrawLine(MathToPixelSK(vs.Item1), MathToPixelSK(vs.Item2), StrokePaintMain);
 
                         dc.DrawBubble($"Straight:{s.Name}", MathToPixelSK((s.Current.Point1 + s.Current.Point2) / 2),
                             BubbleBack, PaintMain);
@@ -786,9 +840,9 @@ public partial class GeometryPad : Addon
                         var v1 = s.Current.Point1;
                         var v2 = s.Current.Point2;
                         if (s.Selected)
-                            dc.DrawLine(MathToPixelSK(v1), MathToPixelSK(v2), FilledPaint);
+                            dc.DrawLine(MathToPixelSK(v1), MathToPixelSK(v2), StrokePaint);
                         else
-                            dc.DrawLine(MathToPixelSK(v1), MathToPixelSK(v2), PaintMain);
+                            dc.DrawLine(MathToPixelSK(v1), MathToPixelSK(v2), StrokePaintMain);
 
                         dc.DrawBubble($"Segment:{s.Name}", MathToPixelSK((s.Current.Point1 + s.Current.Point2) / 2),
                             BubbleBack, PaintMain);
@@ -821,9 +875,9 @@ public partial class GeometryPad : Addon
                         }
 
                         if (h.Selected)
-                            dc.DrawLine(MathToPixelSK(v1), MathToPixelSK(p), FilledPaint);
+                            dc.DrawLine(MathToPixelSK(v1), MathToPixelSK(p), StrokePaint);
                         else
-                            dc.DrawLine(MathToPixelSK(v1), MathToPixelSK(p), PaintMain);
+                            dc.DrawLine(MathToPixelSK(v1), MathToPixelSK(p), StrokePaintMain);
 
                         dc.DrawBubble($"Half:{h.Name}", MathToPixelSK((h.Current.Point1 + h.Current.Point2) / 2),
                             BubbleBack, PaintMain);
@@ -906,9 +960,11 @@ public partial class GeometryPad : Addon
                 }
             }
 
-            foreach (var p in Shapes.GetShape<GeoPoint>())
+            foreach (var p in Shapes.GetShapes<GeoPoint>())
             {
                 if (p is null)
+                    continue;
+                if (p.IsDeleted)
                     continue;
                 if (!p.Visible)
                     continue;
@@ -1023,13 +1079,17 @@ public partial class GeometryPad : Addon
         }
     }*/
 
+    #endregion
+
+    #region ShapeAction
+
     public GeoPoint? PutPoint(AvaPoint Location)
     {
         var getter = GetNewPointGetterFromLocation(Location);
         if (getter is null)
             return null;
         var p = new Point(getter);
-        Shapes.Add(p);
+        AddShape(p);
         return p;
     }
 
@@ -1038,7 +1098,7 @@ public partial class GeometryPad : Addon
         var disp = (Owner as DisplayControl)!;
         var mathcursor = PixelToMath(Location);
         var shapes = new List<(double, Shape)>();
-        foreach (var geoshape in Shapes.GetShape<GeometryShape>())
+        foreach (var geoshape in Shapes.GetShapes<GeometryShape>())
             if (geoshape is Line || geoshape is Circle)
             {
                 var dist = (geoshape.HitTest(mathcursor) * disp.UnitLength).GetLength();
@@ -1086,33 +1146,36 @@ public partial class GeometryPad : Addon
 
     protected AvaPoint FindNearestPointOnAxisLine(AvaPoint location)
     {
-        double nearestX=double.NaN, nearestY=Double.NaN;
+        double nearestX = double.NaN, nearestY = Double.NaN;
         double distance = double.PositiveInfinity;
-        var car=(Owner as DisplayControl)!;
-        car.AxisLineForEachX((x, type) =>
+        var car = (Owner as DisplayControl)!;
+        foreach (var tuple in car.AxisX)
         {
-            var dist = Math.Abs(location.X - x);
-            if (dist< distance&&dist<5)
+            var dist = Math.Abs(location.X - tuple.Item1);
+            if (dist < distance && dist < 5)
             {
                 distance = dist;
-                nearestX = x;
+                nearestX = tuple.Item1;
             }
-        });
+        }
+
         distance = double.PositiveInfinity;
-        car.AxisLineForEachY((y, type) =>
+        foreach (var tuple in car.AxisY)
         {
-            var dist = Math.Abs(location.Y - y);
-            if (dist< distance&&dist<5)
+            var dist = Math.Abs(location.Y - tuple.Item1);
+            if (dist < distance && dist < 5)
             {
                 distance = dist;
-                nearestY = y;
+                nearestY = tuple.Item1;
             }
-        });
+        }
+
         Vec ret;
-        ret.X = double.IsNaN(nearestX)?location.X:nearestX;
-        ret.Y = double.IsNaN(nearestY)?location.Y:nearestY;
+        ret.X = double.IsNaN(nearestX) ? location.X : nearestX;
+        ret.Y = double.IsNaN(nearestY) ? location.Y : nearestY;
         return ret.ToAvaPoint();
     }
+
     public bool TryGetShape<T>(AvaPoint Location, out T shape) where T : GeometryShape
     {
         shape = GetShape<T>(Location);
@@ -1143,11 +1206,83 @@ public partial class GeometryPad : Addon
         return target;
     }
 
-    private void InputElement_OnTapped(object? sender, TappedEventArgs e)
+    #endregion
+
+    #region Do
+    
+
+    private void DoShapeAdd(Shape shape)
     {
-        if (sender is Control control)
-            if (control.Tag is Shape shape)
+        CmdManager.Do(
+            shape,
+            o =>
             {
-            }
+                (o as Shape).IsDeleted = false;
+            },
+            o =>
+            {
+                (o as Shape).IsDeleted = true;
+            },
+            o =>
+            {
+                Shapes.Remove(shape as Shape);
+            },true
+        );
     }
+
+    private void DoGeoShapesDelete(IEnumerable<GeometryShape> shapes)
+    {
+        var ss=shapes.Select(s => ShapeList.GetAllChildren(s)).JoinToOne().Distinct().ToArray();
+        CmdManager.Do(
+                ss,
+                o =>
+                {
+                    foreach (var sh in ss)
+                    {
+                        sh.IsDeleted = true;
+                        sh.Selected = false;
+                    }
+                },
+                o =>
+                {
+                    foreach (var sh in ss)
+                    {
+                        sh.IsDeleted = false;
+                        sh.Selected = false;
+                    }
+                },
+                o =>
+                {
+                },true
+            );
+    }
+
+    private void DoPointMove(Point point, Vec previous,Vec next)
+    {
+        if(point.PointGetter is PointGetter_Movable pg)
+        {
+            CmdManager.Do(pg, o =>
+            {
+                pg.SetControlPoint(next);
+                point.RefreshValues();
+            }, o =>
+            {
+                pg.SetControlPoint(previous);
+                point.RefreshValues();
+            }, o =>
+            {
+
+            });
+        }
+    }
+    #endregion
+
+    public void AddShape(Shape shape)
+    {
+        if(shape.IsDeleted)
+            return;
+        Shapes.Add(shape);
+        DoShapeAdd(shape);
+    }
+    
 }

@@ -36,13 +36,11 @@ public class CheckedControl : TemplatedControl
     {
         Tapped += (s, e) =>
         {
-            this.GetFocus();
             IsChecked = !IsChecked;
             e.Handled = true;
         };
         DoubleTapped += (s, e) =>
         {
-            this.GetFocus();
             Flyout?.ShowAt(this);
         };
         PropertyChanged += (s, e) =>

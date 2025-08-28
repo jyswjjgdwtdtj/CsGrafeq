@@ -15,6 +15,8 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using Avalonia.Controls;
 using Avalonia.Threading;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace CsGrafeqApp;
 
@@ -53,5 +55,11 @@ public static class Extension
                 return false;
         }
         return true;
+    }
+    public static IEnumerable<T> JoinToOne<T>(this IEnumerable<IEnumerable<T>> col)
+    {
+        foreach (var i in col)
+            foreach (var j in i)
+                yield return j;
     }
 }

@@ -16,6 +16,9 @@ public class ShapeListBoxDataTemplate : IDataTemplate
     public Control? Build(object? param)
     {
         if (param is GeoShape item)
+        {
+            if(item.IsDeleted)
+                return null;
             switch (item)
             {
                 case GeoPoint _:
@@ -28,8 +31,8 @@ public class ShapeListBoxDataTemplate : IDataTemplate
 //              case ImplicitFunction _:
 //                  return IsFunction?.Build(param);
             }
-
-        return new Control();
+        }
+        return null;
     }
 
     public bool Match(object? data)

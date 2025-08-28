@@ -29,10 +29,10 @@ public class DisplayControl : CartesianDisplayer
             {
                 var p = e.GetPosition(this);
                 MouseDownPos = new PointL { X = (long)p.X, Y = (long)p.Y };
-                MouseDownZeroPos = _Zero;
+                MouseDownZeroPos = Zero;
             }
 
-            LastZeroPos = _Zero;
+            LastZeroPos = Zero;
         }
         else
         {
@@ -50,8 +50,8 @@ public class DisplayControl : CartesianDisplayer
         {
             var current = e.GetPosition(this);
             bool l = MouseOnYAxis, ll = MouseOnXAxis;
-            MouseOnYAxis = Abs(current.X - _Zero.X) < 3;
-            MouseOnXAxis = Abs(current.Y - _Zero.Y) < 3;
+            MouseOnYAxis = Abs(current.X - Zero.X) < 3;
+            MouseOnXAxis = Abs(current.Y - Zero.Y) < 3;
             if (e.Properties.IsLeftButtonPressed)
             {
                 //移动零点
@@ -60,16 +60,16 @@ public class DisplayControl : CartesianDisplayer
                     X = MouseDownZeroPos.X + (long)current.X - MouseDownPos.X,
                     Y = MouseDownZeroPos.Y + (long)current.Y - MouseDownPos.Y
                 };
-                if (newZero != _Zero)
+                if (newZero != Zero)
                 {
-                    _Zero = newZero;
+                    Zero = newZero;
                     lock (TotalBuffer)
                     {
                         using (var dc = new SKCanvas(TotalBuffer))
                         {
                             dc.Clear(AxisBackground);
                             RenderAxisLine(dc);
-                            if ((LastZeroPos - _Zero).Length > 30)
+                            if ((LastZeroPos - Zero).Length > 30)
                             {
                                 var newbmp = new SKBitmap(TotalBuffer.Width, TotalBuffer.Height);
                                 foreach (var i in Addons)
@@ -78,8 +78,8 @@ public class DisplayControl : CartesianDisplayer
                                     using (var currentCanvas = new SKCanvas(i.Bitmap))
                                     {
                                         currentCanvas.Clear(SKColors.Transparent);
-                                        currentCanvas.DrawBitmap(newbmp, _Zero.X - LastZeroPos.X,
-                                            _Zero.Y - LastZeroPos.Y);
+                                        currentCanvas.DrawBitmap(newbmp, Zero.X - LastZeroPos.X,
+                                            Zero.Y - LastZeroPos.Y);
                                         RenderMovedPlace(currentCanvas, i.AddonRender);
                                     }
 
@@ -87,13 +87,13 @@ public class DisplayControl : CartesianDisplayer
                                 }
 
                                 newbmp.Dispose();
-                                LastZeroPos = _Zero;
+                                LastZeroPos = Zero;
                             }
                             else
                             {
                                 foreach (var i in Addons)
                                 {
-                                    dc.DrawBitmap(i.Bitmap, _Zero.X - LastZeroPos.X, _Zero.Y - LastZeroPos.Y);
+                                    dc.DrawBitmap(i.Bitmap, Zero.X - LastZeroPos.X, Zero.Y - LastZeroPos.Y);
                                     RenderMovedPlace(dc, i.AddonRender);
                                 }
                             }
@@ -121,8 +121,8 @@ public class DisplayControl : CartesianDisplayer
         StopWheeling();
         if (CallAddonPointerReleased(e) == DoNext)
         {
-            if (LastZeroPos != _Zero) Invalidate();
-            LastZeroPos = _Zero;
+            if (LastZeroPos != Zero) Invalidate();
+            LastZeroPos = Zero;
         }
         else
         {
@@ -147,31 +147,31 @@ public class DisplayControl : CartesianDisplayer
     {
         var width = (float)Bounds.Width;
         var height = (float)Bounds.Height;
-        if (_Zero.X < LastZeroPos.X)
+        if (Zero.X < LastZeroPos.X)
         {
-            rm.Invoke(dc, CreateSKRectWH(width - LastZeroPos.X + _Zero.X, 0, width, height));
-            if (_Zero.Y < LastZeroPos.Y)
+            rm.Invoke(dc, CreateSKRectWH(width - LastZeroPos.X + Zero.X, 0, width, height));
+            if (Zero.Y < LastZeroPos.Y)
                 rm.Invoke(dc,
-                    CreateSKRectWH(0, height - LastZeroPos.Y + _Zero.Y, width - LastZeroPos.X + _Zero.X, height));
-            else if (_Zero.Y > LastZeroPos.Y)
-                rm.Invoke(dc, CreateSKRectWH(0, 0, width - LastZeroPos.X + _Zero.X, _Zero.Y - LastZeroPos.Y));
+                    CreateSKRectWH(0, height - LastZeroPos.Y + Zero.Y, width - LastZeroPos.X + Zero.X, height));
+            else if (Zero.Y > LastZeroPos.Y)
+                rm.Invoke(dc, CreateSKRectWH(0, 0, width - LastZeroPos.X + Zero.X, Zero.Y - LastZeroPos.Y));
         }
-        else if (_Zero.X > LastZeroPos.X)
+        else if (Zero.X > LastZeroPos.X)
         {
-            rm.Invoke(dc, CreateSKRectWH(0, 0, (int)(_Zero.X - LastZeroPos.X), height));
-            if (_Zero.Y < LastZeroPos.Y)
+            rm.Invoke(dc, CreateSKRectWH(0, 0, (int)(Zero.X - LastZeroPos.X), height));
+            if (Zero.Y < LastZeroPos.Y)
                 rm.Invoke(dc,
-                    CreateSKRectWH((int)(_Zero.X - LastZeroPos.X), (int)(height - LastZeroPos.Y + _Zero.Y), width,
+                    CreateSKRectWH((int)(Zero.X - LastZeroPos.X), (int)(height - LastZeroPos.Y + Zero.Y), width,
                         height));
-            else if (_Zero.Y > LastZeroPos.Y)
-                rm.Invoke(dc, CreateSKRectWH((int)(_Zero.X - LastZeroPos.X), 0, width, (int)(_Zero.Y - LastZeroPos.Y)));
+            else if (Zero.Y > LastZeroPos.Y)
+                rm.Invoke(dc, CreateSKRectWH((int)(Zero.X - LastZeroPos.X), 0, width, (int)(Zero.Y - LastZeroPos.Y)));
         }
         else
         {
-            if (_Zero.Y < LastZeroPos.Y)
-                rm.Invoke(dc, CreateSKRectWH(0, (int)(height - LastZeroPos.Y + _Zero.Y), width, height));
-            else if (_Zero.Y > LastZeroPos.Y)
-                rm.Invoke(dc, CreateSKRectWH(0, 0, width, (int)(_Zero.Y - LastZeroPos.Y)));
+            if (Zero.Y < LastZeroPos.Y)
+                rm.Invoke(dc, CreateSKRectWH(0, (int)(height - LastZeroPos.Y + Zero.Y), width, height));
+            else if (Zero.Y > LastZeroPos.Y)
+                rm.Invoke(dc, CreateSKRectWH(0, 0, width, (int)(Zero.Y - LastZeroPos.Y)));
         }
     }
     protected override void OnKeyDown(KeyEventArgs e)
