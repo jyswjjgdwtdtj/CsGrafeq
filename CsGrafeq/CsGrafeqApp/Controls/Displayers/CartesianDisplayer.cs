@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using Avalonia.Input;
 using Avalonia.Styling;
@@ -94,6 +95,70 @@ public class CartesianDisplayer : Displayer
         return -(d - _Zero.Y) / UnitLength;
     }
 
+    public void AxisLineForEachX(Action<double,AxisType> delegateX)
+    {
+        var zsX = (int)Floor(Log(350 / UnitLength, 10));;
+        var addnumX = Pow(10D, zsX);
+        var addnumDX = Pow(10M, zsX);
+        for (var i = Min(_Zero.X - addnumX * UnitLength,
+                 MathToPixelX(RoundTen(PixelToMathX(ValidRect.Right), -zsX)));
+             i > ValidRect.Left;
+             i -= addnumX * UnitLength)
+        {
+            var num = RoundTen((decimal)PixelToMathX(i), -zsX);
+            if (num % (10 * addnumDX) == 0)
+                delegateX.Invoke(i,AxisType.Major);
+            else
+                delegateX.Invoke(i, AxisType.Minor);
+        }
+
+        for (var i = Max(_Zero.X + addnumX * UnitLength,
+                 MathToPixelX(RoundTen(PixelToMathX(ValidRect.Left), -zsX)));
+             i < ValidRect.Right;
+             i += addnumX * UnitLength)
+        {
+            var num = RoundTen((decimal)PixelToMathX(i), -zsX);
+            if (num % (10 * addnumDX) == 0)
+                delegateX.Invoke(i,AxisType.Major);
+            else
+                delegateX.Invoke(i, AxisType.Minor);
+        }
+        if (RangeIn(ValidRect.Left, ValidRect.Right, _Zero.X))
+            delegateX.Invoke(_Zero.X,AxisType.Axes);
+    }
+
+    public void AxisLineForEachY(Action<double,AxisType> delegateY)
+    {
+        var zsY = (int)Floor(Log(350 / UnitLength, 10));;
+        var addnumY = Pow(10D, zsY);
+        var addnumDY = Pow(10M, zsY);
+        for (var i = Min(_Zero.Y - addnumY * UnitLength,
+                 MathToPixelY(RoundTen(PixelToMathY(ValidRect.Bottom), -zsY)));
+             i > ValidRect.Top;
+             i -= addnumY * UnitLength)
+        {
+            var num = RoundTen((decimal)PixelToMathY(i), -zsY);
+            if (num % (10 * addnumDY) == 0)
+                delegateY.Invoke(i,AxisType.Major);
+            else
+                delegateY.Invoke(i, AxisType.Minor);
+        }
+
+        for (var i = Max(_Zero.Y + addnumY * UnitLength,
+                 MathToPixelY(RoundTen(PixelToMathY(ValidRect.Top), -zsY)));
+             i < ValidRect.Bottom;
+             i += addnumY * UnitLength)
+        {
+            var num = RoundTen((decimal)PixelToMathY(i), -zsY);
+            if (num % (10 * addnumDY) == 0)
+                delegateY.Invoke(i,AxisType.Major);
+            else
+                delegateY.Invoke(i, AxisType.Minor);
+        }
+        if (RangeIn(ValidRect.Top, ValidRect.Bottom, _Zero.Y))
+            delegateY.Invoke(_Zero.X,AxisType.Axes);
+    }
+
     //不敢动………………
     protected void RenderAxisLine(SKCanvas dc)
     {
@@ -116,7 +181,6 @@ public class CartesianDisplayer : Displayer
         var addnumY = Pow(10D, zsY);
         var addnumDX = Pow(10M, zsX);
         var addnumDY = Pow(10M, zsY);
-        var p = RangeTo(-3, height - TextFont.Size + 1, _Zero.Y);
         SKPaint targetPen;
         for (var i = Min(_Zero.X - addnumX * UnitLength,
                  MathToPixelX(RoundTen(PixelToMathX(ValidRect.Right), -zsX)));
@@ -358,4 +422,11 @@ public class CartesianDisplayer : Displayer
             InvalidateVisual();
         }
     }
+}
+
+public enum AxisType
+{
+    Axes,
+    Major,
+    Minor,
 }

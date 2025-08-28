@@ -124,7 +124,7 @@
                     </Grid>
                     <DockPanel LastChildFill="True" ZIndex="2">
                         <Border DockPanel.Dock="Bottom" MaxHeight="{TemplateBinding Height}" Height="200" >
-                            <Border VerticalAlignment="Center" HorizontalAlignment="Center" Background="{DynamicResource CgHTCtPureBackgroundBrush}" Padding="15" Opacity="0" CornerRadius="4">
+                            <Border VerticalAlignment="Center" HorizontalAlignment="Center" Background="{DynamicResource HTMedianBrush}" Padding="15" Opacity="0" CornerRadius="4">
                                 <ContentPresenter Name="MsgBoxPresenter" Foreground="{DynamicResource CgForegroundBrush}">
                                 </ContentPresenter>
                             </Border>

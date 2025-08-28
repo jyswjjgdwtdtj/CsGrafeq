@@ -41,10 +41,9 @@
             <Setter Property="AcceptsReturn" Value="False" />
             <Setter Property="MinWidth" Value="30" />
             <Setter Property="Width" Value="NaN" />
-            <Setter Property="Height" Value="30"/>
-            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="Height" Value="30" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
             <Setter Property="BorderThickness" Value="0" />
-
         </Style>
         <Style Selector="TextBox.Big">
             <Setter Property="FontSize" Value="14" />
@@ -154,17 +153,49 @@
                                             IsChecked="{CompiledBinding Selected, Mode=TwoWay}"
                                             IsOver="{CompiledBinding PointerOver, Mode=OneWayToSource}"
                                             Color="{CompiledBinding Color}">
+                                            <ctls:CheckedControl.Flyout>
+                                                <Flyout ShowMode="Standard" Placement="BottomEdgeAlignedLeft">
+                                                    <Grid ColumnDefinitions="80,120" RowDefinitions="30,30,Auto"
+                                                          RowSpacing="3">
+                                                        <TextBlock Grid.Row="0" Grid.Column="0"
+                                                                   VerticalAlignment="Center">
+                                                            Opacity:
+                                                        </TextBlock>
+                                                        <TextBlock Grid.Row="1" Grid.Column="0"
+                                                                   VerticalAlignment="Center">
+                                                            Thickness:
+                                                        </TextBlock>
+                                                        <TextBlock Grid.Row="2" Grid.Column="0"
+                                                                   VerticalAlignment="Center">
+                                                            Color:
+                                                        </TextBlock>
+                                                        <NumericUpDown Grid.Row="0" Grid.Column="1"
+                                                                       Value="{CompiledBinding Opacity}"
+                                                                       Increment="0.05" Minimum="0" Maximum="1" />
+                                                        <NumericUpDown Grid.Row="1" Grid.Column="1"
+                                                                       Value="{CompiledBinding Thickness}"
+                                                                       Increment="1" Minimum="1" Maximum="10" />
+                                                        <ColorPicker Grid.Column="1" Grid.Row="2" 
+                                                                     Color="{CompiledBinding Color,Converter={StaticResource UIntToColor}}" 
+                                                                     IsAlphaVisible="False" 
+                                                                     IsAlphaEnabled="False" 
+                                                                     IsAccentColorsVisible="False"
+                                                                     >
+                                                        </ColorPicker>
+                                                    </Grid>
+                                                </Flyout>
+                                            </ctls:CheckedControl.Flyout>
                                             <DockPanel LastChildFill="True">
                                                 <CheckBox
                                                     IsChecked="{CompiledBinding Visible,Mode=TwoWay}"
                                                     Classes="VisibleCheckBox" DockPanel.Dock="Left"
-                                                    VerticalAlignment="Center" Margin="5"/>
+                                                    VerticalAlignment="Center" Margin="5" />
                                                 <ContentControl
                                                     x:DataType="shapes:Point">
                                                     <ContentControl.Content>
                                                         <MultiBinding Converter="{StaticResource PGToPGAN}">
-                                                            <CompiledBinding Path="PointGetter"></CompiledBinding>
-                                                            <CompiledBinding Path="Name"></CompiledBinding>
+                                                            <CompiledBinding Path="PointGetter" />
+                                                            <CompiledBinding Path="Name" />
                                                         </MultiBinding>
                                                     </ContentControl.Content>
                                                     <ContentControl.ContentTemplate>
@@ -254,7 +285,7 @@
                                                                             Classes="CommonTextBox Big"
                                                                             KeyDown="TextBoxKeyDown"
                                                                             LostFocus="TextBoxLostFocus"
-                                                                            x:DataType="getter:PointGetter_Movable"/>
+                                                                            x:DataType="getter:PointGetter_Movable" />
                                                                         <TextBlock Text="," TextAlignment="Left"
                                                                             VerticalAlignment="Center" Classes="Big" />
                                                                         <TextBox
@@ -281,7 +312,8 @@
                                                                         <StackPanel Orientation="Horizontal"
                                                                             Background="Transparent" Margin="0,5"
                                                                             VerticalAlignment="Center" Grid.Column="1"
-                                                                            Grid.Row="0" DataContext="{CompiledBinding PointGetter}">
+                                                                            Grid.Row="0"
+                                                                            DataContext="{CompiledBinding PointGetter}">
                                                                             <TextBlock Text="=Controlled("
                                                                                 TextAlignment="Left"
                                                                                 VerticalAlignment="Center"
@@ -346,6 +378,11 @@
                                             IsChecked="{CompiledBinding Selected, Mode=TwoWay}"
                                             IsOver="{CompiledBinding PointerOver, Mode=OneWayToSource}"
                                             Color="{CompiledBinding Color}">
+                                            <ctls:CheckedControl.ContextMenu>
+                                                <ContextMenu>
+                                                    <MenuItem Header="Change Color" Tag="{CompiledBinding .}" />
+                                                </ContextMenu>
+                                            </ctls:CheckedControl.ContextMenu>
                                             <StackPanel Orientation="Horizontal"
                                                         Background="Transparent" Margin="5"
                                                         VerticalAlignment="Center">

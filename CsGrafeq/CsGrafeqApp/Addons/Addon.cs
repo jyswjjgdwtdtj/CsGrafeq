@@ -188,7 +188,6 @@ public abstract class Addon : UserControl
     public class AddonPointerWheelEventArgs : AddonPointerEventArgs
     {
         public readonly Vec Delta;
-
         public AddonPointerWheelEventArgs(double x, double y, PointerPointProperties properties, KeyModifiers modifiers,
             Vec delta) : base(x, y, properties, modifiers)
         {

@@ -58,5 +58,17 @@ public abstract class Shape : ReactiveObject
         ShapeChanged?.Invoke();
     }
 
+    public double Opacity
+    {
+        get => field;
+        set => this.RaiseAndSetIfChanged(ref field, value);
+    } = 1;
+
+    public uint Thickness
+    {
+        get => field;
+        set => this.RaiseAndSetIfChanged(ref field, value);
+    } = 1;
+
     public event ShapeChangedHandler? ShapeChanged;
 }

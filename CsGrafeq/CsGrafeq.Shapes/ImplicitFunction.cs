@@ -32,7 +32,6 @@ public class ImplicitFunction : Shape
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
                 IsCorrect = false;
             }
 

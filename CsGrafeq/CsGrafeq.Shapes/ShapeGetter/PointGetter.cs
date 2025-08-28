@@ -140,7 +140,6 @@ public abstract class PointGetter_Movable : PointGetter
     {
         get
         {
-            Console.WriteLine(123);
             return CurrentPoint.X;
         }
         set

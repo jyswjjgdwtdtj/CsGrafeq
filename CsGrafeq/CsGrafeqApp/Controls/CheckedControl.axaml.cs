@@ -22,19 +22,28 @@ public class CheckedControl : TemplatedControl
 
     public static readonly StyledProperty<uint> ColorProperty =
         AvaloniaProperty.Register<CheckedControl, uint>(nameof(Color));
+    
+    public static readonly StyledProperty<Flyout?> FlyoutProperty =AvaloniaProperty.Register<CheckedControl, Flyout?>(nameof(Flyout));
 
     static CheckedControl()
     {
         AffectsRender<CheckedControl>(IsCheckedProperty, ContentProperty, IsOverProperty);
     }
+    
+    public Flyout? Flyout { get => GetValue(FlyoutProperty); set => SetValue(FlyoutProperty, value); }
 
     public CheckedControl()
     {
-        PointerPressed += (s, e) =>
+        Tapped += (s, e) =>
         {
             this.GetFocus();
-            if (e.Properties.IsLeftButtonPressed) IsChecked = !IsChecked;
+            IsChecked = !IsChecked;
             e.Handled = true;
+        };
+        DoubleTapped += (s, e) =>
+        {
+            this.GetFocus();
+            Flyout?.ShowAt(this);
         };
         PropertyChanged += (s, e) =>
         {

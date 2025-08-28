@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Avalonia.Controls;
+using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
@@ -17,6 +18,7 @@ using AvaRect = Avalonia.Rect;
 using AvaSize = Avalonia.Size;
 using GeoHalf = CsGrafeq.Shapes.Half;
 using static CsGrafeqApp.AvaloniaMath;
+using Math = System.Math;
 
 namespace CsGrafeqApp.Addons.GeometryPad;
 
@@ -46,16 +48,9 @@ public partial class GeometryPad : Addon
         Shapes.CollectionChanged += (s, e) => { Owner?.Invalidate(this); };
         Shapes.OnShapeChanged += () => { Owner?.Invalidate(this); };
 #if DEBUG
-        var p1 = new GeoPoint(new PointGetter_FromLocation((1, 3)));
-        var p2 = new GeoPoint(new PointGetter_FromLocation((3, 4)));
-        var p3 = new GeoPoint(new PointGetter_FromLocation((6, 7)));
+        var p1 = new Point(new PointGetter_FromLocation((0, 0)));
         Shapes.Add(p1);
-        Shapes.Add(p2);
-        Shapes.Add(p3);
-        Shapes.Add(new GeoPolygon(new PolygonGetter([p1, p2, p3])));
-        Shapes.Add(new Angle(new AngleGetter_FromThreePoint(p1, p2, p3)));
-        Shapes.Add(new Straight(new LineGetter_Connected(p1, p2)));
-        Shapes.Add(new Circle(new CircleGetter_FromCenterAndPoint(p1, p2)));
+
 #endif
         InitializeComponent();
     }
@@ -80,6 +75,8 @@ public partial class GeometryPad : Addon
             MathToPixelY = Owner.MathToPixelY;
             MathToPixel = Owner.MathToPixel;
             MathToPixelSK = Owner.MathToPixelSK;
+#if DEBUG
+#endif
         }
     }
 
@@ -196,7 +193,11 @@ public partial class GeometryPad : Addon
                     }
             }
 
-            if (MovingPoint.PointGetter is PointGetter_Movable)
+            if (MovingPoint.PointGetter is PointGetter_FromLocation)
+            {
+                (MovingPoint.PointGetter as PointGetter_Movable)?.SetControlPoint(Owner.PixelToMath(FindNearestPointOnAxisLine(PointerMovedPos)));
+            }
+            else if(MovingPoint.PointGetter is PointGetter_Movable)
                 (MovingPoint.PointGetter as PointGetter_Movable)?.SetControlPoint(Owner.PixelToMath(PointerMovedPos));
             MovingPoint.RefreshValues();
             Owner.Resume();
@@ -1083,6 +1084,35 @@ public partial class GeometryPad : Addon
         return null;
     }
 
+    protected AvaPoint FindNearestPointOnAxisLine(AvaPoint location)
+    {
+        double nearestX=double.NaN, nearestY=Double.NaN;
+        double distance = double.PositiveInfinity;
+        var car=(Owner as DisplayControl)!;
+        car.AxisLineForEachX((x, type) =>
+        {
+            var dist = Math.Abs(location.X - x);
+            if (dist< distance&&dist<5)
+            {
+                distance = dist;
+                nearestX = x;
+            }
+        });
+        distance = double.PositiveInfinity;
+        car.AxisLineForEachY((y, type) =>
+        {
+            var dist = Math.Abs(location.Y - y);
+            if (dist< distance&&dist<5)
+            {
+                distance = dist;
+                nearestY = y;
+            }
+        });
+        Vec ret;
+        ret.X = double.IsNaN(nearestX)?location.X:nearestX;
+        ret.Y = double.IsNaN(nearestY)?location.Y:nearestY;
+        return ret.ToAvaPoint();
+    }
     public bool TryGetShape<T>(AvaPoint Location, out T shape) where T : GeometryShape
     {
         shape = GetShape<T>(Location);
@@ -1111,5 +1141,13 @@ public partial class GeometryPad : Addon
         }
 
         return target;
+    }
+
+    private void InputElement_OnTapped(object? sender, TappedEventArgs e)
+    {
+        if (sender is Control control)
+            if (control.Tag is Shape shape)
+            {
+            }
     }
 }

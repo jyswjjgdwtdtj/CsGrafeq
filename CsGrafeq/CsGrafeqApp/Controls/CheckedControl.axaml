@@ -12,27 +12,32 @@
 
     <ControlTheme x:Key="{x:Type controls:CheckedControl}" TargetType="controls:CheckedControl">
         <Setter Property="Focusable" Value="True" />
-        <Style Selector="^ /template/ Border#Container">
-            <Setter Property="Background" Value="{DynamicResource CgTransparentBrush}" />
+        <Style Selector="^ /template/ Border#BackgroundShower">
+            <Setter Property="Opacity" Value="0" />
             <Setter Property="Transitions">
                 <Transitions>
-                    <BrushTransition Duration="0:0:0.1" Property="Background" Delay="0:0:0.05" />
+                    <DoubleTransition Duration="0:0:0.1" Property="Opacity" Delay="0:0:0.1" />
                 </Transitions>
             </Setter>
         </Style>
-        <Style Selector="^:over /template/ Border#Container">
-            <Setter Property="Background"
-                    Value="{TemplateBinding Color, Converter={StaticResource UIntColorToBrush},ConverterParameter=60}" />
+        <Style Selector="^:over /template/ Border#BackgroundShower">
+            <Setter Property="Opacity"
+                    Value="0.25" />
         </Style>
-        <Style Selector="^:checked /template/ Border#Container">
-            <Setter Property="Background"
-                    Value="{TemplateBinding Color, Converter={StaticResource UIntColorToBrush},ConverterParameter=140}" />
+        <Style Selector="^:checked /template/ Border#BackgroundShower">
+            <Setter Property="Opacity"
+                    Value="0.5" />
         </Style>
         <Setter Property="Template">
             <ControlTemplate>
-                <Border Name="Container" CornerRadius="5">
-                    <ContentPresenter Content="{TemplateBinding Content}" />
-                </Border>
+                <Panel>
+                    <Border Name="BackgroundShower" CornerRadius="5" Background="{TemplateBinding Color, Converter={StaticResource UIntColorToBrush},ConverterParameter=255}">
+                        
+                    </Border>
+                    <Border Name="Container" CornerRadius="5">
+                        <ContentPresenter Content="{TemplateBinding Content}" />
+                    </Border>
+                </Panel>
             </ControlTemplate>
         </Setter>
     </ControlTheme>

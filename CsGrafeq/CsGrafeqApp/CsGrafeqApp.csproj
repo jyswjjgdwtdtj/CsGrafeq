@@ -30,33 +30,35 @@
         <StartupObject>CsGrafeqApp.Desktop.Program</StartupObject>
         <SignAssembly>False</SignAssembly>
         <Authors>jyswjjgdwtdtj</Authors>
-        <Version/>
+        <Version />
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="11.3.2"/>
-        <PackageReference Include="Avalonia.Controls.ItemsRepeater" Version="11.1.5"/>
-        <PackageReference Include="Avalonia.Desktop" Version="11.3.2"/>
-        <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.2"/>
-        <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.2"/>
-        <PackageReference Include="Avalonia.Skia" Version="11.3.2"/>
-        <PackageReference Include="Avalonia.Themes.Simple" Version="11.3.2"/>
-        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.2"/>
+        <PackageReference Include="Avalonia" Version="11.3.4" />
+        <PackageReference Include="Avalonia.Controls.ColorPicker" Version="11.3.4" />
+        <PackageReference Include="Avalonia.Controls.ItemsRepeater" Version="11.1.5" />
+        <PackageReference Include="Avalonia.Controls.TreeDataGrid" Version="11.1.1" />
+        <PackageReference Include="Avalonia.Desktop" Version="11.3.4" />
+        <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.4" />
+        <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.4" />
+        <PackageReference Include="Avalonia.Skia" Version="11.3.4" />
+        <PackageReference Include="Avalonia.Themes.Simple" Version="11.3.4" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.4" />
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.2"/>
-        <PackageReference Include="Classic.Avalonia.Theme" Version="11.3.0"/>
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.4" />
+        <PackageReference Include="Classic.Avalonia.Theme" Version="11.3.0" />
         <!--Condition below is needed to generate macOS App only.-->
-        <PackageReference Include="Dotnet.Bundle" Version="0.9.13" Condition="$(RuntimeIdentifier.StartsWith('osx'))"/>
-        <PackageReference Include="SkiaSharp" Version="3.119.0"/>
-        <PackageReference Include="Svg.Controls.Skia.Avalonia" Version="11.3.0.2"/>
+        <PackageReference Include="Dotnet.Bundle" Version="0.9.13" Condition="$(RuntimeIdentifier.StartsWith('osx'))" />
+        <PackageReference Include="SkiaSharp" Version="3.119.0" />
+        <PackageReference Include="Svg.Controls.Skia.Avalonia" Version="11.3.0.4" />
     </ItemGroup>
     <ItemGroup>
-        <AvaloniaResource Include="Assets\**"/>
+        <AvaloniaResource Include="Assets\**" />
     </ItemGroup>
     <ItemGroup>
-        <AvaloniaXaml Remove="DataTemplate\**"/>
-        <Compile Remove="DataTemplate\**"/>
-        <EmbeddedResource Remove="DataTemplate\**"/>
-        <None Remove="DataTemplate\**"/>
+        <AvaloniaXaml Remove="DataTemplate\**" />
+        <Compile Remove="DataTemplate\**" />
+        <EmbeddedResource Remove="DataTemplate\**" />
+        <None Remove="DataTemplate\**" />
         <None Remove="Addons\GeometryPad\Actions.json" />
         <EmbeddedResource Include="Addons\GeometryPad\Actions.json" />
     </ItemGroup>
@@ -71,8 +73,8 @@
         </Compile>
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\CsGrafeq.Shapes\CsGrafeq.Shapes.csproj"/>
-        <ProjectReference Include="..\CsGrafeq\CsGrafeq.csproj"/>
+        <ProjectReference Include="..\CsGrafeq.Shapes\CsGrafeq.Shapes.csproj" />
+        <ProjectReference Include="..\CsGrafeq\CsGrafeq.csproj" />
     </ItemGroup>
     <ItemGroup>
         <EmbeddedResource Update="Properties\Resources.resx">
