@@ -12,7 +12,7 @@ public class Polygon : FilledShape
     public Polygon(PolygonGetter getter)
     {
         PolygonGetter = getter;
-        PolygonGetter.AddToChangeEvent(RefreshValues, this);
+        PolygonGetter.Attach(RefreshValues, this);
         RefreshValues();
     }
 

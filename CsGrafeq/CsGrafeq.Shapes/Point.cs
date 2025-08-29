@@ -20,7 +20,7 @@ public class Point : GeometryShape
     public Point(PointGetter pointgetter)
     {
         PointGetter = pointgetter;
-        PointGetter.AddToChangeEvent(RefreshValues, this);
+        PointGetter.Attach(RefreshValues, this);
         RefreshValues();
     }
 

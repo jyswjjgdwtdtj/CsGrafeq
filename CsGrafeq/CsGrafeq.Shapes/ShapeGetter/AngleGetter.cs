@@ -39,7 +39,7 @@ public class AngleGetter_FromThreePoint : AngleGetter
     public override string ActionName => "Angle";
     public override GeometryShape[] Parameters => [AnglePoint, Point1, Point2];
 
-    public override void AddToChangeEvent(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void Attach(ShapeChangedHandler handler, GeometryShape subShape)
     {
         AnglePoint.ShapeChanged += handler;
         AnglePoint.SubShapes.Add(subShape);
@@ -47,6 +47,15 @@ public class AngleGetter_FromThreePoint : AngleGetter
         Point2.SubShapes.Add(subShape);
         Point2.ShapeChanged += handler;
         Point1.SubShapes.Add(subShape);
+    }
+    public override void UnAttach(ShapeChangedHandler handler, GeometryShape subShape)
+    {
+        AnglePoint.ShapeChanged -= handler;
+        AnglePoint.SubShapes.Remove(subShape);
+        Point1.ShapeChanged -= handler;
+        Point2.SubShapes.Remove(subShape);
+        Point2.ShapeChanged -= handler;
+        Point1.SubShapes.Remove(subShape);
     }
 
     public override AngleData GetAngle()

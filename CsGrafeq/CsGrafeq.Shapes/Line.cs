@@ -13,7 +13,7 @@ public abstract class Line : GeometryShape
     public Line(LineGetter lineGetter)
     {
         LineGetter = lineGetter;
-        LineGetter.AddToChangeEvent(RefreshValues, this);
+        LineGetter.Attach(RefreshValues, this);
         RefreshValues();
     }
 

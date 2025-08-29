@@ -41,7 +41,7 @@ public class CircleGetter_FromThreePoint : CircleGetter
         return new CircleStruct { Center = c, Radius = (c - Point1.Location).GetLength() };
     }
 
-    public override void AddToChangeEvent(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void Attach(ShapeChangedHandler handler, GeometryShape subShape)
     {
         Point1.ShapeChanged += handler;
         Point2.ShapeChanged += handler;
@@ -49,6 +49,15 @@ public class CircleGetter_FromThreePoint : CircleGetter
         Point1.SubShapes.Add(subShape);
         Point2.SubShapes.Add(subShape);
         Point3.SubShapes.Add(subShape);
+    }
+    public override void UnAttach(ShapeChangedHandler handler, GeometryShape subShape)
+    {
+        Point1.ShapeChanged -= handler;
+        Point2.ShapeChanged -= handler;
+        Point3.ShapeChanged -= handler;
+        Point1.SubShapes.Remove(subShape);
+        Point2.SubShapes.Remove(subShape);
+        Point3.SubShapes.Remove(subShape);
     }
 }
 
@@ -71,12 +80,19 @@ public class CircleGetter_FromCenterAndPoint : CircleGetter
         return new CircleStruct { Center = Center.Location, Radius = (Center.Location - Point.Location).GetLength() };
     }
 
-    public override void AddToChangeEvent(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void Attach(ShapeChangedHandler handler, GeometryShape subShape)
     {
         Center.ShapeChanged += handler;
         Point.ShapeChanged += handler;
         Point.SubShapes.Add(subShape);
         Center.SubShapes.Add(subShape);
+    }
+    public override void UnAttach(ShapeChangedHandler handler, GeometryShape subShape)
+    {
+        Center.ShapeChanged -= handler;
+        Point.ShapeChanged -= handler;
+        Point.SubShapes.Remove(subShape);
+        Center.SubShapes.Remove(subShape);
     }
 }
 /*public class CircleGetter_FromCenterAndDistance : CircleGetter
@@ -92,8 +108,8 @@ public class CircleGetter_FromCenterAndPoint : CircleGetter
     {
         return new CircleStruct { Center = Center.Location, Radius = Distance.GetNumber() };
     }
-    public override void AddToChangeEvent(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void Attach(ShapeChangedHandler handler, GeometryShape subShape)
     {
         Center.ShapeChanged += handler;
-        //Distance.AddToChangeEvent(handler);
+        //Distance.Attach(handler);
     }*/

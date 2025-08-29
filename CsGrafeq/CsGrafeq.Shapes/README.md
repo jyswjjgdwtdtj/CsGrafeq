@@ -18,7 +18,7 @@ A geometric shape:
    - Getter extends to `GeometryGetter`
      - ActionName as `String`
      - Parameters as `GeometryShape[]`, refers to the shapes it based on.
-     - AddToChangeEvent(handler as `ShapeChangedHandler`, subShape as `GeometryShape`) as `Void`, handler should be the `RefreshValues` method of the shape, subShape should be the shape. It attachs the shape a sub-shape to the shape, or shape tree. The method will be invoked when the sub-shape is created.
+     - Attach(handler as `ShapeChangedHandler`, subShape as `GeometryShape`) as `Void`, handler should be the `RefreshValues` method of the shape, subShape should be the shape. It attachs the shape a sub-shape to the shape, or shape tree. The method will be invoked when the sub-shape is created.
 
 When a `GeometryShape` is changed:\
 1.Modify values of itself directly. (This may be caused by user's action, or from its `Parameter`)

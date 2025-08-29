@@ -10,7 +10,7 @@ public class Circle : FilledShape
     public Circle(CircleGetter cg)
     {
         CircleGetter = cg;
-        cg.AddToChangeEvent(RefreshValues, this);
+        cg.Attach(RefreshValues, this);
         RefreshValues();
     }
 

@@ -52,15 +52,10 @@ public partial class GeometryPad : Addon
         Shapes.CollectionChanged += (s, e) => { Owner?.Invalidate(this); };
         Shapes.OnShapeChanged += () => { Owner?.Invalidate(this); };
 #if DEBUG
-        AddShape(new Point(new PointGetter_FromLocation((0.5,0.5))));
-        AddShape(new Point(new PointGetter_FromLocation((1.5,0.5))));
-        AddShape(new Point(new PointGetter_FromLocation((2.5,0.5))));
-        AddShape(new Point(new PointGetter_FromLocation((3.5,0.5))));
-        AddShape(new Point(new PointGetter_FromLocation((4.5,0.5))));
-        AddShape(new Point(new PointGetter_FromLocation((5.5,0.5))));
-        AddShape(new Point(new PointGetter_FromLocation((6.5,0.5))));
-        AddShape(new Point(new PointGetter_FromLocation((7.5,0.5))));
-        AddShape(new Point(new PointGetter_FromLocation((8.5,0.5))));
+        var p1=AddShape(new Point(new PointGetter_FromLocation((0.5,0.5))));
+        var p2=AddShape(new Point(new PointGetter_FromLocation((1.5,0.5))));
+        var s1=AddShape(new Straight(new LineGetter_Connected(p1,p2)));
+        var p3 = AddShape(new Point(new PointGetter_OnLine(s1, (0, 0))));
 #endif
         InitializeComponent();
     }
@@ -199,25 +194,47 @@ public partial class GeometryPad : Addon
             if (PointerMovedPos != PointerReleasedPos)
                 Shapes.ClearSelected();
             var previous = MovingPoint.PointGetter;
-            //这里怎么undo，怎么redo？？？ 谁看到代码给我提个issue帮帮我……
-            /*
-            if (e.KeyModifiers.HasFlag(KeyModifiers.Control))
+            //如点附着在基于这个点的几何图形上 会造成无限递归 使程序崩溃 同时破坏了图形的树的单向结构
+            /*if (e.KeyModifiers.HasFlag(KeyModifiers.Control))
             {
-                var getter = GetNewPointGetterFromLocation(e.Location);
-                if (getter != null)
+                var previoustype = GetPGType(previous);
+                var newtype=GetNewPointGetterTypeFromLocation(e.Location);
+                if (previoustype!=newtype&&newtype!=PGType.None)
+                {
+                    var getter = GetNewPointGetterFromLocation(e.Location);
                     if (getter.GetType() != previous.GetType() ||
                         !Extension.ArrayEqual(getter.Parameters, previous.Parameters))
                     {
-                        MovingPoint.PointGetter = getter;
-                        getter.AddToChangeEvent(MovingPoint.RefreshValues, MovingPoint);
+                        Console.WriteLine(123);
+                        DoPointGetterChange(MovingPoint, previous, getter);
                     }
-            }
-            */
+                }
+            }*/
             if (MovingPoint.PointGetter is PointGetter_FromLocation)
                 (MovingPoint.PointGetter as PointGetter_Movable)?.SetControlPoint(
-                    Owner.PixelToMath(FindNearestPointOnAxisLine(PointerMovedPos)));
-            else if (MovingPoint.PointGetter is PointGetter_Movable)
+                    Owner.PixelToMath(FindNearestPointOnTwoAxisLine(PointerMovedPos)));
+            else if (MovingPoint.PointGetter is PointGetter_OnLine)
+            {
+                var newp=FindNearestPointOnTwoAxisLine(PointerMovedPos);
+                var pg = (MovingPoint.PointGetter as PointGetter_Movable);
+                if(newp.X == PointerMovedPos.X&&newp.Y == PointerMovedPos.Y)
+                    pg?.SetControlPoint(Owner.PixelToMath(PointerMovedPos));
+                else if (newp.X == PointerMovedPos.X)
+                {
+                    pg.PointY = PixelToMathY(newp.Y);
+                }else if (newp.Y == PointerMovedPos.Y)
+                {
+                    pg.PointX = PixelToMathX(newp.X);
+                }
+                else
+                {
+                    pg?.SetControlPoint(Owner.PixelToMath(newp));
+                }
+            }
+            else
+            {
                 (MovingPoint.PointGetter as PointGetter_Movable)?.SetControlPoint(Owner.PixelToMath(PointerMovedPos));
+            }
             MovingPoint.RefreshValues();
             Owner.Resume();
             return Intercept;
@@ -1143,8 +1160,76 @@ public partial class GeometryPad : Addon
         //暂不支持
         return null;
     }
+    protected enum PGType
+    {
+        None,
+        Location,
+        OnLine,
+        OnCircle,
+        Fixed
+    }
+    protected PGType GetNewPointGetterTypeFromLocation(AvaPoint Location)
+    {
+        var disp = (Owner as DisplayControl)!;
+        var mathcursor = PixelToMath(Location);
+        var shapes = new List<(double, Shape)>();
+        foreach (var geoshape in Shapes.GetShapes<GeometryShape>())
+            if (geoshape is Line || geoshape is Circle)
+            {
+                var dist = (geoshape.HitTest(mathcursor) * disp.UnitLength).GetLength();
+                if (dist < 5) shapes.Add((dist, geoshape));
+            }
 
-    protected AvaPoint FindNearestPointOnAxisLine(AvaPoint location)
+        var ss = shapes.OrderBy(key => key.Item1).ToArray();
+        if (ss.Length == 0) return PGType.Location;
+
+        if (ss.Length == 1)
+        {
+            var shape = ss[0].Item2;
+            if (shape is GeoCircle)
+                return PGType.OnCircle;
+            if (shape is GeoLine)
+                return PGType.OnLine;
+            return PGType.Location;
+        }
+
+        var s1 = ss[0].Item2;
+        var s2 = ss[1].Item2;
+        if (s1 is Line && s2 is Line) return PGType.Fixed;
+
+        if (s1 is Line l1 && s2 is Circle c1)
+        {
+            Vec v1, v2;
+            (v1, v2) = GetPointFromCircleAndLine(l1.Current.Point1, l1.Current.Point2, c1.InnerCircle.Center,
+                c1.InnerCircle.Radius);
+            return PGType.Fixed;
+        }
+
+        if (s1 is Circle c2 && s2 is Line l2)
+        {
+            Vec v1, v2;
+            (v1, v2) = GetPointFromCircleAndLine(l2.Current.Point1, l2.Current.Point2, c2.InnerCircle.Center,
+                c2.InnerCircle.Radius);
+            return PGType.Fixed;
+        }
+
+        //暂不支持
+        return PGType.None;
+    }
+    protected PGType GetPGType(PointGetter pg)
+    {
+        if (pg is PointGetter_FromLocation)
+            return PGType.Location;
+        if (pg is PointGetter_OnLine)
+            return PGType.OnLine;
+        if (pg is PointGetter_OnCircle)
+            return PGType.OnCircle;
+        return PGType.Fixed;
+    }
+    /// <summary>
+    /// 当于xy两个方向的线距离均小于5时 会吸附到交点上
+    /// </summary>
+    protected AvaPoint FindNearestPointOnTwoAxisLine(AvaPoint location)
     {
         double nearestX = double.NaN, nearestY = Double.NaN;
         double distance = double.PositiveInfinity;
@@ -1175,7 +1260,35 @@ public partial class GeometryPad : Addon
         ret.Y = double.IsNaN(nearestY) ? location.Y : nearestY;
         return ret.ToAvaPoint();
     }
+/// <summary>
+/// 当于xy两个方向的线距离均小于5时 会吸附到更近的点
+/// </summary>
+    protected AvaPoint FindNearestPointOnAxisLine(AvaPoint location)
+    {
+        AvaPoint nearest=location;
+        double distance = double.PositiveInfinity;
+        var car = (Owner as DisplayControl)!;
+        foreach (var tuple in car.AxisX)
+        {
+            var dist = Math.Abs(location.X - tuple.Item1);
+            if (dist < distance && dist < 5)
+            {
+                distance = dist;
+                nearest = new AvaPoint(tuple.Item1, location.Y);
+            }
+        }
+        foreach (var tuple in car.AxisY)
+        {
+            var dist = Math.Abs(location.Y - tuple.Item1);
+            if (dist < distance && dist < 5)
+            {
+                distance = dist;
+                nearest = new AvaPoint(location.X,tuple.Item1);
+            }
+        }
 
+        return nearest;
+    }
     public bool TryGetShape<T>(AvaPoint Location, out T shape) where T : GeometryShape
     {
         shape = GetShape<T>(Location);
@@ -1275,14 +1388,34 @@ public partial class GeometryPad : Addon
             });
         }
     }
+    private void DoPointGetterChange(Point point, PointGetter previous,PointGetter next)
+    {
+        CmdManager.Do(null, o =>
+        {
+            previous.UnAttach(point.RefreshValues, point);
+            point.PointGetter = next;
+            next.Attach(point.RefreshValues, point);
+            point.RefreshValues();
+        }, o =>
+        {
+            next.UnAttach(point.RefreshValues, point);
+            point.PointGetter = previous;
+            previous.Attach(point.RefreshValues, point);
+            point.RefreshValues();
+        }, o =>
+        {
+            next = null;
+        },true);
+    }
     #endregion
 
-    public void AddShape(Shape shape)
+    public T? AddShape<T>(T shape) where T:Shape
     {
-        if(shape.IsDeleted)
-            return;
+        if (shape.IsDeleted)
+            return null;
         Shapes.Add(shape);
         DoShapeAdd(shape);
+        return shape;
     }
     
 }
