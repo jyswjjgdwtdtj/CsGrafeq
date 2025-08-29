@@ -12,10 +12,20 @@ AOT(Ahead Of Time), no .Net Runtime environment required.
 
 ## Future
 1.Add implicit function supports\
-2.Add ctrl+z "undo"\
+  - Implement an micro interpreter to replace expression tree under AOT.\
+
+2.~~Add ctrl+z "undo"~~ Done \
 3.Add ctrl+s "save"\
 4.Add variable\
 5.Add trackbar to set value of variables\
+6.Add script supports\
+7.Add text block supports\
+8.Add more shapes supports\
+
+Welcome to any programming enthusiasts who wish to collaborate on development. \
+You can put forward your opinions and suggestions in [Issues](https://github.com/jyswjjgdwtdtj/CsGrafeq/issues) or [Discussions](https://github.com/jyswjjgdwtdtj/CsGrafeq/discussions), I will reply as soon as possible. \
+Due to the pressure of high school academic studies, I will engage in development during the winter and summer holidays.
+Each of your stars🌟 is the motivation for my development. Thank you.
 
 ## Example
 ![image](Example/1.bmp)
