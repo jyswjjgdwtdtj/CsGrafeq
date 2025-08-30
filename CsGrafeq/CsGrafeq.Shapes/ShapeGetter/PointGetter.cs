@@ -24,9 +24,6 @@ public abstract class PointGetter : GeometryGetter
     {
         return new PointGetter_FromLocation(f);
     }
-
-    // 若未实现UnAttach的派生类，提供空实现
-    public override void UnAttach(ShapeChangedHandler handler, GeometryShape subShape) { }
 }
 
 #region FromLine
@@ -160,7 +157,11 @@ public abstract class PointGetter_Movable : PointGetter
     public virtual double PointX
     {
         get;
-        set =>this.RaiseAndSetIfChanged(ref field, value);
+        set
+        {
+            this.RaiseAndSetIfChanged(ref field, value);
+            
+        }
     }
 
     public virtual double PointY

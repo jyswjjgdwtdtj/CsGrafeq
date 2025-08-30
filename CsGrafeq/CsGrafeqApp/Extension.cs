@@ -17,6 +17,7 @@ using Avalonia.Controls;
 using Avalonia.Threading;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace CsGrafeqApp;
 
@@ -62,4 +63,7 @@ public static class Extension
             foreach (var j in i)
                 yield return j;
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal static void Void(){}
 }

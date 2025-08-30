@@ -13,7 +13,7 @@ public class PointGetterDataTemplate : IDataTemplate
     public required IDataTemplate? IsOnShape { get; set; }
     public Control? Build(object? param)
     {
-        if (param is PointGetterAndName item)
+        if (param is Point item)
             switch (item.PointGetter)
             {
                 case PointGetter_FromLocation point:
@@ -29,12 +29,6 @@ public class PointGetterDataTemplate : IDataTemplate
 
     public bool Match(object? data)
     {
-        return data is PointGetterAndName;
+        return data is Point;
     }
-}
-
-public class PointGetterAndName
-{
-    public PointGetter PointGetter { get; set; }
-    public string Name { get; set; }
 }

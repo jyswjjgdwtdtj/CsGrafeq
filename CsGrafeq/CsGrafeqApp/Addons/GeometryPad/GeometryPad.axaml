@@ -179,17 +179,11 @@
 													<TextBlock Text="{CompiledBinding IsDeleted}"></TextBlock>
 												</StackPanel>
                                                 <ContentControl
-                                                    x:DataType="shapes:Point">
-                                                    <ContentControl.Content>
-                                                        <MultiBinding Converter="{StaticResource PGToPGAN}">
-                                                            <CompiledBinding Path="PointGetter" />
-                                                            <CompiledBinding Path="Name" />
-                                                        </MultiBinding>
-                                                    </ContentControl.Content>
+                                                    x:DataType="shapes:Point" Content="{CompiledBinding .}">
                                                     <ContentControl.ContentTemplate>
                                                         <geopad:PointGetterDataTemplate>
                                                             <geopad:PointGetterDataTemplate.IsCommon>
-                                                                <DataTemplate DataType="geopad:PointGetterAndName">
+                                                                <DataTemplate DataType="shapes:Point">
                                                                     <Grid ColumnDefinitions="Auto,Auto"
                                                                           RowDefinitions="Auto,Auto"
                                                                           VerticalAlignment="Center">
@@ -239,22 +233,20 @@
                                                                         <StackPanel Orientation="Horizontal"
                                                                             Background="Transparent" Margin="5"
                                                                             VerticalAlignment="Center" Grid.Column="1"
-                                                                            Grid.Row="1"
-                                                                            DataContext="{CompiledBinding PointGetter}">
+                                                                            Grid.Row="1">
                                                                             <TextBlock Text="=(" TextAlignment="Left"
                                                                                 VerticalAlignment="Center"
                                                                                 Classes="Small" />
                                                                             <TextBlock
-                                                                                Text="{CompiledBinding  PointX,Mode=TwoWay}"
+                                                                                Text="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointX,Mode=OneWay}"
                                                                                 Classes="CommonTextBox Small"
-                                                                                x:DataType="getter:PointGetter_Movable" />
+                                                                                />
                                                                             <TextBlock Text="," TextAlignment="Left"
                                                                                 VerticalAlignment="Center"
                                                                                 Classes="Small" />
                                                                             <TextBlock
-                                                                                Text="{CompiledBinding  PointY,Mode=TwoWay}"
-                                                                                Classes="CommonTextBox Small"
-                                                                                x:DataType="getter:PointGetter_Movable" />
+                                                                                Text="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointY,Mode=OneWay}"
+                                                                                Classes="CommonTextBox Small" />
                                                                             <TextBlock Text=")" TextAlignment="Left"
                                                                                 VerticalAlignment="Center"
                                                                                 Classes="Small" />
@@ -263,30 +255,33 @@
                                                                 </DataTemplate>
                                                             </geopad:PointGetterDataTemplate.IsCommon>
                                                             <geopad:PointGetterDataTemplate.IsLocation>
-                                                                <DataTemplate DataType="geopad:PointGetterAndName">
+                                                                <DataTemplate DataType="shapes:Point">
                                                                     <StackPanel Orientation="Horizontal">
 																		<TextBox
                                                                             Text="{CompiledBinding Name,Mode=TwoWay}"
                                                                             Classes="CommonTextBox Big"
                                                                             Height="20"
                                                                             Margin="0"/>
-																		<StackPanel Orientation="Horizontal" DataContext="{CompiledBinding PointGetter}">
+																		<StackPanel Orientation="Horizontal">
 																			<TextBlock Text="=Point(" TextAlignment="Left"
 																				VerticalAlignment="Center" Classes="Big" />
 																			<TextBox
-																				Text="{CompiledBinding PointX,Mode=TwoWay}"
+                                                                                Text="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointX,Mode=OneWay}"
 																				Classes="CommonTextBox Big"
 																				KeyDown="TextBoxKeyDown"
 																				LostFocus="TextBoxLostFocus"
-																				x:DataType="getter:PointGetter_Movable" />
+                                                                                Tag="{CompiledBinding}"
+                                                                                TextInput="PixelX_OnTextInput"/>
 																			<TextBlock Text="," TextAlignment="Left"
 																				VerticalAlignment="Center" Classes="Big" />
 																			<TextBox
-																				Text="{CompiledBinding  PointY,Mode=TwoWay}"
+                                                                                Text="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointY,Mode=OneWay}"
 																				Classes="CommonTextBox Big"
 																				KeyDown="TextBoxKeyDown"
 																				LostFocus="TextBoxLostFocus"
-																				x:DataType="getter:PointGetter_Movable" />
+                                                                                Tag="{CompiledBinding}"
+                                                                                TextInput="PixelY_OnTextInput"
+                                                                                />
 																			<TextBlock Text=")" TextAlignment="Left"
 																				VerticalAlignment="Center" Classes="Big" />
 																		</StackPanel>
@@ -294,7 +289,7 @@
                                                                 </DataTemplate>
                                                             </geopad:PointGetterDataTemplate.IsLocation>
                                                             <geopad:PointGetterDataTemplate.IsOnShape>
-                                                                <DataTemplate DataType="geopad:PointGetterAndName">
+                                                                <DataTemplate DataType="shapes:Point">
                                                                     <Grid ColumnDefinitions="Auto,Auto"
                                                                           RowDefinitions="Auto,Auto"
                                                                           VerticalAlignment="Center">

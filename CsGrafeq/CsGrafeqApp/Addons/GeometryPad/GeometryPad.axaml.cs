@@ -210,21 +210,23 @@ public partial class GeometryPad : Addon
                     }
                 }
             }*/
+            var pg = (MovingPoint.PointGetter as PointGetter_Movable)!;
+            pg.SetControlPoint(Owner.PixelToMath(PointerMovedPos));
             if (MovingPoint.PointGetter is PointGetter_FromLocation)
-                (MovingPoint.PointGetter as PointGetter_Movable)?.SetControlPoint(
+            {
+                pg.SetControlPoint(
                     Owner.PixelToMath(FindNearestPointOnTwoAxisLine(PointerMovedPos)));
+            }
             else if (MovingPoint.PointGetter is PointGetter_OnLine)
             {
-                var newp=FindNearestPointOnTwoAxisLine(PointerMovedPos);
-                var pg = (MovingPoint.PointGetter as PointGetter_Movable);
-                if(newp.X == PointerMovedPos.X&&newp.Y == PointerMovedPos.Y)
-                    pg?.SetControlPoint(Owner.PixelToMath(PointerMovedPos));
-                else if (newp.X == PointerMovedPos.X)
-                {
-                    pg.PointY = PixelToMathY(newp.Y);
-                }else if (newp.Y == PointerMovedPos.Y)
+                var newp=FindNearestPointOnTwoAxisLine(MathToPixel(pg.GetPoint())); 
+                if (newp.X != PointerMovedPos.X)
                 {
                     pg.PointX = PixelToMathX(newp.X);
+                }
+                else if (newp.Y != PointerMovedPos.Y)
+                {
+                    pg.PointY = PixelToMathY(newp.Y);
                 }
                 else
                 {
@@ -233,7 +235,6 @@ public partial class GeometryPad : Addon
             }
             else
             {
-                (MovingPoint.PointGetter as PointGetter_Movable)?.SetControlPoint(Owner.PixelToMath(PointerMovedPos));
             }
             MovingPoint.RefreshValues();
             Owner.Resume();
@@ -1417,5 +1418,31 @@ public partial class GeometryPad : Addon
         DoShapeAdd(shape);
         return shape;
     }
-    
+
+    private void PixelX_OnTextInput(object? sender, TextInputEventArgs e)
+    {
+        Console.WriteLine(123);
+        if (sender is TextBox tb)
+        {
+            Point p = (tb.Tag as Point)!;
+            if (double.TryParse(tb.Text, out double num))
+            {
+                (p.PointGetter as PointGetter_Movable).PointX = num;
+                p.RefreshValues();
+            }
+        }
+    }
+
+    private void PixelY_OnTextInput(object? sender, TextInputEventArgs e)
+    {
+        if (sender is TextBox tb)
+        {
+            Point p = (tb.Tag as Point)!;
+            if (double.TryParse(tb.Text, out double num))
+            {
+                (p.PointGetter as PointGetter_Movable).PointY = num;
+                p.RefreshValues();
+            }
+        }
+    }
 }
