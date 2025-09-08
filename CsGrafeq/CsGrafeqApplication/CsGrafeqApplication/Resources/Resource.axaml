@@ -1,0 +1,6 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:valueConverter="clr-namespace:CsGrafeqApplication.ValueConverter">
+    <valueConverter:DoubleMinus x:Key="DoubleMinus" />
+    <valueConverter:Not x:Key="Not"></valueConverter:Not>
+</ResourceDictionary>

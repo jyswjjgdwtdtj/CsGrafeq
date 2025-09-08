@@ -1,0 +1,54 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:CsGrafeqApplication.ViewModels"
+             xmlns:ctls="clr-namespace:CsGrafeqApplication.Controls"
+             xmlns:disp="clr-namespace:CsGrafeqApplication.Controls.Displayers"
+             xmlns:geopad="clr-namespace:CsGrafeqApplication.Addons.GeometryPad"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="CsGrafeqApplication.Views.MainView"
+             x:DataType="vm:MainViewModel">
+    <Design.DataContext>    
+        <vm:MainViewModel/>
+    </Design.DataContext>
+    <Design.Width>600</Design.Width>
+    <Design.Height>400</Design.Height>
+    
+    <Panel>
+        <Grid RowDefinitions="25,*" ZIndex="0">
+            <Menu Grid.Row="0">
+                <MenuItem Header="_File">
+                    <MenuItem Header="_Exit" Click="ExitClicked" />
+                </MenuItem>
+                <MenuItem Header="_Edit">
+                </MenuItem>
+                <MenuItem Header="_Help">
+                    <MenuItem Header="_GeometryPad" Click="GeometryPad_OnClick"></MenuItem>
+                </MenuItem>
+            </Menu>
+            <ctls:DisplayerContainer Grid.Row="1">
+                <disp:DisplayControl>
+                    <geopad:GeometryPad />
+                </disp:DisplayControl>
+            </ctls:DisplayerContainer>
+        </Grid>
+        <Border ZIndex="1" Background="Transparent" Name="MsgboxContainer" IsVisible="False">
+            <Border CornerRadius="10" Background="{DynamicResource HTMedianBrush}" VerticalAlignment="Center" Width="600" Height="400" HorizontalAlignment="Center">
+                <DockPanel LastChildFill="True">
+                    <Button Click="Button_OnClick" HorizontalAlignment="Right" Width="60" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="40,10" DockPanel.Dock="Bottom" Content="OK" Background="{DynamicResource CgBackgroundBrush}"></Button>
+                    <Panel>
+                        <Border Name="TextContainer">
+                            <ScrollViewer>
+                                <TextBlock Foreground="{DynamicResource CgForegroundBrush}" TextWrapping="Wrap" TextAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Name="TxtBlock">
+                                </TextBlock>
+                            </ScrollViewer>
+                        </Border>
+                        <Border Name="ContentContainer" Padding="40">
+                        </Border>
+                    </Panel>
+                </DockPanel>
+            </Border>
+        </Border>
+    </Panel>
+</UserControl>

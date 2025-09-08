@@ -1,0 +1,478 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
+using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Styling;
+using Avalonia.Threading;
+using SkiaSharp;
+using static CsGrafeqApplication.Controls.SkiaEx;
+
+namespace CsGrafeqApplication.Controls.Displayers;
+
+public class CartesianDisplayer : Displayer
+{
+    private readonly Stopwatch WheelingStopWatch = new();
+    private readonly Timer WheelingTimer;
+    public PointL Zero
+    {
+        get
+        {
+            return field;
+        }
+        set
+        {
+            field = value;
+            AxisX = GetAxisXs().ToArray();
+            AxisY= GetAxisYs().ToArray();
+        }
+    }
+    public bool DrawAxisGrid = true;
+    public bool DrawAxisLine = true;
+    public bool DrawAxisNumber = true;
+    protected bool MouseOnYAxis, MouseOnXAxis;
+    private SKBitmap PreviousBuffer = new();
+
+    private double PreviousUnitLength;
+    private PointL PreviousZero;
+
+    public CartesianDisplayer()
+    {
+        Zero = new() { X = 500, Y = 250 };
+        UnitLength = 20;
+        WheelingTimer = new Timer(TimerElapsed, null, 0, 500);
+        App.Current.ActualThemeVariantChanged += (s, e) =>
+        {
+            RefreshPaint();
+            InvalidateBuffer();
+        };
+        RefreshPaint();
+    }
+
+    /// <summary>
+    ///     背景
+    /// </summary>
+    public SKColor AxisBackground { get; private set; }
+
+    /// <summary>
+    ///     主轴
+    /// </summary>
+    public SKPaint AxisPaintMain { get; private set; }
+
+    /// <summary>
+    ///     副轴
+    /// </summary>
+    public SKPaint AxisPaint1 { get; private set; }
+
+    /// <summary>
+    ///     普通线
+    /// </summary>
+    public SKPaint AxisPaint2 { get; private set; }
+
+    public double UnitLength
+    {
+        get => field;
+        set
+        {
+            field = value;
+            AxisX = GetAxisXs().ToArray();
+            AxisY= GetAxisYs().ToArray();
+        } } = 20.0001d;
+
+    protected void RefreshPaint()
+    {
+        if (App.Current.ActualThemeVariant == ThemeVariant.Light)
+        {
+            AxisBackground = SKColors.White;
+            AxisPaintMain = new SKPaint { Color = SKColors.Black };
+            AxisPaint1 = new SKPaint { Color = new SKColor(190, 190, 190) };
+            AxisPaint2 = new SKPaint { Color = new SKColor(120, 120, 120) };
+        }
+        else
+        {
+            AxisBackground = new SKColor(30, 30, 30);
+            AxisPaintMain = new SKPaint { Color = new SKColor(240, 240, 240) };
+            AxisPaint1 = new SKPaint { Color = new SKColor(120, 120, 120) };
+            AxisPaint2 = new SKPaint { Color = new SKColor(170, 170, 170) };
+        }
+    }
+
+    public override double MathToPixelX(double d)
+    {
+        return Zero.X + d * UnitLength;
+    }
+
+    public override double MathToPixelY(double d)
+    {
+        return Zero.Y + -d * UnitLength;
+    }
+
+    public override double PixelToMathX(double d)
+    {
+        return (d - Zero.X) / UnitLength;
+    }
+
+    public override double PixelToMathY(double d)
+    {
+        return -(d - Zero.Y) / UnitLength;
+    }
+
+    public IEnumerable<(double,AxisType)> AxisX
+    {
+        get;
+        private set;
+    }
+
+    public IEnumerable<(double,AxisType)> AxisY
+    {
+        get;
+        private set;
+    }
+    
+
+    public IEnumerable<(double,AxisType)> GetAxisXs()
+    {
+        var zsX = (int)Floor(Log(350 / UnitLength, 10));;
+        var addnumX = Pow(10D, zsX);
+        var addnumDX = Pow(10M, zsX);
+        for (var i = Min(Zero.X - addnumX * UnitLength,
+                 MathToPixelX(RoundTen(PixelToMathX(ValidRect.Right), -zsX)));
+             i > ValidRect.Left;
+             i -= addnumX * UnitLength)
+        {
+            var num = RoundTen((decimal)PixelToMathX(i), -zsX);
+            if (num % (10 * addnumDX) == 0)
+                yield return (i,AxisType.Major);
+            else
+                yield return (i,AxisType.Minor);
+        }
+
+        for (var i = Max(Zero.X + addnumX * UnitLength,
+                 MathToPixelX(RoundTen(PixelToMathX(ValidRect.Left), -zsX)));
+             i < ValidRect.Right;
+             i += addnumX * UnitLength)
+        {
+            var num = RoundTen((decimal)PixelToMathX(i), -zsX);
+            if (num % (10 * addnumDX) == 0)
+                yield return (i,AxisType.Major);
+            else
+                yield return (i,AxisType.Minor);
+        }
+        if (RangeIn(ValidRect.Left, ValidRect.Right, Zero.X))
+            yield return (Zero.X,AxisType.Axes);
+    }
+
+    public IEnumerable<(double,AxisType)> GetAxisYs()
+    {
+        var zsY = (int)Floor(Log(350 / UnitLength, 10));;
+        var addnumY = Pow(10D, zsY);
+        var addnumDY = Pow(10M, zsY);
+        for (var i = Min(Zero.Y - addnumY * UnitLength,
+                 MathToPixelY(RoundTen(PixelToMathY(ValidRect.Right), -zsY)));
+             i > ValidRect.Left;
+             i -= addnumY * UnitLength)
+        {
+            var num = RoundTen((decimal)PixelToMathY(i), -zsY);
+            if (num % (10 * addnumDY) == 0)
+                yield return (i,AxisType.Major);
+            else
+                yield return (i,AxisType.Minor);
+        }
+
+        for (var i = Max(Zero.Y + addnumY * UnitLength,
+                 MathToPixelY(RoundTen(PixelToMathY(ValidRect.Left), -zsY)));
+             i < ValidRect.Right;
+             i += addnumY * UnitLength)
+        {
+            var num = RoundTen((decimal)PixelToMathY(i), -zsY);
+            if (num % (10 * addnumDY) == 0)
+                yield return (i,AxisType.Major);
+            else
+                yield return (i,AxisType.Minor);
+        }
+        if (RangeIn(ValidRect.Left, ValidRect.Right, Zero.Y))
+            yield return (Zero.Y,AxisType.Axes);
+    }
+
+    //不敢动………………
+    protected void RenderAxisLine(SKCanvas dc)
+    {
+        var width = Bounds.Width;
+        var height = Bounds.Height;
+        //y
+        if (RangeIn(ValidRect.Left, ValidRect.Right, Zero.X))
+            dc.DrawLine(new SKPoint(Zero.X, (float)ValidRect.Top),
+                new SKPoint(Zero.X, (float)ValidRect.Bottom), AxisPaintMain);
+
+        if (RangeIn(0, height, Zero.Y))
+            dc.DrawLine(new SKPoint((float)ValidRect.Left, Zero.Y),
+                new SKPoint((float)ValidRect.Right, Zero.Y), AxisPaintMain);
+
+        if (!DrawAxisGrid)
+            return;
+        var zsX = (int)Floor(Log(350 / UnitLength, 10));
+        var zsY = (int)Floor(Log(350 / UnitLength, 10));
+        var addnumX = Pow(10D, zsX);
+        var addnumY = Pow(10D, zsY);
+        var addnumDX = Pow(10M, zsX);
+        var addnumDY = Pow(10M, zsY);
+        SKPaint targetPen;
+        for (var i = Min(Zero.X - addnumX * UnitLength,
+                 MathToPixelX(RoundTen(PixelToMathX(ValidRect.Right), -zsX)));
+             i > ValidRect.Left;
+             i -= addnumX * UnitLength)
+        {
+            var num = RoundTen((decimal)PixelToMathX(i), -zsX);
+            if (num % (10 * addnumDX) == 0)
+                targetPen = AxisPaint2;
+            else
+                targetPen = AxisPaint1;
+
+            dc.DrawLine(
+                (float)i, 0,
+                (float)i, (float)height,
+                targetPen
+            );
+        }
+
+        for (var i = Max(Zero.X + addnumX * UnitLength,
+                 MathToPixelX(RoundTen(PixelToMathX(ValidRect.Left), -zsX)));
+             i < ValidRect.Right;
+             i += addnumX * UnitLength)
+        {
+            var num = RoundTen((decimal)PixelToMathX(i), -zsX);
+            if (num % (10 * addnumDX) == 0)
+                targetPen = AxisPaint2;
+            else
+                targetPen = AxisPaint1;
+
+            dc.DrawLine(
+                (float)i, 0,
+                (float)i, (float)height,
+                targetPen
+            );
+        }
+
+        for (var i = Min(Zero.Y - addnumY * UnitLength,
+                 MathToPixelY(RoundTen(PixelToMathY(ValidRect.Bottom), -zsY)));
+             i > ValidRect.Top;
+             i -= addnumY * UnitLength)
+        {
+            var num = RoundTen((decimal)PixelToMathY(i), -zsY);
+            if (num % (10 * addnumDY) == 0)
+                targetPen = AxisPaint2;
+            else
+                targetPen = AxisPaint1;
+
+            dc.DrawLine(
+                0, (float)i,
+                (float)width, (float)i,
+                targetPen
+            );
+        }
+
+        for (var i = Max(Zero.Y + addnumY * UnitLength,
+                 MathToPixelY(RoundTen(PixelToMathY(ValidRect.Top), -zsY)));
+             i < ValidRect.Bottom;
+             i += addnumY * UnitLength)
+        {
+            var num = RoundTen((decimal)PixelToMathY(i), -zsY);
+            if (num % (10 * addnumDY) == 0)
+                targetPen = AxisPaint2;
+            else
+                targetPen = AxisPaint1;
+
+            dc.DrawLine(
+                0, (float)i,
+                (float)width, (float)i,
+                targetPen
+            );
+        }
+    }
+
+    protected void RenderAxisNumber(SKCanvas dc)
+    {
+        if (!DrawAxisNumber)
+            return;
+        var width = Bounds.Width;
+        var height = Bounds.Height;
+        var zsX = (int)Floor(Log(350 / UnitLength, 10));
+        var zsY = (int)Floor(Log(350 / UnitLength, 10));
+        var addnumX = Pow(10D, zsX);
+        var addnumY = Pow(10D, zsY);
+        var addnumDX = Pow(10M, zsX);
+        var addnumDY = Pow(10M, zsY);
+        var p = RangeTo(-3, height - TextFont.Size + 1, Zero.Y);
+        var fff = 1f / 4f * TextFont.Size;
+        for (var i = Min(Zero.X - addnumX * UnitLength,
+                 MathToPixelX(RoundTen(PixelToMathX(ValidRect.Right), -zsX)));
+             i > ValidRect.Left;
+             i -= addnumX * UnitLength)
+        {
+            var num = RoundTen((decimal)PixelToMathX(i), -zsX);
+            dc.DrawText(num.ToString(),
+                new SKPoint((float)(i - num.ToString().Length * fff - 2), (float)p + TextFont.Size),
+                SKTextAlign.Left, TextFont, AxisPaintMain);
+        }
+
+        for (var i = Max(Zero.X + addnumX * UnitLength,
+                 MathToPixelX(RoundTen(PixelToMathX(ValidRect.Left), -zsX)));
+             i < ValidRect.Right;
+             i += addnumX * UnitLength)
+        {
+            var num = RoundTen((decimal)PixelToMathX(i), -zsX);
+            dc.DrawText(num.ToString(),
+                new SKPoint((float)(i - num.ToString().Length * fff - 2), (float)p + TextFont.Size),
+                SKTextAlign.Left, TextFont, AxisPaintMain);
+        }
+
+        for (var i = Min(Zero.Y - addnumY * UnitLength,
+                 MathToPixelY(RoundTen(PixelToMathY(ValidRect.Bottom), -zsY)));
+             i > ValidRect.Top;
+             i -= addnumY * UnitLength)
+        {
+            var num = RoundTen((decimal)PixelToMathY(i), -zsY);
+            if (ValidRect.Left + 3 > Zero.X)
+                dc.DrawText(num.ToString(), new SKPoint((float)ValidRect.Left + 3, (float)(i + 4)),
+                    SKTextAlign.Left, TextFont, AxisPaintMain);
+            else if (Zero.X + num.ToString().Length * TextFont.Size / 2 > ValidRect.Right - 3)
+                dc.DrawText(num.ToString(),
+                    new SKPoint((float)width - num.ToString().Length * TextFont.Size / 2 - 5, (float)(i + 4)),
+                    SKTextAlign.Left, TextFont, AxisPaintMain);
+            else
+                dc.DrawText(num.ToString(), new SKPoint(Zero.X, (float)(i + 4)), SKTextAlign.Left, TextFont,
+                    AxisPaintMain);
+        }
+
+        for (var i = Max(Zero.Y + addnumY * UnitLength,
+                 MathToPixelY(RoundTen(PixelToMathY(ValidRect.Top), -zsY)));
+             i < ValidRect.Bottom;
+             i += addnumY * UnitLength)
+        {
+            var num = RoundTen((decimal)PixelToMathY(i), -zsY);
+            if (ValidRect.Left + 3 > Zero.X)
+                dc.DrawText(num.ToString(), new SKPoint((float)ValidRect.Left + 3, (float)(i + 4)),
+                    SKTextAlign.Left, TextFont, AxisPaintMain);
+            else if (Zero.X + num.ToString().Length * TextFont.Size / 2 > ValidRect.Right - 3)
+                dc.DrawText(num.ToString(),
+                    new SKPoint((float)width - num.ToString().Length * TextFont.Size / 2 - 5, (float)(i + 4)),
+                    SKTextAlign.Left, TextFont, AxisPaintMain);
+            else
+                dc.DrawText(num.ToString(), new SKPoint(Zero.X, (float)(i + 4)), SKTextAlign.Left, TextFont,
+                    AxisPaintMain);
+        }
+
+        dc.DrawText("0", new SKPoint(Zero.X + 3, Zero.Y + TextFont.Size), SKTextAlign.Left, TextFont,
+            AxisPaintMain);
+    }
+
+    public override void CompoundBuffer()
+    {
+        lock (TotalBuffer)
+        {
+            using (var dc = new SKCanvas(TotalBuffer))
+            {
+                dc.Clear(AxisBackground);
+                RenderAxisLine(dc);
+                foreach (var i in Addons) dc.DrawBitmap(i.Bitmap, new SKPoint(0, 0));
+
+                RenderAxisNumber(dc);
+            }
+        }
+    }
+
+    private void TimerElapsed(object? arg)
+    {
+        if (WheelingStopWatch.IsRunning && WheelingStopWatch.ElapsedMilliseconds > 150)
+        {
+            WheelingStopWatch.Stop();
+            WheelingStopWatch.Reset();
+            Dispatcher.UIThread.InvokeAsync(Invalidate);
+        }
+    }
+
+    protected void StopWheeling()
+    {
+        if (WheelingStopWatch.IsRunning)
+        {
+            WheelingStopWatch.Stop();
+            WheelingStopWatch.Reset();
+            Invalidate();
+        }
+    }
+
+    protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
+    {
+        if (CallAddonPointerWheeled(e) == DoNext)
+        {
+            if (!WheelingStopWatch.IsRunning)
+            {
+                PreviousUnitLength = UnitLength;
+                PreviousUnitLength = UnitLength;
+                PreviousZero = Zero;
+                WheelingStopWatch.Restart();
+                PreviousBuffer.Dispose();
+                PreviousBuffer = TotalBuffer.Copy();
+            }
+
+            var (x, y) = e.GetPosition(this);
+            var bzero = Zero;
+            var times_x = (Zero.X - x) / UnitLength;
+            var times_y = (Zero.Y - y) / UnitLength;
+            var delta = Pow(1.04, e.Delta.Y);
+            UnitLength *= delta;
+            UnitLength *= delta;
+            UnitLength = RangeTo(0.01, 1000000, UnitLength);
+            UnitLength = RangeTo(0.01, 1000000, UnitLength);
+            var ratioX = UnitLength / PreviousUnitLength;
+            var ratioY = UnitLength / PreviousUnitLength;
+            Zero = new PointL
+            {
+                X = (long)((long)x - ((long)x - PreviousZero.X) * ratioX),
+                Y = (long)((long)y - ((long)y - PreviousZero.Y) * ratioY)
+            };
+            if (ratioX > 2 || ratioX < 0.5 || ratioY > 2 || ratioY < 0.5)
+            {
+                WheelingStopWatch.Stop();
+                WheelingStopWatch.Reset();
+                PreviousUnitLength = UnitLength;
+                PreviousUnitLength = UnitLength;
+                PreviousZero = Zero;
+                PreviousBuffer.Dispose();
+                Invalidate();
+                return;
+            }
+
+            lock (TotalBuffer)
+            {
+                using (var dc = new SKCanvas(TotalBuffer))
+                {
+                    dc.Clear(AxisBackground);
+                    dc.DrawBitmap(PreviousBuffer, CreateSKRectWH(
+                        (float)(Zero.X - PreviousZero.X * ratioX),
+                        (float)(Zero.Y - PreviousZero.Y * ratioY),
+                        (float)(ratioX * PreviousBuffer.Width),
+                        (float)(ratioY * PreviousBuffer.Height)), AntiAlias);
+                }
+            }
+
+            InvalidateVisual();
+        }
+    }
+
+    protected override void OnSizeChanged(SizeChangedEventArgs e)
+    {
+        base.OnSizeChanged(e);
+        AxisX=GetAxisXs().ToArray();
+        AxisY=GetAxisYs().ToArray();
+    }
+}
+
+public enum AxisType
+{
+    Axes,
+    Major,
+    Minor,
+}
