@@ -58,7 +58,7 @@ public class CheckedControl : TemplatedControl
             if (e.Property == IsOverProperty) PseudoClasses.Set(":over", IsOver);
             if (e.Property == IsDisplayedProperty)
             {
-                PseudoClasses.Set(":displayed", IsDisplayed??(bool)IsDisplayed);
+                PseudoClasses.Set(":displayed", IsDisplayed??false);
             }
         };
         Resources.TryGetResource("MedianColor", null, out var color);

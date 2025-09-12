@@ -60,6 +60,35 @@ public class CircleGetter_FromThreePoint : CircleGetter
         Point3.SubShapes.Remove(subShape);
     }
 }
+public class CircleGetter_FromCenterAndRadius : CircleGetter
+{
+    public Point Center { get; init; }
+    public Number Radius { get; init; }
+    public CircleGetter_FromCenterAndRadius(Point center, Number radius)
+    {
+        Center = center;
+        Radius = radius;
+    }
+
+    public override string ActionName => "Circle";
+    public override GeometryShape[] Parameters => [Center];
+    public override CircleStruct GetCircle()
+    {
+        return new CircleStruct { Center = Center.Location, Radius = Radius.Value };
+    }
+    public override void Attach(ShapeChangedHandler handler, GeometryShape subShape)
+    {
+        Center.ShapeChanged += handler;
+        Center.SubShapes.Add(subShape);
+        Radius.NumberChanged+=handler;
+    }
+    public override void UnAttach(ShapeChangedHandler handler, GeometryShape subShape)
+    {
+        Center.ShapeChanged -= handler;
+        Center.SubShapes.Remove(subShape);
+        Radius.NumberChanged-=handler;
+    }
+}
 
 public class CircleGetter_FromCenterAndPoint : CircleGetter
 {

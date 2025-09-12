@@ -10,6 +10,7 @@ public sealed class Value<T> : Shape
     {
         _Value = value;
         Name = IsNullRetEmpty(_Value.ToString());
+        Visible = false;
     }
 
 
@@ -19,6 +20,7 @@ public sealed class Value<T> : Shape
     {
         throw new NotImplementedException();
     }
+    
 
     private string IsNullRetEmpty(string str)
     {

@@ -63,6 +63,7 @@ public partial class GeometryPad : Addon
         var p2=AddShape(new Point(new PointGetter_FromLocation((1.5,0.5))));
         var s1=AddShape(new Straight(new LineGetter_Connected(p1,p2)));
         var p3 = AddShape(new Point(new PointGetter_OnLine(s1, (0, 0))));
+        var c1 = AddShape(new Circle(new CircleGetter_FromCenterAndRadius(p1, new Number(new NumberGetter_Direct(4)))));
 #endif
         InitializeComponent();
     }
@@ -120,6 +121,19 @@ public partial class GeometryPad : Addon
             }
     }
 
+    public void NumberLostFocus(object? sender, RoutedEventArgs e)
+    {
+        if (sender is TextBox box)
+            if (!double.TryParse(box.Text, out _))
+            {
+                box.Text = ((box.Tag as Number)).Value.ToString();
+            }
+    }
+
+    public void HandleEvent(object? sender, RoutedEventArgs e)
+    {
+        e.Handled = true;
+    }
     public void TextBoxKeyDown(object? sender, KeyEventArgs e)
     {
         Console.WriteLine(e.Key.ToString());
@@ -239,33 +253,35 @@ public partial class GeometryPad : Addon
                     }
                 }
             }*/
-            var pg = (MovingPoint.PointGetter as PointGetter_Movable)!;
-            pg.SetControlPoint(Owner.PixelToMath(PointerMovedPos));
-            if (MovingPoint.PointGetter is PointGetter_FromLocation)
+            if(MovingPoint.PointGetter is PointGetter_Movable pg)
             {
-                pg.SetControlPoint(
-                    Owner.PixelToMath(FindNearestPointOnTwoAxisLine(PointerMovedPos)));
-            }
-            else if (MovingPoint.PointGetter is PointGetter_OnLine)
-            {
-                var newp=FindNearestPointOnTwoAxisLine(MathToPixel(pg.GetPoint())); 
-                if (newp.X != PointerMovedPos.X)
+                pg.SetControlPoint(Owner.PixelToMath(PointerMovedPos));
+                if (MovingPoint.PointGetter is PointGetter_FromLocation)
                 {
-                    pg.PointX = PixelToMathX(newp.X);
+                    pg.SetControlPoint(
+                        Owner.PixelToMath(FindNearestPointOnTwoAxisLine(PointerMovedPos)));
                 }
-                else if (newp.Y != PointerMovedPos.Y)
+                else if (MovingPoint.PointGetter is PointGetter_OnLine)
                 {
-                    pg.PointY = PixelToMathY(newp.Y);
+                    var newp = FindNearestPointOnTwoAxisLine(MathToPixel(pg.GetPoint()));
+                    if (newp.X != PointerMovedPos.X)
+                    {
+                        pg.PointX = PixelToMathX(newp.X);
+                    }
+                    else if (newp.Y != PointerMovedPos.Y)
+                    {
+                        pg.PointY = PixelToMathY(newp.Y);
+                    }
+                    else
+                    {
+                        pg?.SetControlPoint(Owner.PixelToMath(newp));
+                    }
                 }
                 else
                 {
-                    pg?.SetControlPoint(Owner.PixelToMath(newp));
                 }
+                MovingPoint.RefreshValues();
             }
-            else
-            {
-            }
-            MovingPoint.RefreshValues();
             Owner.Resume();
             return Intercept;
         }
@@ -1489,6 +1505,21 @@ public partial class GeometryPad : Addon
             {
                 (p.PointGetter as PointGetter_Movable).PointY = num;
                 p.RefreshValues();
+                DataValidationErrors.ClearErrors(tb);
+            }
+            else
+            {
+                DataValidationErrors.SetError(tb,new Exception());
+            }
+        }
+    }
+    private void Number_OnKeyUp(object? sender, KeyEventArgs e)
+    {
+        if (sender is TextBox tb)
+        {
+            Number n = (tb.Tag as Number)!;
+            if (n.ParseString(tb.Text))
+            {
                 DataValidationErrors.ClearErrors(tb);
             }
             else
