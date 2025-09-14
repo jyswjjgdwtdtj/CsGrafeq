@@ -3,4 +3,5 @@
                     xmlns:valueConverter="clr-namespace:CsGrafeqApplication.ValueConverter">
     <valueConverter:DoubleMinus x:Key="DoubleMinus" />
     <valueConverter:Not x:Key="Not"></valueConverter:Not>
+    <valueConverter:DoubleToString x:Key="DoubleToString"></valueConverter:DoubleToString>
 </ResourceDictionary>

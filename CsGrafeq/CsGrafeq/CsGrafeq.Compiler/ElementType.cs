@@ -1,6 +1,6 @@
-namespace CsGrafeq.Interval.Compiler;
+namespace CsGrafeq.Compiler;
 
-internal enum ElementType
+public enum ElementType
 {
     None,
     Variable,

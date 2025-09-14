@@ -25,7 +25,7 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
 
     internal double Number { get; init; }
 
-    public static IntervalSet CreateWithNumber(double num)
+    public static IntervalSet CreateFromDouble(double num)
     {
         return Create(num);
     }

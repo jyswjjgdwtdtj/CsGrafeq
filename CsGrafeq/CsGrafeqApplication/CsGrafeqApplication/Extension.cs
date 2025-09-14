@@ -23,31 +23,7 @@ namespace CsGrafeqApplication;
 
 public static class Extension
 {
-    [DoesNotReturn]
-    internal static TResult Throw<TException, TResult>(TException exception) where TException : Exception
-    {
-        throw exception;
-    }
-    internal static void Throw<TException>(TException exception) where TException : Exception
-    {
-        throw exception;
-    }
-
-    [DoesNotReturn]
-    internal static TResult Throw<TException, TResult>() where TException : Exception, new()
-    {
-        throw new TException();
-    }
-
-    [DoesNotReturn]
-    internal static TResult Throw<TResult>(string message)
-    {
-        throw new Exception(message);
-    }
-    internal static void Throw(string message)
-    {
-        throw new Exception(message);
-    }
+    
 
     internal static void GetFocus(this Control control)
     {

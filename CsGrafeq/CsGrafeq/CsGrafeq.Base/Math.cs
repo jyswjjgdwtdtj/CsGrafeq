@@ -97,18 +97,18 @@ public static class Math
         return t3;
     }
 
-    public static int GCD(int a, int b)
+    public static long GCD(long a, long b)
     {
-        return a == 0 || b == 0 ? 0 : GCDForInt(a, b);
+        return a == 0 || b == 0 ? 0 : GCDForLong(a, b);
     }
 
-    private static int GCDForInt(int a, int b)
+    private static long GCDForLong(long a, long b)
     {
-        return b == 0 ? sysMath.Abs(a) : GCDForInt(b, a % b);
+        return b == 0 ? sysMath.Abs(a) : GCDForLong(b, a % b);
     }
 
-    public static int LCM(int a, int b)
+    public static long LCM(long a, long b)
     {
-        return a == 0 || b == 0 ? 0 : a * b / GCDForInt(a, b);
+        return a == 0 || b == 0 ? 0 : a * b / GCDForLong(a, b);
     }
 }

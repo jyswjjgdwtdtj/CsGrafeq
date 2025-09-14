@@ -11,6 +11,7 @@
                 <ResourceInclude Source="/Resources/ColorResource.axaml" />
                 <ResourceInclude Source="/Themes/BackgroundTheme.axaml" />
                 <ResourceInclude Source="/Resources/Resource.axaml" />
+                <ResourceInclude Source="/Controls/VariableBox.axaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

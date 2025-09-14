@@ -1,6 +1,6 @@
-namespace CsGrafeq.Interval.Compiler;
+namespace CsGrafeq.Compiler;
 
-internal static class Extension
+public static class Extension
 {
     public static Element ToElement(this OperatorType t)
     {

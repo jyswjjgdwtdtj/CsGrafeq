@@ -8,11 +8,10 @@ public interface IInterval
     public Def Def { get; }
 }
 
-public interface IInterval<T> : IRange, IComputableNumber<T>, IInterval where T : IInterval<T>
+public interface IInterval<T> : IRange, IComputableNumber<T>, IInterval,INeedClone<T> where T : IInterval<T>
 {
     public static T InValid => T.Create(double.NaN, double.NaN, FF);
     static abstract T Create(double min, double max, Def def);
-    static abstract T CreateWithNumber(double num);
 
     static Def Equal(T left, T right)
     {
@@ -51,5 +50,4 @@ public interface IInterval<T> : IRange, IComputableNumber<T>, IInterval where T 
     static abstract Def operator >(T left, T right);
     static abstract Def operator <=(T left, T right);
     static abstract Def operator >=(T left, T right);
-    static abstract T Clone(T source);
 }

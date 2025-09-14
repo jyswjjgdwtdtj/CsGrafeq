@@ -26,7 +26,7 @@ public readonly struct Interval : _Interval
     public bool IsInValid => double.IsNaN(Inf) || double.IsNaN(Sup) || Def == FF;
     public bool IsEmpty => Def == FF;
 
-    public static Interval CreateWithNumber(double num)
+    public static Interval CreateFromDouble(double num)
     {
         return Create(num, num, TT);
     }

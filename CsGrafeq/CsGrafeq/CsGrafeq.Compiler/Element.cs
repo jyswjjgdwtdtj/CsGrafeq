@@ -1,6 +1,6 @@
-namespace CsGrafeq.Interval.Compiler;
+namespace CsGrafeq.Compiler;
 
-internal struct Element
+public struct Element
 {
     public ElementType Type;
     public string NameOrValue;

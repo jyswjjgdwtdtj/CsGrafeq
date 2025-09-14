@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using sysMath = System.Math;
 
@@ -25,5 +26,33 @@ public static class ColorExtension
         return k * sysMath.Pow(
             sysMath.Pow((double)c.R / 255, 2.2) + sysMath.Pow((double)c.G / 255 * 1.5, 2.2) +
             sysMath.Pow((double)c.B / 255 * 0.6, 2.2), 1 / 2.2);
+    }
+}
+public static class Extension
+{
+    [DoesNotReturn]
+    public static TResult Throw<TException, TResult>(TException exception) where TException : Exception
+    {
+        throw exception;
+    }
+    public static void Throw<TException>(TException exception) where TException : Exception
+    {
+        throw exception;
+    }
+
+    [DoesNotReturn]
+    public static TResult Throw<TException, TResult>() where TException : Exception, new()
+    {
+        throw new TException();
+    }
+
+    [DoesNotReturn]
+    public static TResult Throw<TResult>(string message)
+    {
+        throw new Exception(message);
+    }
+    public static void Throw(string message)
+    {
+        throw new Exception(message);
     }
 }

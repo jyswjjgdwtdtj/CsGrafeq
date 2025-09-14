@@ -40,4 +40,37 @@ public interface IComputableNumber<T> : IHasOperatorNumber<T> where T : IComputa
     static abstract T Median(T num1, T num2, T num3);
     static abstract T Min(T num1, T num2);
     static abstract T Max(T num1, T num2);
+    static abstract T CreateFromDouble(double num);
+    static IDictionary<string,Delegate> MethodDictionary { get; }=new Dictionary<string, Delegate>()
+    {
+        {"sqrt",T.Sqrt},
+        {"cbrt",T.Cbrt},
+        {"pow",T.Pow},
+        {"exp",T.Exp},
+        {"log",T.Log},
+        {"lg",T.Lg},
+        {"ln",T.Ln},
+        {"sin",T.Sin},
+        {"cos",T.Cos},
+        {"tan",T.Tan},
+        {"cot",T.Cot},
+        {"arcsin",T.ArcSin},
+        {"arccos",T.ArcCos},
+        {"arctan",T.ArcTan},
+        {"tanh",T.Tanh},
+        {"cosh",T.Cosh},
+        {"sinh",T.Sinh},
+        {"arccosh",T.ArcCosh},
+        {"arctanh",T.ArcTanh},
+        {"arcsinh",T.ArcSinh},
+        {"floor",T.Floor},
+        {"ceil",T.Ceil},
+        {"gcd",T.GCD},
+        {"lcm",T.LCM},
+        {"sgn",T.Sgn},
+        {"abs",T.Abs},
+        {"median",T.Median},
+        {"min",T.Min},
+        {"max",T.Max}
+    };
 }

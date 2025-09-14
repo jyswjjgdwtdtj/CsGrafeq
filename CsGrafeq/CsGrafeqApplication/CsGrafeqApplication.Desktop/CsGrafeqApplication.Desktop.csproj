@@ -6,7 +6,6 @@
 	  <InvariantGlobalization>true</InvariantGlobalization>
 	  <Nullable>enable</Nullable>
 	  <PublishAot>true</PublishAot>
-	  <PublishTrimmed>true</PublishTrimmed>
 	  <RuntimeIdentifier>win-x64</RuntimeIdentifier>
 	  <PublishTrimmed>True</PublishTrimmed>
 	  <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>

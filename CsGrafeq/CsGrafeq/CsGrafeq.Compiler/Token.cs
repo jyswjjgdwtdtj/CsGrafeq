@@ -1,6 +1,6 @@
-namespace CsGrafeq.Interval.Compiler;
+namespace CsGrafeq.Compiler;
 
-internal struct Token
+public struct Token
 {
     public TokenType Type;
     public string NameOrValue;

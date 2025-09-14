@@ -1,9 +1,12 @@
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Avalonia.Collections;
+using CsGrafeq.Collections;
 using CsGrafeq.Shapes;
 using CsGrafeqApplication.Addons.GeometryPad;
 using CsGrafeqApplication.Properties;
-using static CsGrafeqApplication.Extension;
+using ReactiveUI;
+using static CsGrafeq.Extension;
 
 namespace CsGrafeqApplication.ViewModels;
 
@@ -53,4 +56,7 @@ internal class GeometryPadViewModel : ViewModelBase
         new();
 
     internal ShapeList Shapes { get; } = new();
+    
+    public EnglishChar Variables { get; } = new();
+    
 }

@@ -1,13 +1,13 @@
-namespace CsGrafeq.Interval.Compiler;
+namespace CsGrafeq.Compiler;
 
-internal enum OperatorType
+public enum TokenType
 {
     Add,
     Subtract,
     Multiply,
     Divide,
     Pow,
-    Modulo,
+    Mod,
     LeftBracket,
     RightBracket,
     Start,
@@ -18,5 +18,9 @@ internal enum OperatorType
     LessEqual,
     GreaterEqual,
     Union,
-    Intersect
+    Intersect,
+    VariableOrFunction,
+    Number,
+    Comma,
+    Err_UnDefined
 }
