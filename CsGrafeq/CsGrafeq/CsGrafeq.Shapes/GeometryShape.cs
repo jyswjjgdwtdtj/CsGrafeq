@@ -7,6 +7,9 @@ public abstract class GeometryShape : Shape
 {
     public List<GeometryShape> SubShapes = new();
     public abstract GeometryGetter Getter { get; }
+    public GeometryShape()
+    {
+    }
 
     public bool PointerOver
     {

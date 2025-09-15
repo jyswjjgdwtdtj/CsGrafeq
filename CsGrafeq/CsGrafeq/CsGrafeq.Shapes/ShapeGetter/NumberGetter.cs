@@ -1,3 +1,6 @@
+using CsGrafeq;
+using CsGrafeq.Compiler;
+using CsGrafeq.Numeric;
 using ReactiveUI;
 
 namespace CsGrafeq.Shapes.ShapeGetter;
@@ -6,53 +9,87 @@ public abstract class NumberGetter:Getter
 {
     public abstract bool IsReadOnly { get; }
     public abstract double Number { get; }
+    public abstract bool TryLateParse(string str);
+    public string LastValidString="0";
 }
-public abstract class NumberGetter_Setable : NumberGetter
+public class NumberGetter_Direct:NumberGetter
 {
-    public abstract void SetNumber(double number);
     public sealed override bool IsReadOnly => false;
-}
-public class NumberGetter_Direct:NumberGetter_Setable
-{
+    public override bool TryLateParse(string str)
+    {
+        if (double.TryParse(str, out double result))
+        {
+            SetNumber(result);
+            return true;
+        }
+        return false;
+    }
     protected double Value=0;
-    public NumberGetter_Direct(double value)
+    public NumberGetter_Direct(double value=1)
     {
         Value = value;
     }
     public override double Number => Value;
-    public override void SetNumber(double number)
+    public void SetNumber(double number)
     {
         if (number != Value)
         {
             Value= number;  
             this.RaisePropertyChanged(nameof(Number));
+            this.RaiseAndSetIfChanged(ref LastValidString, number.ToString(), nameof(LastValidString));
         }
     }
 }
-public abstract class NumberGetter_Unsetable : NumberGetter
+public class NumberGetter_FromExpression : NumberGetter
 {
-    public override bool IsReadOnly => true;
-}
-
-public class NumberGetter_Constant : NumberGetter_Unsetable
-{
-    protected double Value=0;
-    public NumberGetter_Constant(double number)
+    public sealed override bool IsReadOnly => false;
+    protected Function0<DoubleNumber> Func;
+    protected bool[] UsedVars=new bool['z'-'a'+1];
+    public NumberGetter_FromExpression()
     {
-        Value= number;
+        Func = DefaultFunc;
+        EnglishChar.Instance.PropertyChanged += (s, e) =>
+        {
+            CallChanged();
+        };
+        this.RaiseAndSetIfChanged(ref LastValidString, "1", nameof(LastValidString));
     }
-    public override double Number => Number;
-}
-public class NumberGetter_FromExpression : NumberGetter_Unsetable
-{
-    protected readonly Func<double> Func;
-    public NumberGetter_FromExpression(Func<double> func)
-    {
-        Func = func;
-    }
-    public override double Number => Func();
+    private static DoubleNumber DefaultFunc() => new DoubleNumber(1);
+    public override double Number => Func().Value;
     public void CallChanged()
     {
         this.RaisePropertyChanged(nameof(Number));
+    }
+    public override bool TryLateParse(string str)
+    {
+        if(str==LastValidString)
+            return true;
+        try
+        {
+            Func = Compiler.Compiler.Compile0<DoubleNumber>(str, out var usedVars);
+            for (int i = 0; i < 'z' - 'a' + 1; i++)
+            {
+                if (UsedVars[i])
+                {
+                    EnglishChar.Instance.RemoveReference((char)('a' + i));
+                }
+            }
+            for (int i = 0; i < usedVars.Length; i++)
+            {
+                if (usedVars[i])
+                {
+                    EnglishChar.Instance.AddReference((char)('a' + i));
+                }
+            }
+            UsedVars = usedVars;
+            CallChanged();
+            this.RaiseAndSetIfChanged(ref LastValidString, str, nameof(LastValidString));
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return false;
+        }
     }
 }

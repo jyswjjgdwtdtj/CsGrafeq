@@ -23,34 +23,35 @@ public static class Compiler
     private static readonly Regex letterOrnumberOr_ = new("[a-zA-Z0-9_]");
     private static readonly Regex numberOrpoint = new("[0-9.]");
     private static readonly Regex spaceOrtab = new(@"([ ]|\t)");
-    public static Function0<T> Compile0<T>(string expression, EnglishChar vars) where T : IComputableNumber<T>
+    public static Function0<T> Compile0<T>(string expression,out bool[] usedVars) where T : IComputableNumber<T>
     {
-        var exp = ConstructExpTree<T>(expression, vars, 0,out _,out _,out _);
+        var exp = ConstructExpTree<T>(expression, 0,out _,out _,out _,out usedVars);
         var expres = Expression.Lambda<Function0<T>>(exp);
         return expres.Compile();
     }
-    public static Function1<T> Compile1<T>(string expression, EnglishChar vars) where T : IComputableNumber<T>
+    public static Function1<T> Compile1<T>(string expression, out bool[] usedVars) where T : IComputableNumber<T>
     {
-        var exp = ConstructExpTree<T>(expression, vars, 1,out ParameterExpression xVar,out _,out _);
+        var exp = ConstructExpTree<T>(expression, 1,out ParameterExpression xVar,out _,out _,out usedVars);
         var expres = Expression.Lambda<Function1<T>>(exp, xVar);
         return expres.Compile();
     }
-    public static Function2<T> Compile2<T>(string expression, EnglishChar vars) where T : IComputableNumber<T>
+    public static Function2<T> Compile2<T>(string expression, out bool[] usedVars) where T : IComputableNumber<T>
     {
-        var exp = ConstructExpTree<T>(expression, vars, 2,out ParameterExpression xVar,out ParameterExpression yVar,out _);
+        var exp = ConstructExpTree<T>(expression, 2,out ParameterExpression xVar,out ParameterExpression yVar,out _,out usedVars);
         var expres = Expression.Lambda<Function2<T>>(exp, xVar, yVar);
         return expres.Compile();
     }
-    public static Function3<T> Compile3<T>(string expression, EnglishChar vars) where T : IComputableNumber<T>
+    public static Function3<T> Compile3<T>(string expression, out bool[] usedVars) where T : IComputableNumber<T>
     {
-        var exp = ConstructExpTree<T>(expression, vars, 3,out ParameterExpression xVar,out ParameterExpression yVar,out ParameterExpression zVar);
+        var exp = ConstructExpTree<T>(expression, 3,out ParameterExpression xVar,out ParameterExpression yVar,out ParameterExpression zVar,out usedVars);
         var expres = Expression.Lambda<Function3<T>>(exp, xVar, yVar, zVar);
         return expres.Compile();
     }
-    public static Expression ConstructExpTree<T>(string expression, EnglishChar vars,[Range(0,3)] uint argsLength,out ParameterExpression xVar,out ParameterExpression yVar,out ParameterExpression zVar) where T : IComputableNumber<T>
+    public static Expression ConstructExpTree<T>(string expression, [Range(0,3)] uint argsLength,out ParameterExpression xVar,out ParameterExpression yVar,out ParameterExpression zVar,out bool[] usedVars) where T : IComputableNumber<T>
     {
         if (string.IsNullOrWhiteSpace(expression))
             throw new ArgumentException("Expression cannot be empty", nameof(expression));
+        usedVars=new bool['z'-'a'+1];
         var elements = expression.GetTokens().ParseTokens();
         var expStack = new Stack<Expression>();
         var cloneMethod = typeof(T).GetMethod("Clone", BindingFlags.Static | BindingFlags.Public);
@@ -58,7 +59,7 @@ public static class Compiler
         xVar= Expression.Parameter(typeof(T), "x");
         yVar= Expression.Parameter(typeof(T), "y");
         zVar= Expression.Parameter(typeof(T), "z");
-        var variables= Expression.Constant(vars);
+        var variables= Expression.Constant(EnglishChar.Instance);
         foreach (var element in elements)
             switch (element.Type)
             {
@@ -85,7 +86,7 @@ public static class Compiler
                                     expStack.Push(Expression.Add(expStack.Pop(), exp1));
                                 }
                                 break;
-                            case "Substract":
+                            case "Subtract":
                                 {
                                     var exp1 = expStack.Pop();
                                     expStack.Push(Expression.Subtract(expStack.Pop(), exp1));
@@ -194,7 +195,8 @@ public static class Compiler
                             expStack.Push(needClone ? Expression.Call(cloneMethod, zVar) : zVar);
                         }else if(name.Length==1&&'a'<=name[0]&&name[0]<='z')
                         {
-                            expStack.Push(Expression.Call(GetInfo(T.CreateFromDouble), Expression.Call(variables, GetInfo(vars.GetValue), Expression.Constant(name[0]))));
+                            expStack.Push(Expression.Call(GetInfo(T.CreateFromDouble), Expression.Call(variables, GetInfo(EnglishChar.Instance.GetValue), Expression.Constant(name[0]))));
+                            usedVars[name[0]-'a']=true;
                         }
                         else
                             throw new Exception("未知变量 " + element.NameOrValue);

@@ -33,7 +33,8 @@ public class CartesianDisplayer : Displayer
     public bool DrawAxisLine = true;
     public bool DrawAxisNumber = true;
     protected bool MouseOnYAxis, MouseOnXAxis;
-    private SKBitmap PreviousBuffer = new();
+    private SKBitmap PreviousBuffer = new(1,1);
+    private object LockTargetForPreviousBuffer = new();
 
     private double PreviousUnitLength;
     private PointL PreviousZero;
@@ -413,8 +414,14 @@ public class CartesianDisplayer : Displayer
                 PreviousUnitLength = UnitLength;
                 PreviousZero = Zero;
                 WheelingStopWatch.Restart();
-                PreviousBuffer.Dispose();
-                PreviousBuffer = TotalBuffer.Copy();
+                if (ZoomingOptimization)
+                {
+                    lock (LockTargetForPreviousBuffer)
+                    {
+                        PreviousBuffer.Dispose();
+                        PreviousBuffer = TotalBuffer.Copy();
+                    }
+                }
             }
 
             var (x, y) = e.GetPosition(this);
@@ -433,14 +440,13 @@ public class CartesianDisplayer : Displayer
                 X = (long)((long)x - ((long)x - PreviousZero.X) * ratioX),
                 Y = (long)((long)y - ((long)y - PreviousZero.Y) * ratioY)
             };
-            if (ratioX > 2 || ratioX < 0.5 || ratioY > 2 || ratioY < 0.5)
+            if ((!ZoomingOptimization) || ratioX > 2 || ratioX < 0.5 || ratioY > 2 || ratioY < 0.5)
             {
                 WheelingStopWatch.Stop();
                 WheelingStopWatch.Reset();
                 PreviousUnitLength = UnitLength;
                 PreviousUnitLength = UnitLength;
                 PreviousZero = Zero;
-                PreviousBuffer.Dispose();
                 Invalidate();
                 return;
             }

@@ -56,7 +56,7 @@ internal class GeometryPadViewModel : ViewModelBase
         new();
 
     internal ShapeList Shapes { get; } = new();
-    
-    public EnglishChar Variables { get; } = new();
-    
+
+    public EnglishChar Variables=>EnglishChar.Instance;
+
 }

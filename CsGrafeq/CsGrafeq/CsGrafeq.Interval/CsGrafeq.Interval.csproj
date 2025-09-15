@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\CsGrafeq.Compiler\CsGrafeq.Compiler.csproj" />
+      <ProjectReference Include="..\CsGrafeq.Compiler\CsGrafeq.Compiler.csproj" />
       <ProjectReference Include="..\CsGrafeq.Base\CsGrafeq.Base.csproj" />
       <ProjectReference Include="..\CsGrafeq.Compiler\CsGrafeq.Compiler.csproj" />
     </ItemGroup>

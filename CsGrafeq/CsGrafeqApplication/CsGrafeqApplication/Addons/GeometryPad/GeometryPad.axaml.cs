@@ -62,7 +62,9 @@ public partial class GeometryPad : Addon
         var p2 = AddShape(new Point(new PointGetter_FromLocation((1.5, 0.5))));
         var s1 = AddShape(new Straight(new LineGetter_Connected(p1, p2)));
         var p3 = AddShape(new Point(new PointGetter_OnLine(s1, (0, 0))));
-        var c1 = AddShape(new Circle(new CircleGetter_FromCenterAndRadius(p1, new Number(new NumberGetter_Direct(4)))));
+        var num = new Number(new NumberGetter_FromExpression());
+        var c1 = AddShape(new Circle(new CircleGetter_FromCenterAndRadius(p1,num)));
+        num.NumberGetter.TryLateParse("1-f");
 #endif
         InitializeComponent();
     }
@@ -108,21 +110,21 @@ public partial class GeometryPad : Addon
     {
         if (sender is TextBox box)
             if (!double.TryParse(box.Text, out _))
-                box.Text = ((box.Tag as Point).PointGetter as PointGetter_Movable).PointX.ToString();
+                box.Text = ((box.Tag as Point).PointGetter as PointGetter_Movable).PointX.NumberGetter.LastValidString;
     }
 
     public void TextBoxPixelYLostFocus(object? sender, RoutedEventArgs e)
     {
         if (sender is TextBox box)
             if (!double.TryParse(box.Text, out _))
-                box.Text = ((box.Tag as Point).PointGetter as PointGetter_Movable).PointY.ToString();
+                box.Text = ((box.Tag as Point).PointGetter as PointGetter_Movable).PointY.NumberGetter.LastValidString;
     }
 
     public void NumberLostFocus(object? sender, RoutedEventArgs e)
     {
         if (sender is TextBox box)
             if (!double.TryParse(box.Text, out _))
-                box.Text = (box.Tag as Number).Value.ToString();
+                box.Text = (box.Tag as Number).NumberString;
     }
 
     public void HandleEvent(object? sender, RoutedEventArgs e)
@@ -132,7 +134,6 @@ public partial class GeometryPad : Addon
 
     public void TextBoxKeyDown(object? sender, KeyEventArgs e)
     {
-        Console.WriteLine(e.Key.ToString());
         if (sender is TextBox box)
         {
             var parent = box.Parent;
@@ -167,7 +168,9 @@ public partial class GeometryPad : Addon
                 {
                 }
                 else if (e.Key == Key.OemMinus || e.Key == Key.OemPeriod || e.Key == Key.Subtract ||
-                         e.Key == Key.Decimal)
+                         e.Key == Key.Decimal||e.Key==Key.Add||e.Key==Key.Divide||e.Key==Key.Multiply||e.Key==Key.OemPlus||e.Key==Key.OemQuestion)
+                {
+                }else if(e.Key>=Key.A&&e.Key<=Key.Z)
                 {
                 }
                 else
@@ -255,21 +258,21 @@ public partial class GeometryPad : Addon
             }*/
             if (MovingPoint.PointGetter is PointGetter_Movable pg)
             {
-                pg.SetControlPoint(Owner.PixelToMath(PointerMovedPos));
+                pg.SetPoint(Owner.PixelToMath(PointerMovedPos));
                 if (MovingPoint.PointGetter is PointGetter_FromLocation)
                 {
-                    pg.SetControlPoint(
+                    pg.SetPoint(
                         Owner.PixelToMath(FindNearestPointOnTwoAxisLine(PointerMovedPos)));
                 }
                 else if (MovingPoint.PointGetter is PointGetter_OnLine)
                 {
                     var newp = FindNearestPointOnTwoAxisLine(MathToPixel(pg.GetPoint()));
                     if (newp.X != PointerMovedPos.X)
-                        pg.PointX = PixelToMathX(newp.X);
+                        pg.SetX(PixelToMathX(newp.X));
                     else if (newp.Y != PointerMovedPos.Y)
-                        pg.PointY = PixelToMathY(newp.Y);
+                        pg.SetY(PixelToMathY(newp.Y));
                     else
-                        pg?.SetControlPoint(Owner.PixelToMath(newp));
+                        pg?.SetPoint(Owner.PixelToMath(newp));
                 }
                 else
                 {
@@ -800,7 +803,6 @@ public partial class GeometryPad : Addon
                 if (e.KeyModifiers == KeyModifiers.Control)
                 {
                     CmdManager.UnDo();
-                    Console.WriteLine("UnDo");
                 }
             }
                 break;
@@ -809,7 +811,6 @@ public partial class GeometryPad : Addon
                 if (e.KeyModifiers == KeyModifiers.Control)
                 {
                     CmdManager.ReDo();
-                    Console.WriteLine("ReDo");
                 }
             }
                 break;
@@ -1181,7 +1182,8 @@ public partial class GeometryPad : Addon
         {
             var shape = ss[0].Item2;
             if (shape is GeoCircle)
-                return new PointGetter_OnCircle((Circle)shape, PixelToMath(Location));
+                _ = 0;
+                //return new PointGetter_OnCircle((Circle)shape, PixelToMath(Location));
             if (shape is GeoLine)
                 return new PointGetter_OnLine((Line)shape, PixelToMath(Location));
             return new PointGetter_FromLocation(PixelToMath(Location));
@@ -1277,8 +1279,8 @@ public partial class GeometryPad : Addon
             return PGType.Location;
         if (pg is PointGetter_OnLine)
             return PGType.OnLine;
-        if (pg is PointGetter_OnCircle)
-            return PGType.OnCircle;
+        //if (pg is PointGetter_OnCircle)
+        //    return PGType.OnCircle;
         return PGType.Fixed;
     }
 
@@ -1434,11 +1436,11 @@ public partial class GeometryPad : Addon
         if (point.PointGetter is PointGetter_Movable pg)
             CmdManager.Do(pg, o =>
             {
-                pg.SetControlPoint(next);
+                pg.SetPoint(next);
                 point.RefreshValues();
             }, o =>
             {
-                pg.SetControlPoint(previous);
+                pg.SetPoint(previous);
                 point.RefreshValues();
             }, o => { });
     }
@@ -1476,9 +1478,8 @@ public partial class GeometryPad : Addon
         if (sender is TextBox tb)
         {
             var p = (tb.Tag as Point)!;
-            if (double.TryParse(tb.Text, out var num))
+            if ((p.PointGetter as PointGetter_Movable).SetX(tb.Text))
             {
-                (p.PointGetter as PointGetter_Movable).PointX = num;
                 p.RefreshValues();
                 DataValidationErrors.ClearErrors(tb);
             }
@@ -1494,9 +1495,8 @@ public partial class GeometryPad : Addon
         if (sender is TextBox tb)
         {
             var p = (tb.Tag as Point)!;
-            if (double.TryParse(tb.Text, out var num))
+            if ((p.PointGetter as PointGetter_Movable).SetY(tb.Text))
             {
-                (p.PointGetter as PointGetter_Movable).PointY = num;
                 p.RefreshValues();
                 DataValidationErrors.ClearErrors(tb);
             }
@@ -1512,10 +1512,15 @@ public partial class GeometryPad : Addon
         if (sender is TextBox tb)
         {
             var n = (tb.Tag as Number)!;
-            if (n.ParseString(tb.Text))
+            if (n.NumberGetter.TryLateParse(tb.Text))
                 DataValidationErrors.ClearErrors(tb);
             else
                 DataValidationErrors.SetError(tb, new Exception());
         }
+    }
+
+    private void InputElement_OnTextInput(object? sender, TextInputEventArgs e)
+    {
+        
     }
 }

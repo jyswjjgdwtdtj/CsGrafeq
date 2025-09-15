@@ -8,18 +8,21 @@ using System.Text;
 using System.Threading.Tasks;
 using CsGrafeq;
 using static CsGrafeq.Extension;
+using System.Collections.ObjectModel;
 
 namespace CsGrafeq
 {
-
     public class EnglishChar : ReactiveObject
     {
-        private NativeBuffer<double> CharsValue = new NativeBuffer<double>('Z' - 'A' + 1);
+        public static EnglishChar Instance { get; } = new EnglishChar();
+        protected EnglishChar() { }
+        public NativeBuffer<double> CharsValue { get; } = new NativeBuffer<double>('Z' - 'A' + 1,true);
+        public ObservableCollection<uint> CharsReferenceCounter { get; }= new ObservableCollection<uint>(new uint['Z' - 'A' + 1]);
         public double this[char c]
         {
             get
             {
-                if (c < 'a' || c > 'a')
+                if (c < 'a' || c > 'z')
                     return Throw<double>("Only a-z are supported.");
                 return CharsValue[(nuint)(c - 'a')];
             }
@@ -27,7 +30,7 @@ namespace CsGrafeq
             {
                 if (c < 'a' || c > 'z')
                     Throw("Only a-z are supported.");
-                this.RaiseAndSetIfChanged(ref CharsValue[(nuint)(c - 'a')], value);
+                this.RaiseAndSetIfChanged(ref CharsValue[(nuint)(c - 'a')], value,(c+"").ToUpper());
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -35,11 +38,32 @@ namespace CsGrafeq
         {
             return this[c];
         }
+        public void AddReference(char c)
+        {
+            if (c < 'a' || c > 'z')
+                Throw("Only a-z are supported.");
+            CharsReferenceCounter[(c - 'a')]++;
+            this.RaisePropertyChanged(nameof(CharsReferenceCounter));
+        }
+        public void RemoveReference(char c)
+        {
+            if (c < 'a' || c > 'z')
+                Throw("Only a-z are supported.");
+            var index = (c - 'a');
+            if (CharsReferenceCounter[index] == 0)
+                Throw("Reference count is already zero.");
+            CharsReferenceCounter[index]--;
+            this.RaisePropertyChanged(nameof(CharsReferenceCounter));
+        }
         public double A
         {
             get => CharsValue[0];
-            set => this.RaiseAndSetIfChanged(ref CharsValue[0], value);
+            set
+            {
+                this.RaiseAndSetIfChanged(ref CharsValue[0], value);
+            }
         }
+
         public double B
         {
             get => CharsValue[1];

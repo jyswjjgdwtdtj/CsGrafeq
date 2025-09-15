@@ -7,6 +7,10 @@ namespace CsGrafeq.Shapes;
 [Obsolete("Do not use (although it works)", true)]
 public class ImplicitFunction : Shape
 {
+    public ImplicitFunction()
+    {
+        Description = "ImplicitFunction";
+    }
     public bool IsCorrect
     {
         get => field;
@@ -27,7 +31,7 @@ public class ImplicitFunction : Shape
             this.RaiseAndSetIfChanged(ref field, value);
             try
             {
-                Function = Compiler.CompileAndTest<IntervalSet>(Expression);
+                Function =CsGrafeq.Interval.Compiler.Compiler.CompileAndTest<IntervalSet>(Expression);
                 IsCorrect = true;
             }
             catch (Exception ex)

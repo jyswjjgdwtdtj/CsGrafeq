@@ -54,13 +54,6 @@ public static class GeometryMath
         return new Vec(x, y);
     }
 
-    public static PointGetter[] ToPointGetters(this GeoPoint[] ps)
-    {
-        var points = new PointGetter[ps.Length];
-        for (var i = 0; i < ps.Length; i++) points[i] = new PointGetter_FromPoint(ps[i]);
-        return points;
-    }
-
     public static Vec GetIntersectionPoint(Vec s1, Vec e1, Vec s2, Vec e2)
     {
         double k1, k2;

@@ -60,6 +60,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Base\CsGrafeq.Base.csproj" />
+    <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Compiler\CsGrafeq.Compiler.csproj" />
     <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Interval\CsGrafeq.Interval.csproj" />
     <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Shapes\CsGrafeq.Shapes.csproj" />
   </ItemGroup>

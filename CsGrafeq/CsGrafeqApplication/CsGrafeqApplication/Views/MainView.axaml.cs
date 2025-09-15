@@ -20,25 +20,22 @@ public partial class MainView : UserControl
     {
         MsgboxContainer.IsVisible = false;
     }
+    private void Setting_OnClick(object? sender, RoutedEventArgs e)
+    {
+        Msg(new SettingView() { Tag=MainDisplayControl});
+    }
+    
 
     private void Msg(Control content)
     {
-        ContentContainer.IsVisible = true;
-        TextContainer.IsVisible=false;
+        content.VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch;
+        content.HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch;
         ContentContainer.Child = content;
-        MsgboxContainer.IsVisible = true;
-    }
-
-    private void Msg(string content)
-    {
-        ContentContainer.IsVisible = false;
-        TextContainer.IsVisible=true;
-        TxtBlock.Text = content;
         MsgboxContainer.IsVisible = true;
     }
 
     private void GeometryPad_OnClick(object? sender, RoutedEventArgs e)
     {
-        Msg("123");
+        Msg(new TextBlock() { Text="123"});
     }
 }

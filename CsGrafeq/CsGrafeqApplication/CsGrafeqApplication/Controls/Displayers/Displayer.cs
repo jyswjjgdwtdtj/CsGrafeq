@@ -18,6 +18,8 @@ public abstract class Displayer : SkiaControl
     public const bool Intercept = false;
     private bool CanPerform = true;
     protected SKBitmap TotalBuffer = new(1, 1);
+    public bool MovingOptimization = false;
+    public bool ZoomingOptimization = false;
 
     public Displayer()
     {

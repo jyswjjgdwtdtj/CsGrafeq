@@ -3,6 +3,7 @@ using Avalonia.Input;
 using SkiaSharp;
 using System;
 using static CsGrafeqApplication.Controls.SkiaEx;
+using static CsGrafeq.Extension;
 
 namespace CsGrafeqApplication.Controls.Displayers;
 
@@ -70,13 +71,13 @@ public class DisplayControl : CartesianDisplayer
                         {
                             dc.Clear(AxisBackground);
                             RenderAxisLine(dc);
-                            if ((LastZeroPos - Zero).Length > 30)
+                            if ((!MovingOptimization)||(LastZeroPos - Zero).Length > 30)
                             {
                                 foreach (var i in Addons)
                                 {
                                     if (i.Bitmap.Width != TotalBuffer.Width || i.Bitmap.Height != TotalBuffer.Height)
                                     {
-                                        Extension.Throw("Bitmap size mismatch");
+                                        Throw("Bitmap size mismatch");
                                         return;
                                     }
                                     var newbmp = new SKBitmap(TotalBuffer.Width, TotalBuffer.Height);

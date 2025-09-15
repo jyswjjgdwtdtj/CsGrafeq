@@ -26,10 +26,13 @@
                 <MenuItem Header="_Help">
                     <MenuItem Header="_GeometryPad" Click="GeometryPad_OnClick"></MenuItem>
                 </MenuItem>
+				<MenuItem Header="_Tools">
+					<MenuItem Header="_Setting" Click="Setting_OnClick"></MenuItem>
+				</MenuItem>
             </Menu>
-            <ctls:DisplayerContainer Grid.Row="1">
-                <disp:DisplayControl>
-                    <geopad:GeometryPad />
+            <ctls:DisplayerContainer Grid.Row="1" Name="MainContainer">
+                <disp:DisplayControl Name="MainDisplayControl">
+                    <geopad:GeometryPad/>
                 </disp:DisplayControl>
             </ctls:DisplayerContainer>
         </Grid>
@@ -37,16 +40,8 @@
             <Border CornerRadius="10" Background="{DynamicResource HTMedianBrush}" VerticalAlignment="Center" Width="600" Height="400" HorizontalAlignment="Center">
                 <DockPanel LastChildFill="True">
                     <Button Click="Button_OnClick" HorizontalAlignment="Right" Width="60" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="40,10" DockPanel.Dock="Bottom" Content="OK" Background="{DynamicResource CgBackgroundBrush}"></Button>
-                    <Panel>
-                        <Border Name="TextContainer">
-                            <ScrollViewer>
-                                <TextBlock Foreground="{DynamicResource CgForegroundBrush}" TextWrapping="Wrap" TextAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Name="TxtBlock">
-                                </TextBlock>
-                            </ScrollViewer>
-                        </Border>
-                        <Border Name="ContentContainer" Padding="40">
-                        </Border>
-                    </Panel>
+					<Border Name="ContentContainer" Padding="40" Background="White" Margin="15" CornerRadius="5"> 
+					</Border>
                 </DockPanel>
             </Border>
         </Border>

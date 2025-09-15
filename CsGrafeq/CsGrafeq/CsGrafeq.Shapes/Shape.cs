@@ -11,7 +11,6 @@ public delegate void ShapeChangedHandler<T1, T2>(T1 shape, T2 args) where T1 : S
 public abstract class Shape : ReactiveObject
 {
     protected bool CanInteract = true;
-
     /// <summary>
     ///     As ARGB order
     /// </summary>
@@ -46,12 +45,12 @@ public abstract class Shape : ReactiveObject
 
     public abstract string TypeName { get; }
     public string Type => TypeName + ":";
-    
+
     public string Description
     {
         get => field;
-        protected set=> this.RaiseAndSetIfChanged(ref field, value,nameof(Description));
-    }
+        protected set => this.RaiseAndSetIfChanged(ref field, value, nameof(Description));
+    } = "";
 
     public virtual void InvokeEvent()
     {
