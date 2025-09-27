@@ -1,8 +1,7 @@
-﻿using ReactiveUI;
+﻿global using ShapeChangedHandler = System.Action;
+using ReactiveUI;
 
 namespace CsGrafeq.Shapes;
-
-public delegate void ShapeChangedHandler();
 
 public delegate void ShapeChangedHandler<T>(Shape shape, T args);
 

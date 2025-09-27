@@ -1,0 +1,5 @@
+﻿[Desktop Entry]
+Name=CsGrafeqApplication
+Type=Application
+Exec=/usr/share/CsGrafeqApplication/CsGrafeqApplication
+Icon=/usr/share/icons/CsGrafeqApplication.ico

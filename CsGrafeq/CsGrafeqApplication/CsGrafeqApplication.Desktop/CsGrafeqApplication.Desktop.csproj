@@ -17,15 +17,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia.Desktop" />
-    <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-    <PackageReference Include="Avalonia.Diagnostics" >
-      <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
-      <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
-    </PackageReference>
+    <ProjectReference Include="..\CsGrafeqApplication\CsGrafeqApplication.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CsGrafeqApplication\CsGrafeqApplication.csproj" />
+    <PackageReference Remove="Packaging.Targets" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia.Desktop" />
   </ItemGroup>
 </Project>

@@ -9,15 +9,29 @@ using System.Threading.Tasks;
 using CsGrafeq;
 using static CsGrafeq.Extension;
 using System.Collections.ObjectModel;
+using sysMath = System.Math;
 
 namespace CsGrafeq
 {
     public class EnglishChar : ReactiveObject
     {
         public static EnglishChar Instance { get; } = new EnglishChar();
-        protected EnglishChar() { }
+        protected EnglishChar() {
+            PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName.Length == 1)
+                {
+                    char c=e.PropertyName[0];
+                    if ('A' <= c && c <= 'Z')
+                    {
+                        CharValueChanged?.Invoke((EnglishCharEnum)(sysMath.Pow(2,c-'A')));
+                    }
+                }
+            };
+        }
         public NativeBuffer<double> CharsValue { get; } = new NativeBuffer<double>('Z' - 'A' + 1,true);
         public ObservableCollection<uint> CharsReferenceCounter { get; }= new ObservableCollection<uint>(new uint['Z' - 'A' + 1]);
+        public event Action<EnglishCharEnum> CharValueChanged;
         public double this[char c]
         {
             get
@@ -38,21 +52,24 @@ namespace CsGrafeq
         {
             return this[c];
         }
-        public void AddReference(char c)
+        public void AddReference(EnglishCharEnum c)
         {
-            if (c < 'a' || c > 'z')
-                Throw("Only a-z are supported.");
-            CharsReferenceCounter[(c - 'a')]++;
+            uint uc = (uint)c;
+            for(var i=0;i<26;i++)
+                if (((uc >> i) & 0x1) == 0x1)
+                    CharsReferenceCounter[i]++;
             this.RaisePropertyChanged(nameof(CharsReferenceCounter));
         }
-        public void RemoveReference(char c)
+        public void RemoveReference(EnglishCharEnum c)
         {
-            if (c < 'a' || c > 'z')
-                Throw("Only a-z are supported.");
-            var index = (c - 'a');
-            if (CharsReferenceCounter[index] == 0)
-                Throw("Reference count is already zero.");
-            CharsReferenceCounter[index]--;
+            uint uc = (uint)c;
+            for(var i=0;i<26;i++)
+                if (((uc >> i) & 0x1) == 0x1)
+                {
+                    if(CharsReferenceCounter[i]==0)
+                        Throw(new Exception("The reference counter is already zero."));
+                    CharsReferenceCounter[i]--;
+                }
             this.RaisePropertyChanged(nameof(CharsReferenceCounter));
         }
         public double A
@@ -189,5 +206,36 @@ namespace CsGrafeq
             get => CharsValue[25];
             set => this.RaiseAndSetIfChanged(ref CharsValue[25], value);
         }
+    }
+    [Flags]
+    public enum EnglishCharEnum : long
+    {
+        None = 0,
+        A = 1L << 0,
+        B = 1L << 1,
+        C = 1L << 2,
+        D = 1L << 3,
+        E = 1L << 4,
+        F = 1L << 5,
+        G = 1L << 6,
+        H = 1L << 7,
+        I = 1L << 8,
+        J = 1L << 9,
+        K = 1L << 10,
+        L = 1L << 11,
+        M = 1L << 12,
+        N = 1L << 13,
+        O = 1L << 14,
+        P = 1L << 15,
+        Q = 1L << 16,
+        R = 1L << 17,
+        S = 1L << 18,
+        T = 1L << 19,
+        U = 1L << 20,
+        V = 1L << 21,
+        W = 1L << 22,
+        X = 1L << 23,
+        Y = 1L << 24,
+        Z = 1L << 25
     }
 }

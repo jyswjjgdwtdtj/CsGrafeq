@@ -189,7 +189,6 @@
                                                                 <DataTemplate DataType="shapes:Point">
                                                                     <StackPanel Orientation="Horizontal">
                                                                         <TextBox
-                                                                            InputMethod.IsInputMethodEnabled="False"
                                                                             Text="{CompiledBinding Name,Mode=TwoWay}"
                                                                             Classes="CommonTextBox Big"
                                                                             Height="20"
@@ -201,25 +200,25 @@
                                                                                 VerticalAlignment="Center"
                                                                                 Classes="Big" />
                                                                             <TextBox
-                                                                                InputMethod.IsInputMethodEnabled="False"
-                                                                                Text="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointX.NumberString,Mode=OneWay}"
+                                                                                Text="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointX.ValueStr,Mode=TwoWay}"
                                                                                 Classes="CommonTextBox Big"
+                                                                                GotFocus="TextBoxGetFocus"
                                                                                 KeyDown="TextBoxKeyDown"
                                                                                 LostFocus="TextBoxPixelXLostFocus"
                                                                                 Tag="{CompiledBinding}"
-                                                                                KeyUp="PixelX_OnKeyUp"
+                                                                                KeyUp="PointX_OnKeyUp"
                                                                                 Tapped="HandleEvent" />
                                                                             <TextBlock Text="," TextAlignment="Left"
                                                                                 VerticalAlignment="Center"
                                                                                 Classes="Big" />
                                                                             <TextBox
-                                                                                InputMethod.IsInputMethodEnabled="False"
-                                                                                Text="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointY.NumberString,Mode=OneWay}"
+                                                                                Text="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointY.ValueStr,Mode=TwoWay}"
                                                                                 Classes="CommonTextBox Big"
+                                                                                GotFocus="TextBoxGetFocus"
                                                                                 KeyDown="TextBoxKeyDown"
                                                                                 LostFocus="TextBoxPixelYLostFocus"
                                                                                 Tag="{CompiledBinding}"
-                                                                                KeyUp="PixelY_OnKeyUp"
+                                                                                KeyUp="PointY_OnKeyUp"
                                                                                 Tapped="HandleEvent" />
                                                                             <TextBlock Text=")" TextAlignment="Left"
                                                                                 VerticalAlignment="Center"
@@ -234,7 +233,6 @@
                                                                           RowDefinitions="Auto,Auto"
                                                                           VerticalAlignment="Center">
                                                                         <TextBox
-                                                                            InputMethod.IsInputMethodEnabled="False"
                                                                             Text="{CompiledBinding Name,Mode=TwoWay}"
                                                                             Classes="CommonTextBox Big"
                                                                             Grid.Column="0" Grid.Row="0" Height="20"
@@ -249,25 +247,24 @@
                                                                                 VerticalAlignment="Center"
                                                                                 Classes="Big" />
                                                                             <TextBox
-                                                                                InputMethod.IsInputMethodEnabled="False"
-                                                                                Text="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointX.NumberString,Mode=TwoWay}"
+                                                                                Text="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointX.ValueStr,Mode=TwoWay}"
                                                                                 Classes="CommonTextBox Big"
+                                                                                GotFocus="TextBoxGetFocus"
                                                                                 KeyDown="TextBoxKeyDown"
                                                                                 LostFocus="TextBoxPixelXLostFocus"
-                                                                                KeyUp="PixelX_OnKeyUp"
+                                                                                KeyUp="PointX_OnKeyUp"
                                                                                 Tag="{CompiledBinding}"
                                                                                 Tapped="HandleEvent" />
                                                                             <TextBlock Text="," TextAlignment="Left"
                                                                                 VerticalAlignment="Center"
                                                                                 Classes="Big" />
                                                                             <TextBox
-                                                                                InputMethod.IsInputMethodEnabled="False"
-                                                                                Text="{CompiledBinding  ((getter:PointGetter_Movable)PointGetter).PointY.NumberString,Mode=TwoWay}"
+                                                                                Text="{CompiledBinding  ((getter:PointGetter_Movable)PointGetter).PointY.ValueStr,Mode=TwoWay}"
                                                                                 Classes="CommonTextBox Big"
-                                                                                TextInput="InputElement_OnTextInput"
+                                                                                GotFocus="TextBoxGetFocus"
                                                                                 KeyDown="TextBoxKeyDown"
                                                                                 LostFocus="TextBoxPixelYLostFocus"
-                                                                                KeyUp="PixelY_OnKeyUp"
+                                                                                KeyUp="PointY_OnKeyUp"
                                                                                 Tag="{CompiledBinding}"
                                                                                 Tapped="HandleEvent" />
                                                                             <TextBlock Text=")" TextAlignment="Left"
@@ -308,7 +305,6 @@
                                                                           RowDefinitions="Auto,Auto"
                                                                           VerticalAlignment="Center">
                                                                         <TextBox
-                                                                            InputMethod.IsInputMethodEnabled="False"
                                                                             Text="{CompiledBinding Name,Mode=TwoWay}"
                                                                             Classes="CommonTextBox Big"
                                                                             Grid.Column="0" Grid.Row="0" Height="20"
@@ -462,8 +458,8 @@
                                                                                 VerticalAlignment="Center"
                                                                                 Classes="Big" />
                                                                             <TextBox
-                                                                                InputMethod.IsInputMethodEnabled="False"
-                                                                                Text="{CompiledBinding NumberString,Mode=OneWay}"
+                                                                                GotFocus="TextBoxGetFocus"
+                                                                                Text="{CompiledBinding ValueStr,Mode=TwoWay}"
                                                                                 Classes="CommonTextBox Big"
                                                                                 LostFocus="NumberLostFocus"
                                                                                 Tag="{CompiledBinding Path=.}"

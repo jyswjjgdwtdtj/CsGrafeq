@@ -8,6 +8,7 @@
         <InvariantGlobalization>true</InvariantGlobalization>
         <LangVersion>Preview</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	
     </PropertyGroup>
 
     <ItemGroup>

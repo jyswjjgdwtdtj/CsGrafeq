@@ -1,5 +1,7 @@
+using ReactiveUI;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Runtime.CompilerServices;
 using sysMath = System.Math;
 
 namespace CsGrafeq;
@@ -54,5 +56,24 @@ public static class Extension
     public static void Throw(string message)
     {
         throw new Exception(message);
+    }
+
+    public static bool CompareDoubleIfBothNaNThenEqual(double a, double b)
+    {
+        if (a == b) return true;
+        if (double.IsNaN(a) && double.IsNaN(b)) return true;
+        return false;
+    }
+    public static double RaiseAndSetIfChangedDouble<TObj>(this TObj reactiveObject, ref double backingField, double newValue, [CallerMemberName] string? propertyName = null) where TObj : IReactiveObject
+    {
+        if (CompareDoubleIfBothNaNThenEqual(backingField,newValue))
+        {
+            return newValue;
+        }
+
+        reactiveObject.RaisePropertyChanging(propertyName);
+        backingField = newValue;
+        reactiveObject.RaisePropertyChanged(propertyName);
+        return newValue;
     }
 }
