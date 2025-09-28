@@ -7,13 +7,6 @@ using sysMath=System.Math;
 
 namespace CsGrafeq.Compiler;
 
-public delegate T Function0<T>() where T : IComputableNumber<T>;
-
-public delegate T Function1<T>(T arg1) where T : IComputableNumber<T>;
-
-public delegate T Function2<T>(T arg1, T arg2) where T : IComputableNumber<T>;
-
-public delegate T Function3<T>(T arg1, T arg2, T arg3) where T : IComputableNumber<T>;
 
 public static class Compiler
 {
@@ -23,90 +16,86 @@ public static class Compiler
     private static readonly Regex letterOrnumberOr_ = new("[a-zA-Z0-9_]");
     private static readonly Regex numberOrpoint = new("[0-9.]");
     private static readonly Regex spaceOrtab = new(@"([ ]|\t)");
-    public static Function0<T> Compile0<T>(string expression,out EnglishCharEnum usedVars) where T : IComputableNumber<T>
+    public static HasReferenceFunction0<T> Compile0<T>(string expression) where T : IComputableNumber<T>
     {
-        var exp = ConstructExpTree<T>(expression, 0,out _,out _,out _,out usedVars);
+        var exp = ConstructExpTree<T>(expression, 0,out _,out _,out _,out var usedVars);
         var expres = Expression.Lambda<Function0<T>>(exp);
-        return expres.Compile();
+        return new HasReferenceFunction0<T>(expres.Compile(),usedVars);
     }
-    public static bool TryCompile0<T>(string expression, out EnglishCharEnum usedVars,out Function0<T> expFunc,out Exception? ex) where T : IComputableNumber<T>
+    public static bool TryCompile0<T>(string expression, out HasReferenceFunction0<T> expFunc,out Exception? ex) where T : IComputableNumber<T>
     {
         try
         {
-            expFunc = Compile0<T>(expression, out usedVars);
+            expFunc = Compile0<T>(expression);
             ex = null;
             return true;
         }
         catch (Exception e)
         {
             ex = e;
-            usedVars = EnglishCharEnum.None;
             expFunc = null;
             return false;
         }
     }
-    public static Function1<T> Compile1<T>(string expression, out EnglishCharEnum usedVars) where T : IComputableNumber<T>
+    public static HasReferenceFunction1<T> Compile1<T>(string expression) where T : IComputableNumber<T>
     {
-        var exp = ConstructExpTree<T>(expression, 1,out ParameterExpression xVar,out _,out _,out usedVars);
+        var exp = ConstructExpTree<T>(expression, 1,out ParameterExpression xVar,out _,out _,out var usedVars);
         var expres = Expression.Lambda<Function1<T>>(exp, xVar);
-        return expres.Compile();
+        return new HasReferenceFunction1<T>(expres.Compile(),usedVars);
     }
-    public static bool TryCompile1<T>(string expression, out EnglishCharEnum usedVars, out Function1<T> expFunc, out Exception? ex) where T : IComputableNumber<T>
+    public static bool TryCompile1<T>(string expression, out HasReferenceFunction1<T> expFunc, out Exception? ex) where T : IComputableNumber<T>
     {
         try
         {
-            expFunc = Compile1<T>(expression, out usedVars);
+            expFunc = Compile1<T>(expression);
             ex = null;
             return true;
         }
         catch (Exception e)
         {
             ex = e;
-            usedVars = EnglishCharEnum.None;
             expFunc = null;
             return false;
         }
     }
-    public static Function2<T> Compile2<T>(string expression, out EnglishCharEnum usedVars) where T : IComputableNumber<T>
+    public static HasReferenceFunction2<T> Compile2<T>(string expression) where T : IComputableNumber<T>
     {
-        var exp = ConstructExpTree<T>(expression, 2,out ParameterExpression xVar,out ParameterExpression yVar,out _,out usedVars);
+        var exp = ConstructExpTree<T>(expression, 2,out ParameterExpression xVar,out ParameterExpression yVar,out _,out var usedVars);
         var expres = Expression.Lambda<Function2<T>>(exp, xVar, yVar);
-        return expres.Compile();
+        return new HasReferenceFunction2<T>(expres.Compile(),usedVars);
     }
-    public static bool TryCompile2<T>(string expression, out EnglishCharEnum usedVars, out Function2<T> expFunc, out Exception? ex) where T : IComputableNumber<T>
+    public static bool TryCompile2<T>(string expression,out HasReferenceFunction2<T> expFunc, out Exception? ex) where T : IComputableNumber<T>
     {
         try
         {
-            expFunc = Compile2<T>(expression, out usedVars);
+            expFunc = Compile2<T>(expression);
             ex = null;
             return true;
         }
         catch (Exception e)
         {
             ex = e;
-            usedVars = EnglishCharEnum.None;
             expFunc = null;
             return false;
         }
     }
-    public static Function3<T> Compile3<T>(string expression, out EnglishCharEnum usedVars) where T : IComputableNumber<T>
+    public static HasReferenceFunction3<T> Compile3<T>(string expression) where T : IComputableNumber<T>
     {
-        var exp = ConstructExpTree<T>(expression, 3,out ParameterExpression xVar,out ParameterExpression yVar,out ParameterExpression zVar,out usedVars);
+        var exp = ConstructExpTree<T>(expression, 3,out ParameterExpression xVar,out ParameterExpression yVar,out ParameterExpression zVar,out var usedVars);
         var expres = Expression.Lambda<Function3<T>>(exp, xVar, yVar, zVar);
-        return expres.Compile();
+        return new HasReferenceFunction3<T>(expres.Compile(),usedVars);
     }
-    public static bool TryCompile3<T>(string expression, out EnglishCharEnum usedVars, out Function3<T> expFunc, out Exception? ex) where T : IComputableNumber<T>
+    public static bool TryCompile3<T>(string expression, out HasReferenceFunction3<T> expFunc, out Exception? ex) where T : IComputableNumber<T>
     {
         try
         {
-            expFunc = Compile3<T>(expression, out usedVars);
+            expFunc = Compile3<T>(expression);
             ex = null;
             return true;
         }
         catch (Exception e)
         {
             ex = e;
-            usedVars = EnglishCharEnum.None;
             expFunc = null;
             return false;
         }

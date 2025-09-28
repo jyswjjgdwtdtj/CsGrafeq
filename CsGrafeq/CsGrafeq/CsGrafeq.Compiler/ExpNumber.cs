@@ -12,13 +12,15 @@ namespace CsGrafeq
 {
     public class ExpNumber:ReactiveObject
     {
-        private Function0<DoubleNumber> Func;
+        private HasReferenceFunction0<DoubleNumber> Func;
         private DoubleNumber Number;
-        private EnglishCharEnum Reference = EnglishCharEnum.None;
         public bool IsExpression { get; private set; } = false;
         public event Action NumberChanged;
         private string ShownText = "0";
-        public ExpNumber(double initialNumber=0) {
+        public ExpNumber(double initialNumber=0)
+        {
+            Direct = new HasReferenceFunction0<DoubleNumber>(DirectFunc, EnglishCharEnum.None);
+            Func = Direct;
             SetValueNumber(initialNumber);
             EnglishChar.Instance.CharValueChanged += CharValueChanged;
         }
@@ -35,11 +37,10 @@ namespace CsGrafeq
         private void SetNumber(double number)
         {
             IsExpression = false;
-            EnglishChar.Instance.RemoveReference(Reference);
-            Reference = EnglishCharEnum.None;
+            Func.Dispose();
             Number = new DoubleNumber(number);
             Func = Direct;
-            Value = Func().Value;
+            Value = Func.Function().Value;
             IsError = false;
         }
         public bool SetExpression(string expression)
@@ -50,17 +51,13 @@ namespace CsGrafeq
                 return true;
             }
             IsExpression = true;
-            EnglishChar.Instance.RemoveReference(Reference);
-            Reference = EnglishCharEnum.None;
+            Func.Dispose();
             Func = None;
-            if (Compiler.Compiler.TryCompile0<DoubleNumber>(expression, out var usedVars, out var expfunc, out _))
+            if (Compiler.Compiler.TryCompile0<DoubleNumber>(expression, out var expfunc, out _))
             {
-                Console.WriteLine(usedVars.ToString());
-                Reference = usedVars;
-                EnglishChar.Instance.AddReference(Reference);
                 Func = expfunc;
                 IsError = false;
-                Value = Func().Value;
+                Value = Func.Function().Value;
                 return true;
             }
             Value = double.NaN;
@@ -97,12 +94,14 @@ namespace CsGrafeq
         public bool IsError { get => field; private set => this.RaiseAndSetIfChanged(ref field, value); } = false;
 
         private void CharValueChanged(EnglishCharEnum c) {
-            if (Reference.HasFlag(c))
+            if (Func.Reference.HasFlag(c))
             {
-                Value = Func().Value;
+                Value = Func.Function().Value;
             }
         }
-        private DoubleNumber Direct() => Number;
-        private static DoubleNumber None() =>new DoubleNumber(double.NaN);
+        private DoubleNumber DirectFunc() => Number;
+        private readonly HasReferenceFunction0<DoubleNumber> Direct;
+        private static DoubleNumber NoneFunc() => new DoubleNumber(double.NaN);
+        private readonly HasReferenceFunction0<DoubleNumber> None=new HasReferenceFunction0<DoubleNumber>(NoneFunc,EnglishCharEnum.None);
     }
 }

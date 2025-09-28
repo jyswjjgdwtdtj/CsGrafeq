@@ -833,7 +833,6 @@ public partial class GeometryPad : Addon
         }
 
         dc.Restore();
-        dc.DrawBubble(rect.Width + " " + rect.Height, new SKPoint(10, 10), FilledWhite, StrokeBlack);
     }
 
     private void RenderShapes(SKCanvas dc, SKRect rect, IEnumerable<GeometryShape> shapes)

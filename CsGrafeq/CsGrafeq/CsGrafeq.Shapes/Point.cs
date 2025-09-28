@@ -33,7 +33,6 @@ public class Point : GeometryShape
     public override void RefreshValues()
     {
         _Location = PointGetter.GetPoint();
-        Console.WriteLine("GetPoint:"+_Location);
         InvokeEvent();
     }
 
