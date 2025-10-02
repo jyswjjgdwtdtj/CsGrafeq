@@ -4,7 +4,8 @@
     <TargetFramework>net9.0-android</TargetFramework>
     <SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
     <Nullable>enable</Nullable>
-    <ApplicationId>com.CompanyName.CsGrafeqApplication</ApplicationId>
+	  <RuntimeIdentifier>android-arm</RuntimeIdentifier>
+    <ApplicationId>com.JYSW.CsGrafeq</ApplicationId>
     <ApplicationVersion>1</ApplicationVersion>
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
     <AndroidPackageFormat>apk</AndroidPackageFormat>

@@ -1,87 +1,120 @@
-﻿using CsGrafeq.Compiler;
+﻿using CsGrafeq;
+using CsGrafeq.Compiler;
 using CsGrafeq.Numeric;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using CsGrafeq;
 
 namespace CsGrafeq
 {
     public class ExpNumber:ReactiveObject
     {
         private HasReferenceFunction0<DoubleNumber> Func;
-        private DoubleNumber Number;
         public bool IsExpression { get; private set; } = false;
+        private DoubleNumber Number;
         public event Action NumberChanged;
+        public event Action UserSetValueStr;
         private string ShownText = "0";
+        private bool NumberChangedSuspended=false;
+        private void CallNumberChanged()
+        {
+            if(NumberChangedSuspended) return;
+            NumberChanged?.Invoke();
+        }
+        public void SuspendNumberChanged()
+        {
+            NumberChangedSuspended=true;
+        }
+        public void ResumeNumberChanged(bool call)
+        {
+            NumberChangedSuspended = false;
+            if (call)
+            {
+                NumberChanged?.Invoke();
+            }
+        }
         public ExpNumber(double initialNumber=0)
         {
             Direct = new HasReferenceFunction0<DoubleNumber>(DirectFunc, EnglishCharEnum.None);
             Func = Direct;
-            SetValueNumber(initialNumber);
             EnglishChar.Instance.CharValueChanged += CharValueChanged;
+            PropertyChanged += (s, e) =>
+            {
+#if DEBUG
+                if (e.PropertyName == nameof(ValueStr))
+                {
+                    Console.WriteLine(nameof(ValueStr)+"Changed:"+ValueStr);
+                }
+#endif
+            };
         }
         ~ExpNumber()
         {
             EnglishChar.Instance.CharValueChanged -= CharValueChanged;
         }
-
-        public void SetValueNumber(double number)
-        {
-            SetNumber(number);
-            SetValueStr(number.ToString());
-        }
-        private void SetNumber(double number)
+        public void SetNumber(double number)
         {
             IsExpression = false;
             Func.Dispose();
             Number = new DoubleNumber(number);
             Func = Direct;
-            Value = Func.Function().Value;
+            SetValue(Func.Function().Value);
             IsError = false;
+            return;
         }
-        public bool SetExpression(string expression)
+        private void SetExpression(string expression)
         {
-            if (double.TryParse(expression, out double result))
+           if (double.TryParse(expression, out double result))
             {
-                SetNumber(result);
-                return true;
+                IsExpression = false;
+                Func.Dispose();
+                Number = new DoubleNumber(result);
+                Func = Direct;
+                SuspendNumberChanged();
+                SetValue(Func.Function().Value);
+                ResumeNumberChanged(false);
+                UserSetValueStr?.Invoke();
+                IsError = false;
+                return;
             }
-            IsExpression = true;
             Func.Dispose();
-            Func = None;
+            IsExpression = true;
             if (Compiler.Compiler.TryCompile0<DoubleNumber>(expression, out var expfunc, out _))
             {
                 Func = expfunc;
                 IsError = false;
-                Value = Func.Function().Value;
-                return true;
+                SetValue(Func.Function().Value);
+                UserSetValueStr?.Invoke();
+                return;
             }
-            Value = double.NaN;
+            Func= None;
+            SetValue(double.NaN);
             IsError = true;
-            return false;
+            UserSetValueStr?.Invoke();
         }
+        private double _Value=0;
         public double Value
         {
-            get => field; 
-            private set
+            get => _Value;
+        }
+        private void SetValue(double value)
+        {
+            if ((!Extension.CompareDoubleIfBothNaNThenEqual(value, _Value))||IsExpression)
             {
-                if (!Extension.CompareDoubleIfBothNaNThenEqual(value,field))
-                {
-                    this.RaiseAndSetIfChanged(ref field, value);
-                    NumberChanged?.Invoke();
-                }
+                this.RaiseAndSetIfChanged(ref _Value, value,nameof(Value));
+                CallNumberChanged();
+            }
+            if (!IsExpression)
+            {
+                ShownText = double.IsNaN(value) ? "" : value.ToString();
+                this.RaisePropertyChanged(nameof(ValueStr));
             }
         }
-
-        private void SetValueStr(string value)
-        {
-            ShownText = value;
-            this.RaisePropertyChanged(nameof(ValueStr));
-        }
+        /// <summary>
+        /// 只能由用户触发
+        /// </summary>
         public string ValueStr
         {
             get => ShownText;
@@ -96,7 +129,7 @@ namespace CsGrafeq
         private void CharValueChanged(EnglishCharEnum c) {
             if (Func.Reference.HasFlag(c))
             {
-                Value = Func.Function().Value;
+                SetValue(Func.Function().Value);
             }
         }
         private DoubleNumber DirectFunc() => Number;

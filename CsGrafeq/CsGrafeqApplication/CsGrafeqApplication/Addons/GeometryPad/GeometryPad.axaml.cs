@@ -56,13 +56,12 @@ public partial class GeometryPad : Addon
         foreach (var i in (DataContext as GeometryPadViewModel)!.Operations)
         foreach (var j in i)
             Actions!.Add(j);
-
         GeoPadAction = Actions.FirstOrDefault();
         Shapes.CollectionChanged += (s, e) => { Owner?.Invalidate(this); };
         Shapes.OnShapeChanged += () => { Owner?.Invalidate(this); };
 #if DEBUG
         var p1 = AddShape(new Point(new PointGetter_FromLocation((0.5, 0.5))));
-        var p2 = AddShape(new Point(new PointGetter_FromLocation((1.5, 0.5))));
+        var p2 = AddShape(new Point(new PointGetter_FromLocation((1.5, 1.5))));
         var s1 = AddShape(new Straight(new LineGetter_Connected(p1, p2)));
         var p3 = AddShape(new Point(new PointGetter_OnLine(s1, (0, 0))));
         var c1 = AddShape(new Circle(new CircleGetter_FromCenterAndRadius(p1,1)));
@@ -260,9 +259,9 @@ public partial class GeometryPad : Addon
                 {
                     var newp = FindNearestPointOnTwoAxisLine(MathToPixel(pg.GetPoint()));
                     if (newp.X != PointerMovedPos.X)
-                        pg.PointX.SetValueNumber(PixelToMathX(newp.X));
+                        pg.PointX.SetNumber(PixelToMathX(newp.X));
                     else if (newp.Y != PointerMovedPos.Y)
-                        pg.PointY.SetValueNumber(PixelToMathY(newp.Y));
+                        pg.PointY.SetNumber(PixelToMathY(newp.Y));
                     else
                         pg?.SetPoint(Owner.PixelToMath(newp));
                 }
@@ -1173,8 +1172,7 @@ public partial class GeometryPad : Addon
         {
             var shape = ss[0].Item2;
             if (shape is GeoCircle)
-                _ = 0;
-                //return new PointGetter_OnCircle((Circle)shape, PixelToMath(Location));
+                return new PointGetter_OnCircle((Circle)shape, PixelToMath(Location));
             if (shape is GeoLine)
                 return new PointGetter_OnLine((Line)shape, PixelToMath(Location));
             return new PointGetter_FromLocation(PixelToMath(Location));
@@ -1513,8 +1511,6 @@ public partial class GeometryPad : Addon
     {
         if (sender is TextBox tb)
         {
-            Console.WriteLine("1"+tb[!TextBox.TextProperty].GetType());
-            Console.WriteLine("2"+tb[~TextBox.TextProperty].GetType());
         }
     }
 

@@ -67,7 +67,7 @@ public class CircleGetter_FromCenterAndRadius : CircleGetter
     public CircleGetter_FromCenterAndRadius(Point center,double radius=1)
     {
         Center = center;
-        Radius.SetValueNumber(radius);
+        Radius.SetNumber(radius);
     }
 
     public override string ActionName => "Circle";

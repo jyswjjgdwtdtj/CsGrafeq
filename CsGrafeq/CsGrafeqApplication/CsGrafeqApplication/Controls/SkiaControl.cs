@@ -27,7 +27,6 @@ public class SkiaControl : TemplatedControl
         OnValidRectRefresh();
         SizeChanged += (s, e) => { OnValidRectRefresh(); };
 #if Windows
-        Console.WriteLine(123);
 #endif
     }
 
