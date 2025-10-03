@@ -24,15 +24,22 @@
 	<PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
 	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
+	<ItemGroup>
+	  <None Remove="Assets\camera.svg" />
+	  <None Remove="Assets\Github.svg" />
+	  <None Remove="Assets\input.svg" />
+	  <None Remove="Assets\shape.svg" />
+	  <None Remove="Assets\slider.svg" />
+	</ItemGroup>
   <ItemGroup>
     <AvaloniaResource Include="Assets\avalonia-logo.ico" />
     <AvaloniaResource Include="Assets\calc.svg" />
-    <AvaloniaResource Include="Assets\func.svg" />
-    <AvaloniaResource Include="Assets\func1.svg" />
-    <AvaloniaResource Include="Assets\fx.svg" />
-    <AvaloniaResource Include="Assets\geo.svg" />
-    <AvaloniaResource Include="Assets\GeoIcon.ico" />
-    <AvaloniaResource Include="Assets\points.svg" />
+    <AvaloniaResource Include="Assets\camera.svg" />
+    <AvaloniaResource Include="Assets\favicon.ico" />
+    <AvaloniaResource Include="Assets\Github.svg" />
+    <AvaloniaResource Include="Assets\input.svg" />
+    <AvaloniaResource Include="Assets\shape.svg" />
+    <AvaloniaResource Include="Assets\slider.svg" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Addons\GeometryPad\Actions.json" />

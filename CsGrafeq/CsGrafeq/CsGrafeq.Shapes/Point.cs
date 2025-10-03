@@ -36,8 +36,8 @@ public class Point : GeometryShape
         InvokeEvent();
     }
 
-    public override Vec HitTest(Vec vec)
+    public override Vec NearestOf(Vec vec)
     {
-        return vec - Location;
+        return Location;
     }
 }

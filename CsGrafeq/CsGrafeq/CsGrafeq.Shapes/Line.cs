@@ -32,10 +32,10 @@ public abstract class Line : GeometryShape
 
     public abstract bool CheckIsValid(Vec vec);
 
-    public override Vec HitTest(Vec vec)
+    public override Vec NearestOf(Vec vec)
     {
         var res = DistanceToLine(Current.Point1, Current.Point2, vec, out var point);
-        return CheckIsValid(point) ? vec - point : Vec.Infinity;
+        return CheckIsValid(point) ? point : Vec.Infinity;
     }
 }
 

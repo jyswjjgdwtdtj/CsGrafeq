@@ -5,4 +5,5 @@
     <valueConverter:Not x:Key="Not"></valueConverter:Not>
     <valueConverter:DoubleToString x:Key="DoubleToString"></valueConverter:DoubleToString>
     <valueConverter:IntToBool x:Key="IntToBool"></valueConverter:IntToBool>
+	<valueConverter:BoolToDouble x:Key="BoolToDouble"></valueConverter:BoolToDouble>
 </ResourceDictionary>

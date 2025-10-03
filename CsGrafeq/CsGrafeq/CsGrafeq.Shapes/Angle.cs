@@ -24,7 +24,7 @@ public class Angle : GeometryShape
         Description = "Degree:" + AngleData.Angle;
     }
 
-    public override Vec HitTest(Vec vec)
+    public override Vec NearestOf(Vec vec)
     {
         return Vec.Infinity;
     }

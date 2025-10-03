@@ -4,16 +4,13 @@
                     xmlns:adn="clr-namespace:CsGrafeqApplication.Addons"
                     xmlns:disp="clr-namespace:CsGrafeqApplication.Controls.Displayers"
                     xmlns:geopad="clr-namespace:CsGrafeqApplication.Addons.GeometryPad">
+	<!--事实上这个控件不该是TemplatedControl 而应该是UserControl 然而我偷懒了。。。-->
     <Design.PreviewWith>
-        <StackPanel Width="400" Spacing="10">
-            <StackPanel Background="Transparent">
-                <controls:DisplayerContainer>
-                    <disp:DisplayControl>
-                        <geopad:GeometryPad />
-                    </disp:DisplayControl>
-                </controls:DisplayerContainer>
-            </StackPanel>
-        </StackPanel>
+		<controls:DisplayerContainer Width="1000" Height="700">
+			<disp:DisplayControl>
+				<geopad:GeometryPad />
+			</disp:DisplayControl>
+		</controls:DisplayerContainer>
     </Design.PreviewWith>
     <ControlTheme x:Key="{x:Type controls:DisplayerContainer}" TargetType="controls:DisplayerContainer">
         <Setter Property="Template">
@@ -44,7 +41,12 @@
                     <Border Name="DisplayerCon" ZIndex="0" BorderThickness="0">
                         <ContentPresenter Content="{TemplateBinding Displayer}" />
                     </Border>
-                    <Grid ColumnDefinitions="300,6,*" ZIndex="1" Name="PART_Grid">
+                    <Grid ZIndex="1" Name="PART_Grid">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="300"></ColumnDefinition>
+							<ColumnDefinition Width="6"></ColumnDefinition>
+							<ColumnDefinition Width="*"></ColumnDefinition>
+						</Grid.ColumnDefinitions>
                         <Border Grid.Column="0" BorderThickness="0" BorderBrush="Gray" Name="OperationContainer"
                                 DataContext="{TemplateBinding Displayer}" x:DataType="disp:Displayer"
                                 Background="{DynamicResource CgBackgroundBrush}">

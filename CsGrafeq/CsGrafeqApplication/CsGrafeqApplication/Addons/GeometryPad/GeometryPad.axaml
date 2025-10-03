@@ -125,20 +125,9 @@
                 Background="Transparent">
         <TabItem>
             <TabItem.Header>
-                <Svg Path="/Assets/calc.svg" Width="25" Height="25" Margin="0" />
+                <Svg Path="/Assets/input.svg" Width="25" Height="25" Margin="0" />
             </TabItem.Header>
             <DockPanel ZIndex="1" LastChildFill="True">
-                <Border BorderThickness="0,0,0,1" IsVisible="False">
-                    <Grid Height="40" ColumnDefinitions="40,*" Background="Aquamarine">
-                        <Border Grid.Column="0" Width="40" Height="40" BorderThickness="0,0,1,0">
-                            <ComboBox SelectedIndex="0">
-                                <ComboBoxItem>
-                                    <Svg Source="/Assets/fx.svg" />
-                                </ComboBoxItem>
-                            </ComboBox>
-                        </Border>
-                    </Grid>
-                </Border>
                 <ScrollViewer ZIndex="1" DockPanel.Dock="Bottom">
                     <ItemsControl ItemsSource="{CompiledBinding Shapes}" Padding="0,0,0,5">
                         <ItemsControl.ItemsPanel>
@@ -148,7 +137,6 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemContainerTheme>
                             <ControlTheme TargetType="ContentPresenter">
-                                <Setter Property="Height" Value="70" />
                                 <Setter Property="CornerRadius" Value="3" />
                             </ControlTheme>
                         </ItemsControl.ItemContainerTheme>
@@ -160,6 +148,7 @@
                                             IsDisplayed="{CompiledBinding IsDeleted,Converter={StaticResource Not}}"
                                             IsChecked="{CompiledBinding Selected, Mode=TwoWay}"
                                             IsOver="{CompiledBinding PointerOver, Mode=OneWayToSource}"
+                                            Height="{CompiledBinding IsDeleted,Converter={StaticResource BoolToDouble},ConverterParameter='70',Mode=OneWay}"
                                             Color="{CompiledBinding Color}">
                                             <ctls:CheckedControl.Flyout>
                                                 <Flyout ShowMode="Standard" Placement="BottomEdgeAlignedLeft">
@@ -507,7 +496,7 @@
         </TabItem>
         <TabItem>
             <TabItem.Header>
-                <Svg Path="/Assets/geo.svg" Width="25" Height="25" Margin="0" />
+                <Svg Path="/Assets/shape.svg" Width="25" Height="25" Margin="0" />
             </TabItem.Header>
             <ScrollViewer Name="PART_ActionViewer">
                 <ItemsControl ItemsSource="{CompiledBinding Operations}">
@@ -560,7 +549,7 @@
         </TabItem>
         <TabItem>
             <TabItem.Header>
-                <TextBlock>abc</TextBlock>
+				<Svg Path="/Assets/slider.svg" Width="25" Height="25" Margin="0" />
             </TabItem.Header>
             <ScrollViewer Name="PART_VariableViewer">
                 <StackPanel Orientation="Vertical">

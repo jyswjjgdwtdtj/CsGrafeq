@@ -854,9 +854,9 @@ public partial class GeometryPad : Addon
             {
                 case OSType.Android:
                 {
-                    StrokePaint.StrokeWidth = 3;
-                    StrokeMain.StrokeWidth = 3;
-                    StrokePaintMain.StrokeWidth = 3;
+                    StrokePaint.StrokeWidth = 2;
+                    StrokeMain.StrokeWidth = 2;
+                    StrokePaintMain.StrokeWidth = 2;
                 }
                     break;
             }
@@ -1161,7 +1161,7 @@ public partial class GeometryPad : Addon
         foreach (var geoshape in Shapes.GetShapes<GeometryShape>())
             if (geoshape is Line || geoshape is Circle)
             {
-                var dist = (geoshape.HitTest(mathcursor) * disp.UnitLength).GetLength();
+                var dist = ((geoshape.NearestOf(mathcursor)-mathcursor) * disp.UnitLength).GetLength();
                 if (dist < 5) shapes.Add((dist, geoshape));
             }
 
@@ -1221,7 +1221,7 @@ public partial class GeometryPad : Addon
         foreach (var geoshape in Shapes.GetShapes<GeometryShape>())
             if (geoshape is Line || geoshape is Circle)
             {
-                var dist = (geoshape.HitTest(mathcursor) * disp.UnitLength).GetLength();
+                var dist = ((geoshape.NearestOf(mathcursor)-mathcursor )* disp.UnitLength).GetLength();
                 if (dist < 5) shapes.Add((dist, geoshape));
             }
 
@@ -1357,7 +1357,7 @@ public partial class GeometryPad : Addon
                 continue;
             if (s is T tar)
             {
-                var dis = (tar.HitTest(v) * disp.UnitLength).GetLength();
+                var dis = ((tar.NearestOf(v)-v) * disp.UnitLength).GetLength();
                 if (dis < PointerTouchRange && dis < distance)
                 {
                     distance = dis;

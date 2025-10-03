@@ -5,15 +5,17 @@
 	  <TargetFramework>net9.0</TargetFramework>
 	  <InvariantGlobalization>true</InvariantGlobalization>
 	  <Nullable>enable</Nullable>
-	  <PublishAot>true</PublishAot>
-	  <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-	  <PublishTrimmed>True</PublishTrimmed>
+	  <PublishAot Condition="'$(Configuration.toUpper())' != 'DEBUG'">true</PublishAot>
+	  <PublishAot Condition="'$(Configuration.toUpper())' == 'DEBUG'">false</PublishAot>
+	  <PublishTrimmed Condition="'$(Configuration.toUpper())' != 'DEBUG'">true</PublishTrimmed>
+	  <PublishTrimmed Condition="'$(Configuration.toUpper())' == 'DEBUG'">false</PublishTrimmed>
 	  <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
 	  <LangVersion>Preview</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>favicon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,6 +27,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="favicon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Avalonia.Desktop" />
+    <PackageReference Include="PublishAotCompressed" />
   </ItemGroup>
 </Project>

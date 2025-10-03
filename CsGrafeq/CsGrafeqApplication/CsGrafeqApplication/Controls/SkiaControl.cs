@@ -1,24 +1,26 @@
-﻿using System;
-using Avalonia;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Rendering.SceneGraph;
 using Avalonia.Skia;
 using SkiaSharp;
+using System;
+using System.Runtime.Intrinsics.Arm;
 
 namespace CsGrafeqApplication.Controls;
 
 /// <summary>
 ///     使用SkiaSharp直接绘制图形
 /// </summary>
-public class SkiaControl : TemplatedControl
+public class SkiaControl :UserControl
 {
     /// <summary>
     ///     用于DrawingContext的Custom方法
     /// </summary>
     private readonly CustomDrawOperation customDrawOper;
-
     public SkiaControl()
     {
         Background = new SolidColorBrush(Colors.Transparent);
@@ -65,17 +67,33 @@ public class SkiaControl : TemplatedControl
 
     private class CustomDrawOperation : ICustomDrawOperation
     {
+        private WriteableBitmap Buffer;
+        private object BufferLock=new object();
         public CustomDrawOperation(Rect bounds, uint clearColor = 0x00FFFFFF)
         {
             Bounds = bounds;
             SKDraw += (s, e) => { e.Canvas.Clear(clearColor); };
+            Buffer = new WriteableBitmap(new PixelSize(System.Math.Max((int)bounds.Width,100), System.Math.Max((int)bounds.Height,100)), new Vector(200,200));
         }
 
         public void Dispose()
         {
         }
 
-        public Rect Bounds { get; set; }
+        public Rect Bounds { get=>field; 
+            set
+            {
+                if (field == value) return;
+                lock (BufferLock)
+                {
+                    if (field.Width < value.Width || field.Height < value.Height)
+                    {
+                        Buffer = new WriteableBitmap(new PixelSize((int)value.Width, (int)value.Height), new Vector(200,200));
+                    }
+                }
+                field = value;
+            }
+        }
 
         public bool HitTest(Point p)
         {
@@ -89,13 +107,19 @@ public class SkiaControl : TemplatedControl
 
         public void Render(ImmediateDrawingContext context)
         {
-            var leaseFeature = context.TryGetFeature<ISkiaSharpApiLeaseFeature>();
-            if (leaseFeature != null)
+            lock (BufferLock)
             {
-                using var lease = leaseFeature.Lease();
-                var canvas = lease.SkCanvas;
-                SKDraw.Invoke(this, new SKRenderEventArgs(canvas));
+                using (var lb = Buffer.Lock())
+                {
+                    var info = new SKImageInfo(lb.Size.Width, lb.Size.Height, lb.Format.ToSkColorType(), SKAlphaType.Premul);
+                    using (SKSurface surface = SKSurface.Create(info, lb.Address, lb.RowBytes))
+                    {
+                        using SKCanvas canvas = surface.Canvas;
+                        SKDraw?.Invoke(null,new SKRenderEventArgs(canvas));
+                    }
+                }
             }
+            context.DrawBitmap(Buffer,Bounds);
         }
 
         public event EventHandler<SKRenderEventArgs> SKDraw;

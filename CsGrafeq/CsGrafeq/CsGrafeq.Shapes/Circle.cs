@@ -27,9 +27,9 @@ public class Circle : FilledShape
         InvokeEvent();
     }
 
-    public override Vec HitTest(Vec vec)
+    public override Vec NearestOf(Vec vec)
     {
-        return (vec - InnerCircle.Center)-(vec - InnerCircle.Center).Unit() * InnerCircle.Radius;
+        return InnerCircle.Center+(vec - InnerCircle.Center).Unit() * InnerCircle.Radius;
     }
 }
 

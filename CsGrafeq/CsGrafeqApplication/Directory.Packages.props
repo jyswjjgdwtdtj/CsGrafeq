@@ -23,7 +23,9 @@
     <PackageVersion Include="Avalonia.ReactiveUI" Version="11.3.6" />
     <PackageVersion Include="HarfBuzzSharp.NativeAssets.WebAssembly" Version="8.3.1.2" />
     <PackageVersion Include="Microsoft.NET.Runtime.WebAssembly.Sdk" Version="9.0.9" />
+    <PackageVersion Include="PublishAotCompressed" Version="1.0.5" />
     <PackageVersion Include="SkiaSharp" Version="3.119.0" />
+    <PackageVersion Include="SkiaSharp.NativeAssets.Android" Version="3.119.1" />
     <PackageVersion Include="SkiaSharp.NativeAssets.WebAssembly" Version="3.119.1" />
     <PackageVersion Include="Xamarin.AndroidX.Core.SplashScreen" Version="1.0.1.15" />
   </ItemGroup>

@@ -39,7 +39,7 @@ public abstract class GeometryShape : Shape
         }
     } = false;
 
-    public abstract Vec HitTest(Vec vec);
+    public abstract Vec NearestOf(Vec vec);
     public abstract void RefreshValues();
     public event ShapeChangedHandler<bool>? SelectedChanged;
 }

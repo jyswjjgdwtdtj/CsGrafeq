@@ -8,7 +8,6 @@ namespace CsGrafeq.Shapes;
 public class ShapeList:ObservableCollection<Shape>
 {
     private static readonly StringBuilder sb = new();
-    private int index = 0;
     public event Action? OnShapeChanged;
     private List<GeometryShape> SelectedShapes= new();
     public ShapeList() : base()
@@ -72,7 +71,7 @@ public class ShapeList:ObservableCollection<Shape>
     private void AddGeometry(GeometryShape shape)
     {
         base.Add(shape);
-        shape.Name = GetNameFromIndex(index++).ToUpper();
+        shape.Name = GetFirstNameNotDistributed().ToUpper();
         shape.SelectedChanged += (s, e) =>
         {
             if (e)
@@ -156,6 +155,21 @@ public class ShapeList:ObservableCollection<Shape>
             foreach (var s in shape.SubShapes)
             foreach (var i in GetAllChildren(s)) 
                 yield return i;
+        }
+    }
+    public Shape? GetShapeByName(string name)
+    {
+        name = name.ToLower();
+        return this.FirstOrDefault((shape) => (!shape.IsDeleted)&&shape.Name.ToLower() == name, null);
+    }
+
+    public string GetFirstNameNotDistributed()
+    {
+        for(var i = 0;;i++)
+        {
+            string name=GetNameFromIndex(i);
+            if (GetShapeByName(name) == null)
+                return name;
         }
     }
 }

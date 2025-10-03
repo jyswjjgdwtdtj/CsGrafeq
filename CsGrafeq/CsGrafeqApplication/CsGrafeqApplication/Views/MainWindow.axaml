@@ -5,9 +5,7 @@
         xmlns:views="clr-namespace:CsGrafeqApplication.Views"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="CsGrafeqApplication.Views.MainWindow"
-        Icon="/Assets/GeoIcon.ico"
-        Title="CsGrafeq"
-        RenderOptions.BitmapInterpolationMode="HighQuality"
-        RenderOptions.EdgeMode="Antialias">
+        Icon="/Assets/favicon.ico"
+        Title="CsGrafeq">
     <views:MainView />
 </Window>

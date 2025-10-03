@@ -24,10 +24,10 @@ public class Polygon : FilledShape
         InvokeEvent();
     }
 
-    public override Vec HitTest(Vec vec)
+    public override Vec NearestOf(Vec vec)
     {
         var len = Locations.Length;
-        return FindMin(GetEnumDistance(Locations, vec))-vec;
+        return FindMin(GetEnumDistance(Locations, vec));
     }
     private static IEnumerable<(double,Vec)> GetEnumDistance(Vec[] vecs, Vec test)
     {

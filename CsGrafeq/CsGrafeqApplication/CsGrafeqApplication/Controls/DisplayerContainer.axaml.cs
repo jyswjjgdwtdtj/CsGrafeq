@@ -75,7 +75,14 @@ public class DisplayerContainer : TemplatedControl
             };
         var toggle = e.NameScope.Find<CheckBox>("Toggle");
         var previousWidth = 300d;
-        toggle.Tapped += (s, e) =>
+        splitter.DragCompleted += (s, e) =>
+        {
+            if (splitter.Bounds.Left == 0)
+            {
+                toggle.IsChecked = true;
+            }
+        };
+        toggle.IsCheckedChanged += (s, e) =>
         {
             if (toggle.IsChecked is null)
                 return;
@@ -89,6 +96,8 @@ public class DisplayerContainer : TemplatedControl
             }
             else
             {
+                if (previousWidth == 0)
+                    previousWidth = 300;
                 grid.ColumnDefinitions[0].Width = new GridLength(previousWidth, GridUnitType.Pixel);
                 splitter.IsVisible = true;
             }
