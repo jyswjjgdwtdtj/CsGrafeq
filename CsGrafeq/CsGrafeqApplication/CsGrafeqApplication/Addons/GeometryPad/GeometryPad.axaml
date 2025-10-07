@@ -21,6 +21,12 @@
                 <Setter Property="Background" Value="Transparent" />
             </Style>
         </Style>
+        <Style Selector="TextBox">
+            <Setter Property="FontFamily" Value="{StaticResource JetbrainsMono}"></Setter>
+        </Style>
+        <Style Selector="TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource JetbrainsMono}"></Setter>
+        </Style>
         <Style Selector="TextBox DataValidationErrors">
             <Setter Property="Template">
                 <ControlTemplate>
@@ -140,15 +146,20 @@
                                 <Setter Property="CornerRadius" Value="3" />
                             </ControlTheme>
                         </ItemsControl.ItemContainerTheme>
+                        <ItemsControl.Styles>
+                            <Style Selector="ItemsPresenter#PART_ItemsPresenter > VirtualizingStackPanel > ContentPresenter > TextBlock">
+                                <Setter Property="IsVisible" Value="False"></Setter>
+                            </Style>
+                        </ItemsControl.Styles>
                         <ItemsControl.ItemTemplate>
                             <geopad:GeoShapeAndElseTemplate>
                                 <geopad:GeoShapeAndElseTemplate.IsGeometryShape>
                                     <DataTemplate DataType="shapes:GeometryShape">
                                         <ctls:CheckedControl
-                                            IsDisplayed="{CompiledBinding IsDeleted,Converter={StaticResource Not}}"
                                             IsChecked="{CompiledBinding Selected, Mode=TwoWay}"
                                             IsOver="{CompiledBinding PointerOver, Mode=OneWayToSource}"
                                             Height="{CompiledBinding IsDeleted,Converter={StaticResource BoolToDouble},ConverterParameter='70',Mode=OneWay}"
+											
                                             Color="{CompiledBinding Color}">
                                             <ctls:CheckedControl.Flyout>
                                                 <Flyout ShowMode="Standard" Placement="BottomEdgeAlignedLeft">
@@ -171,17 +182,21 @@
                                                     IsChecked="{CompiledBinding Visible,Mode=TwoWay}"
                                                     Classes="VisibilityCheckBox"
                                                     VerticalAlignment="Center" Margin="5" />
+												<Button DockPanel.Dock="Right" VerticalAlignment="Center" Tag="{CompiledBinding .}" Click="DeleteButtonClicked" Background="{StaticResource HTMedianBrush}">
+													<Svg Path="/Assets/delete.svg" Width="20" Height="20" Margin="0" />
+												</Button>
                                                 <ContentControl Content="{CompiledBinding .}">
                                                     <ContentControl.ContentTemplate>
                                                         <geopad:ShapeTemplate>
                                                             <geopad:ShapeTemplate.LocationPoint>
                                                                 <DataTemplate DataType="shapes:Point">
-                                                                    <StackPanel Orientation="Horizontal">
+                                                                    <DockPanel LastChildFill="True">
                                                                         <TextBox
                                                                             Text="{CompiledBinding Name,Mode=TwoWay}"
                                                                             Classes="CommonTextBox Big"
                                                                             Height="20"
                                                                             Margin="0"
+                                                                            DockPanel.Dock="Left"
                                                                             Tapped="HandleEvent" />
                                                                         <StackPanel Orientation="Horizontal">
                                                                             <TextBlock Text="=Point("
@@ -195,8 +210,9 @@
                                                                                 KeyDown="TextBoxKeyDown"
                                                                                 LostFocus="TextBoxPixelXLostFocus"
                                                                                 Tag="{CompiledBinding}"
-                                                                                KeyUp="PointX_OnKeyUp"
-                                                                                Tapped="HandleEvent" />
+                                                                                TextChanged="PointX_OnTextChanged"
+                                                                                Tapped="HandleEvent"
+                                                                                IsEnabled="{CompiledBinding IsUserEnabled}"/>
                                                                             <TextBlock Text="," TextAlignment="Left"
                                                                                 VerticalAlignment="Center"
                                                                                 Classes="Big" />
@@ -207,18 +223,19 @@
                                                                                 KeyDown="TextBoxKeyDown"
                                                                                 LostFocus="TextBoxPixelYLostFocus"
                                                                                 Tag="{CompiledBinding}"
-                                                                                KeyUp="PointY_OnKeyUp"
-                                                                                Tapped="HandleEvent" />
+                                                                                TextChanged="PointY_OnTextChanged"
+                                                                                Tapped="HandleEvent"
+                                                                                IsEnabled="{CompiledBinding IsUserEnabled}" />
                                                                             <TextBlock Text=")" TextAlignment="Left"
                                                                                 VerticalAlignment="Center"
                                                                                 Classes="Big" />
                                                                         </StackPanel>
-                                                                    </StackPanel>
+                                                                    </DockPanel>
                                                                 </DataTemplate>
                                                             </geopad:ShapeTemplate.LocationPoint>
                                                             <geopad:ShapeTemplate.ControlledPoint>
                                                                 <DataTemplate DataType="shapes:Point">
-                                                                    <Grid ColumnDefinitions="Auto,Auto"
+                                                                    <Grid ColumnDefinitions="Auto,*"
                                                                           RowDefinitions="Auto,Auto"
                                                                           VerticalAlignment="Center">
                                                                         <TextBox
@@ -227,10 +244,11 @@
                                                                             Grid.Column="0" Grid.Row="0" Height="20"
                                                                             Margin="0"
                                                                             Tapped="HandleEvent" />
-                                                                        <StackPanel Orientation="Horizontal"
+                                                                        <DockPanel Grid.Column="1"
+                                                                            Grid.Row="0" LastChildFill="True">
+                                                                            <StackPanel Orientation="Horizontal"
                                                                             Background="Transparent" Margin="0,5"
-                                                                            VerticalAlignment="Center" Grid.Column="1"
-                                                                            Grid.Row="0">
+                                                                            VerticalAlignment="Center" >
                                                                             <TextBlock Text="=Controlled("
                                                                                 TextAlignment="Left"
                                                                                 VerticalAlignment="Center"
@@ -241,9 +259,10 @@
                                                                                 GotFocus="TextBoxGetFocus"
                                                                                 KeyDown="TextBoxKeyDown"
                                                                                 LostFocus="TextBoxPixelXLostFocus"
-                                                                                KeyUp="PointX_OnKeyUp"
+                                                                                TextChanged="PointX_OnTextChanged"
                                                                                 Tag="{CompiledBinding}"
-                                                                                Tapped="HandleEvent" />
+                                                                                Tapped="HandleEvent" 
+                                                                                IsEnabled="{CompiledBinding IsUserEnabled}"/>
                                                                             <TextBlock Text="," TextAlignment="Left"
                                                                                 VerticalAlignment="Center"
                                                                                 Classes="Big" />
@@ -253,13 +272,15 @@
                                                                                 GotFocus="TextBoxGetFocus"
                                                                                 KeyDown="TextBoxKeyDown"
                                                                                 LostFocus="TextBoxPixelYLostFocus"
-                                                                                KeyUp="PointY_OnKeyUp"
+                                                                                TextChanged="PointY_OnTextChanged"
                                                                                 Tag="{CompiledBinding}"
-                                                                                Tapped="HandleEvent" />
+                                                                                Tapped="HandleEvent" 
+                                                                                IsEnabled="{CompiledBinding IsUserEnabled}"/>
                                                                             <TextBlock Text=")" TextAlignment="Left"
                                                                                 VerticalAlignment="Center"
                                                                                 Classes="Big" />
                                                                         </StackPanel>
+                                                                        </DockPanel>
                                                                         <StackPanel
                                                                             DataContext="{CompiledBinding PointGetter}"
                                                                             Orientation="Horizontal"
@@ -419,7 +440,6 @@
                                                                 <DataTemplate DataType="shapes:Circle">
                                                                     <StackPanel Orientation="Horizontal">
                                                                         <TextBox
-                                                                            InputMethod.IsInputMethodEnabled="False"
                                                                             Text="{CompiledBinding Name,Mode=TwoWay}"
                                                                             Classes="CommonTextBox Big"
                                                                             Height="20"
@@ -452,7 +472,7 @@
                                                                                 Classes="CommonTextBox Big"
                                                                                 LostFocus="NumberLostFocus"
                                                                                 Tag="{CompiledBinding Path=.}"
-                                                                                KeyUp="Number_OnKeyUp"
+                                                                                TextChanged="Number_OnTextChanged"
                                                                                 Tapped="HandleEvent"
                                                                                 DataContext="{CompiledBinding Path=((getter:CircleGetter_FromCenterAndRadius)Getter).Radius}" />
                                                                             <TextBlock Text=")" TextAlignment="Left"

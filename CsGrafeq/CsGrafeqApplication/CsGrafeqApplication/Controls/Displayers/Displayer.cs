@@ -24,6 +24,7 @@ public abstract class Displayer : SkiaControl
     public Displayer()
     {
         Addons.CollectionChanged += ChildrenChanged;
+        GestureRecognizers.Add(new PinchGestureRecognizer());
     }
 
     [Content] public AddonList Addons { get; } = new();
@@ -152,7 +153,6 @@ public abstract class Displayer : SkiaControl
                 return Intercept;
         return DoNext;
     }
-
     protected override void OnSizeChanged(SizeChangedEventArgs e)
     {
         base.OnSizeChanged(e);

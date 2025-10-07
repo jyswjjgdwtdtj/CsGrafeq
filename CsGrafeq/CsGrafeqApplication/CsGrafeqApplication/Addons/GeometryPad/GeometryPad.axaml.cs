@@ -850,7 +850,7 @@ public partial class GeometryPad : Addon
                StrokePaintMain = new() { Color = cd.AxisPaintMain.Color, IsAntialias = true, IsStroke = true },
                BubbleBack = new() { Color = cd.AxisPaint1.Color.WithAlpha(90), IsAntialias = true })
         {
-            switch (OS.GetOSType())
+            /*switch (OS.GetOSType())
             {
                 case OSType.Android:
                 {
@@ -859,7 +859,7 @@ public partial class GeometryPad : Addon
                     StrokePaintMain.StrokeWidth = 2;
                 }
                     break;
-            }
+            }*/
 
             foreach (var shape in shapes)
             {
@@ -1462,55 +1462,78 @@ public partial class GeometryPad : Addon
         return shape;
     }
 
-    private void PointX_OnKeyUp(object? sender, KeyEventArgs e)
+    private void PointX_OnTextChanged(object? sender, RoutedEventArgs e)
     {
         if (sender is TextBox tb)
         {
             var p = (tb.Tag as Point)!;
-            if ((p.PointGetter as PointGetter_Movable).PointX.IsError)
+            if(p is not null)
             {
-                DataValidationErrors.SetError(tb, new Exception());
-            }
-            else
-            {
-                p.RefreshValues();
-                DataValidationErrors.ClearErrors(tb);
+                if ((p.PointGetter as PointGetter_Movable).PointX.IsError)
+                {
+                    DataValidationErrors.SetError(tb, new Exception());
+                }
+                else
+                {
+                    p.RefreshValues();
+                    DataValidationErrors.ClearErrors(tb);
+                }
             }
         }
     }
 
-    private void PointY_OnKeyUp(object? sender, KeyEventArgs e)
+    private void PointY_OnTextChanged(object? sender, RoutedEventArgs e)
     {
         if (sender is TextBox tb)
         {
             var p = (tb.Tag as Point)!;
-            if ((p.PointGetter as PointGetter_Movable).PointY.IsError)
+            if (p is not null)
             {
-                DataValidationErrors.SetError(tb, new Exception());
-            }
-            else
-            {
-                p.RefreshValues();
-                DataValidationErrors.ClearErrors(tb);
+                if ((p.PointGetter as PointGetter_Movable).PointY.IsError)
+                {
+                    DataValidationErrors.SetError(tb, new Exception());
+                }
+                else
+                {
+                    p.RefreshValues();
+                    DataValidationErrors.ClearErrors(tb);
+                }
             }
         }
     }
 
-    private void Number_OnKeyUp(object? sender, KeyEventArgs e)
+    private void Number_OnTextChanged(object? sender, RoutedEventArgs e)
     {
         if (sender is TextBox tb)
         {
             var n = (tb.Tag as ExpNumber)!;
-            if (n.IsError)
-                DataValidationErrors.SetError(tb, new Exception());
-            else
-                DataValidationErrors.ClearErrors(tb);
+            if(n is not null)
+            {
+                if (n.IsError)
+                    DataValidationErrors.SetError(tb, new Exception());
+                else
+                    DataValidationErrors.ClearErrors(tb);
+            }
         }
     }
     private void TextBoxGetFocus(object? sender, GotFocusEventArgs e)
     {
         if (sender is TextBox tb)
         {
+        }
+    }
+    private void EventHandledTrue(object? sender, RoutedEventArgs e)
+    {
+        e.Handled = true;
+    }
+    private void DeleteButtonClicked(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn)
+        {
+            if (btn.Tag is GeometryShape shape)
+            {
+                DoGeoShapesDelete([shape]);
+            }
         }
     }
 

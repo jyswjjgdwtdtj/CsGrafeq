@@ -67,4 +67,14 @@ public abstract class Shape : ReactiveObject
             InvokeEvent();
         }
     } = false;
+    public bool IsUserEnabled
+    {
+        get => field;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref field, value);
+            InvokeEvent();
+        }
+    } = true;
+    
 }

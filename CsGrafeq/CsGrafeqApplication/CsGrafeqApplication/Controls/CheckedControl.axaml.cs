@@ -6,7 +6,7 @@ using Avalonia.Metadata;
 
 namespace CsGrafeqApplication.Controls;
 
-[PseudoClasses(":checked", ":over",":displayed")]
+[PseudoClasses(":checked", ":over")]
 public class CheckedControl : TemplatedControl
 {
     public static readonly DirectProperty<CheckedControl, bool> IsCheckedProperty =
@@ -24,21 +24,12 @@ public class CheckedControl : TemplatedControl
         AvaloniaProperty.Register<CheckedControl, uint>(nameof(Color));
     
     public static readonly StyledProperty<Flyout?> FlyoutProperty =AvaloniaProperty.Register<CheckedControl, Flyout?>(nameof(Flyout));
-
-    public static readonly StyledProperty<bool?> IsDisplayedProperty =
-        AvaloniaProperty.Register<CheckedControl, bool?>(nameof(IsDisplayed));
     static CheckedControl()
     {
         AffectsRender<CheckedControl>(IsCheckedProperty, ContentProperty, IsOverProperty);
     }
     
     public Flyout? Flyout { get => GetValue(FlyoutProperty); set => SetValue(FlyoutProperty, value); }
-
-    public bool? IsDisplayed
-    {
-        get => GetValue(IsDisplayedProperty);
-        set => SetValue(IsDisplayedProperty, value);
-    }
 
     public CheckedControl()
     {
@@ -56,14 +47,8 @@ public class CheckedControl : TemplatedControl
             if (e.Property == IsCheckedProperty) PseudoClasses.Set(":checked", IsChecked);
             if (e.Property == IsPointerOverProperty) IsOver = IsPointerOver;
             if (e.Property == IsOverProperty) PseudoClasses.Set(":over", IsOver);
-            if (e.Property == IsDisplayedProperty)
-            {
-                PseudoClasses.Set(":displayed", IsDisplayed??false);
-            }
         };
-        Resources.TryGetResource("MedianColor", null, out var color);
         Color = 0x050505;
-        IsDisplayed = true;
     }
 
     public uint Color

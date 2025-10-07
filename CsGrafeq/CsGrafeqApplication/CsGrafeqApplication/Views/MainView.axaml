@@ -37,13 +37,25 @@
             </ctls:DisplayerContainer>
         </Grid>
         <Border ZIndex="1" Background="Transparent" Name="MsgboxContainer" IsVisible="False">
-            <Border CornerRadius="10" Background="{DynamicResource HTMedianBrush}" VerticalAlignment="Center" Width="600" Height="400" HorizontalAlignment="Center">
-                <DockPanel LastChildFill="True">
-                    <Button Click="Button_OnClick" HorizontalAlignment="Right" Width="60" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="40,10" DockPanel.Dock="Bottom" Content="OK" Background="{DynamicResource CgBackgroundBrush}"></Button>
-					<Border Name="ContentContainer" Padding="40" Background="White" Margin="15" CornerRadius="5"> 
-					</Border>
-                </DockPanel>
-            </Border>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="20*"></ColumnDefinition>
+                    <ColumnDefinition Width="60*" MaxWidth="600"></ColumnDefinition>
+                    <ColumnDefinition Width="20*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="20*"></RowDefinition>
+                    <RowDefinition Height="60*" MaxHeight="400"></RowDefinition>
+                    <RowDefinition Height="20*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Border Grid.Row="1" Grid.Column="1" CornerRadius="10" Background="{DynamicResource HTMedianBrush}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                    <DockPanel LastChildFill="True">
+                        <Button Click="Button_OnClick" HorizontalAlignment="Right" Width="60" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="40,10" DockPanel.Dock="Bottom" Content="OK" Background="{DynamicResource CgBackgroundBrush}"></Button>
+                        <Border Name="ContentContainer" Padding="40" Background="White" Margin="15" CornerRadius="5"> 
+                        </Border>
+                    </DockPanel>
+                </Border>
+            </Grid>
         </Border>
     </Panel>
 </UserControl>

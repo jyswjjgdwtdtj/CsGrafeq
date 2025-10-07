@@ -14,6 +14,7 @@
                 <ResourceInclude Source="/Controls/VariableBox.axaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
+		<FontFamily x:Key="JetbrainsMono">avares://CsGrafeqApplication/Fonts/JetBrainsMono-Regular.ttf#JetBrains Mono</FontFamily>
     </Application.Resources>
     <Application.Styles>
         <FluentTheme />

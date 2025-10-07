@@ -12,10 +12,6 @@
 
     <ControlTheme x:Key="{x:Type controls:CheckedControl}" TargetType="controls:CheckedControl">
         <Setter Property="Focusable" Value="True" />
-        <Setter Property="IsDisplayed" Value="True"></Setter>
-        <Style Selector="^:not(:displayed)">
-            <Setter Property="Height" Value="0"></Setter>
-        </Style>
         <Style Selector="^ /template/ Border#BackgroundShower">
             <Setter Property="Opacity" Value="0" />
             <Setter Property="Transitions">

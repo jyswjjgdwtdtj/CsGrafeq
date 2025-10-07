@@ -26,20 +26,55 @@
 	</PropertyGroup>
 	<ItemGroup>
 	  <None Remove="Assets\camera.svg" />
+	  <None Remove="Assets\delete.svg" />
 	  <None Remove="Assets\Github.svg" />
 	  <None Remove="Assets\input.svg" />
 	  <None Remove="Assets\shape.svg" />
 	  <None Remove="Assets\slider.svg" />
+	  <None Remove="Fonts\JETBRAINSMONOREGULAR.TTF" />
 	</ItemGroup>
   <ItemGroup>
     <AvaloniaResource Include="Assets\avalonia-logo.ico" />
     <AvaloniaResource Include="Assets\calc.svg" />
     <AvaloniaResource Include="Assets\camera.svg" />
+    <AvaloniaResource Include="Assets\delete.svg" />
     <AvaloniaResource Include="Assets\favicon.ico" />
     <AvaloniaResource Include="Assets\Github.svg" />
     <AvaloniaResource Include="Assets\input.svg" />
     <AvaloniaResource Include="Assets\shape.svg" />
     <AvaloniaResource Include="Assets\slider.svg" />
+    <None Remove="Fonts\JetBrainsMono-Bold.ttf" />
+    <AvaloniaResource Include="Fonts\JetBrainsMono-Bold.ttf" />
+    <None Remove="Fonts\JetBrainsMono-BoldItalic.ttf" />
+    <AvaloniaResource Include="Fonts\JetBrainsMono-BoldItalic.ttf" />
+    <None Remove="Fonts\JetBrainsMono-ExtraBold.ttf" />
+    <AvaloniaResource Include="Fonts\JetBrainsMono-ExtraBold.ttf" />
+    <None Remove="Fonts\JetBrainsMono-ExtraBoldItalic.ttf" />
+    <AvaloniaResource Include="Fonts\JetBrainsMono-ExtraBoldItalic.ttf" />
+    <None Remove="Fonts\JetBrainsMono-ExtraLight.ttf" />
+    <AvaloniaResource Include="Fonts\JetBrainsMono-ExtraLight.ttf" />
+    <None Remove="Fonts\JetBrainsMono-ExtraLightItalic.ttf" />
+    <AvaloniaResource Include="Fonts\JetBrainsMono-ExtraLightItalic.ttf" />
+    <None Remove="Fonts\JetBrainsMono-Italic.ttf" />
+    <AvaloniaResource Include="Fonts\JetBrainsMono-Italic.ttf" />
+    <None Remove="Fonts\JetBrainsMono-Light.ttf" />
+    <AvaloniaResource Include="Fonts\JetBrainsMono-Light.ttf" />
+    <None Remove="Fonts\JetBrainsMono-LightItalic.ttf" />
+    <AvaloniaResource Include="Fonts\JetBrainsMono-LightItalic.ttf" />
+    <None Remove="Fonts\JetBrainsMono-Medium.ttf" />
+    <AvaloniaResource Include="Fonts\JetBrainsMono-Medium.ttf" />
+    <None Remove="Fonts\JetBrainsMono-MediumItalic.ttf" />
+    <AvaloniaResource Include="Fonts\JetBrainsMono-MediumItalic.ttf" />
+    <None Remove="Fonts\JetBrainsMono-Regular.ttf" />
+    <AvaloniaResource Include="Fonts\JetBrainsMono-Regular.ttf" />
+    <None Remove="Fonts\JetBrainsMono-SemiBold.ttf" />
+    <AvaloniaResource Include="Fonts\JetBrainsMono-SemiBold.ttf" />
+    <None Remove="Fonts\JetBrainsMono-SemiBoldItalic.ttf" />
+    <AvaloniaResource Include="Fonts\JetBrainsMono-SemiBoldItalic.ttf" />
+    <None Remove="Fonts\JetBrainsMono-Thin.ttf" />
+    <AvaloniaResource Include="Fonts\JetBrainsMono-Thin.ttf" />
+    <None Remove="Fonts\JetBrainsMono-ThinItalic.ttf" />
+    <AvaloniaResource Include="Fonts\JetBrainsMono-ThinItalic.ttf" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Addons\GeometryPad\Actions.json" />

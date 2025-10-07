@@ -8,6 +8,7 @@ using Avalonia.Rendering.SceneGraph;
 using Avalonia.Skia;
 using SkiaSharp;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Intrinsics.Arm;
 
 namespace CsGrafeqApplication.Controls;
@@ -73,7 +74,7 @@ public class SkiaControl :UserControl
         {
             Bounds = bounds;
             SKDraw += (s, e) => { e.Canvas.Clear(clearColor); };
-            Buffer = new WriteableBitmap(new PixelSize(System.Math.Max((int)bounds.Width,100), System.Math.Max((int)bounds.Height,100)), new Vector(200,200));
+            Buffer = new WriteableBitmap(new PixelSize((int)(System.Math.Max((int)bounds.Width,100)), (int)((System.Math.Max((int)bounds.Height,100)))), new Vector(96,96));
         }
 
         public void Dispose()
@@ -88,7 +89,8 @@ public class SkiaControl :UserControl
                 {
                     if (field.Width < value.Width || field.Height < value.Height)
                     {
-                        Buffer = new WriteableBitmap(new PixelSize((int)value.Width, (int)value.Height), new Vector(200,200));
+                        Buffer.Dispose();
+                        Buffer = new WriteableBitmap(new PixelSize((int)(value.Width), (int)(value.Height)), new Vector(96,96));
                     }
                 }
                 field = value;
@@ -118,8 +120,8 @@ public class SkiaControl :UserControl
                         SKDraw?.Invoke(null,new SKRenderEventArgs(canvas));
                     }
                 }
+                context.DrawBitmap(Buffer, Bounds);
             }
-            context.DrawBitmap(Buffer,Bounds);
         }
 
         public event EventHandler<SKRenderEventArgs> SKDraw;
@@ -185,7 +187,7 @@ public static class SkiaEx
             2,
             SKColors.Gray
         );
-        TextFont = new SKFont(SKTypeface.FromFamilyName("Microsoft Yahei UI"));
+        TextFont = new SKFont(SKTypeface.FromStream(AssetLoader.Open(new Uri("avares://CsGrafeqApplication/Fonts/JetBrainsMono-Regular.ttf"))));
         Refresh();
     }
 

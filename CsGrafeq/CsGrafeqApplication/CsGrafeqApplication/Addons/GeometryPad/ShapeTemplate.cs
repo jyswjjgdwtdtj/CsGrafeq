@@ -19,7 +19,7 @@ public class ShapeTemplate : IDataTemplate
         if (param is GeometryShape item)
         {
             if(item.IsDeleted)
-                return null;
+                return new Control();
             switch (item)
             {
                 case GeoPoint point:
@@ -27,9 +27,9 @@ public class ShapeTemplate : IDataTemplate
                     switch (point.PointGetter)
                     {
                         case PointGetter_FromLocation pgloc:
-                            return LocationPoint.Build(pgloc);
+                            return LocationPoint?.Build(pgloc);
                         case PointGetter_Movable pgmov:
-                            return ControlledPoint.Build(pgmov);
+                            return ControlledPoint?.Build(pgmov);
                         default:
                             return CommonPoint?.Build(param);
                     }
@@ -48,7 +48,7 @@ public class ShapeTemplate : IDataTemplate
 //                  return IsFunction?.Build(param);
             }
         }
-        return null;
+        return new Control();
     }
 
     public bool Match(object? data)

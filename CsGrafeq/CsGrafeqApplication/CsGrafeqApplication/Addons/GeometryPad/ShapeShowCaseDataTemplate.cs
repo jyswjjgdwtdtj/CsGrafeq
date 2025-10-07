@@ -24,7 +24,6 @@ public class ShapeShowCaseDataTemplate : IDataTemplate
                 ctls[index++] = c;
                 ctls[index++] = new TextBlock { Text = "," };
             }
-
             ctls[index++] = new TextBlock { Text = item[item.Length - 1].Type, Classes = { "Prompt" } };
             var cc = ShapeShowcaseTemplate!.Build(item[item.Length - 1])!;
             cc.DataContext = item[item.Length - 1];

@@ -15,11 +15,11 @@ public class GeoShapeAndElseTemplate : IDataTemplate
         if (param is Shape s)
         {
             if (s.IsDeleted)
-                return null;
+                return new Control();
             return s is GeometryShape? IsGeometryShape?.Build(s) : IsElse?.Build(s);
         }
 
-        return null;
+        return new Control();
     }
 
     public bool Match(object? data)

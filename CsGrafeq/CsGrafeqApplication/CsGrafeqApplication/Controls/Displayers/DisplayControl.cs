@@ -24,6 +24,7 @@ public class DisplayControl : CartesianDisplayer
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
+        if (!e.Pointer.IsPrimary) return;
         Focus();
         StopWheeling();
         if (CallAddonPointerPressed(e) == DoNext)
@@ -47,6 +48,7 @@ public class DisplayControl : CartesianDisplayer
 
     protected override void OnPointerMoved(PointerEventArgs e)
     {
+        if (!e.Pointer.IsPrimary) return;
         StopWheeling();
         if (CallAddonPointerMoved(e) == DoNext)
         {
@@ -122,6 +124,7 @@ public class DisplayControl : CartesianDisplayer
 
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
+        if (!e.Pointer.IsPrimary) return;
         Focus();
         StopWheeling();
         if (CallAddonPointerReleased(e) == DoNext)
@@ -140,11 +143,13 @@ public class DisplayControl : CartesianDisplayer
 
     protected virtual void OnPointerTapped(TappedEventArgs e)
     {
+        if (!e.Pointer.IsPrimary) return;
         CallAddonPointerTapped(e);
     }
 
     protected virtual void OnPointerDoubleTapped(TappedEventArgs e)
     {
+        if (!e.Pointer.IsPrimary) return;
         CallAddonPointerDoubleTapped(e);
     }
 
