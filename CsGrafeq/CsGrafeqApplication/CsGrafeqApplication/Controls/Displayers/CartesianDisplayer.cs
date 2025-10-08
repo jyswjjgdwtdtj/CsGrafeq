@@ -9,6 +9,7 @@ using Avalonia.Styling;
 using Avalonia.Threading;
 using SkiaSharp;
 using static CsGrafeqApplication.Controls.SkiaEx;
+using Math = CsGrafeq.Math;
 
 namespace CsGrafeqApplication.Controls.Displayers;
 
@@ -404,11 +405,9 @@ public class CartesianDisplayer : Displayer
         }
     }
 
-    protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
+    public override void Zoom(double delta,Avalonia.Point point)
     {
-        if (CallAddonPointerWheeled(e) == DoNext)
-        {
-            if (!WheelingStopWatch.IsRunning)
+        if (!WheelingStopWatch.IsRunning)
             {
                 PreviousUnitLength = UnitLength;
                 PreviousUnitLength = UnitLength;
@@ -424,11 +423,10 @@ public class CartesianDisplayer : Displayer
                 }
             }
 
-            var (x, y) = e.GetPosition(this);
+            var (x, y) = point;
             var bzero = Zero;
             var times_x = (Zero.X - x) / UnitLength;
             var times_y = (Zero.Y - y) / UnitLength;
-            var delta = Pow(1.04, e.Delta.Y);
             UnitLength *= delta;
             UnitLength *= delta;
             UnitLength = RangeTo(0.01, 1000000, UnitLength);
@@ -465,6 +463,12 @@ public class CartesianDisplayer : Displayer
             }
 
             InvalidateVisual();
+    }
+    protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
+    {
+        if (CallAddonPointerWheeled(e) == DoNext)
+        {
+            Zoom(System.Math.Pow(1.04,e.Delta.Y), e.GetPosition(this));
         }
     }
 

@@ -194,4 +194,18 @@ public abstract class Addon : UserControl
             Delta = delta;
         }
     }
+    public readonly CommandManager CmdManager = new();
+    public void Undo()
+    {
+        CmdManager.UnDo();
+        Owner?.Invalidate();
+    }
+
+    public void Redo()
+    {
+        CmdManager.ReDo();
+        Owner?.Invalidate();
+    }
+
+    public Control Setting { get; init; }
 }

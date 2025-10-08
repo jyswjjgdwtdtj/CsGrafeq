@@ -8,6 +8,7 @@
              xmlns:shapes="clr-namespace:CsGrafeq.Shapes;assembly=CsGrafeq.Shapes"
              xmlns:getter="clr-namespace:CsGrafeq.Shapes.ShapeGetter;assembly=CsGrafeq.Shapes"
              xmlns:csgrafeqbase="clr-namespace:CsGrafeq;assembly=CsGrafeq.Base"
+			 xmlns:system="clr-namespace:System"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CsGrafeqApplication.Addons.GeometryPad.GeometryPad" x:DataType="vm:GeometryPadViewModel">
     <UserControl.Styles>
@@ -129,13 +130,65 @@
     </UserControl.Styles>
     <TabControl TabStripPlacement="Left" Name="TabControl" Margin="0" Padding="0"
                 Background="Transparent">
+		<TabItem>
+			<TabItem.Header>
+				<Svg Path="/Assets/shape.svg" Width="25" Height="25" Margin="0" />
+			</TabItem.Header>
+			<ScrollViewer Name="PART_ActionViewer">
+				<ItemsControl ItemsSource="{CompiledBinding Operations}">
+					<ItemsControl.ItemsPanel>
+						<ItemsPanelTemplate>
+							<VirtualizingStackPanel Orientation="Vertical" />
+						</ItemsPanelTemplate>
+					</ItemsControl.ItemsPanel>
+					<ItemsControl.ItemTemplate>
+						<DataTemplate DataType="geopad:HasNameActionList">
+							<StackPanel Orientation="Vertical">
+								<Expander Classes="NoBorderExpander" BorderThickness="0"
+                                          IsExpanded="True"
+                                          Width="{CompiledBinding $parent[StackPanel].Bounds.Width}"
+                                          Padding="0" Background="Transparent">
+									<Expander.Header>
+										<TextBlock Text="{CompiledBinding Name }" Margin="0"
+                                                   Padding="0" />
+									</Expander.Header>
+									<Border Padding="10,0" Background="Transparent">
+										<ItemsControl ItemsSource="{CompiledBinding .}">
+											<ItemsControl.ItemsPanel>
+												<ItemsPanelTemplate>
+													<WrapPanel Orientation="Horizontal" ItemSpacing="5"
+                                                               Background="Transparent" Margin="0" />
+												</ItemsPanelTemplate>
+											</ItemsControl.ItemsPanel>
+											<ItemsControl.ItemTemplate>
+												<DataTemplate>
+													<RadioButton Classes="GeoRadio"
+                                                                 IsCheckedChanged="RadioButtonChecked"
+                                                                 Name="{CompiledBinding Name}">
+														<TextBlock VerticalAlignment="Center"
+                                                                   HorizontalAlignment="Center"
+                                                                   TextWrapping="Wrap" FontSize="11"
+                                                                   TextAlignment="Center" Name="RadioText"
+                                                                   Text="{CompiledBinding Name}" />
+													</RadioButton>
+												</DataTemplate>
+											</ItemsControl.ItemTemplate>
+										</ItemsControl>
+									</Border>
+								</Expander>
+							</StackPanel>
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+			</ScrollViewer>
+		</TabItem>
         <TabItem>
             <TabItem.Header>
                 <Svg Path="/Assets/input.svg" Width="25" Height="25" Margin="0" />
             </TabItem.Header>
             <DockPanel ZIndex="1" LastChildFill="True">
                 <ScrollViewer ZIndex="1" DockPanel.Dock="Bottom">
-                    <ItemsControl ItemsSource="{CompiledBinding Shapes}" Padding="0,0,0,5">
+                    <ItemsControl ItemsSource="{CompiledBinding Shapes}" Padding="0,0,0,5" Name="ShapeItemsControl">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <VirtualizingStackPanel Orientation="Vertical" />
@@ -146,11 +199,6 @@
                                 <Setter Property="CornerRadius" Value="3" />
                             </ControlTheme>
                         </ItemsControl.ItemContainerTheme>
-                        <ItemsControl.Styles>
-                            <Style Selector="ItemsPresenter#PART_ItemsPresenter > VirtualizingStackPanel > ContentPresenter > TextBlock">
-                                <Setter Property="IsVisible" Value="False"></Setter>
-                            </Style>
-                        </ItemsControl.Styles>
                         <ItemsControl.ItemTemplate>
                             <geopad:GeoShapeAndElseTemplate>
                                 <geopad:GeoShapeAndElseTemplate.IsGeometryShape>
@@ -159,7 +207,6 @@
                                             IsChecked="{CompiledBinding Selected, Mode=TwoWay}"
                                             IsOver="{CompiledBinding PointerOver, Mode=OneWayToSource}"
                                             Height="{CompiledBinding IsDeleted,Converter={StaticResource BoolToDouble},ConverterParameter='70',Mode=OneWay}"
-											
                                             Color="{CompiledBinding Color}">
                                             <ctls:CheckedControl.Flyout>
                                                 <Flyout ShowMode="Standard" Placement="BottomEdgeAlignedLeft">
@@ -513,59 +560,6 @@
                     </ItemsControl>
                 </ScrollViewer>
             </DockPanel>
-        </TabItem>
-        <TabItem>
-            <TabItem.Header>
-                <Svg Path="/Assets/shape.svg" Width="25" Height="25" Margin="0" />
-            </TabItem.Header>
-            <ScrollViewer Name="PART_ActionViewer">
-                <ItemsControl ItemsSource="{CompiledBinding Operations}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <VirtualizingStackPanel Orientation="Vertical" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate DataType="geopad:HasNameActionList">
-                            <StackPanel Orientation="Vertical">
-                                <Expander Classes="NoBorderExpander" BorderThickness="0"
-                                          IsExpanded="True"
-                                          Width="{CompiledBinding $parent[StackPanel].Bounds.Width}"
-                                          Padding="0" Background="Transparent">
-                                    <Expander.Header>
-                                        <TextBlock Text="{CompiledBinding Name }" Margin="0"
-                                                   Padding="0" />
-                                    </Expander.Header>
-                                    <Border Padding="10,0" Background="Transparent">
-                                        <ItemsControl ItemsSource="{CompiledBinding .}">
-                                            <ItemsControl.ItemsPanel>
-                                                <ItemsPanelTemplate>
-                                                    <WrapPanel Orientation="Horizontal" ItemSpacing="5"
-                                                               Background="Transparent" Margin="0" />
-                                                </ItemsPanelTemplate>
-                                            </ItemsControl.ItemsPanel>
-                                            <ItemsControl.ItemTemplate>
-                                                <DataTemplate>
-                                                    <RadioButton Classes="GeoRadio"
-                                                                 IsCheckedChanged="RadioButtonChecked"
-                                                                 Name="{CompiledBinding Name}">
-                                                        <TextBlock VerticalAlignment="Center"
-                                                                   HorizontalAlignment="Center"
-                                                                   TextWrapping="Wrap" FontSize="11"
-                                                                   TextAlignment="Center" Name="RadioText"
-                                                                   Text="{CompiledBinding Name}"
-                                                                   FontFamily="Arial" />
-                                                    </RadioButton>
-                                                </DataTemplate>
-                                            </ItemsControl.ItemTemplate>
-                                        </ItemsControl>
-                                    </Border>
-                                </Expander>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
         </TabItem>
         <TabItem>
             <TabItem.Header>

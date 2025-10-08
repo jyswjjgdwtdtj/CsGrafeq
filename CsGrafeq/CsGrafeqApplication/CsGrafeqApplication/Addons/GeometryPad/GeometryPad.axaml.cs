@@ -28,6 +28,7 @@ using GeoHalf = CsGrafeq.Shapes.Half;
 using static CsGrafeqApplication.AvaloniaMath;
 using Math = System.Math;
 using CsGrafeq;
+using System.Text;
 
 namespace CsGrafeqApplication.Addons.GeometryPad;
 
@@ -43,13 +44,18 @@ public partial class GeometryPad : Addon
     private AvaPoint PointerMovedPos;
     private AvaPoint PointerPressedPos;
     private AvaPoint PointerReleasedPos;
+    private Vector2<string> MovingPointStartPos;
+    private Vector2<string> MovingPointEndPos;
     private Vec PointerPressedMovingPointPos;
     private PointerPointProperties PointerProperties;
-    private CommandManager CmdManager = new();
     private static double PointerTouchRange = OS.GetOSType() == OSType.Android ? 15 : 5;
+
+
+
 
     public GeometryPad()
     {
+        Setting = new GeometryPadSetting(this);
         InputMethod.SetIsInputMethodEnabled(this, false);
         DataContext = new GeometryPadViewModel();
         Shapes = (DataContext as GeometryPadViewModel)!.Shapes;
@@ -67,8 +73,8 @@ public partial class GeometryPad : Addon
         var c1 = AddShape(new Circle(new CircleGetter_FromCenterAndRadius(p1,1)));
 #endif
         InitializeComponent();
-    }
 
+    }
     internal ActionData GeoPadAction { get; private set; }
 
     public ShapeList Shapes { get; init; }
@@ -178,14 +184,14 @@ public partial class GeometryPad : Addon
             if (rb.IsChecked == true)
             {
                 SetAction(rb.Name);
-                Owner.Owner.MsgBox(new TextBlock { Text = GeoPadAction.Description });
+                Static.Info(new TextBlock { Text = GeoPadAction.Description });
             }
     }
 
     #endregion
 
     #region PointerAction
-
+    private bool IsMovingPointMovable=false;
     protected override bool PointerPressed(AddonPointerEventArgs e)
     {
         PointerProperties = e.Properties;
@@ -200,6 +206,15 @@ public partial class GeometryPad : Addon
             if (MovingPoint != null)
             {
                 PointerPressedMovingPointPos = MovingPoint.Location;
+                if( MovingPoint.PointGetter is PointGetter_Movable pgm && MovingPoint.IsUserEnabled)
+                {
+                    IsMovingPointMovable = true;
+                    MovingPointStartPos = new Vector2<string>(pgm.PointX.ValueStr, pgm.PointY.ValueStr);
+                }
+                else
+                {
+                    IsMovingPointMovable = false;
+                }
                 return Intercept;
             }
         }
@@ -228,8 +243,15 @@ public partial class GeometryPad : Addon
 
         if (e.Properties.IsLeftButtonPressed)
         {
-            if (PointerMovedPos != PointerReleasedPos)
+            if (OS.GetOSType() == OSType.Android&&(PointerMovedPos - PointerPressedPos).GetLength()<10)
+            {
+            }else if (PointerMovedPos == PointerPressedPos)
+            {
+            }
+            else
+            {
                 Shapes.ClearSelected();
+            }
             var previous = MovingPoint.PointGetter;
             //如点附着在基于这个点的几何图形上 会造成无限递归 使程序崩溃 同时破坏了图形的树的单向结构
             /*if (e.KeyModifiers.HasFlag(KeyModifiers.Control))
@@ -361,6 +383,7 @@ public partial class GeometryPad : Addon
                 }
 
             Owner.Resume();
+            PointerPressedPos = new AvaPoint(double.NaN, double.NaN);
             return Intercept;
         }
 
@@ -372,7 +395,11 @@ public partial class GeometryPad : Addon
 
         if (PointerReleasedPos != PointerPressedPos)
             Shapes.ClearSelected();
-        DoPointMove(MovingPoint, PointerPressedMovingPointPos, PixelToMath(PointerReleasedPos));
+        if (IsMovingPointMovable)
+        {
+            PointGetter_Movable pgm= (PointGetter_Movable)MovingPoint.PointGetter;
+            DoPointMove(MovingPoint, MovingPointStartPos,new(pgm.PointX.ValueStr,pgm.PointY.ValueStr));
+        }
         MovingPoint = null;
         Owner.Resume();
         return Intercept;
@@ -830,10 +857,10 @@ public partial class GeometryPad : Addon
             dc.DrawRect(selrect.ToSKRect(), FilledTpMedian);
             dc.DrawRect(selrect.ToSKRect(), StrokeMedian);
         }
-
+        
         dc.Restore();
     }
-
+    
     private void RenderShapes(SKCanvas dc, SKRect rect, IEnumerable<GeometryShape> shapes)
     {
         var UnitLength = (Owner as CartesianDisplayer)!.UnitLength;
@@ -1379,15 +1406,15 @@ public partial class GeometryPad : Addon
             shape,
             o =>
             {
-                (o as Shape).IsDeleted = false;
-                Shapes.Move(0, 0);
+                shape.IsDeleted = false;
+                ShapeItemsControl?.InvalidateArrange();
             },
             o =>
             {
-                (o as Shape).IsDeleted = true;
-                Shapes.Move(0, 0);
+                shape.IsDeleted = true;
+                ShapeItemsControl?.InvalidateArrange();
             },
-            o => { Shapes.Remove(shape as Shape); }, true
+            o => { Shapes.Remove(shape); }, true
         );
     }
 
@@ -1403,8 +1430,7 @@ public partial class GeometryPad : Addon
                     sh.IsDeleted = true;
                     sh.Selected = false;
                 }
-
-                Shapes.Move(0, 0);
+                ShapeItemsControl.InvalidateArrange();
             },
             o =>
             {
@@ -1413,23 +1439,22 @@ public partial class GeometryPad : Addon
                     sh.IsDeleted = false;
                     sh.Selected = false;
                 }
-
-                Shapes.Move(0, 0);
+                ShapeItemsControl.InvalidateArrange();
             },
             o => { }, true
         );
     }
 
-    private void DoPointMove(Point point, Vec previous, Vec next)
+    private void DoPointMove(Point point, Vector2<string> previous, Vector2<string> next)
     {
         if (point.PointGetter is PointGetter_Movable pg)
             CmdManager.Do(pg, o =>
             {
-                pg.SetPoint(next);
+                pg.SetStringPoint(next);
                 point.RefreshValues();
             }, o =>
             {
-                pg.SetPoint(previous);
+                pg.SetStringPoint(previous);
                 point.RefreshValues();
             }, o => { });
     }
@@ -1536,5 +1561,4 @@ public partial class GeometryPad : Addon
             }
         }
     }
-
 }

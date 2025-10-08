@@ -13,8 +13,4 @@
         <ProjectReference Include="..\CsGrafeq.Interval\CsGrafeq.Interval.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <PackageReference Include="Avalonia" Version="11.3.4" />
-    </ItemGroup>
-
 </Project>

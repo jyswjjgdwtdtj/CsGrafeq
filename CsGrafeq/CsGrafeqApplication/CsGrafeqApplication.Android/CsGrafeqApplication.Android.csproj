@@ -6,7 +6,7 @@
 		<Nullable>enable</Nullable>
 		<ApplicationId>com.JYSW.CsGrafeq</ApplicationId>
 		<ApplicationVersion>1</ApplicationVersion>
-		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+		<ApplicationDisplayVersion>0.0.2</ApplicationDisplayVersion>
 		<AndroidPackageFormat>apk</AndroidPackageFormat>
 		<AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
 		<UseAppHost>true</UseAppHost>

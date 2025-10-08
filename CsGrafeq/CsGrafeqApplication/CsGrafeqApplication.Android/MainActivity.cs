@@ -7,7 +7,7 @@ using Avalonia.ReactiveUI;
 namespace CsGrafeqApplication.Android;
 
 [Activity(
-    Label = "CsGrafeqApplication.Android",
+    Label = "CsGrafeq",
     Theme = "@style/MyTheme.NoActionBar",
     Icon = "@drawable/icon",
     MainLauncher = true,

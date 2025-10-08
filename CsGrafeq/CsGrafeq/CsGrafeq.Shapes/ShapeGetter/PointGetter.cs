@@ -124,6 +124,7 @@ public abstract class PointGetter_Movable : PointGetter
     public abstract void XChanged();
     public abstract void YChanged();
     public abstract void SetPoint(Vec controlPoint);
+    public abstract void SetStringPoint(Vector2<string> point);
     public override void Attach(ShapeChangedHandler handler, GeometryShape subShape)
     {
         PointX.NumberChanged += handler;
@@ -168,6 +169,13 @@ public class PointGetter_FromLocation : PointGetter_Movable
     {
         PointX.SetNumber(controlPoint.X);
         PointY.SetNumber(controlPoint.Y);
+        this.RaisePropertyChanged(nameof(PointX));
+        this.RaisePropertyChanged(nameof(PointY));
+    }
+    public override void SetStringPoint(Vector2<string> point)
+    {
+        PointX.ValueStr = point.X;
+        PointY.ValueStr = point.Y;
         this.RaisePropertyChanged(nameof(PointX));
         this.RaisePropertyChanged(nameof(PointY));
     }
@@ -255,6 +263,29 @@ public abstract class PointGetter_OnShape<T> : PointGetter_Movable where T:Geome
     {
         CheckExp();
         PointX.SetNumber(XFromY(PointY.Value));
+    }
+    public override void SetStringPoint(Vector2<string> point)
+    {
+        var x=point.X;
+        var y=point.Y;
+        if(double.TryParse(x,out var px))
+        {
+            if(double.TryParse(y,out var py))
+            {
+                //x,y均为数字
+                UseExpression=false;
+                SetPoint(new Vec(px,py));
+            }
+            else
+            {
+                //x为数字，y为表达式
+                PointY.ValueStr=y;
+            }
+        }
+        else
+        {
+            PointX.ValueStr = x;
+        }
     }
 
 

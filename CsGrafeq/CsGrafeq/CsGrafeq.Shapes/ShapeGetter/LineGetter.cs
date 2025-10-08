@@ -1,7 +1,5 @@
 ﻿using System.Text;
 using static System.Math;
-using Avalonia;
-using Avalonia.Controls;
 
 namespace CsGrafeq.Shapes.ShapeGetter;
 

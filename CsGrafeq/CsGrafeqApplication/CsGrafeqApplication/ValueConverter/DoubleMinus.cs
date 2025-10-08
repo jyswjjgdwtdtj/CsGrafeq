@@ -8,7 +8,7 @@ internal class DoubleMinus : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if ((value is double || value is double?) && parameter is string)
+        if (value is double && parameter is string)
         {
             var val = (double)value;
             var param = double.Parse((string)parameter);

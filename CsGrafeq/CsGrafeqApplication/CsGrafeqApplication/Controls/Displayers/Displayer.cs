@@ -2,6 +2,7 @@
 using System.Collections.Specialized;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Input.GestureRecognizers;
 using Avalonia.Metadata;
 using CsGrafeqApplication.Addons;
 using SkiaSharp;
@@ -9,6 +10,7 @@ using AvaPoint = Avalonia.Point;
 using AddonPointerEventArgs = CsGrafeqApplication.Addons.Addon.AddonPointerEventArgs;
 using AddonPointerWheelEventArgs = CsGrafeqApplication.Addons.Addon.AddonPointerWheelEventArgs;
 using AddonPointerEventArgsBase = CsGrafeqApplication.Addons.Addon.AddonPointerEventArgsBase;
+using Math = System.Math;
 
 namespace CsGrafeqApplication.Controls.Displayers;
 
@@ -24,8 +26,19 @@ public abstract class Displayer : SkiaControl
     public Displayer()
     {
         Addons.CollectionChanged += ChildrenChanged;
+        GestureRecognizers.Add(new ScrollGestureRecognizer(){CanHorizontallyScroll = false, CanVerticallyScroll = false, });
         GestureRecognizers.Add(new PinchGestureRecognizer());
+        this.AddHandler(Gestures.ScrollGestureEvent, (s, e) =>
+        {
+            Zoom(Math.Pow(1.04,e.Delta.Y),this.Bounds.Center);
+        });
+        this.AddHandler(Gestures.PinchEvent, (s, e) =>
+        {
+            Zoom(e.Scale,e.ScaleOrigin);
+        });
     }
+    protected PointerPointProperties LastPointerProperties = new();
+    protected AvaPoint LastPoint = new();
 
     [Content] public AddonList Addons { get; } = new();
 
@@ -71,7 +84,9 @@ public abstract class Displayer : SkiaControl
 
     protected bool CallAddonPointerPressed(PointerPressedEventArgs e)
     {
-        var loc = e.GetPosition(this);
+        LastPoint = e.GetPosition(this);
+        LastPointerProperties = e.Properties;
+        var loc = LastPoint;
         var args = new AddonPointerEventArgs(loc.X, loc.Y, e.Properties, e.KeyModifiers);
         foreach (var addon in Addons)
             if (addon.AddonPointerPressed(args) == Intercept)
@@ -81,7 +96,9 @@ public abstract class Displayer : SkiaControl
 
     protected bool CallAddonPointerMoved(PointerEventArgs e)
     {
-        var loc = e.GetPosition(this);
+        LastPoint = e.GetPosition(this);
+        LastPointerProperties = e.Properties;
+        var loc = LastPoint;
         var args = new AddonPointerEventArgs(loc.X, loc.Y, e.Properties, e.KeyModifiers);
         foreach (var addon in Addons)
             if (addon.AddonPointerMoved(args) == Intercept)
@@ -91,7 +108,9 @@ public abstract class Displayer : SkiaControl
 
     protected bool CallAddonPointerReleased(PointerReleasedEventArgs e)
     {
-        var loc = e.GetPosition(this);
+        LastPoint = e.GetPosition(this);
+        LastPointerProperties = e.Properties;
+        var loc = LastPoint;
         var args = new AddonPointerEventArgs(loc.X, loc.Y, e.Properties, e.KeyModifiers);
         foreach (var addon in Addons)
             if (addon.AddonPointerReleased(args) == Intercept)
@@ -101,7 +120,9 @@ public abstract class Displayer : SkiaControl
 
     protected bool CallAddonPointerWheeled(PointerWheelEventArgs e)
     {
-        var loc = e.GetPosition(this);
+        LastPoint = e.GetPosition(this);
+        LastPointerProperties = e.Properties;
+        var loc = LastPoint;
         var args = new AddonPointerWheelEventArgs(loc.X, loc.Y, e.Properties, e.KeyModifiers,
             new Vec(e.Delta.X, e.Delta.Y));
         foreach (var addon in Addons)
@@ -109,6 +130,7 @@ public abstract class Displayer : SkiaControl
                 return Intercept;
         return DoNext;
     }
+    public abstract void Zoom(double del, AvaPoint center);
 
     protected bool CallAddonPointerTapped(TappedEventArgs e)
     {

@@ -52,11 +52,13 @@ internal class GeometryPadViewModel : ViewModelBase
         }
     }
 
+    public string? DebugInfo { get; set => this.RaiseAndSetIfChanged(ref field, value); } = "1";
     internal AvaloniaList<HasNameActionList> Operations { get; } =
         new();
 
     internal ShapeList Shapes { get; } = new();
 
     public EnglishChar Variables=>EnglishChar.Instance;
+    
 
 }

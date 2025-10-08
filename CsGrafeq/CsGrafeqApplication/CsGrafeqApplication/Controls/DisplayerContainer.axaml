@@ -1,140 +1,216 @@
-<ResourceDictionary xmlns="https://github.com/avaloniaui"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:controls="using:CsGrafeqApplication.Controls"
-                    xmlns:adn="clr-namespace:CsGrafeqApplication.Addons"
-                    xmlns:disp="clr-namespace:CsGrafeqApplication.Controls.Displayers"
-                    xmlns:geopad="clr-namespace:CsGrafeqApplication.Addons.GeometryPad">
-	<!--事实上这个控件不该是TemplatedControl 而应该是UserControl 然而我偷懒了。。。-->
-    <Design.PreviewWith>
-		<controls:DisplayerContainer Width="1000" Height="700">
-			<disp:DisplayControl>
-				<geopad:GeometryPad />
-			</disp:DisplayControl>
-		</controls:DisplayerContainer>
-    </Design.PreviewWith>
-    <ControlTheme x:Key="{x:Type controls:DisplayerContainer}" TargetType="controls:DisplayerContainer">
-        <Setter Property="Template">
-            <ControlTemplate>
-                <Panel Name="PART_Container" IsTabStop="False">
-                    <Panel.Styles>
-                        <Style Selector="Control">
-                            <Setter Property="IsTabStop" Value="False"/>
-                        </Style>
-                        <Style Selector="GridSplitter#Splitter">
-                            <Setter Property="Background" Value="LightGray" />
-                            <Style Selector="^ Border">
-                                <Setter Property="Width" Value="2" />
-                                <Setter Property="Transitions">
-                                    <Transitions>
-                                        <DoubleTransition Property="Width" Duration="0:0:0.1" />
-                                    </Transitions>
-                                </Setter>
-                            </Style>
-                            <Style Selector="^:pointerover Border">
-                                <Setter Property="Width" Value="6" />
-                            </Style>
-                            <Style Selector="^:pressed Border">
-                                <Setter Property="Width" Value="6" />
-                            </Style>
-                        </Style>
-                    </Panel.Styles>
-                    <Border Name="DisplayerCon" ZIndex="0" BorderThickness="0">
-                        <ContentPresenter Content="{TemplateBinding Displayer}" />
-                    </Border>
-                    <Grid ZIndex="1" Name="PART_Grid">
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="300"></ColumnDefinition>
-							<ColumnDefinition Width="6"></ColumnDefinition>
-							<ColumnDefinition Width="*"></ColumnDefinition>
-						</Grid.ColumnDefinitions>
-                        <Border Grid.Column="0" BorderThickness="0" BorderBrush="Gray" Name="OperationContainer"
-                                DataContext="{TemplateBinding Displayer}" x:DataType="disp:Displayer"
-                                Background="{DynamicResource CgBackgroundBrush}">
-                            <ItemsControl ItemsSource="{CompiledBinding Addons}">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <VirtualizingStackPanel Orientation="Vertical" />
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate DataType="adn:Addon">
-                                        <Expander Width="{CompiledBinding $parent[ItemsControl].Bounds.Width}"
-                                                  Height="{CompiledBinding $parent[ScrollViewer].Bounds.Height}"
-                                                  Padding="0" Margin="0" Classes="NoBorderExpander"
-                                                  BorderThickness="0">
-                                            <Expander.Styles>
-                                                <Style Selector="Expander.NoBorderExpander">
-                                                    <Style Selector="^ /template/ ToggleButton#ExpanderHeader">
-                                                        <Setter Property="BorderThickness" Value="0" />
-                                                    </Style>
-                                                    <Style Selector="^  /template/ Border#ExpanderContent">
-                                                        <Setter Property="BorderThickness" Value="0" />
-                                                    </Style>
-                                                </Style>
-                                            </Expander.Styles>
-                                            <Expander.Header>
-                                                <TextBlock Text="{CompiledBinding Name}" />
-                                            </Expander.Header>
-                                            <ContentPresenter Content="{CompiledBinding .}" />
-                                        </Expander>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </Border>
-                        <GridSplitter Grid.Column="1" ResizeDirection="Columns" Name="Splitter" Width="1"/>
-                        <Border BorderThickness="0" Grid.Column="2" Name="PART_CoverDisplayer">
-                            <CheckBox Width="15" Height="40" VerticalAlignment="Center" HorizontalAlignment="Left"
-                                      Name="Toggle">
-                                <CheckBox.Template>
-                                    <ControlTemplate>
-                                        <Border>
-                                            <Border Name="Border" CornerRadius="4" BorderThickness="0"
-                                                    Background="{DynamicResource HTMedianBrush}"
-                                                    VerticalAlignment="Center" HorizontalAlignment="Center">
-                                                <TextBlock Name="TextBlock" MinWidth="0" MinHeight="0"
-                                                           VerticalAlignment="Center" HorizontalAlignment="Center" />
-                                            </Border>
-                                        </Border>
-                                    </ControlTemplate>
-                                </CheckBox.Template>
-                                <CheckBox.Styles>
-                                    <Style Selector="CheckBox TextBlock#TextBlock">
-                                        <Setter Property="Text" Value="&lt;" />
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:CsGrafeqApplication.ViewModels"
+             xmlns:disp="clr-namespace:CsGrafeqApplication.Controls.Displayers"
+             xmlns:addons="clr-namespace:CsGrafeqApplication.Addons"
+             xmlns:controls="clr-namespace:CsGrafeqApplication.Controls"
+             xmlns:avacon="clr-namespace:Avalonia.Controls;assembly=Avalonia.Controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="CsGrafeqApplication.Controls.DisplayerContainer"
+             x:DataType="vm:DisplayerContainerViewModel">
+    <Panel Name="PART_Container" IsTabStop="False">
+        <Panel.Styles>
+            <Style Selector="Control">
+                <Setter Property="IsTabStop" Value="False" />
+            </Style>
+            <Style Selector="GridSplitter#Splitter">
+                <Setter Property="Background" Value="LightGray" />
+                <Style Selector="^ Border">
+                    <Setter Property="Width" Value="{CompiledBinding SplitterThicknessOff}" />
+                    <Setter Property="Transitions">
+                        <Transitions>
+                            <DoubleTransition Property="Width" Duration="0:0:0.1" />
+                        </Transitions>
+                    </Setter>
+                </Style>
+                <Style Selector="^:pointerover Border">
+                    <Setter Property="Width" Value="{CompiledBinding SplitterThicknessOn}" />
+                </Style>
+                <Style Selector="^:pressed Border">
+                    <Setter Property="Width" Value="{CompiledBinding SplitterThicknessOn}" />
+                </Style>
+            </Style>
+        </Panel.Styles>
+        <Border Name="DisplayerCon" ZIndex="0" BorderThickness="0">
+            <ContentPresenter Content="{CompiledBinding Displayer}" />
+        </Border>
+        <Grid ZIndex="1" Name="PART_Grid">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300" />
+                <ColumnDefinition Width="6" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Border Grid.Column="0" BorderThickness="0" BorderBrush="Gray" Name="OperationContainer"
+                    DataContext="{CompiledBinding Displayer}" 
+                    Background="{DynamicResource CgBackgroundBrush}">
+                <ItemsControl ItemsSource="{CompiledBinding Addons}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel Orientation="Vertical" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="addons:Addon">
+                            <Expander Width="{CompiledBinding $parent[ItemsControl].Bounds.Width}"
+                                      Height="{CompiledBinding $parent[ScrollViewer].Bounds.Height}"
+                                      Padding="0" Margin="0" Classes="NoBorderExpander"
+                                      BorderThickness="0">
+                                <Expander.Styles>
+                                    <Style Selector="Expander.NoBorderExpander">
+                                        <Style Selector="^ /template/ ToggleButton#ExpanderHeader">
+                                            <Setter Property="BorderThickness" Value="0" />
+                                        </Style>
+                                        <Style Selector="^  /template/ Border#ExpanderContent">
+                                            <Setter Property="BorderThickness" Value="0" />
+                                        </Style>
                                     </Style>
-                                    <Style Selector="CheckBox:checked TextBlock#TextBlock">
-                                        <Setter Property="Text" Value="&gt;" />
-                                    </Style>
-                                    <Style Selector="CheckBox Border#Border">
-                                        <Setter Property="Width" Value="{TemplateBinding Width}" />
-                                        <Setter Property="Height" Value="{TemplateBinding Height}" />
-                                    </Style>
-                                    <Style Selector="CheckBox:pressed Border#Border">
-                                        <Setter Property="Width"
-                                                Value="{TemplateBinding Width,Converter={StaticResource DoubleMinus},ConverterParameter='2'}" />
-                                        <Setter Property="Height"
-                                                Value="{TemplateBinding Height,Converter={StaticResource DoubleMinus},ConverterParameter='2'}" />
-                                    </Style>
-                                </CheckBox.Styles>
-                                <CheckBox.Transitions>
-                                    <Transitions>
-                                        <DoubleTransition Property="Width" Duration="0:0:0.2" />
-                                        <DoubleTransition Property="Height" Duration="0:0:0.2" />
-                                    </Transitions>
-                                </CheckBox.Transitions>
-                            </CheckBox>
-                        </Border>
-                    </Grid>
-                    <DockPanel LastChildFill="True" ZIndex="2">
-                        <Border DockPanel.Dock="Bottom" MaxHeight="{TemplateBinding Height}" Height="200" >
-                            <Border VerticalAlignment="Center" HorizontalAlignment="Center" Background="{DynamicResource HTMedianBrush}" Padding="15" Opacity="0" CornerRadius="4">
-                                <ContentPresenter Name="MsgBoxPresenter" Foreground="{DynamicResource CgForegroundBrush}">
-                                </ContentPresenter>
+                                </Expander.Styles>
+                                <Expander.Header>
+                                    <TextBlock Text="{CompiledBinding Name}" />
+                                </Expander.Header>
+                                <ContentPresenter Content="{CompiledBinding .}" />
+                            </Expander>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Border>
+            <GridSplitter Grid.Column="1" ResizeDirection="Columns" Name="Splitter" Width="1" />
+            <Border BorderThickness="0" Grid.Column="2" Name="PART_CoverDisplayer">
+                <CheckBox Width="15" Height="40" VerticalAlignment="Center" HorizontalAlignment="Left"
+                          Name="Toggle">
+                    <CheckBox.Template>
+                        <ControlTemplate>
+                            <Border>
+                                <Border Name="Border" CornerRadius="4" BorderThickness="0"
+                                        Background="{DynamicResource HTMedianBrush}"
+                                        VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <TextBlock Name="TextBlock" MinWidth="0" MinHeight="0"
+                                               VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                </Border>
                             </Border>
+                        </ControlTemplate>
+                    </CheckBox.Template>
+                    <CheckBox.Styles>
+                        <Style Selector="CheckBox TextBlock#TextBlock">
+                            <Setter Property="Text" Value="&lt;" />
+                        </Style>
+                        <Style Selector="CheckBox:checked TextBlock#TextBlock">
+                            <Setter Property="Text" Value="&gt;" />
+                        </Style>
+                        <Style Selector="CheckBox Border#Border">
+                            <Setter Property="Width" Value="15" />
+                            <Setter Property="Height" Value="40" />
+                        </Style>
+                        <Style Selector="CheckBox:pressed Border#Border">
+                            <Setter Property="Width"
+                                    Value="13" />
+                            <Setter Property="Height"
+                                    Value="38" />
+                        </Style>
+                    </CheckBox.Styles>
+                    <CheckBox.Transitions>
+                        <Transitions>
+                            <DoubleTransition Property="Width" Duration="0:0:0.2" />
+                            <DoubleTransition Property="Height" Duration="0:0:0.2" />
+                        </Transitions>
+                    </CheckBox.Transitions>
+                </CheckBox>
+            </Border>
+        </Grid>
+        <Grid ColumnDefinitions="*,52" RowDefinitions="*,52" ZIndex="2" Name="SettingDockPanel" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+            <ToggleButton Grid.Column="1" Grid.Row="1" Name="SettingToggle">
+                <ToggleButton.Styles>
+                    <Style Selector="ToggleButton">
+                        <Style Selector="^:checked">
+                            <Setter Property="Template">
+                                <ControlTemplate>
+                                    <Border Margin="10" CornerRadius="5" Background="{StaticResource HTMedianBrush}">
+                                        <Svg Path="/Assets/lineup.svg" Width="32" Height="32" Margin="0" />
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter>
+                        </Style>
+                        <Style Selector="^:unchecked">
+                            <Setter Property="Template">
+                                <ControlTemplate>
+                                    <Border Margin="10" CornerRadius="5" Background="{StaticResource HTMedianBrush}">
+                                        <Svg Path="/Assets/linedown.svg" Width="32" Height="32" Margin="0" />
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter>
+                        </Style>
+                    </Style>
+                </ToggleButton.Styles>
+            </ToggleButton>
+            <controls:ShownControl Grid.Column="1" Grid.Row="0" VerticalAlignment="Bottom" 
+                                   IsShown="{CompiledBinding #SettingToggle.IsChecked,Mode=OneWay}" 
+                                   TargetHeight="300" Margin="0" Padding="0" Duration="0.2">
+                <controls:ShownControl.Template>
+                    <ControlTemplate>
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" Name="SettingStackPanel" Spacing="5" Margin="0" HorizontalAlignment="Center">
+                            <StackPanel.Styles>
+                                <Style Selector="Button">
+                                    <Setter Property="Background" Value="{StaticResource HTMedianBrush}"></Setter>
+                                    <Setter Property="Padding" Value="0"></Setter>
+                                    <Setter Property="CornerRadius" Value="4"></Setter>
+                                    <Setter Property="Margin" Value="0"></Setter>
+                                </Style>
+                                <Style Selector="RepeatButton">
+                                    <Setter Property="Background" Value="{StaticResource HTMedianBrush}"></Setter>
+                                    <Setter Property="Padding" Value="0"></Setter>
+                                    <Setter Property="CornerRadius" Value="4"></Setter>
+                                    <Setter Property="Margin" Value="0"></Setter>
+                                </Style>
+                            </StackPanel.Styles>
+                            <Button Click="Setting_Clicked">
+                            <Svg Path="/Assets/setting.svg" Width="32" Height="32" Margin="0" />
+                            </Button>
+                            <RepeatButton Click="StepBack_Clicked">
+                            <Svg Path="/Assets/stepback.svg" Width="32" Height="32" Margin="0" />
+                            </RepeatButton>
+                            <RepeatButton Click="StepOver_Clicked">
+                            <Svg Path="/Assets/stepover.svg" Width="32" Height="32" Margin="0" />
+                            </RepeatButton>
+                            <RepeatButton Click="ZoomOut_Clicked">
+                                <Svg Path="/Assets/zoomout.svg" Width="32" Height="32" Margin="0" />
+                            </RepeatButton>
+                            <RepeatButton Click="ZoomIn_Clicked">
+                                <Svg Path="/Assets/zoomin.svg" Width="32" Height="32" Margin="0" />
+                            </RepeatButton>
+                            <Button>
+                                <Svg Path="/Assets/language.svg" Width="32" Height="32" Margin="0" />
+                            </Button>
+                        </StackPanel>
+                    </ControlTemplate>
+                </controls:ShownControl.Template>
+            </controls:ShownControl>
+        </Grid>
+        <Border ZIndex="3" Name="PopupBack">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="20*"></ColumnDefinition>
+                    <ColumnDefinition Width="60*" MaxWidth="600"></ColumnDefinition>
+                    <ColumnDefinition Width="20*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="20*"></RowDefinition>
+                    <RowDefinition Height="60*" MaxHeight="400"></RowDefinition>
+                    <RowDefinition Height="20*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Border Name="MsgBoxContainer" Grid.Row="1" Grid.Column="1" CornerRadius="10" Background="{DynamicResource HTMedianBrush}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" IsVisible="False">
+                    <DockPanel LastChildFill="True">
+                        <Button Click="Button_OnClick" HorizontalAlignment="Right" Width="60" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="40,10" DockPanel.Dock="Bottom" Content="OK" Background="{DynamicResource CgBackgroundBrush}"></Button>
+                        <Border Name="ContentContainer" Padding="40" Background="White" Margin="15" CornerRadius="5"> 
                         </Border>
-                        <Border></Border>
                     </DockPanel>
-                </Panel>
-            </ControlTemplate>
-        </Setter>
-    </ControlTheme>
-</ResourceDictionary>
+                </Border>
+                <Border Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center" Background="{DynamicResource HTMedianBrush}" Padding="15" Opacity="0" CornerRadius="4">
+                    <ContentPresenter Name="InfoPresenter" Foreground="{DynamicResource CgForegroundBrush}">
+                    </ContentPresenter>
+                </Border>
+            </Grid>
+        </Border>
+    </Panel>
+</UserControl>

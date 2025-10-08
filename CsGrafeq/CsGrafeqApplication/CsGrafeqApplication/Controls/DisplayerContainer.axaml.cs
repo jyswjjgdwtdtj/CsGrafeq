@@ -4,32 +4,31 @@ using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
-using Avalonia.Controls.Primitives;
+using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 using Avalonia.Metadata;
 using Avalonia.Styling;
+using CsGrafeqApplication.Addons.GeometryPad;
+using CsGrafeqApplication.Controls;
 using CsGrafeqApplication.Controls.Displayers;
+using CsGrafeqApplication.ViewModels;
 
 namespace CsGrafeqApplication.Controls;
 
-public class DisplayerContainer : TemplatedControl
+public partial class DisplayerContainer : UserControl
 {
-    public static readonly DirectProperty<DisplayerContainer, Displayer?> DisplayerProperty =
-        AvaloniaProperty.RegisterDirect<DisplayerContainer, Displayer?>(nameof(Displayer), o => o.Displayer,
-            (o, v) => o.Displayer = v);
+    private readonly DisplayerContainerViewModel VM=new DisplayerContainerViewModel();
 
     public static readonly DirectProperty<DisplayerContainer, bool> IsOperationVisibleProperty =
-        AvaloniaProperty.RegisterDirect<DisplayerContainer, bool>(nameof(IsOperationVisible), o => o.IsOperationVisible,
-            (o, v) => o.IsOperationVisible = v);
-
+        AvaloniaProperty.RegisterDirect<DisplayerContainer, bool>(nameof(VM.IsOperationVisible), o => o.VM.IsOperationVisible,
+            (o, v) => o.VM.IsOperationVisible = v);
     public DisplayerContainer()
     {
-        PropertyChanged += (s, e) =>
-        {
-            if (e.Property == IsOperationVisibleProperty)
-            {
-                //PseudoClasses.Set(":operationvisible", IsOperationVisible);
-            }
-        };
+        DataContext = VM;
+        VM.Displayer = new DisplayControl(){Addons = { new GeometryPad() }};
+        InitializeComponent();
         anim.Delay=TimeSpan.FromSeconds(3);
         anim.Duration = TimeSpan.FromSeconds(0.2);
         anim.FillMode=FillMode.Forward;
@@ -41,78 +40,90 @@ public class DisplayerContainer : TemplatedControl
         keyframe2.Setters.Add(new Setter(ContentPresenter.OpacityProperty, 0.0));
         anim.Children.Add(keyframe1);
         anim.Children.Add(keyframe2);
-    }
-
-    [Content]
-    public Displayer? Displayer
-    {
-        get => field;
-        set
-        {
-            SetAndRaise(DisplayerProperty, ref field, value);
-            value.Owner = this;
-        }
-    }
-
-    public bool IsOperationVisible
-    {
-        get => field;
-        set => SetAndRaise(IsOperationVisibleProperty, ref field, value);
-    }
-
-    protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
-    {
-        base.OnApplyTemplate(e);
-        MsgBoxPresenter = e.NameScope.Find<ContentPresenter>("MsgBoxPresenter");
-        var border = e.NameScope.Find<Border>("PART_CoverDisplayer");
-        var splitter = e.NameScope.Find<GridSplitter>("Splitter");
-        var left = e.NameScope.Find<Border>("OperationContainer");
-        var grid = e.NameScope.Find<Grid>("PART_Grid");
-        if (border != null)
-            border.PropertyChanged += (s, e) =>
-            {
-                if (e.Property == BoundsProperty && Displayer != null) Displayer.InvalidateBuffer();
-            };
-        var toggle = e.NameScope.Find<CheckBox>("Toggle");
+        
         var previousWidth = 300d;
-        splitter.DragCompleted += (s, e) =>
+        Splitter.DragCompleted += (s, e) =>
         {
-            if (splitter.Bounds.Left == 0)
+            if (Splitter.Bounds.Left == 0)
             {
-                toggle.IsChecked = true;
+                Toggle.IsChecked = true;
             }
         };
-        toggle.IsCheckedChanged += (s, e) =>
+        Toggle.IsCheckedChanged += (s, e) =>
         {
-            if (toggle.IsChecked is null)
+            if (Toggle.IsChecked is null)
                 return;
-            var ischecked = (bool)toggle.IsChecked;
+            var ischecked = (bool)Toggle.IsChecked;
             if (ischecked)
             {
-                previousWidth = grid.ColumnDefinitions[0].ActualWidth;
-                grid.ColumnDefinitions[0].Width = new GridLength(0, GridUnitType.Pixel);
-                splitter.IsVisible = false;
-                Displayer.Invalidate();
+                previousWidth = PART_Grid.ColumnDefinitions[0].ActualWidth;
+                PART_Grid.ColumnDefinitions[0].Width = new GridLength(0, GridUnitType.Pixel);
+                Splitter.IsVisible = false;
+                VM.Displayer.Invalidate();
             }
             else
             {
                 if (previousWidth == 0)
                     previousWidth = 300;
-                grid.ColumnDefinitions[0].Width = new GridLength(previousWidth, GridUnitType.Pixel);
-                splitter.IsVisible = true;
+                PART_Grid.ColumnDefinitions[0].Width = new GridLength(previousWidth, GridUnitType.Pixel);
+                Splitter.IsVisible = true;
             }
         };
+        Static.MsgBox = MsgBox;
+        Static.Info = Info;
+    }
+    private CancellationTokenSource InfoCancellation = new CancellationTokenSource();
+    private Animation anim=new();
+    protected override void OnSizeChanged(SizeChangedEventArgs e)
+    {
+        base.OnSizeChanged(e);
+        VM.Displayer.InvalidateBuffer();
+    }
+    
+    private void MsgBox(Control content)
+    {
+        content.VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch;
+        content.HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch;
+        ContentContainer.Child = content;
+        MsgBoxContainer.IsVisible = true;
+        PopupBack.Background=Brushes.Transparent;
     }
 
-    private ContentPresenter MsgBoxPresenter;
-    private CancellationTokenSource msgboxCancellation = new CancellationTokenSource();
-    private Animation anim=new Animation();
-    public async void MsgBox(Control control)
+    private async void Info(Control content)
     {
-        msgboxCancellation.Cancel();
-        msgboxCancellation = new CancellationTokenSource();
-        MsgBoxPresenter.Content=control;
-        ((Control)(MsgBoxPresenter.Parent)).Opacity = 1;
-        await anim.RunAsync(MsgBoxPresenter.Parent,msgboxCancellation.Token);
+        InfoCancellation.Cancel();
+        InfoCancellation = new CancellationTokenSource();
+        InfoPresenter.Content=content;
+        ((Control)(InfoPresenter.Parent)).Opacity = 1;
+        await anim.RunAsync(InfoPresenter.Parent,InfoCancellation.Token);
+    }
+    private void Button_OnClick(object? sender, RoutedEventArgs e)
+    {
+        MsgBoxContainer.IsVisible = false;
+        PopupBack.Background = null;
+    }
+
+    private void Setting_Clicked(object? sender, RoutedEventArgs e)
+    {
+        MsgBox(new Control());
+    }
+
+    private void StepBack_Clicked(object? sender, RoutedEventArgs e)
+    {
+        VM.Displayer.Addons[0].CmdManager.UnDo();
+    }
+
+    private void StepOver_Clicked(object? sender, RoutedEventArgs e)
+    {
+        VM.Displayer.Addons[0].CmdManager.ReDo();
+    }
+
+    private void ZoomOut_Clicked(object? sender, RoutedEventArgs e)
+    {
+        VM.Displayer.Zoom(1/1.05, Bounds.Center);
+    }
+    private void ZoomIn_Clicked(object? sender, RoutedEventArgs e)
+    {
+        VM.Displayer.Zoom(1.05, Bounds.Center);
     }
 }

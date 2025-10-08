@@ -14,48 +14,6 @@
     </Design.DataContext>
     <Design.Width>600</Design.Width>
     <Design.Height>400</Design.Height>
-    
-    <Panel>
-        <Grid RowDefinitions="25,*" ZIndex="0">
-            <Menu Grid.Row="0">
-                <MenuItem Header="_File">
-                    <MenuItem Header="_Exit" Click="ExitClicked" />
-                </MenuItem>
-                <MenuItem Header="_Edit">
-                </MenuItem>
-                <MenuItem Header="_Help">
-                    <MenuItem Header="_GeometryPad" Click="GeometryPad_OnClick"></MenuItem>
-                </MenuItem>
-				<MenuItem Header="_Tools">
-					<MenuItem Header="_Setting" Click="Setting_OnClick"></MenuItem>
-				</MenuItem>
-            </Menu>
-            <ctls:DisplayerContainer Grid.Row="1" Name="MainContainer">
-                <disp:DisplayControl Name="MainDisplayControl">
-                    <geopad:GeometryPad/>
-                </disp:DisplayControl>
-            </ctls:DisplayerContainer>
-        </Grid>
-        <Border ZIndex="1" Background="Transparent" Name="MsgboxContainer" IsVisible="False">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="20*"></ColumnDefinition>
-                    <ColumnDefinition Width="60*" MaxWidth="600"></ColumnDefinition>
-                    <ColumnDefinition Width="20*"></ColumnDefinition>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="20*"></RowDefinition>
-                    <RowDefinition Height="60*" MaxHeight="400"></RowDefinition>
-                    <RowDefinition Height="20*"></RowDefinition>
-                </Grid.RowDefinitions>
-                <Border Grid.Row="1" Grid.Column="1" CornerRadius="10" Background="{DynamicResource HTMedianBrush}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                    <DockPanel LastChildFill="True">
-                        <Button Click="Button_OnClick" HorizontalAlignment="Right" Width="60" Height="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="40,10" DockPanel.Dock="Bottom" Content="OK" Background="{DynamicResource CgBackgroundBrush}"></Button>
-                        <Border Name="ContentContainer" Padding="40" Background="White" Margin="15" CornerRadius="5"> 
-                        </Border>
-                    </DockPanel>
-                </Border>
-            </Grid>
-        </Border>
-    </Panel>
+    <ctls:DisplayerContainer Grid.Row="1" Name="MainContainer">
+    </ctls:DisplayerContainer>
 </UserControl>

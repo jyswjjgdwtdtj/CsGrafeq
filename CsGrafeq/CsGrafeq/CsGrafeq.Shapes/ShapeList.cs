@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Text;
+using DynamicData;
 
 namespace CsGrafeq.Shapes;
 
@@ -31,7 +32,7 @@ public class ShapeList:ObservableCollection<Shape>
             i.Selected = false;
     }
 
-    public void Add(Shape shape)
+    public new void Add(Shape shape)
     {
         shape.ShapeChanged += ShapeChanged;
         if (shape is GeometryShape s)
@@ -60,7 +61,7 @@ public class ShapeList:ObservableCollection<Shape>
             DeleteGeometry(i);
         }
     }
-    public void Remove(Shape shape)
+    public new void Remove(Shape shape)
     {
         if (shape is GeometryShape s)
             RemoveGeometry(s);
@@ -123,7 +124,13 @@ public class ShapeList:ObservableCollection<Shape>
         }
         return sb.ToString();
     }
-
+    public void Invalidate()
+    {
+        Shape[] newarr=new  Shape[this.Count];
+        this.CopyTo(newarr,0);
+        this.ClearItems();
+        this.AddRange(newarr);
+    }
     public IEnumerable<T> GetShapes<T>()
     {
         return this.OfType<T>();

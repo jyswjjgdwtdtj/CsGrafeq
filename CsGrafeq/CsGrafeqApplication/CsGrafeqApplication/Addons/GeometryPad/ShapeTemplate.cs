@@ -18,8 +18,6 @@ public class ShapeTemplate : IDataTemplate
     {
         if (param is GeometryShape item)
         {
-            if(item.IsDeleted)
-                return new Control();
             switch (item)
             {
                 case GeoPoint point:
@@ -48,7 +46,7 @@ public class ShapeTemplate : IDataTemplate
 //                  return IsFunction?.Build(param);
             }
         }
-        return new Control();
+        return new Control() { Tag = "Invalid" };
     }
 
     public bool Match(object? data)
