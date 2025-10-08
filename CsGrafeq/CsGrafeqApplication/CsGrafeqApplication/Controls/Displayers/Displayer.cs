@@ -34,7 +34,7 @@ public abstract class Displayer : SkiaControl
         });
         this.AddHandler(Gestures.PinchEvent, (s, e) =>
         {
-            Zoom(e.Scale,e.ScaleOrigin);
+            Zoom(e.Scale-1,e.ScaleOrigin);
         });
     }
     protected PointerPointProperties LastPointerProperties = new();
