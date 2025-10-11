@@ -16,16 +16,32 @@ public class CommandManager
     }
     public class Command
     {
-        public readonly object Tag;
-        public readonly Action<object> Do;
-        public readonly Action<object> UnDo;
-        public readonly Action<object> Clear;
+        public object Tag { get; protected set; }
+        public  Action<object> Do { get; protected set; }
+        public  Action<object> UnDo { get; protected set; }
+        public  Action<object> Clear { get; protected set; }
         public Command(object tag, Action<object> doFunc, Action<object> unDoFunc, Action<object> clearFunc)
         {
             Tag = tag;
             Do = doFunc;
             UnDo = unDoFunc;
             Clear = clearFunc;
+        }
+        public void SetTag(object tag)
+        {
+            Tag = tag;
+        }
+        public void SetDo<T>(Action<T> doFunc)
+        {
+            Do = (arg) => { doFunc((T)arg); };
+        }
+        public void SetUnDo<T>(Action<T> unDoFunc)
+        {
+            UnDo = (arg) => { unDoFunc((T)arg); };
+        }
+        public void SetClear<T>(Action<T> clearFunc)
+        {
+            Clear = (arg) => { clearFunc((T)arg); };
         }
     }
     public void ReDo()
@@ -45,7 +61,7 @@ public class CommandManager
             CurrentDoNode = CurrentDoNode.Previous;
         }
     }
-    public void Do(object tag, Action<object> doFunc, Action<object> unDoFunc, Action<object> clearFunc,bool invokeDo=false)
+    public void Do<T>(T tag, Action<T> doFunc, Action<T> unDoFunc, Action<T> clearFunc,bool invokeDo=false)
     {
         while (DoList.Last != CurrentDoNode)
         {
@@ -53,7 +69,18 @@ public class CommandManager
             DoList.RemoveLast();
         }
         if(invokeDo) doFunc.Invoke(tag);
-        DoList.AddLast(new Command(tag,doFunc,unDoFunc,clearFunc));
+        DoList.AddLast(new Command((object)tag,(arg)=> { doFunc((T)arg); }, (arg) => { unDoFunc((T)arg); }, (arg) => { clearFunc((T)arg); }));
+        CurrentDoNode = DoList.Last;
+    }
+    public void Do(Command command,bool invokeDo=false)
+    {
+        while (DoList.Last != CurrentDoNode)
+        {
+            DoList.Last.Value.Clear(DoList.Last.Value.Tag);
+            DoList.RemoveLast();
+        }
+        if (invokeDo) command.Do.Invoke(command.Tag);
+        DoList.AddLast(command);
         CurrentDoNode = DoList.Last;
     }
 

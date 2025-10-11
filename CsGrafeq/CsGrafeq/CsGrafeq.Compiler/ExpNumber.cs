@@ -42,12 +42,6 @@ namespace CsGrafeq
             EnglishChar.Instance.CharValueChanged += CharValueChanged;
             PropertyChanged += (s, e) =>
             {
-#if DEBUG
-                if (e.PropertyName == nameof(ValueStr))
-                {
-                    Console.WriteLine(nameof(ValueStr)+"Changed:"+ValueStr);
-                }
-#endif
             };
         }
         ~ExpNumber()

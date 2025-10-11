@@ -57,7 +57,6 @@ public class ShownControl : TemplatedControl
             }
             else if (e.Property == IsShownProperty)
             {
-                Console.WriteLine(123);
                 if (IsShown)
                 {
                     AnimTo.RunAsync(this,new CancellationToken());

@@ -29,6 +29,7 @@ using static CsGrafeqApplication.AvaloniaMath;
 using Math = System.Math;
 using CsGrafeq;
 using System.Text;
+using System.ComponentModel;
 
 namespace CsGrafeqApplication.Addons.GeometryPad;
 
@@ -67,10 +68,10 @@ public partial class GeometryPad : Addon
         Shapes.OnShapeChanged += () => { Owner?.Invalidate(this); };
 #if DEBUG
         var p1 = AddShape(new Point(new PointGetter_FromLocation((0.5, 0.5))));
-        var p2 = AddShape(new Point(new PointGetter_FromLocation((1.5, 1.5))));
+        /*var p2 = AddShape(new Point(new PointGetter_FromLocation((1.5, 1.5))));
         var s1 = AddShape(new Straight(new LineGetter_Connected(p1, p2)));
         var p3 = AddShape(new Point(new PointGetter_OnLine(s1, (0, 0))));
-        var c1 = AddShape(new Circle(new CircleGetter_FromCenterAndRadius(p1,1)));
+        var c1 = AddShape(new Circle(new CircleGetter_FromCenterAndRadius(p1,1)));*/
 #endif
         InitializeComponent();
 
@@ -110,85 +111,6 @@ public partial class GeometryPad : Addon
         Shapes.ClearSelected();
     }
 
-    #region ControlAction
-
-    public void TextBoxPixelXLostFocus(object? sender, RoutedEventArgs e)
-    {
-    }
-
-    public void TextBoxPixelYLostFocus(object? sender, RoutedEventArgs e)
-    {
-    }
-
-    public void NumberLostFocus(object? sender, RoutedEventArgs e)
-    {
-    }
-
-    public void HandleEvent(object? sender, RoutedEventArgs e)
-    {
-        e.Handled = true;
-    }
-
-    public void TextBoxKeyDown(object? sender, KeyEventArgs e)
-    {
-        if (sender is TextBox box)
-        {
-            var parent = box.Parent;
-            if (parent != null)
-            {
-                if (e.Key == Key.Left)
-                {
-                    var ls = new List<TextBox>();
-                    foreach (var i in parent.GetLogicalChildren())
-                        if (i is TextBox tb)
-                            ls.Add(tb);
-                    var index = ls.IndexOf(box);
-                    if (index > 0)
-                        ls[index - 1].Focus();
-                    e.Handled = true;
-                }
-                else if (e.Key == Key.Right)
-                {
-                    var ls = new List<TextBox>();
-                    foreach (var i in parent.GetLogicalChildren())
-                        if (i is TextBox tb)
-                            ls.Add(tb);
-                    var index = ls.IndexOf(box);
-                    if (index < ls.Count - 1)
-                        ls[index + 1].Focus();
-                    e.Handled = true;
-                }
-                else if (e.Key >= Key.D0 && e.Key <= Key.D9)
-                {
-                }
-                else if (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9)
-                {
-                }
-                else if (e.Key == Key.OemMinus || e.Key == Key.OemPeriod || e.Key == Key.Subtract ||
-                         e.Key == Key.Decimal||e.Key==Key.Add||e.Key==Key.Divide||e.Key==Key.Multiply||e.Key==Key.OemPlus||e.Key==Key.OemQuestion)
-                {
-                }else if(e.Key>=Key.A&&e.Key<=Key.Z)
-                {
-                }
-                else
-                {
-                    e.Handled = true;
-                }
-            }
-        }
-    }
-
-    public void RadioButtonChecked(object? sender, RoutedEventArgs e)
-    {
-        if (sender is RadioButton rb)
-            if (rb.IsChecked == true)
-            {
-                SetAction(rb.Name);
-                Static.Info(new TextBlock { Text = GeoPadAction.Description });
-            }
-    }
-
-    #endregion
 
     #region PointerAction
     private bool IsMovingPointMovable=false;
@@ -1461,7 +1383,7 @@ public partial class GeometryPad : Addon
 
     private void DoPointGetterChange(Point point, PointGetter previous, PointGetter next)
     {
-        CmdManager.Do(null, o =>
+        CmdManager.Do<object?>(null, o =>
         {
             previous.UnAttach(point.RefreshValues, point);
             point.PointGetter = next;
@@ -1486,44 +1408,92 @@ public partial class GeometryPad : Addon
         DoShapeAdd(shape);
         return shape;
     }
-
-    private void PointX_OnTextChanged(object? sender, RoutedEventArgs e)
+    private class TextChangedCommand : CommandManager.Command
+    {
+        public readonly string PreviousText;
+        public string CurrentText { get; init; }
+        public ExpNumber Number { get; init; }
+        public TextChangedCommand(string previous, string current, ExpNumber target,TextBox tb)
+            : base(null, (_) => { }, (_) => { }, (_) => { })
+        {
+            PreviousText = previous;
+            CurrentText = current;
+            Number = target;
+            Do = (_) =>
+            {
+                target.ValueStr = current;
+                if (target.IsError)
+                    DataValidationErrors.SetError(tb, new Exception());
+                else
+                    DataValidationErrors.ClearErrors(tb);
+            };
+            UnDo = (_) =>
+            {
+                target.ValueStr = previous;
+                if (target.IsError)
+                    DataValidationErrors.SetError(tb, new Exception());
+                else
+                    DataValidationErrors.ClearErrors(tb);
+            };
+            Clear = (_) => { };
+        }
+    }
+    #region ControlAction
+    private void TextBox_OnKeyUp(object? sender, KeyEventArgs e)
+    {
+    }
+    private void PointX_OnPropertyChanged(object? sender, Avalonia.AvaloniaPropertyChangedEventArgs e)
     {
         if (sender is TextBox tb)
         {
-            var p = (tb.Tag as Point)!;
-            if(p is not null)
-            {
-                if ((p.PointGetter as PointGetter_Movable).PointX.IsError)
+                if (e.Property == TextBox.TextProperty)
                 {
-                    DataValidationErrors.SetError(tb, new Exception());
-                }
-                else
-                {
-                    p.RefreshValues();
-                    DataValidationErrors.ClearErrors(tb);
-                }
+                    var p = (tb.Tag as Point)!;
+                    if (p is not null&&tb.IsFocused)
+                    {
+                        var px = (p.PointGetter as PointGetter_Movable).PointX;
+                        if (px.IsError)
+                        {
+                            DataValidationErrors.SetError(tb, new Exception());
+                        }
+                        else
+                        {
+                            p.RefreshValues();
+                            DataValidationErrors.ClearErrors(tb);
+                        }
+                        CmdManager.Do(
+                            new TextChangedCommand(((string?)e.OldValue) ?? "", ((string?)e.NewValue) ?? "", px, tb),
+                            false);
+                    }
             }
         }
     }
-
-    private void PointY_OnTextChanged(object? sender, RoutedEventArgs e)
+    
+    private void PointY_OnPropertyChanged(object? sender, Avalonia.AvaloniaPropertyChangedEventArgs e)
     {
         if (sender is TextBox tb)
         {
-            var p = (tb.Tag as Point)!;
-            if (p is not null)
-            {
-                if ((p.PointGetter as PointGetter_Movable).PointY.IsError)
+                if (e.Property == TextBox.TextProperty)
                 {
-                    DataValidationErrors.SetError(tb, new Exception());
+                    var p = (tb.Tag as Point)!;
+                    if (p is not null&&tb.IsFocused)
+                    {
+                        var py = (p.PointGetter as PointGetter_Movable).PointY;
+                        if (py.IsError)
+                        {
+                            DataValidationErrors.SetError(tb, new Exception());
+                        }
+                        else
+                        {
+                            p.RefreshValues();
+                            DataValidationErrors.ClearErrors(tb);
+                        }
+
+                        CmdManager.Do(
+                            new TextChangedCommand(((string?)e.OldValue) ?? "", ((string?)e.NewValue) ?? "", py,tb),
+                            false);
+                    }
                 }
-                else
-                {
-                    p.RefreshValues();
-                    DataValidationErrors.ClearErrors(tb);
-                }
-            }
         }
     }
 
@@ -1561,4 +1531,110 @@ public partial class GeometryPad : Addon
             }
         }
     }
+
+    private void NumberTextBox_OnLoaded(object? sender, RoutedEventArgs e)
+    {
+        if (sender is TextBox tb)
+        {
+            tb.AddHandler(InputElement.KeyDownEvent, TunnelTextBoxKeyDown, RoutingStrategies.Tunnel);
+        }
+    }
+
+    public void TextBoxPixelXLostFocus(object? sender, RoutedEventArgs e)
+    {
+    }
+
+    public void TextBoxPixelYLostFocus(object? sender, RoutedEventArgs e)
+    {
+    }
+
+    public void NumberLostFocus(object? sender, RoutedEventArgs e)
+    {
+    }
+
+    public void HandleEvent(object? sender, RoutedEventArgs e)
+    {
+        e.Handled = true;
+    }
+
+    public void TextBoxKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (sender is TextBox box)
+        {
+            var parent = box.Parent;
+            if(e.KeyModifiers!=KeyModifiers.None)
+            {
+                e.Handled = true;
+                return;
+            }
+            if (parent != null)
+            {
+                if (e.Key == Key.Left)
+                {
+                    var ls = new List<TextBox>();
+                    foreach (var i in parent.GetLogicalChildren())
+                        if (i is TextBox tb)
+                            ls.Add(tb);
+                    var index = ls.IndexOf(box);
+                    if (index > 0)
+                        ls[index - 1].Focus();
+                    e.Handled = true;
+                }
+                else if (e.Key == Key.Right)
+                {
+                    var ls = new List<TextBox>();
+                    foreach (var i in parent.GetLogicalChildren())
+                        if (i is TextBox tb)
+                            ls.Add(tb);
+                    var index = ls.IndexOf(box);
+                    if (index < ls.Count - 1)
+                        ls[index + 1].Focus();
+                    e.Handled = true;
+                }
+                else if (e.Key >= Key.D0 && e.Key <= Key.D9)
+                {
+                }
+                else if (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9)
+                {
+                }
+                else if (e.Key == Key.OemMinus || e.Key == Key.OemPeriod || e.Key == Key.Subtract ||
+                         e.Key == Key.Decimal||e.Key==Key.Add||e.Key==Key.Divide||e.Key==Key.Multiply||e.Key==Key.OemPlus||e.Key==Key.OemQuestion)
+                {
+                }else if(e.Key>=Key.A&&e.Key<=Key.Z)
+                {
+                }
+                else
+                {
+                    e.Handled = true;
+                }
+            }
+        }
+    }
+
+    public void TunnelTextBoxKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (e.KeyModifiers == KeyModifiers.Control)
+        {
+            if (e.Key == Key.A)
+            {
+                
+            }
+            else
+            {
+                e.Handled = true;
+            }
+        }
+    }
+
+    public void RadioButtonChecked(object? sender, RoutedEventArgs e)
+    {
+        if (sender is RadioButton rb)
+            if (rb.IsChecked == true)
+            {
+                SetAction(rb.Name);
+                Static.Info(new TextBlock { Text = GeoPadAction.Description });
+            }
+    }
+
+    #endregion
 }
