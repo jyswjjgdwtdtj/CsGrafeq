@@ -18,6 +18,7 @@ namespace CsGrafeqApplication.Desktop
             => AppBuilder.Configure<App>()
                 .UsePlatformDetect()
                 .WithInterFont()
+                
                 .UseReactiveUI()
                 .LogToTrace();
     }

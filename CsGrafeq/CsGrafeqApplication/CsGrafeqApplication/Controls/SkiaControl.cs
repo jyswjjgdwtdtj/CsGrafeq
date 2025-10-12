@@ -120,7 +120,7 @@ public class SkiaControl :UserControl
                         SKDraw?.Invoke(null,new SKRenderEventArgs(canvas));
                     }
                 }
-                context.DrawBitmap(Buffer, Bounds);
+                context.DrawBitmap(Buffer, Bounds,Bounds);
             }
         }
 

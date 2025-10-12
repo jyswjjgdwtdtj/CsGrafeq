@@ -68,10 +68,10 @@ public partial class GeometryPad : Addon
         Shapes.OnShapeChanged += () => { Owner?.Invalidate(this); };
 #if DEBUG
         var p1 = AddShape(new Point(new PointGetter_FromLocation((0.5, 0.5))));
-        /*var p2 = AddShape(new Point(new PointGetter_FromLocation((1.5, 1.5))));
+        var p2 = AddShape(new Point(new PointGetter_FromLocation((1.5, 1.5))));
         var s1 = AddShape(new Straight(new LineGetter_Connected(p1, p2)));
         var p3 = AddShape(new Point(new PointGetter_OnLine(s1, (0, 0))));
-        var c1 = AddShape(new Circle(new CircleGetter_FromCenterAndRadius(p1,1)));*/
+        var c1 = AddShape(new Circle(new CircleGetter_FromCenterAndRadius(p1,1)));
 #endif
         InitializeComponent();
 
@@ -1422,6 +1422,7 @@ public partial class GeometryPad : Addon
             Do = (_) =>
             {
                 target.ValueStr = current;
+                (tb.Tag as Point)?.RefreshValues();
                 if (target.IsError)
                     DataValidationErrors.SetError(tb, new Exception());
                 else
@@ -1430,6 +1431,7 @@ public partial class GeometryPad : Addon
             UnDo = (_) =>
             {
                 target.ValueStr = previous;
+                (tb.Tag as Point)?.RefreshValues();
                 if (target.IsError)
                     DataValidationErrors.SetError(tb, new Exception());
                 else
@@ -1442,72 +1444,28 @@ public partial class GeometryPad : Addon
     private void TextBox_OnKeyUp(object? sender, KeyEventArgs e)
     {
     }
-    private void PointX_OnPropertyChanged(object? sender, Avalonia.AvaloniaPropertyChangedEventArgs e)
+    private void Number_OnPropertyChanged(object? sender, Avalonia.AvaloniaPropertyChangedEventArgs e)
     {
         if (sender is TextBox tb)
         {
                 if (e.Property == TextBox.TextProperty)
                 {
-                    var p = (tb.Tag as Point)!;
-                    if (p is not null&&tb.IsFocused)
+                    var n = (tb.Tag as ExpNumber);
+                    if (n is not null&&tb.IsFocused)
                     {
-                        var px = (p.PointGetter as PointGetter_Movable).PointX;
-                        if (px.IsError)
+                        if (n.IsError)
                         {
                             DataValidationErrors.SetError(tb, new Exception());
                         }
                         else
                         {
-                            p.RefreshValues();
+                            (n.Owner as GeometryShape)?.RefreshValues();
                             DataValidationErrors.ClearErrors(tb);
                         }
                         CmdManager.Do(
-                            new TextChangedCommand(((string?)e.OldValue) ?? "", ((string?)e.NewValue) ?? "", px, tb),
+                            new TextChangedCommand(((string?)e.OldValue) ?? "", ((string?)e.NewValue) ?? "", n,tb),
                             false);
                     }
-            }
-        }
-    }
-    
-    private void PointY_OnPropertyChanged(object? sender, Avalonia.AvaloniaPropertyChangedEventArgs e)
-    {
-        if (sender is TextBox tb)
-        {
-                if (e.Property == TextBox.TextProperty)
-                {
-                    var p = (tb.Tag as Point)!;
-                    if (p is not null&&tb.IsFocused)
-                    {
-                        var py = (p.PointGetter as PointGetter_Movable).PointY;
-                        if (py.IsError)
-                        {
-                            DataValidationErrors.SetError(tb, new Exception());
-                        }
-                        else
-                        {
-                            p.RefreshValues();
-                            DataValidationErrors.ClearErrors(tb);
-                        }
-
-                        CmdManager.Do(
-                            new TextChangedCommand(((string?)e.OldValue) ?? "", ((string?)e.NewValue) ?? "", py,tb),
-                            false);
-                    }
-                }
-        }
-    }
-
-    private void Number_OnTextChanged(object? sender, RoutedEventArgs e)
-    {
-        if (sender is TextBox tb)
-        {
-            var n = (tb.Tag as ExpNumber)!;
-            if(n is not null)
-            {
-                if (n.IsError)
-                    DataValidationErrors.SetError(tb, new Exception());
-                else
-                    DataValidationErrors.ClearErrors(tb);
             }
         }
     }

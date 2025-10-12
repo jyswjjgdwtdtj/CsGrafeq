@@ -63,11 +63,11 @@ public class CircleGetter_FromThreePoint : CircleGetter
 public class CircleGetter_FromCenterAndRadius : CircleGetter
 {
     public Point Center { get; init; }
-    public ExpNumber Radius { get; } = new ExpNumber(1);
+    public ExpNumber Radius { get; init; }
     public CircleGetter_FromCenterAndRadius(Point center,double radius=1)
     {
+        Radius = new ExpNumber(radius, this);
         Center = center;
-        Radius.SetNumber(radius);
     }
 
     public override string ActionName => "Circle";

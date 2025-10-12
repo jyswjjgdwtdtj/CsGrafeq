@@ -256,8 +256,8 @@
                                                                                 GotFocus="TextBoxGetFocus"
                                                                                 KeyDown="TextBoxKeyDown"
                                                                                 LostFocus="TextBoxPixelXLostFocus"
-                                                                                Tag="{CompiledBinding}"
-                                                                                PropertyChanged="PointX_OnPropertyChanged"
+                                                                                Tag="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointX}"
+                                                                                PropertyChanged="Number_OnPropertyChanged"
                                                                                 KeyUp="TextBox_OnKeyUp"
                                                                                 Loaded="NumberTextBox_OnLoaded"
                                                                                 Tapped="HandleEvent"
@@ -273,8 +273,8 @@
                                                                                 Loaded="NumberTextBox_OnLoaded"
                                                                                 KeyDown="TextBoxKeyDown"
                                                                                 LostFocus="TextBoxPixelYLostFocus"
-                                                                                Tag="{CompiledBinding}"
-                                                                                PropertyChanged="PointY_OnPropertyChanged"
+                                                                                Tag="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointY}"
+                                                                                PropertyChanged="Number_OnPropertyChanged"
                                                                                 KeyUp="TextBox_OnKeyUp"
                                                                                 Tapped="HandleEvent"
                                                                                 Focusable="True"
@@ -312,10 +312,10 @@
                                                                                 GotFocus="TextBoxGetFocus"
                                                                                 KeyDown="TextBoxKeyDown"
                                                                                 LostFocus="TextBoxPixelXLostFocus"
-                                                                                PropertyChanged="PointX_OnPropertyChanged"
+                                                                                PropertyChanged="Number_OnPropertyChanged"
                                                                                 KeyUp="TextBox_OnKeyUp"
                                                                                 Loaded="NumberTextBox_OnLoaded"
-                                                                                Tag="{CompiledBinding}"
+                                                                                Tag="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointX}"
                                                                                 Tapped="HandleEvent" 
                                                                                 Focusable="True"
                                                                                 IsEnabled="{CompiledBinding IsUserEnabled}"/>
@@ -328,10 +328,10 @@
                                                                                 GotFocus="TextBoxGetFocus"
                                                                                 KeyDown="TextBoxKeyDown"
                                                                                 LostFocus="TextBoxPixelYLostFocus"
-                                                                                PropertyChanged="PointY_OnPropertyChanged"
+                                                                                PropertyChanged="Number_OnPropertyChanged"
                                                                                 KeyUp="TextBox_OnKeyUp"
                                                                                 Loaded="NumberTextBox_OnLoaded"
-                                                                                Tag="{CompiledBinding}"
+                                                                                Tag="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointX}"
                                                                                 Tapped="HandleEvent" 
                                                                                 Focusable="True"
                                                                                 IsEnabled="{CompiledBinding IsUserEnabled}"/>
@@ -424,13 +424,13 @@
                                                                                 VerticalAlignment="Center"
                                                                                 Classes="Small" />
                                                                             <TextBlock
-                                                                                Text="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointX,Mode=OneWay}"
+                                                                                Text="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointX.ValueStr,Mode=OneWay}"
                                                                                 Classes="CommonTextBox Small" />
                                                                             <TextBlock Text="," TextAlignment="Left"
                                                                                 VerticalAlignment="Center"
                                                                                 Classes="Small" />
                                                                             <TextBlock
-                                                                                Text="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointY,Mode=OneWay}"
+                                                                                Text="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointY.ValueStr,Mode=OneWay}"
                                                                                 Classes="CommonTextBox Small" />
                                                                             <TextBlock Text=")" TextAlignment="Left"
                                                                                 VerticalAlignment="Center"
@@ -531,7 +531,7 @@
                                                                                 Classes="CommonTextBox Big"
                                                                                 LostFocus="NumberLostFocus"
                                                                                 Tag="{CompiledBinding Path=.}"
-                                                                                TextChanged="Number_OnTextChanged"
+                                                                                PropertyChanged="Number_OnPropertyChanged"
                                                                                 Tapped="HandleEvent"
                                                                                 DataContext="{CompiledBinding Path=((getter:CircleGetter_FromCenterAndRadius)Getter).Radius}" />
                                                                             <TextBlock Text=")" TextAlignment="Left"

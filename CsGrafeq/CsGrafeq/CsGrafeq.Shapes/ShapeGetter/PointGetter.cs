@@ -114,12 +114,14 @@ public abstract class PointGetter_Movable : PointGetter
     public abstract GeometryShape? On { get; }
     public PointGetter_Movable()
     {
+        PointX = new(0, this);
+        PointY = new(0, this);
         PointX.UserSetValueStr += XChanged;
         PointY.UserSetValueStr += YChanged;
     }
 
-    public ExpNumber PointX { get; } = new ExpNumber();
-    public ExpNumber PointY { get; } = new ExpNumber();
+    public ExpNumber PointX { get; init; }
+    public ExpNumber PointY { get; init; }
 
     public abstract void XChanged();
     public abstract void YChanged();
@@ -295,7 +297,7 @@ public sealed class PointGetter_OnLine(Line line, Vec InitialPoint) : PointGette
     private readonly Line Line=line;
     private double ratio;
 
-    protected double GetRatio(Vec p)
+    private double GetRatio(Vec p)
     {
         double ratio;
         if (Line.Current.Point1.X != Line.Current.Point2.X)
@@ -411,6 +413,16 @@ public class PointGetter_OnCircle(Circle circle, Vec InitialPoint) : PointGetter
         PointY.SetNumber(vec.Y);
     }
 
+    private double GetTheta(Vec controlPoint)
+    {
+        double theta;
+        if ((controlPoint - Circle.InnerCircle.Center).GetLength() == 0)
+            theta = 0;
+        else
+            theta = (controlPoint - Circle.InnerCircle.Center).Arg2();
+        return theta;
+    }
+
     protected override double YFromX(double x)
     {
         var r= Circle.InnerCircle.Radius;
@@ -440,6 +452,22 @@ public class PointGetter_OnCircle(Circle circle, Vec InitialPoint) : PointGetter
         var x1 = cx + val;
         var x2 = cx - val;
         return Abs(x1-PointX.Value)<Abs(x2-PointX.Value)?x1:x2;
+    }
+    public override void XChanged()
+    {
+        CheckExp();
+        PointY.SuspendNumberChanged();
+        PointY.SetNumber(YFromX(PointX.Value));
+        PointY.ResumeNumberChanged(false);
+        theta = GetTheta(new Vec(PointX.Value, PointY.Value));
+    }
+    public override void YChanged()
+    {
+        CheckExp();
+        PointX.SuspendNumberChanged();
+        PointX.SetNumber(XFromY(PointY.Value));
+        PointX.ResumeNumberChanged(false);
+        theta=GetTheta(new Vec(PointX.Value, PointY.Value));
     }
     
 }

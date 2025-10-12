@@ -9,34 +9,40 @@ using System.Text;
 
 namespace CsGrafeq
 {
+    /// <summary>
+    /// 充满了别扭 没办法……
+    /// 面向用户编程就是这样子 要拗出很奇怪恶心的东西
+    /// </summary>
     public class ExpNumber:ReactiveObject
     {
         private HasReferenceFunction0<DoubleNumber> Func;
+        public readonly object Owner;
         public bool IsExpression { get; private set; } = false;
         private DoubleNumber Number;
         public event Action NumberChanged;
         public event Action UserSetValueStr;
         private string ShownText = "0";
-        private bool NumberChangedSuspended=false;
+        private int NumberChangedSuspended = 0;
         private void CallNumberChanged()
         {
-            if(NumberChangedSuspended) return;
+            if (NumberChangedSuspended!=0) return;
             NumberChanged?.Invoke();
         }
         public void SuspendNumberChanged()
         {
-            NumberChangedSuspended=true;
+            NumberChangedSuspended++;
         }
-        public void ResumeNumberChanged(bool call)
+        public void ResumeNumberChanged(bool call=false)
         {
-            NumberChangedSuspended = false;
+            NumberChangedSuspended--;
             if (call)
             {
                 NumberChanged?.Invoke();
             }
         }
-        public ExpNumber(double initialNumber=0)
+        public ExpNumber(double initialNumber=0,object owner=null)
         {
+            Owner = owner;
             Direct = new HasReferenceFunction0<DoubleNumber>(DirectFunc, EnglishCharEnum.None);
             Func = Direct;
             EnglishChar.Instance.CharValueChanged += CharValueChanged;
@@ -60,16 +66,18 @@ namespace CsGrafeq
         }
         private void SetExpression(string expression)
         {
-           if (double.TryParse(expression, out double result))
+            if (double.TryParse(expression, out double result))
             {
                 IsExpression = false;
                 Func.Dispose();
                 Number = new DoubleNumber(result);
                 Func = Direct;
+                //改这里就会出bug 不敢动了
                 SuspendNumberChanged();
                 SetValue(Func.Function().Value);
                 ResumeNumberChanged(false);
                 UserSetValueStr?.Invoke();
+                CallNumberChanged();
                 IsError = false;
                 return;
             }
@@ -97,7 +105,8 @@ namespace CsGrafeq
         {
             if ((!Extension.CompareDoubleIfBothNaNThenEqual(value, _Value))||IsExpression)
             {
-                this.RaiseAndSetIfChanged(ref _Value, value,nameof(Value));
+                _Value=value;
+                this.RaisePropertyChanged(nameof(Value));
                 CallNumberChanged();
             }
             if (!IsExpression)
