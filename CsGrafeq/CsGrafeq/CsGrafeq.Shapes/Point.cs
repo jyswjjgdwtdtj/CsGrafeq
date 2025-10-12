@@ -7,15 +7,6 @@ namespace CsGrafeq.Shapes;
 public class Point : GeometryShape
 {
     public readonly DistinctList<TextGetter> TextGetters = new();
-    private Vec _Location;
-    public PointGetter PointGetter { 
-        get {
-            return field;
-        }
-        set {
-            this.RaiseAndSetIfChanged(ref field, value,nameof(PointGetter));
-        } 
-    }
 
     public Point(PointGetter pointgetter)
     {
@@ -24,15 +15,22 @@ public class Point : GeometryShape
         RefreshValues();
     }
 
-    public Vec Location => _Location;
+    public PointGetter PointGetter
+    {
+        get => field;
+        set => this.RaiseAndSetIfChanged(ref field, value);
+    }
+
+    public Vector2Double Location { get; } = new(0,0);
 
     public override PointGetter Getter => PointGetter;
 
     public override string TypeName => "Point";
-    
+
     public override void RefreshValues()
     {
-        _Location = PointGetter.GetPoint();
+        var loc = PointGetter.GetPoint();
+        Location.SetValue(loc.X,loc.Y);
         InvokeEvent();
     }
 

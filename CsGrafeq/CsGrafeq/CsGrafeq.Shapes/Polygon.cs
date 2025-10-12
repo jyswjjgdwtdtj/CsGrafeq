@@ -1,5 +1,4 @@
 ﻿using CsGrafeq.Shapes.ShapeGetter;
-using static CsGrafeq.Math;
 using static CsGrafeq.Shapes.GeometryMath;
 
 namespace CsGrafeq.Shapes;
@@ -18,6 +17,7 @@ public class Polygon : FilledShape
 
     public override string TypeName => "Polygon";
     public override PolygonGetter Getter => PolygonGetter;
+
     public override void RefreshValues()
     {
         Locations = PolygonGetter.GetPolygon();
@@ -29,14 +29,15 @@ public class Polygon : FilledShape
         var len = Locations.Length;
         return FindMin(GetEnumDistance(Locations, vec));
     }
-    private static IEnumerable<(double,Vec)> GetEnumDistance(Vec[] vecs, Vec test)
+
+    private static IEnumerable<(double, Vec)> GetEnumDistance(Vec[] vecs, Vec test)
     {
-        for (int i = 0,j=vecs.Length-1; i < vecs.Length - 1; i++,j=i+1)
+        for (int i = 0, j = vecs.Length - 1; i < vecs.Length - 1; i++, j = i + 1)
         {
             var res = DistanceToLine(vecs[i], vecs[j], test, out var point);
             yield return FuzzyOnSegment(vecs[i], vecs[j], point)
-                ? (res,point)
-                : (double.PositiveInfinity,Vec.Infinity);
+                ? (res, point)
+                : (double.PositiveInfinity, Vec.Infinity);
         }
     }
 
@@ -50,6 +51,7 @@ public class Polygon : FilledShape
                 distance = vec.distance;
                 tar = vec.tar;
             }
+
         return tar;
     }
 }

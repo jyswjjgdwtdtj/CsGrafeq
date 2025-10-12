@@ -8,10 +8,7 @@ internal class BoolToDouble : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if ((value is bool b) && double.TryParse(parameter.ToString(),out var d))
-        {
-            return !b ? d : 0d;
-        }
+        if (value is bool b && double.TryParse(parameter.ToString(), out var d)) return !b ? d : 0d;
         return 0;
     }
 

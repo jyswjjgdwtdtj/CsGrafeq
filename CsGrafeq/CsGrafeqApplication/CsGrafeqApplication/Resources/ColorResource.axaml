@@ -15,5 +15,5 @@
     <SolidColorBrush x:Key="HTDarkBrush" Color="{DynamicResource Dark}" Opacity="0.3" />
     <SolidColorBrush x:Key="DarkBrush" Color="{DynamicResource Dark}" />
     <converter:UIntColorToBrush x:Key="UIntColorToBrush" />
-    <converter:UIntToColor x:Key="UIntToColor"></converter:UIntToColor>
+    <converter:UIntToColor x:Key="UIntToColor" />
 </ResourceDictionary>

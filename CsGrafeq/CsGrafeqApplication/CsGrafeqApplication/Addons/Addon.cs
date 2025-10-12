@@ -11,6 +11,7 @@ public abstract class Addon : UserControl
 {
     public const bool DoNext = true;
     public const bool Intercept = false;
+    public readonly CommandManager CmdManager = new();
     private readonly OnceLock IsLoaded = new();
 
     private Displayer? _Owner;
@@ -30,6 +31,8 @@ public abstract class Addon : UserControl
     }
 
     public abstract string Name { get; }
+
+    public Control Setting { get; init; }
     protected abstract void Render(SKCanvas dc, SKRect rect);
 
     internal void AddonRender(SKCanvas dc, SKRect rect)
@@ -148,6 +151,18 @@ public abstract class Addon : UserControl
         return DoNext;
     }
 
+    public void Undo()
+    {
+        CmdManager.UnDo();
+        Owner?.Invalidate();
+    }
+
+    public void Redo()
+    {
+        CmdManager.ReDo();
+        Owner?.Invalidate();
+    }
+
     private class OnceLock
     {
         public bool Value { get; private set; }
@@ -188,24 +203,11 @@ public abstract class Addon : UserControl
     public class AddonPointerWheelEventArgs : AddonPointerEventArgs
     {
         public readonly Vec Delta;
+
         public AddonPointerWheelEventArgs(double x, double y, PointerPointProperties properties, KeyModifiers modifiers,
             Vec delta) : base(x, y, properties, modifiers)
         {
             Delta = delta;
         }
     }
-    public readonly CommandManager CmdManager = new();
-    public void Undo()
-    {
-        CmdManager.UnDo();
-        Owner?.Invalidate();
-    }
-
-    public void Redo()
-    {
-        CmdManager.ReDo();
-        Owner?.Invalidate();
-    }
-
-    public Control Setting { get; init; }
 }

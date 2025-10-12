@@ -1,7 +1,5 @@
-﻿using Avalonia.Controls;
-using Avalonia.Input;
+﻿using Avalonia.Input;
 using SkiaSharp;
-using System;
 using static CsGrafeqApplication.Controls.SkiaEx;
 using static CsGrafeq.Extension;
 
@@ -73,7 +71,7 @@ public class DisplayControl : CartesianDisplayer
                         {
                             dc.Clear(AxisBackground);
                             RenderAxisLine(dc);
-                            if ((!MovingOptimization)||(LastZeroPos - Zero).Length > 30)
+                            if (!MovingOptimization || (LastZeroPos - Zero).Length > 30)
                             {
                                 foreach (var i in Addons)
                                 {
@@ -82,18 +80,21 @@ public class DisplayControl : CartesianDisplayer
                                         Throw("Bitmap size mismatch");
                                         return;
                                     }
+
                                     var newbmp = new SKBitmap(TotalBuffer.Width, TotalBuffer.Height);
-                                    using(var newbmpcanvas=new SKCanvas(newbmp))
+                                    using (var newbmpcanvas = new SKCanvas(newbmp))
                                     {
                                         newbmpcanvas.Clear(SKColors.Transparent);
                                         newbmpcanvas.DrawBitmap(i.Bitmap, Zero.X - LastZeroPos.X,
                                             Zero.Y - LastZeroPos.Y);
                                         RenderMovedPlace(newbmpcanvas, i.AddonRender);
                                     }
+
                                     i.Bitmap.Dispose();
                                     i.Bitmap = newbmp;
                                     dc.DrawBitmap(i.Bitmap, 0, 0);
                                 }
+
                                 LastZeroPos = Zero;
                             }
                             else
@@ -184,11 +185,13 @@ public class DisplayControl : CartesianDisplayer
                 rm.Invoke(dc, CreateSKRectWH(0, 0, width, (int)(Zero.Y - LastZeroPos.Y)));
         }
     }
+
     protected override void OnKeyDown(KeyEventArgs e)
     {
         if (CallAddonKeyDown(e) == DoNext)
         {
         }
+
         e.Handled = true;
     }
 
@@ -197,6 +200,7 @@ public class DisplayControl : CartesianDisplayer
         if (CallAddonKeyUp(e) == DoNext)
         {
         }
+
         e.Handled = true;
     }
 }

@@ -16,6 +16,7 @@ internal class UIntToColor : IValueConverter
             val |= 0xFF000000;
             return Color.FromUInt32(val);
         }
+
         return null;
     }
 
@@ -23,8 +24,10 @@ internal class UIntToColor : IValueConverter
     {
         if (value is Color val)
         {
-            return (val.ToUInt32()&0x00FFFFFF)|0xFF000000;;
+            return (val.ToUInt32() & 0x00FFFFFF) | 0xFF000000;
+            ;
         }
+
         return null;
     }
 }

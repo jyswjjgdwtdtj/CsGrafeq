@@ -1,20 +1,15 @@
-﻿using System.Collections;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
+﻿using System.Collections.ObjectModel;
 using System.Text;
+using CsGrafeq.Collections;
 using DynamicData;
 
 namespace CsGrafeq.Shapes;
 
-public class ShapeList:ObservableCollection<Shape>
+public class ShapeList : ObservableCollection<Shape>
 {
     private static readonly StringBuilder sb = new();
+    private readonly DistinctList<GeometryShape> SelectedShapes = new();
     public event Action? OnShapeChanged;
-    private List<GeometryShape> SelectedShapes= new();
-    public ShapeList() : base()
-    {
-
-    }
 
     private void ShapeChanged()
     {
@@ -44,23 +39,17 @@ public class ShapeList:ObservableCollection<Shape>
     public void Delete(Shape shape)
     {
         if (shape is GeometryShape s)
-        {
             DeleteGeometry(s);
-        }
         else
-        {
             shape.IsDeleted = true;
-        }
     }
 
     private void DeleteGeometry(GeometryShape shape)
     {
         shape.IsDeleted = true;
-        foreach (var i in shape.SubShapes)
-        {
-            DeleteGeometry(i);
-        }
+        foreach (var i in shape.SubShapes) DeleteGeometry(i);
     }
+
     public new void Remove(Shape shape)
     {
         if (shape is GeometryShape s)
@@ -94,43 +83,41 @@ public class ShapeList:ObservableCollection<Shape>
         foreach (var i in shape.SubShapes)
             RemoveGeometry(i);
     }
+
     private void RemoveNotGeometry(Shape shape)
     {
         base.Remove(shape);
     }
+
     public static string GetNameFromIndex(int index)
     {
         if (index < 0)
             return "";
         sb.Clear();
-        if (index<26)
-        {
-            return ((char)('A' + index)).ToString();
-        }
+        if (index < 26) return ((char)('A' + index)).ToString();
         index -= 26;
-        if(index==0)
+        if (index == 0)
             return "A";
         while (index != 0)
         {
             var remainder = index % 26;
             sb.Insert(0, (char)('A' + remainder));
-            index-=remainder;
+            index -= remainder;
             index /= 26;
         }
 
-        if (sb.Length == 1)
-        {
-            sb.Insert(0, 'A');
-        }
+        if (sb.Length == 1) sb.Insert(0, 'A');
         return sb.ToString();
     }
+
     public void Invalidate()
     {
-        Shape[] newarr=new  Shape[this.Count];
-        this.CopyTo(newarr,0);
-        this.ClearItems();
+        var newarr = new Shape[Count];
+        CopyTo(newarr, 0);
+        ClearItems();
         this.AddRange(newarr);
     }
+
     public IEnumerable<T> GetShapes<T>()
     {
         return this.OfType<T>();
@@ -148,6 +135,7 @@ public class ShapeList:ObservableCollection<Shape>
 
         return res;
     }
+
     public IEnumerable<T> GetSelectedShapes<T>() where T : GeometryShape
     {
         foreach (var i in SelectedShapes.OfType<T>())
@@ -160,21 +148,22 @@ public class ShapeList:ObservableCollection<Shape>
         {
             yield return shape;
             foreach (var s in shape.SubShapes)
-            foreach (var i in GetAllChildren(s)) 
+            foreach (var i in GetAllChildren(s))
                 yield return i;
         }
     }
+
     public Shape? GetShapeByName(string name)
     {
         name = name.ToLower();
-        return this.FirstOrDefault((shape) => (!shape.IsDeleted)&&shape.Name.ToLower() == name, null);
+        return this.FirstOrDefault(shape => !shape.IsDeleted && shape.Name.ToLower() == name, null);
     }
 
     public string GetFirstNameNotDistributed()
     {
-        for(var i = 0;;i++)
+        for (var i = 0;; i++)
         {
-            string name=GetNameFromIndex(i);
+            var name = GetNameFromIndex(i);
             if (GetShapeByName(name) == null)
                 return name;
         }

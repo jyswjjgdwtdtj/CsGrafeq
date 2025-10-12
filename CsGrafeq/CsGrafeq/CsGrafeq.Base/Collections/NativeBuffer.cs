@@ -8,7 +8,7 @@ public class NativeBuffer<T> : IDisposable where T : struct
 {
     private unsafe T* pointer;
 
-    public NativeBuffer(nuint length,bool setDefault=false)
+    public NativeBuffer(nuint length, bool setDefault = false)
     {
         Length = length;
         unsafe
@@ -17,12 +17,8 @@ public class NativeBuffer<T> : IDisposable where T : struct
         }
 
         if (setDefault)
-        {
             foreach (ref var item in this)
-            {
-                item = default(T);
-            }
-        }
+                item = default;
     }
 
     public NativeBuffer(Span<T> span) : this((nuint)span.Length)

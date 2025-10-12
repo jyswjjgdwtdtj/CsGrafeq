@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Specialized;
+﻿using System.Collections.Specialized;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Input.GestureRecognizers;
@@ -10,7 +9,6 @@ using AvaPoint = Avalonia.Point;
 using AddonPointerEventArgs = CsGrafeqApplication.Addons.Addon.AddonPointerEventArgs;
 using AddonPointerWheelEventArgs = CsGrafeqApplication.Addons.Addon.AddonPointerWheelEventArgs;
 using AddonPointerEventArgsBase = CsGrafeqApplication.Addons.Addon.AddonPointerEventArgsBase;
-using Math = System.Math;
 
 namespace CsGrafeqApplication.Controls.Displayers;
 
@@ -19,28 +17,25 @@ public abstract class Displayer : SkiaControl
     public const bool DoNext = true;
     public const bool Intercept = false;
     private bool CanPerform = true;
-    protected SKBitmap TotalBuffer = new(1, 1);
+    protected AvaPoint LastPoint;
+    protected PointerPointProperties LastPointerProperties = new();
     public bool MovingOptimization = false;
+    protected SKBitmap TotalBuffer = new(1, 1);
     public bool ZoomingOptimization = false;
 
     public Displayer()
     {
         Addons.CollectionChanged += ChildrenChanged;
-        GestureRecognizers.Add(new ScrollGestureRecognizer(){CanHorizontallyScroll = false, CanVerticallyScroll = false, });
+        GestureRecognizers.Add(new ScrollGestureRecognizer
+            { CanHorizontallyScroll = false, CanVerticallyScroll = false });
         GestureRecognizers.Add(new PinchGestureRecognizer());
-        this.AddHandler(Gestures.ScrollGestureEvent, (s, e) =>
-        {
-            Zoom(Math.Pow(1.04,e.Delta.Y),this.Bounds.Center);
-        });
-        this.AddHandler(Gestures.PinchEvent, (s, e) =>
-        {
-            Zoom(e.Scale-1,e.ScaleOrigin);
-        });
+        AddHandler(Gestures.ScrollGestureEvent, (s, e) => { Zoom(Pow(1.04, e.Delta.Y), Bounds.Center); });
+        AddHandler(Gestures.PinchEvent, (s, e) => { Zoom(e.Scale - 1, e.ScaleOrigin); });
     }
-    protected PointerPointProperties LastPointerProperties = new();
-    protected AvaPoint LastPoint = new();
 
     [Content] public AddonList Addons { get; } = new();
+
+    public DisplayerContainer Owner { get; set; }
 
     protected sealed override void OnSkiaRender(SKRenderEventArgs e)
     {
@@ -49,12 +44,6 @@ public abstract class Displayer : SkiaControl
         {
             dc.DrawBitmap(TotalBuffer, SKPoint.Empty);
         }
-    }
-
-    public DisplayerContainer Owner
-    {
-        get;
-        set;
     }
 
     public abstract double MathToPixelX(double x);
@@ -130,6 +119,7 @@ public abstract class Displayer : SkiaControl
                 return Intercept;
         return DoNext;
     }
+
     public abstract void Zoom(double del, AvaPoint center);
 
     protected bool CallAddonPointerTapped(TappedEventArgs e)
@@ -175,6 +165,7 @@ public abstract class Displayer : SkiaControl
                 return Intercept;
         return DoNext;
     }
+
     protected override void OnSizeChanged(SizeChangedEventArgs e)
     {
         base.OnSizeChanged(e);

@@ -3,15 +3,11 @@ using System.Threading;
 using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Controls;
-using Avalonia.Controls.Presenters;
-using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Markup.Xaml;
+using Avalonia.Layout;
 using Avalonia.Media;
-using Avalonia.Metadata;
 using Avalonia.Styling;
 using CsGrafeqApplication.Addons.GeometryPad;
-using CsGrafeqApplication.Controls;
 using CsGrafeqApplication.Controls.Displayers;
 using CsGrafeqApplication.ViewModels;
 
@@ -19,35 +15,36 @@ namespace CsGrafeqApplication.Controls;
 
 public partial class DisplayerContainer : UserControl
 {
-    private readonly DisplayerContainerViewModel VM=new DisplayerContainerViewModel();
-
     public static readonly DirectProperty<DisplayerContainer, bool> IsOperationVisibleProperty =
-        AvaloniaProperty.RegisterDirect<DisplayerContainer, bool>(nameof(VM.IsOperationVisible), o => o.VM.IsOperationVisible,
+        AvaloniaProperty.RegisterDirect<DisplayerContainer, bool>(nameof(VM.IsOperationVisible),
+            o => o.VM.IsOperationVisible,
             (o, v) => o.VM.IsOperationVisible = v);
+
+    private readonly Animation anim = new();
+    private readonly DisplayerContainerViewModel VM = new();
+    private CancellationTokenSource InfoCancellation = new();
+
     public DisplayerContainer()
     {
         DataContext = VM;
-        VM.Displayer = new DisplayControl(){Addons = { new GeometryPad() }};
+        VM.Displayer = new DisplayControl { Addons = { new GeometryPad() } };
         InitializeComponent();
-        anim.Delay=TimeSpan.FromSeconds(3);
+        anim.Delay = TimeSpan.FromSeconds(3);
         anim.Duration = TimeSpan.FromSeconds(0.2);
-        anim.FillMode=FillMode.Forward;
+        anim.FillMode = FillMode.Forward;
         var keyframe1 = new KeyFrame();
         keyframe1.Cue = new Cue(0);
-        keyframe1.Setters.Add(new Setter(ContentPresenter.OpacityProperty, 1.0));
+        keyframe1.Setters.Add(new Setter(OpacityProperty, 1.0));
         var keyframe2 = new KeyFrame();
         keyframe2.Cue = new Cue(1);
-        keyframe2.Setters.Add(new Setter(ContentPresenter.OpacityProperty, 0.0));
+        keyframe2.Setters.Add(new Setter(OpacityProperty, 0.0));
         anim.Children.Add(keyframe1);
         anim.Children.Add(keyframe2);
-        
+
         var previousWidth = 300d;
         Splitter.DragCompleted += (s, e) =>
         {
-            if (Splitter.Bounds.Left == 0)
-            {
-                Toggle.IsChecked = true;
-            }
+            if (Splitter.Bounds.Left == 0) Toggle.IsChecked = true;
         };
         Toggle.IsCheckedChanged += (s, e) =>
         {
@@ -72,31 +69,31 @@ public partial class DisplayerContainer : UserControl
         Static.MsgBox = MsgBox;
         Static.Info = Info;
     }
-    private CancellationTokenSource InfoCancellation = new CancellationTokenSource();
-    private Animation anim=new();
+
     protected override void OnSizeChanged(SizeChangedEventArgs e)
     {
         base.OnSizeChanged(e);
         VM.Displayer.InvalidateBuffer();
     }
-    
+
     private void MsgBox(Control content)
     {
-        content.VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch;
-        content.HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch;
+        content.VerticalAlignment = VerticalAlignment.Stretch;
+        content.HorizontalAlignment = HorizontalAlignment.Stretch;
         ContentContainer.Child = content;
         MsgBoxContainer.IsVisible = true;
-        PopupBack.Background=Brushes.Transparent;
+        PopupBack.Background = Brushes.Transparent;
     }
 
     private async void Info(Control content)
     {
         InfoCancellation.Cancel();
         InfoCancellation = new CancellationTokenSource();
-        InfoPresenter.Content=content;
-        ((Control)(InfoPresenter.Parent)).Opacity = 1;
-        await anim.RunAsync(InfoPresenter.Parent,InfoCancellation.Token);
+        InfoPresenter.Content = content;
+        ((Control)InfoPresenter.Parent).Opacity = 1;
+        await anim.RunAsync(InfoPresenter.Parent, InfoCancellation.Token);
     }
+
     private void Button_OnClick(object? sender, RoutedEventArgs e)
     {
         MsgBoxContainer.IsVisible = false;
@@ -120,8 +117,9 @@ public partial class DisplayerContainer : UserControl
 
     private void ZoomOut_Clicked(object? sender, RoutedEventArgs e)
     {
-        VM.Displayer.Zoom(1/1.05, Bounds.Center);
+        VM.Displayer.Zoom(1 / 1.05, Bounds.Center);
     }
+
     private void ZoomIn_Clicked(object? sender, RoutedEventArgs e)
     {
         VM.Displayer.Zoom(1.05, Bounds.Center);

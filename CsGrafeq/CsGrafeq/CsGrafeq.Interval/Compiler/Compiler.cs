@@ -2,9 +2,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using CsGrafeq.Compiler;
 using CsGrafeq.Interval.Interface;
 using CsGrafeq.Numeric;
-using CsGrafeq.Compiler;
 using sysMath = System.Math;
 
 namespace CsGrafeq.Interval.Compiler;
@@ -150,8 +150,7 @@ public static class Compiler
                 case ElementType.Function:
                 {
                     if (IComputableNumber<T>.MethodDictionary.TryGetValue(element.NameOrValue.ToLower(),
-                            out var method)&&method.Method.GetParameters().Length == element.ArgCount)
-                    {
+                            out var method) && method.Method.GetParameters().Length == element.ArgCount)
                         switch (element.ArgCount)
                         {
                             case 1:
@@ -173,11 +172,8 @@ public static class Compiler
                             default:
                                 throw new Exception(element.NameOrValue + " " + element.ArgCount);
                         }
-                    }
                     else
-                    {
                         throw new Exception("Method not found: " + element.NameOrValue);
-                    }
                 }
                     break;
                 default:

@@ -1,7 +1,5 @@
-﻿using CsGrafeq.Shapes.ShapeGetter;
-using static System.Math;
+﻿using static System.Math;
 using static CsGrafeq.Math;
-using GeoPoint = CsGrafeq.Shapes.Point;
 
 namespace CsGrafeq.Shapes;
 

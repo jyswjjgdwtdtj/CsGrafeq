@@ -1,5 +1,4 @@
-﻿using System;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using CsGrafeq.Shapes;
 using CsGrafeq.Shapes.ShapeGetter;
@@ -17,7 +16,6 @@ public class ShapeTemplate : IDataTemplate
     public Control? Build(object? param)
     {
         if (param is GeometryShape item)
-        {
             switch (item)
             {
                 case GeoPoint point:
@@ -42,11 +40,11 @@ public class ShapeTemplate : IDataTemplate
                 case GeoPolygon _:
                 case Angle _:
                     return Common?.Build(param);
-//              case ImplicitFunction _:
-//                  return IsFunction?.Build(param);
+                //              case ImplicitFunction _:
+                //                  return IsFunction?.Build(param);
             }
-        }
-        return new Control() { Tag = "Invalid" };
+
+        return new Control { Tag = "Invalid" };
     }
 
     public bool Match(object? data)

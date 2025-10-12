@@ -48,6 +48,7 @@ public class AngleGetter_FromThreePoint : AngleGetter
         Point2.ShapeChanged += handler;
         Point1.SubShapes.Add(subShape);
     }
+
     public override void UnAttach(ShapeChangedHandler handler, GeometryShape subShape)
     {
         AnglePoint.ShapeChanged -= handler;
@@ -60,7 +61,7 @@ public class AngleGetter_FromThreePoint : AngleGetter
 
     public override AngleData GetAngle()
     {
-        var aa = ((Point2.Location - AnglePoint.Location).Arg2() - (Point1.Location - AnglePoint.Location).Arg2()) /
+        var aa = (((Vec)Point2.Location - AnglePoint.Location).Arg2() - ((Vec)Point1.Location - AnglePoint.Location).Arg2()) /
             PI * 180;
         aa = aa % 360;
         if (aa > 180)

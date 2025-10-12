@@ -1,30 +1,30 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<OutputType>Exe</OutputType>
-		<TargetFramework>net9.0-android</TargetFramework>
-		<SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
-		<Nullable>enable</Nullable>
-		<ApplicationId>com.JYSW.CsGrafeq</ApplicationId>
-		<ApplicationVersion>1</ApplicationVersion>
-		<ApplicationDisplayVersion>0.0.2</ApplicationDisplayVersion>
-		<AndroidPackageFormat>apk</AndroidPackageFormat>
-		<AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
-		<UseAppHost>true</UseAppHost>
-		<PublishSingleFile>false</PublishSingleFile>
-	</PropertyGroup>
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net9.0-android</TargetFramework>
+        <SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
+        <Nullable>enable</Nullable>
+        <ApplicationId>com.JYSW.CsGrafeq</ApplicationId>
+        <ApplicationVersion>1</ApplicationVersion>
+        <ApplicationDisplayVersion>0.0.2</ApplicationDisplayVersion>
+        <AndroidPackageFormat>apk</AndroidPackageFormat>
+        <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
+        <UseAppHost>true</UseAppHost>
+        <PublishSingleFile>false</PublishSingleFile>
+    </PropertyGroup>
 
-	<ItemGroup>
-		<AndroidResource Include="Icon.png">
-			<Link>Resources\drawable\Icon.png</Link>
-		</AndroidResource>
-	</ItemGroup>
+    <ItemGroup>
+        <AndroidResource Include="Icon.png">
+            <Link>Resources\drawable\Icon.png</Link>
+        </AndroidResource>
+    </ItemGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Avalonia.Android" />
-		<PackageReference Include="Xamarin.AndroidX.Core.SplashScreen" />
-	</ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Avalonia.Android"/>
+        <PackageReference Include="Xamarin.AndroidX.Core.SplashScreen"/>
+    </ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\CsGrafeqApplication\CsGrafeqApplication.csproj" />
-	</ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\CsGrafeqApplication\CsGrafeqApplication.csproj"/>
+    </ItemGroup>
 </Project>

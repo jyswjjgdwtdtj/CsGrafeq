@@ -11,6 +11,9 @@
             <SolidColorBrush x:Key="CgCtPureBackgroundBrush" Color="Black" />
             <SolidColorBrush x:Key="CgHTCtPureBackgroundBrush" Color="Black" Opacity="0.3" />
             <SolidColorBrush x:Key="CgTransparentBrush" Opacity="0" Color="White" />
+            <system:String x:Key="CurrentColorString">path {fill:#ffffff}</system:String>
+            <system:String x:Key="OppositeCssPathFillString">path { fill: #000000 }</system:String>
+            <system:String x:Key="OppositeCssPathStrokeString">path { stroke: #000000 }</system:String>
         </ResourceDictionary>
         <ResourceDictionary x:Key='Dark'>
             <system:Boolean x:Key="IsLight">False</system:Boolean>
@@ -21,6 +24,9 @@
             <SolidColorBrush x:Key="CgCtPureBackgroundBrush" Color="White" />
             <SolidColorBrush x:Key="CgHTCtPureBackgroundBrush" Color="White" Opacity="0.3" />
             <SolidColorBrush x:Key="CgTransparentBrush" Opacity="0" Color="Black" />
+            <system:String x:Key="CurrentColorString">path {fill:#000000}</system:String>
+            <system:String x:Key="OppositeCssPathFillString">path {fill:#ffffff}</system:String>
+            <system:String x:Key="OppositeCssPathStrokeString">path { stroke: #ffffff }</system:String>
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>
 </ResourceDictionary>

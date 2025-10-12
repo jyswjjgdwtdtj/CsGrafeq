@@ -29,7 +29,7 @@ public class Circle : FilledShape
 
     public override Vec NearestOf(Vec vec)
     {
-        return InnerCircle.Center+(vec - InnerCircle.Center).Unit() * InnerCircle.Radius;
+        return InnerCircle.Center + (vec - InnerCircle.Center).Unit() * InnerCircle.Radius;
     }
 }
 

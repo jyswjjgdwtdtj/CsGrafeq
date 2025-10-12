@@ -176,8 +176,8 @@ public class LineGetter_PerpendicularBisector : LineGetter_TwoPoint
 
     public override TwoPoint GetLine()
     {
-        var RealPoint1 = Point1.Location;
-        var RealPoint2 = Point2.Location;
+        var RealPoint1 = (Vec)Point1.Location;
+        var RealPoint2 = (Vec)Point2.Location;
         var MiddlePoint = (RealPoint1 + RealPoint2) / 2;
         var p1 = MiddlePoint;
         Vec p2;
@@ -227,9 +227,9 @@ public class LineGetter_AngleBisector : LineGetter
 
     public override TwoPoint GetLine()
     {
-        var p1 = Point1.Location;
-        var p2 = Point2.Location;
-        var ap = AnglePoint.Location;
+        var p1 = (Vec)Point1.Location;
+        var p2 = (Vec)Point2.Location;
+        var ap = (Vec)AnglePoint.Location;
         Vec v1, v2;
         v1 = ap;
         p1 -= ap;
@@ -247,7 +247,7 @@ public class LineGetter_AngleBisector : LineGetter
 
 public abstract class LineGetter_PointAndLine : LineGetter
 {
-    public LineGetter_PointAndLine(Line line, Point point)
+    public LineGetter_PointAndLine(Point point, Line line)
     {
         Line = line;
         Point = point;
@@ -277,7 +277,7 @@ public abstract class LineGetter_PointAndLine : LineGetter
 
 public class LineGetter_Vertical : LineGetter_PointAndLine
 {
-    public LineGetter_Vertical(Line line, Point point) : base(line, point)
+    public LineGetter_Vertical( Point point, Line line) : base(point,line)
     {
     }
 
@@ -300,7 +300,7 @@ public class LineGetter_Vertical : LineGetter_PointAndLine
 
 public class LineGetter_Parallel : LineGetter_PointAndLine
 {
-    public LineGetter_Parallel(Line line, Point point) : base(line, point)
+    public LineGetter_Parallel(Point point,Line line) : base( point,line)
     {
     }
 

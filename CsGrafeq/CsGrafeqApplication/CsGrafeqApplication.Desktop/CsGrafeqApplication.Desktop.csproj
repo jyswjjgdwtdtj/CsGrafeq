@@ -1,37 +1,35 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-	  <OutputType Condition="'$(Configuration.toUpper())' != 'DEBUG'">WinExe</OutputType>
-	  <OutputType Condition="'$(Configuration.toUpper())' == 'DEBUG'">Exe</OutputType>
-	  <TargetFramework>net9.0</TargetFramework>
-	  <InvariantGlobalization>true</InvariantGlobalization>
-	  <Nullable>enable</Nullable>
-	  <PublishAot Condition="'$(Configuration.toUpper())' != 'DEBUG'">true</PublishAot>
-	  <PublishAot Condition="'$(Configuration.toUpper())' == 'DEBUG'">false</PublishAot>
-	  <PublishTrimmed Condition="'$(Configuration.toUpper())' != 'DEBUG'">true</PublishTrimmed>
-	  <PublishTrimmed Condition="'$(Configuration.toUpper())' == 'DEBUG'">false</PublishTrimmed>
-	  <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-	  <LangVersion>Preview</LangVersion>
-  </PropertyGroup>
+    <PropertyGroup>
+        <OutputType Condition="'$(Configuration.toUpper())' != 'DEBUG'">WinExe</OutputType>
+        <OutputType Condition="'$(Configuration.toUpper())' == 'DEBUG'">Exe</OutputType>
+        <TargetFramework>net9.0</TargetFramework>
+        <InvariantGlobalization>true</InvariantGlobalization>
+        <Nullable>enable</Nullable>
+        <PublishAot Condition="'$(Configuration.toUpper())' != 'DEBUG'">true</PublishAot>
+        <PublishAot Condition="'$(Configuration.toUpper())' == 'DEBUG'">false</PublishAot>
+        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+        <LangVersion>Preview</LangVersion>
+    </PropertyGroup>
 
-  <PropertyGroup>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-    <ApplicationIcon>favicon.ico</ApplicationIcon>
-  </PropertyGroup>
+    <PropertyGroup>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <ApplicationIcon>favicon.ico</ApplicationIcon>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\CsGrafeqApplication\CsGrafeqApplication.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\CsGrafeqApplication\CsGrafeqApplication.csproj"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Remove="Packaging.Targets" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Remove="Packaging.Targets"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <Content Include="favicon.ico" />
-  </ItemGroup>
+    <ItemGroup>
+        <Content Include="favicon.ico"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Avalonia.Desktop" />
-    <PackageReference Include="PublishAotCompressed" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Avalonia.Desktop"/>
+        <PackageReference Include="PublishAotCompressed"/>
+    </ItemGroup>
 </Project>

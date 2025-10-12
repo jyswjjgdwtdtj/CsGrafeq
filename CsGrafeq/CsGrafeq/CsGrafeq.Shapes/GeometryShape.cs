@@ -7,9 +7,6 @@ public abstract class GeometryShape : Shape
 {
     public List<GeometryShape> SubShapes = new();
     public abstract GeometryGetter Getter { get; }
-    public GeometryShape()
-    {
-    }
 
     public bool PointerOver
     {
@@ -29,12 +26,9 @@ public abstract class GeometryShape : Shape
         {
             if (!CanInteract)
                 return;
-            bool v = field;
+            var v = field;
             this.RaiseAndSetIfChanged(ref field, value);
-            if (v != value)
-            {
-                SelectedChanged?.Invoke(this, value);
-            }
+            if (v != value) SelectedChanged?.Invoke(this, value);
             InvokeEvent();
         }
     } = false;

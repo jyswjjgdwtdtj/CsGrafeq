@@ -1,19 +1,12 @@
 #define TEST_MEMORY_LEAK
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Templates;
-using Avalonia.Data;
 using Avalonia.Input;
-using Avalonia.Input.Raw;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
-using Avalonia.Markup.Xaml.MarkupExtensions;
-using Avalonia.Markup.Xaml.MarkupExtensions.CompiledBindings;
-using Avalonia.Media;
-using Avalonia.VisualTree;
 using CsGrafeq.Shapes;
 using CsGrafeq.Shapes.ShapeGetter;
 using CsGrafeqApplication.Controls.Displayers;
@@ -26,56 +19,50 @@ using AvaRect = Avalonia.Rect;
 using AvaSize = Avalonia.Size;
 using GeoHalf = CsGrafeq.Shapes.Half;
 using static CsGrafeqApplication.AvaloniaMath;
-using Math = System.Math;
-using CsGrafeq;
-using System.Text;
-using System.ComponentModel;
 
 namespace CsGrafeqApplication.Addons.GeometryPad;
 
 public partial class GeometryPad : Addon
 {
+    private static readonly double PointerTouchRange = OS.GetOSType() == OSType.Android ? 15 : 5;
     private readonly List<ActionData> Actions = new();
     private Func<Vec, AvaPoint> MathToPixel;
     protected Func<Vec, SKPoint> MathToPixelSK;
     private GeoPoint? MovingPoint;
+    private Vector2<string> MovingPointEndPos;
+    private Vector2<string> MovingPointStartPos;
     protected Func<AvaPoint, Vec> PixelToMath;
     protected Func<SKPoint, Vec> PixelToMathSK;
     protected Func<double, double> PixelToMathX, PixelToMathY, MathToPixelX, MathToPixelY;
     private AvaPoint PointerMovedPos;
-    private AvaPoint PointerPressedPos;
-    private AvaPoint PointerReleasedPos;
-    private Vector2<string> MovingPointStartPos;
-    private Vector2<string> MovingPointEndPos;
     private Vec PointerPressedMovingPointPos;
+    private AvaPoint PointerPressedPos;
     private PointerPointProperties PointerProperties;
-    private static double PointerTouchRange = OS.GetOSType() == OSType.Android ? 15 : 5;
-
-
-
+    private AvaPoint PointerReleasedPos;
+    private GeometryPadViewModel VM;
 
     public GeometryPad()
     {
         Setting = new GeometryPadSetting(this);
         InputMethod.SetIsInputMethodEnabled(this, false);
-        DataContext = new GeometryPadViewModel();
-        Shapes = (DataContext as GeometryPadViewModel)!.Shapes;
-        foreach (var i in (DataContext as GeometryPadViewModel)!.Operations)
+        DataContext=VM = new GeometryPadViewModel();
+        Shapes = VM!.Shapes;
+        foreach (var i in VM!.Actions)
         foreach (var j in i)
             Actions!.Add(j);
         GeoPadAction = Actions.FirstOrDefault();
         Shapes.CollectionChanged += (s, e) => { Owner?.Invalidate(this); };
         Shapes.OnShapeChanged += () => { Owner?.Invalidate(this); };
 #if DEBUG
-        var p1 = AddShape(new Point(new PointGetter_FromLocation((0.5, 0.5))));
-        var p2 = AddShape(new Point(new PointGetter_FromLocation((1.5, 1.5))));
+        var p1 = AddShape(new GeoPoint(new PointGetter_FromLocation((0.5, 0.5))));
+        var p2 = AddShape(new GeoPoint(new PointGetter_FromLocation((1.5, 1.5))));
         var s1 = AddShape(new Straight(new LineGetter_Connected(p1, p2)));
-        var p3 = AddShape(new Point(new PointGetter_OnLine(s1, (0, 0))));
-        var c1 = AddShape(new Circle(new CircleGetter_FromCenterAndRadius(p1,1)));
+        var p3 = AddShape(new GeoPoint(new PointGetter_OnLine(s1, (0, 0))));
+        var c1 = AddShape(new Circle(new CircleGetter_FromCenterAndRadius(p1)));
 #endif
         InitializeComponent();
-
     }
+
     internal ActionData GeoPadAction { get; private set; }
 
     public ShapeList Shapes { get; init; }
@@ -111,9 +98,127 @@ public partial class GeometryPad : Addon
         Shapes.ClearSelected();
     }
 
+    #region KeyAction
+
+    protected override bool KeyDown(KeyEventArgs e)
+    {
+        Owner.Suspend();
+        var res = DoNext;
+        switch (e.Key)
+        {
+            case Key.Delete:
+            {
+                List<GeometryShape> todelete = new();
+                foreach (var shape in Shapes.GetSelectedShapes<GeometryShape>().ToArray())
+                    if (shape.Selected)
+                    {
+                        todelete.Add(shape);
+
+                        res &= Intercept;
+                    }
+
+                if (todelete.Count > 0) DoGeoShapesDelete(todelete.ToArray());
+            }
+                break;
+            case Key.Tab:
+            {
+                foreach (var shape in Shapes.GetSelectedShapes<GeometryShape>().ToArray())
+                    if (shape.Selected)
+                    {
+                        res &= Intercept;
+                        shape.Selected = false;
+                        foreach (var subshape in shape.SubShapes) subshape.Selected = true;
+                    }
+            }
+                break;
+            case Key.A:
+            {
+                if (e.KeyModifiers == KeyModifiers.Control)
+                {
+                    res &= Intercept;
+                    foreach (var shape in Shapes.OfType<GeometryShape>().ToArray())
+                        shape.Selected = true;
+                }
+            }
+                break;
+            case Key.B:
+            {
+                if (e.KeyModifiers == KeyModifiers.Control)
+                {
+                    res &= Intercept;
+                    foreach (var shape in Shapes.OfType<GeometryShape>().ToArray())
+                        shape.Selected = false;
+                }
+            }
+                break;
+            case Key.Z:
+            {
+                if (e.KeyModifiers == KeyModifiers.Control) CmdManager.UnDo();
+            }
+                break;
+            case Key.Y:
+            {
+                if (e.KeyModifiers == KeyModifiers.Control) CmdManager.ReDo();
+            }
+                break;
+        }
+
+        if (res == Intercept) Owner.Invalidate();
+        Owner.Resume();
+        return res;
+    }
+
+    #endregion
+
+    public T? AddShape<T>(T shape) where T : Shape
+    {
+        if (shape.IsDeleted)
+            return null;
+        Shapes.Add(shape);
+        DoShapeAdd(shape);
+        return shape;
+    }
+
+    private class TextChangedCommand : CommandManager.Command
+    {
+        public readonly string PreviousText;
+
+        public TextChangedCommand(string previous, string current, ExpNumber target, TextBox tb)
+            : base(null, _ => { }, _ => { }, _ => { })
+        {
+            PreviousText = previous;
+            CurrentText = current;
+            Number = target;
+            Do = _ =>
+            {
+                target.ValueStr = current;
+                (tb.Tag as GeoPoint)?.RefreshValues();
+                if (target.IsError)
+                    DataValidationErrors.SetError(tb, new Exception());
+                else
+                    DataValidationErrors.ClearErrors(tb);
+            };
+            UnDo = _ =>
+            {
+                target.ValueStr = previous;
+                (tb.Tag as GeoPoint)?.RefreshValues();
+                if (target.IsError)
+                    DataValidationErrors.SetError(tb, new Exception());
+                else
+                    DataValidationErrors.ClearErrors(tb);
+            };
+            Clear = _ => { };
+        }
+
+        public string CurrentText { get; init; }
+        public ExpNumber Number { get; init; }
+    }
+
 
     #region PointerAction
-    private bool IsMovingPointMovable=false;
+
+    private bool IsMovingPointMovable;
+
     protected override bool PointerPressed(AddonPointerEventArgs e)
     {
         PointerProperties = e.Properties;
@@ -128,7 +233,7 @@ public partial class GeometryPad : Addon
             if (MovingPoint != null)
             {
                 PointerPressedMovingPointPos = MovingPoint.Location;
-                if( MovingPoint.PointGetter is PointGetter_Movable pgm && MovingPoint.IsUserEnabled)
+                if (MovingPoint.PointGetter is PointGetter_Movable pgm && MovingPoint.IsUserEnabled)
                 {
                     IsMovingPointMovable = true;
                     MovingPointStartPos = new Vector2<string>(pgm.PointX.ValueStr, pgm.PointY.ValueStr);
@@ -137,6 +242,7 @@ public partial class GeometryPad : Addon
                 {
                     IsMovingPointMovable = false;
                 }
+
                 return Intercept;
             }
         }
@@ -165,15 +271,17 @@ public partial class GeometryPad : Addon
 
         if (e.Properties.IsLeftButtonPressed)
         {
-            if (OS.GetOSType() == OSType.Android&&(PointerMovedPos - PointerPressedPos).GetLength()<10)
+            if (OS.GetOSType() == OSType.Android && (PointerMovedPos - PointerPressedPos).GetLength() < 10)
             {
-            }else if (PointerMovedPos == PointerPressedPos)
+            }
+            else if (PointerMovedPos == PointerPressedPos)
             {
             }
             else
             {
                 Shapes.ClearSelected();
             }
+
             var previous = MovingPoint.PointGetter;
             //如点附着在基于这个点的几何图形上 会造成无限递归 使程序崩溃 同时破坏了图形的树的单向结构
             /*if (e.KeyModifiers.HasFlag(KeyModifiers.Control))
@@ -208,9 +316,6 @@ public partial class GeometryPad : Addon
                         pg.PointY.SetNumber(PixelToMathY(newp.Y));
                     else
                         pg?.SetPoint(Owner.PixelToMath(newp));
-                }
-                else
-                {
                 }
 
                 MovingPoint.RefreshValues();
@@ -319,9 +424,11 @@ public partial class GeometryPad : Addon
             Shapes.ClearSelected();
         if (IsMovingPointMovable)
         {
-            PointGetter_Movable pgm= (PointGetter_Movable)MovingPoint.PointGetter;
-            DoPointMove(MovingPoint, MovingPointStartPos,new(pgm.PointX.ValueStr,pgm.PointY.ValueStr));
+            var pgm = (PointGetter_Movable)MovingPoint.PointGetter;
+            DoPointMove(MovingPoint, MovingPointStartPos,
+                new Vector2<string>(pgm.PointX.ValueStr, pgm.PointY.ValueStr));
         }
+
         MovingPoint = null;
         Owner.Resume();
         return Intercept;
@@ -330,435 +437,130 @@ public partial class GeometryPad : Addon
     protected override bool PointerTapped(AddonPointerEventArgsBase e)
     {
         Owner.Suspend();
-        if (GeoPadAction.Name == "Put")
+        using (var ec=new ExitController(() => Owner.Resume()))
         {
-            Shapes.ClearSelected();
-            PutPoint(e.Location).Selected = true;
-            Owner.Resume();
-            return Intercept;
-        }
-
-        var first = Shapes.GetSelectedShapes<GeoPoint>().FirstOrDefault();
-        var selectfirst = false;
-        if (GeoPadAction.ShapesToUse.HasFlag(ActionData.UseShape.Point) &&
-            TryGetShape<GeoPoint>(e.Location, out var point))
-        {
-            if (first == point)
-                selectfirst = true;
-            else
-                point.Selected = !point.Selected;
-        }
-        else if (GeoPadAction.ShapesToUse.HasFlag(ActionData.UseShape.Line) &&
-                 TryGetShape<GeoLine>(e.Location, out var line))
-        {
-            line.Selected = !line.Selected;
-        }
-        else if (GeoPadAction.ShapesToUse.HasFlag(ActionData.UseShape.Circle) &&
-                 TryGetShape<GeoCircle>(e.Location, out var circle))
-        {
-            circle.Selected = !circle.Selected;
-        }
-        else if (GeoPadAction.ShapesToUse.HasFlag(ActionData.UseShape.Polygon) &&
-                 TryGetShape<GeoPolygon>(e.Location, out var polygon))
-        {
-            polygon.Selected = !polygon.Selected;
-        }
-        else if (GeoPadAction.ShapesToUse.HasFlag(ActionData.UseShape.Point) && GeoPadAction.Name != "Move" &&
-                 GeoPadAction.Name != "Select")
-        {
-            PutPoint(e.Location).Selected = true;
-        }
-
-        if (GeoPadAction.Name != "Move" && GeoPadAction.Name != "Select")
-        {
-            if (!GeoPadAction.ShapesToUse.HasFlag(ActionData.UseShape.Point))
-                Shapes.ClearSelected<GeoPoint>();
-            if (!GeoPadAction.ShapesToUse.HasFlag(ActionData.UseShape.Line))
-                Shapes.ClearSelected<GeoLine>();
-            if (!GeoPadAction.ShapesToUse.HasFlag(ActionData.UseShape.Circle))
-                Shapes.ClearSelected<GeoCircle>();
-            if (!GeoPadAction.ShapesToUse.HasFlag(ActionData.UseShape.Polygon))
-                Shapes.ClearSelected<GeoPolygon>();
-        }
-
-        var SPoints = Shapes.GetSelectedShapes<GeoPoint>().ToArray();
-        var SLines = Shapes.GetSelectedShapes<GeoLine>().ToArray();
-        var SCircles = Shapes.GetSelectedShapes<GeoCircle>().ToArray();
-        var SPolygons = Shapes.GetSelectedShapes<GeoPolygon>().ToArray();
-        var plen = SPoints.Length;
-        var llen = SLines.Length;
-        var clen = SCircles.Length;
-        switch (GeoPadAction.Name)
-        {
-            case "Select":
-            case "Move":
-                break;
-            case "Put":
+            if (GeoPadAction.Name == "Put")
             {
                 Shapes.ClearSelected();
+                PutPoint(e.Location).Selected = true;
+                return Intercept;
             }
-                break;
-            case "Middle":
-            {
-                if (plen == 2 && llen == 0 && clen == 0)
-                {
-                    var newpoint = new GeoPoint(new PointGetter_MiddlePoint(SPoints[0], SPoints[1]));
-                    AddShape(newpoint);
-                    Shapes.ClearSelected();
-                }
 
-                Shapes.ClearSelected<GeoLine>();
-                Shapes.ClearSelected<GeoCircle>();
-                if (plen >= 2)
-                    Shapes.ClearSelected<GeoPoint>();
+            var first = Shapes.GetSelectedShapes<GeoPoint>().FirstOrDefault();
+            var selectfirst = false;
+            if (GeoPadAction.Args.Contains(ShapeArg.Point) &&
+                TryGetShape<GeoPoint>(e.Location, out var point))
+            {
+                if (first == point)
+                    selectfirst = true;
+                else
+                    point.Selected = !point.Selected;
             }
-                break;
-            case "Median Center":
+            else if (GeoPadAction.Args.Contains(ShapeArg.Line) &&
+                     TryGetShape<GeoLine>(e.Location, out var line))
             {
-                if (plen == 3 && llen == 0 && clen == 0)
-                {
-                    var newpoint = new GeoPoint(new PointGetter_MedianCenter(SPoints[0], SPoints[1],
-                        SPoints[2]));
-                    AddShape(newpoint);
-                    Shapes.ClearSelected<GeoPoint>();
-                }
-
-                Shapes.ClearSelected<GeoLine>();
-                Shapes.ClearSelected<GeoCircle>();
-                if (plen >= 3)
-                    Shapes.ClearSelected<GeoPoint>();
+                line.Selected = !line.Selected;
             }
-                break;
-            case "In Center":
+            else if (GeoPadAction.Args.Contains(ShapeArg.Circle) &&
+                     TryGetShape<GeoCircle>(e.Location, out var circle))
             {
-                if (plen == 3 && llen == 0 && clen == 0)
-                {
-                    var newpoint = new GeoPoint(new PointGetter_InCenter(SPoints[0], SPoints[1],
-                        SPoints[2]));
-                    AddShape(newpoint);
-                    Shapes.ClearSelected<GeoPoint>();
-                }
-
-                Shapes.ClearSelected<GeoLine>();
-                Shapes.ClearSelected<GeoCircle>();
-                if (plen >= 3)
-                    Shapes.ClearSelected<GeoPoint>();
+                circle.Selected = !circle.Selected;
             }
-                break;
-            case "Out Center":
+            else if (GeoPadAction.Args.Contains(ShapeArg.Polygon) &&
+                     TryGetShape<GeoPolygon>(e.Location, out var polygon))
             {
-                if (plen == 3 && llen == 0 && clen == 0)
-                {
-                    var newpoint = new GeoPoint(new PointGetter_OutCenter(SPoints[0], SPoints[1],
-                        SPoints[2]));
-                    AddShape(newpoint);
-                    Shapes.ClearSelected<GeoPoint>();
-                }
-
-                Shapes.ClearSelected<GeoLine>();
-                Shapes.ClearSelected<GeoCircle>();
-                if (plen >= 3)
-                    Shapes.ClearSelected<GeoPoint>();
+                polygon.Selected = !polygon.Selected;
             }
-                break;
-            case "Ortho Center":
+            else if (GeoPadAction.Args.Contains(ShapeArg.Point) && GeoPadAction.Name != "Move" &&
+                     GeoPadAction.Name != "Select")
             {
-                if (plen == 3 && llen == 0 && clen == 0)
-                {
-                    var newpoint = new GeoPoint(new PointGetter_OrthoCenter(SPoints[0], SPoints[1],
-                        SPoints[2]));
-                    AddShape(newpoint);
-                    Shapes.ClearSelected<GeoPoint>();
-                }
-
-                Shapes.ClearSelected<GeoLine>();
-                Shapes.ClearSelected<GeoCircle>();
-                if (plen >= 3)
-                    Shapes.ClearSelected<GeoPoint>();
+                PutPoint(e.Location).Selected = true;
             }
-                break;
-            case "Axial Symmetry":
-            {
-                if (plen == 1 && llen == 1 && clen == 0)
-                {
-                    var newpoint =
-                        new GeoPoint(new PointGetter_AxialSymmetryPoint(SPoints[0], SLines[0]));
-                    AddShape(newpoint);
-                    Shapes.ClearSelected();
-                }
 
-                if (plen > 1)
+            if (GeoPadAction.Name != "Move" && GeoPadAction.Name != "Select")
+            {
+                if (!GeoPadAction.Args.Contains(ShapeArg.Point))
                     Shapes.ClearSelected<GeoPoint>();
-                if (llen > 1)
+                if (!GeoPadAction.Args.Contains(ShapeArg.Line))
                     Shapes.ClearSelected<GeoLine>();
-                Shapes.ClearSelected<GeoCircle>();
+                if (!GeoPadAction.Args.Contains(ShapeArg.Circle))
+                    Shapes.ClearSelected<GeoCircle>();
+                if (!GeoPadAction.Args.Contains(ShapeArg.Polygon))
+                    Shapes.ClearSelected<GeoPolygon>();
             }
-                break;
-            case "Nearest":
+            var SAll = Shapes.GetSelectedShapes<GeometryShape>().ToList();
+            var SPoints = Shapes.GetSelectedShapes<GeoPoint>().ToArray();
+            var SLines = Shapes.GetSelectedShapes<GeoLine>().ToArray();
+            var SCircles = Shapes.GetSelectedShapes<GeoCircle>().ToArray();
+            var SPolygons = Shapes.GetSelectedShapes<GeoPolygon>().ToArray();
+            var plen = SPoints.Length;
+            var llen = SLines.Length;
+            var clen = SCircles.Length;
+            var polen = SPolygons.Length;
+            var needplen = GeoPadAction.Args.Count(i => i == ShapeArg.Point);
+            var needllen = GeoPadAction.Args.Count(i => i == ShapeArg.Line);
+            var needclen = GeoPadAction.Args.Count(i => i == ShapeArg.Circle);
+            var needpolen = GeoPadAction.Args.Count(i => i == ShapeArg.Circle);
+            if (GeoPadAction.IsMultiPoint)
             {
-                if (plen == 1 && llen == 1 && clen == 0)
-                {
-                    var newpoint =
-                        new GeoPoint(new PointGetter_NearestPointOnLine(SLines[0], SPoints[0]));
-                    AddShape(newpoint);
-                    Shapes.ClearSelected();
-                }
-
-                if (plen > 1)
-                    Shapes.ClearSelected<GeoPoint>();
-                if (llen > 1)
-                    Shapes.ClearSelected<GeoLine>();
-                Shapes.ClearSelected<GeoCircle>();
-            }
-                break;
-            case "Straight":
-            {
-                if (plen == 2 && llen == 0 && clen == 0)
-                {
-                    var line = new Straight(new LineGetter_Connected(SPoints[0], SPoints[1]));
-                    AddShape(line);
-                    Shapes.ClearSelected();
-                }
-
                 if (plen > 2)
-                    Shapes.ClearSelected<GeoPoint>();
-            }
-                break;
-            case "Segment":
-            {
-                if (plen == 2 && llen == 0 && clen == 0)
-                {
-                    var line = new Segment(new LineGetter_Segment(SPoints[0], SPoints[1]));
-                    AddShape(line);
-                    Shapes.ClearSelected();
-                }
-
-                if (plen > 2)
-                    Shapes.ClearSelected<GeoPoint>();
-            }
-                break;
-            case "Half":
-            {
-                if (plen == 2 && llen == 0 && clen == 0)
-                {
-                    var line = new GeoHalf(new LineGetter_Half(SPoints[0], SPoints[1]));
-                    AddShape(line);
-                    Shapes.ClearSelected();
-                }
-
-                if (plen > 2)
-                    Shapes.ClearSelected<GeoPoint>();
-            }
-                break;
-            case "Vertical":
-            {
-                if (plen == 1 && llen == 1 && clen == 0)
-                {
-                    var line = new Straight(new LineGetter_Vertical(SLines[0], SPoints[0]));
-                    AddShape(line);
-                    Shapes.ClearSelected();
-                }
-
-                if (plen > 1)
-                    Shapes.ClearSelected<GeoPoint>();
-                if (llen > 1)
-                    Shapes.ClearSelected<GeoLine>();
-            }
-                break;
-            case "Parallel":
-            {
-                if (plen == 1 && llen == 1 && clen == 0)
-                {
-                    var line = new Straight(new LineGetter_Parallel(SLines[0], SPoints[0]));
-                    AddShape(line);
-                    Shapes.ClearSelected();
-                }
-
-                if (plen > 1)
-                    Shapes.ClearSelected<GeoPoint>();
-                if (llen > 1)
-                    Shapes.ClearSelected<GeoLine>();
-            }
-                break;
-            case "Perpendicular Bisector":
-            {
-                if (plen == 2 && llen == 0 && clen == 0)
-                {
-                    var line = new Straight(new LineGetter_PerpendicularBisector(SPoints[0], SPoints[1]));
-                    AddShape(line);
-                    Shapes.ClearSelected();
-                }
-                else if (plen == 0 && llen == 1 && clen == 0)
-                {
-                    if (SLines[0] is Segment)
-                    {
-                        var line = new Straight(new LineGetter_PerpendicularBisector(
-                            new GeoPoint(new PointGetter_EndOfLine(SLines[0], true)),
-                            new GeoPoint(new PointGetter_EndOfLine(SLines[0], false))));
-                        AddShape(line);
-                        Shapes.ClearSelected();
-                    }
-                }
-
-                if (plen > 2)
-                    Shapes.ClearSelected<GeoPoint>();
-            }
-                break;
-            case "Three Points":
-            {
-                if (plen == 3 && llen == 0 && clen == 0)
-                {
-                    var circle = new Circle(new CircleGetter_FromThreePoint(SPoints[0], SPoints[1],
-                        SPoints[2]));
-                    AddShape(circle);
-                    Shapes.ClearSelected<GeoPoint>();
-                }
-
-                if (plen > 3)
-                    Shapes.ClearSelected<GeoPoint>();
-            }
-                break;
-            case "Center and Point":
-            {
-                if (plen == 2 && llen == 0 && clen == 0)
-                {
-                    var circle =
-                        new Circle(new CircleGetter_FromCenterAndPoint(SPoints[0], SPoints[1]));
-                    AddShape(circle);
-                    Shapes.ClearSelected<GeoPoint>();
-                }
-
-                if (plen > 2)
-                    Shapes.ClearSelected<GeoPoint>();
-            }
-                break;
-            case "Polygon":
-            {
-                if (llen == 0 && clen == 0 && plen > 2)
                     if (selectfirst)
                     {
-                        var polygon = new Polygon(new PolygonGetter(SPoints));
-                        AddShape(polygon);
+                        var shape = GeometryActions.CreateShape(GeoPadAction.Self, (Getter)GeoPadAction.GetterConstructor.Invoke(SPoints.ToArray()));
+                        AddShape(shape);
                         Shapes.ClearSelected();
                     }
                     else if (plen <= 2 && selectfirst)
                     {
                         Shapes.ClearSelected<GeoPoint>();
                     }
+                return Intercept;
             }
-                break;
-            case "Fitted":
+            if (GeoPadAction.Name == "Select" || GeoPadAction.Name == "Move")
             {
-                if (llen == 0 && clen == 0 && plen > 2)
-                    if (selectfirst)
-                    {
-                        var fitted = new Straight(new LineGetter_Fitted(SPoints));
-                        AddShape(fitted);
-                        Shapes.ClearSelected();
-                    }
+                return Intercept;
             }
-                break;
-            case "Angle":
+            //==========================
+            if (needplen < plen || needclen < clen || needllen < llen || needpolen < polen)
             {
-                if (plen == 3 && llen == 0 && clen == 0)
+                Shapes.ClearSelected();
+                return Intercept;
+            }
+            int GetIndex(GeometryShape s)
+            {
+                switch (s)
                 {
-                    var angle = new Angle(new AngleGetter_FromThreePoint(SPoints[0], SPoints[1], SPoints[2]));
-                    AddShape(angle);
-                    Shapes.ClearSelected<GeoPoint>();
+                    case GeoPoint _: 
+                        return 0;
+                    case GeoLine _:
+                        return 5;
+                    case GeoCircle _:
+                        return 10;
+                    case GeoPolygon _:
+                        return 15;
+                    default:
+                        CsGrafeq.Extension.Throw("");
+                        return 20;
                 }
-
-                Shapes.ClearSelected<GeoCircle>();
-                Shapes.ClearSelected<GeoLine>();
-                if (plen > 3)
-                    Shapes.ClearSelected<GeoPoint>();
             }
-                break;
-            default:
-                CsGrafeq.Extension.Throw<bool>(GeoPadAction.Name);
-                Owner.Resume();
-                return DoNext;
+            if (needplen == plen && needclen == clen && needllen == llen && needpolen == polen)
+            {
+                SAll.Sort((s1, s2) =>
+                {
+                    var i1 = GetIndex(s1);
+                    var i2 = GetIndex(s2);
+                    if (i1 < i2)
+                        return -1;
+                    if (i1 == i2)
+                        return 0;
+                    return 1;
+                });
+                var shape=GeometryActions.CreateShape(GeoPadAction.Self,(Getter)GeoPadAction.GetterConstructor.Invoke(SAll.Select(o => (object)o).ToArray()));
+                AddShape(shape);
+                Shapes.ClearSelected();
+            }
+            return Intercept;
         }
-
-        Owner.Resume();
-        return Intercept;
-    }
-
-    #endregion
-
-    #region KeyAction
-
-    protected override bool KeyDown(KeyEventArgs e)
-    {
-        Owner.Suspend();
-        var res = DoNext;
-        switch (e.Key)
-        {
-            case Key.Delete:
-            {
-                List<GeometryShape> todelete = new();
-                foreach (var shape in Shapes.GetSelectedShapes<GeometryShape>().ToArray())
-                    if (shape.Selected)
-                    {
-                        todelete.Add(shape);
-
-                        res &= Intercept;
-                    }
-
-                if (todelete.Count > 0) DoGeoShapesDelete(todelete.ToArray());
-            }
-                break;
-            case Key.Tab:
-            {
-                foreach (var shape in Shapes.GetSelectedShapes<GeometryShape>().ToArray())
-                    if (shape.Selected)
-                    {
-                        res &= Intercept;
-                        shape.Selected = false;
-                        foreach (var subshape in shape.SubShapes) subshape.Selected = true;
-                    }
-            }
-                break;
-            case Key.A:
-            {
-                if (e.KeyModifiers == KeyModifiers.Control)
-                {
-                    res &= Intercept;
-                    foreach (var shape in Shapes.OfType<GeometryShape>().ToArray())
-                        shape.Selected = true;
-                }
-            }
-                break;
-            case Key.B:
-            {
-                if (e.KeyModifiers == KeyModifiers.Control)
-                {
-                    res &= Intercept;
-                    foreach (var shape in Shapes.OfType<GeometryShape>().ToArray())
-                        shape.Selected = false;
-                }
-            }
-                break;
-            case Key.Z:
-            {
-                if (e.KeyModifiers == KeyModifiers.Control)
-                {
-                    CmdManager.UnDo();
-                }
-            }
-                break;
-            case Key.Y:
-            {
-                if (e.KeyModifiers == KeyModifiers.Control)
-                {
-                    CmdManager.ReDo();
-                }
-            }
-                break;
-        }
-
-        if (res == Intercept) Owner.Invalidate();
-        Owner.Resume();
-        return res;
     }
 
     #endregion
@@ -779,10 +581,10 @@ public partial class GeometryPad : Addon
             dc.DrawRect(selrect.ToSKRect(), FilledTpMedian);
             dc.DrawRect(selrect.ToSKRect(), StrokeMedian);
         }
-        
+
         dc.Restore();
     }
-    
+
     private void RenderShapes(SKCanvas dc, SKRect rect, IEnumerable<GeometryShape> shapes)
     {
         var UnitLength = (Owner as CartesianDisplayer)!.UnitLength;
@@ -988,7 +790,7 @@ public partial class GeometryPad : Addon
                     dc.DrawOval(loc, new SKSize(4, 4), FilledMedian);
                     dc.DrawOval(loc, new SKSize(7, 7), StrokeMedian);
                     dc.DrawBubble(
-                        $"({p.Location.X},{p.Location.Y}) {(p.PointGetter is PointGetter_Movable ? "" : "不可移动")}",
+                        $"({p.Location.X},{p.Location.Y}) {(p.PointGetter is PointGetter_Movable ? "" : "Unmovable")}",
                         loc.OffSetBy(2, 2 + 20 * index++), BubbleBack, PaintMain);
                 }
                 else if (p.Selected)
@@ -1097,7 +899,7 @@ public partial class GeometryPad : Addon
         var getter = GetNewPointGetterFromLocation(Location);
         if (getter is null)
             return null;
-        var p = new Point(getter);
+        var p = new GeoPoint(getter);
         AddShape(p);
         return p;
     }
@@ -1110,7 +912,7 @@ public partial class GeometryPad : Addon
         foreach (var geoshape in Shapes.GetShapes<GeometryShape>())
             if (geoshape is Line || geoshape is Circle)
             {
-                var dist = ((geoshape.NearestOf(mathcursor)-mathcursor) * disp.UnitLength).GetLength();
+                var dist = ((geoshape.NearestOf(mathcursor) - mathcursor) * disp.UnitLength).GetLength();
                 if (dist < 5) shapes.Add((dist, geoshape));
             }
 
@@ -1170,7 +972,7 @@ public partial class GeometryPad : Addon
         foreach (var geoshape in Shapes.GetShapes<GeometryShape>())
             if (geoshape is Line || geoshape is Circle)
             {
-                var dist = ((geoshape.NearestOf(mathcursor)-mathcursor )* disp.UnitLength).GetLength();
+                var dist = ((geoshape.NearestOf(mathcursor) - mathcursor) * disp.UnitLength).GetLength();
                 if (dist < 5) shapes.Add((dist, geoshape));
             }
 
@@ -1223,7 +1025,7 @@ public partial class GeometryPad : Addon
     }
 
     /// <summary>
-    /// 当于xy两个方向的线距离均小于5时 会吸附到交点上
+    ///     当于xy两个方向的线距离均小于5时 会吸附到交点上
     /// </summary>
     protected AvaPoint FindNearestPointOnTwoAxisLine(AvaPoint location)
     {
@@ -1258,7 +1060,7 @@ public partial class GeometryPad : Addon
     }
 
     /// <summary>
-    /// 当于xy两个方向的线距离均小于5时 会吸附到更近的点
+    ///     当于xy两个方向的线距离均小于5时 会吸附到更近的点
     /// </summary>
     protected AvaPoint FindNearestPointOnAxisLine(AvaPoint location)
     {
@@ -1306,7 +1108,7 @@ public partial class GeometryPad : Addon
                 continue;
             if (s is T tar)
             {
-                var dis = ((tar.NearestOf(v)-v) * disp.UnitLength).GetLength();
+                var dis = ((tar.NearestOf(v) - v) * disp.UnitLength).GetLength();
                 if (dis < PointerTouchRange && dis < distance)
                 {
                     distance = dis;
@@ -1352,6 +1154,7 @@ public partial class GeometryPad : Addon
                     sh.IsDeleted = true;
                     sh.Selected = false;
                 }
+
                 ShapeItemsControl.InvalidateArrange();
             },
             o =>
@@ -1361,13 +1164,14 @@ public partial class GeometryPad : Addon
                     sh.IsDeleted = false;
                     sh.Selected = false;
                 }
+
                 ShapeItemsControl.InvalidateArrange();
             },
             o => { }, true
         );
     }
 
-    private void DoPointMove(Point point, Vector2<string> previous, Vector2<string> next)
+    private void DoPointMove(GeoPoint point, Vector2<string> previous, Vector2<string> next)
     {
         if (point.PointGetter is PointGetter_Movable pg)
             CmdManager.Do(pg, o =>
@@ -1381,7 +1185,7 @@ public partial class GeometryPad : Addon
             }, o => { });
     }
 
-    private void DoPointGetterChange(Point point, PointGetter previous, PointGetter next)
+    private void DoPointGetterChange(GeoPoint point, PointGetter previous, PointGetter next)
     {
         CmdManager.Do<object?>(null, o =>
         {
@@ -1400,102 +1204,58 @@ public partial class GeometryPad : Addon
 
     #endregion
 
-    public T? AddShape<T>(T shape) where T : Shape
-    {
-        if (shape.IsDeleted)
-            return null;
-        Shapes.Add(shape);
-        DoShapeAdd(shape);
-        return shape;
-    }
-    private class TextChangedCommand : CommandManager.Command
-    {
-        public readonly string PreviousText;
-        public string CurrentText { get; init; }
-        public ExpNumber Number { get; init; }
-        public TextChangedCommand(string previous, string current, ExpNumber target,TextBox tb)
-            : base(null, (_) => { }, (_) => { }, (_) => { })
-        {
-            PreviousText = previous;
-            CurrentText = current;
-            Number = target;
-            Do = (_) =>
-            {
-                target.ValueStr = current;
-                (tb.Tag as Point)?.RefreshValues();
-                if (target.IsError)
-                    DataValidationErrors.SetError(tb, new Exception());
-                else
-                    DataValidationErrors.ClearErrors(tb);
-            };
-            UnDo = (_) =>
-            {
-                target.ValueStr = previous;
-                (tb.Tag as Point)?.RefreshValues();
-                if (target.IsError)
-                    DataValidationErrors.SetError(tb, new Exception());
-                else
-                    DataValidationErrors.ClearErrors(tb);
-            };
-            Clear = (_) => { };
-        }
-    }
     #region ControlAction
+
     private void TextBox_OnKeyUp(object? sender, KeyEventArgs e)
     {
     }
-    private void Number_OnPropertyChanged(object? sender, Avalonia.AvaloniaPropertyChangedEventArgs e)
+
+    private void Number_OnPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
     {
         if (sender is TextBox tb)
-        {
-                if (e.Property == TextBox.TextProperty)
+            if (e.Property == TextBox.TextProperty)
+            {
+                var n = tb.Tag as ExpNumber;
+                if (n is not null && tb.IsFocused)
                 {
-                    var n = (tb.Tag as ExpNumber);
-                    if (n is not null&&tb.IsFocused)
+                    if (n.IsError)
                     {
-                        if (n.IsError)
-                        {
-                            DataValidationErrors.SetError(tb, new Exception());
-                        }
-                        else
-                        {
-                            (n.Owner as GeometryShape)?.RefreshValues();
-                            DataValidationErrors.ClearErrors(tb);
-                        }
-                        CmdManager.Do(
-                            new TextChangedCommand(((string?)e.OldValue) ?? "", ((string?)e.NewValue) ?? "", n,tb),
-                            false);
+                        DataValidationErrors.SetError(tb, new Exception());
                     }
+                    else
+                    {
+                        (n.Owner as GeometryShape)?.RefreshValues();
+                        DataValidationErrors.ClearErrors(tb);
+                    }
+
+                    CmdManager.Do(
+                        new TextChangedCommand((string?)e.OldValue ?? "", (string?)e.NewValue ?? "", n, tb));
+                }
             }
-        }
     }
+
     private void TextBoxGetFocus(object? sender, GotFocusEventArgs e)
     {
         if (sender is TextBox tb)
         {
         }
     }
+
     private void EventHandledTrue(object? sender, RoutedEventArgs e)
     {
         e.Handled = true;
     }
+
     private void DeleteButtonClicked(object? sender, RoutedEventArgs e)
     {
         if (sender is Button btn)
-        {
             if (btn.Tag is GeometryShape shape)
-            {
                 DoGeoShapesDelete([shape]);
-            }
-        }
     }
 
     private void NumberTextBox_OnLoaded(object? sender, RoutedEventArgs e)
     {
-        if (sender is TextBox tb)
-        {
-            tb.AddHandler(InputElement.KeyDownEvent, TunnelTextBoxKeyDown, RoutingStrategies.Tunnel);
-        }
+        if (sender is TextBox tb) tb.AddHandler(KeyDownEvent, TunnelTextBoxKeyDown, RoutingStrategies.Tunnel);
     }
 
     public void TextBoxPixelXLostFocus(object? sender, RoutedEventArgs e)
@@ -1520,11 +1280,12 @@ public partial class GeometryPad : Addon
         if (sender is TextBox box)
         {
             var parent = box.Parent;
-            if(e.KeyModifiers!=KeyModifiers.None)
+            if (e.KeyModifiers != KeyModifiers.None)
             {
                 e.Handled = true;
                 return;
             }
+
             if (parent != null)
             {
                 if (e.Key == Key.Left)
@@ -1556,9 +1317,11 @@ public partial class GeometryPad : Addon
                 {
                 }
                 else if (e.Key == Key.OemMinus || e.Key == Key.OemPeriod || e.Key == Key.Subtract ||
-                         e.Key == Key.Decimal||e.Key==Key.Add||e.Key==Key.Divide||e.Key==Key.Multiply||e.Key==Key.OemPlus||e.Key==Key.OemQuestion)
+                         e.Key == Key.Decimal || e.Key == Key.Add || e.Key == Key.Divide || e.Key == Key.Multiply ||
+                         e.Key == Key.OemPlus || e.Key == Key.OemQuestion)
                 {
-                }else if(e.Key>=Key.A&&e.Key<=Key.Z)
+                }
+                else if (e.Key >= Key.A && e.Key <= Key.Z)
                 {
                 }
                 else
@@ -1575,7 +1338,6 @@ public partial class GeometryPad : Addon
         {
             if (e.Key == Key.A)
             {
-                
             }
             else
             {

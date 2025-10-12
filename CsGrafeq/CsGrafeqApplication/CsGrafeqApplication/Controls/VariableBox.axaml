@@ -10,24 +10,29 @@
          https://docs.avaloniaui.net/docs/guides/styles-and-resources/how-to-use-theme-variants
   -->
     <ControlTheme x:Key="{x:Type controls:VariableBox}" TargetType="controls:VariableBox">
-        <Setter Property="Margin" Value="5"></Setter>
+        <Setter Property="Margin" Value="5" />
         <Style Selector="^:modifying">
             <Setter Property="Template">
                 <ControlTemplate>
                     <StackPanel Orientation="Vertical">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{TemplateBinding ValueName}" VerticalAlignment="Center" />
-                            <TextBlock Text=" = " VerticalAlignment="Center"/>
+                            <TextBlock Text=" = " VerticalAlignment="Center" />
                             <Border DataContext="{TemplateBinding MySliderData}">
-                                <TextBox VerticalAlignment="Center" Text="{CompiledBinding Value}" Width="NaN" x:DataType="controls:SliderData" BorderThickness="0"/>
+                                <TextBox VerticalAlignment="Center" Text="{CompiledBinding Value}" Width="NaN"
+                                         x:DataType="controls:SliderData" BorderThickness="0" />
                             </Border>
                         </StackPanel>
                         <StackPanel DataContext="{TemplateBinding MySliderData}" Orientation="Horizontal">
-                            <TextBox Text="{CompiledBinding Min}" Width="NaN" VerticalAlignment="Center" VerticalContentAlignment="Center" x:DataType="controls:SliderData"  BorderThickness="0"/>
-                            <TextBlock Text=" ≼ " VerticalAlignment="Center"></TextBlock>
-                            <TextBlock Text="{TemplateBinding ValueName}" VerticalAlignment="Center"></TextBlock>
-                            <TextBlock Text=" ≼ " VerticalAlignment="Center"></TextBlock>
-                            <TextBox Text="{CompiledBinding Max}" Width="NaN" VerticalAlignment="Center" VerticalContentAlignment="Center" x:DataType="controls:SliderData" BorderThickness="0"/>
+                            <TextBox Text="{CompiledBinding Min}" Width="NaN" VerticalAlignment="Center"
+                                     VerticalContentAlignment="Center" x:DataType="controls:SliderData"
+                                     BorderThickness="0" />
+                            <TextBlock Text=" ≼ " VerticalAlignment="Center" />
+                            <TextBlock Text="{TemplateBinding ValueName}" VerticalAlignment="Center" />
+                            <TextBlock Text=" ≼ " VerticalAlignment="Center" />
+                            <TextBox Text="{CompiledBinding Max}" Width="NaN" VerticalAlignment="Center"
+                                     VerticalContentAlignment="Center" x:DataType="controls:SliderData"
+                                     BorderThickness="0" />
                         </StackPanel>
                     </StackPanel>
                 </ControlTemplate>
@@ -40,12 +45,16 @@
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{TemplateBinding ValueName}" />
                             <TextBlock Text=" = " />
-                            <TextBlock VerticalAlignment="Center" Text="{TemplateBinding Value}" Name="ValueTextBlock"/>
+                            <TextBlock VerticalAlignment="Center" Text="{TemplateBinding Value}" Name="ValueTextBlock" />
                         </StackPanel>
                         <DockPanel LastChildFill="True" DataContext="{TemplateBinding MySliderData}">
-                            <TextBlock Text="{CompiledBinding Min}" Width="NaN" DockPanel.Dock="Left" VerticalAlignment="Center" Name="RangeMinimum" x:DataType="controls:SliderData"/>
-                            <TextBlock Text="{CompiledBinding Max}" Width="NaN" DockPanel.Dock="Right" VerticalAlignment="Center" Name="RangeMaximum" x:DataType="controls:SliderData"/>
-                            <Slider Name="PART_Slider" Minimum="{CompiledBinding Min}" Maximum="{CompiledBinding Max}" Orientation="Horizontal" Value="{TemplateBinding Value,Mode=TwoWay}"  Margin="5,0" x:DataType="controls:SliderData" />
+                            <TextBlock Text="{CompiledBinding Min}" Width="NaN" DockPanel.Dock="Left"
+                                       VerticalAlignment="Center" Name="RangeMinimum" x:DataType="controls:SliderData" />
+                            <TextBlock Text="{CompiledBinding Max}" Width="NaN" DockPanel.Dock="Right"
+                                       VerticalAlignment="Center" Name="RangeMaximum" x:DataType="controls:SliderData" />
+                            <Slider Name="PART_Slider" Minimum="{CompiledBinding Min}" Maximum="{CompiledBinding Max}"
+                                    Orientation="Horizontal" Value="{TemplateBinding Value,Mode=TwoWay}" Margin="5,0"
+                                    x:DataType="controls:SliderData" />
                         </DockPanel>
                     </StackPanel>
                 </ControlTemplate>

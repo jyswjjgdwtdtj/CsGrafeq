@@ -1,12 +1,11 @@
-﻿using CsGrafeq.Numeric;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using sysMath=System.Math;
+using CsGrafeq.Numeric;
+using sysMath = System.Math;
 
 namespace CsGrafeq.Compiler;
-
 
 public static class Compiler
 {
@@ -16,13 +15,16 @@ public static class Compiler
     private static readonly Regex letterOrnumberOr_ = new("[a-zA-Z0-9_]");
     private static readonly Regex numberOrpoint = new("[0-9.]");
     private static readonly Regex spaceOrtab = new(@"([ ]|\t)");
+
     public static HasReferenceFunction0<T> Compile0<T>(string expression) where T : IComputableNumber<T>
     {
-        var exp = ConstructExpTree<T>(expression, 0,out _,out _,out _,out var usedVars);
+        var exp = ConstructExpTree<T>(expression, 0, out _, out _, out _, out var usedVars);
         var expres = Expression.Lambda<Function0<T>>(exp);
-        return new HasReferenceFunction0<T>(expres.Compile(),usedVars);
+        return new HasReferenceFunction0<T>(expres.Compile(), usedVars);
     }
-    public static bool TryCompile0<T>(string expression, out HasReferenceFunction0<T> expFunc,out Exception? ex) where T : IComputableNumber<T>
+
+    public static bool TryCompile0<T>(string expression, out HasReferenceFunction0<T> expFunc, out Exception? ex)
+        where T : IComputableNumber<T>
     {
         try
         {
@@ -37,13 +39,16 @@ public static class Compiler
             return false;
         }
     }
+
     public static HasReferenceFunction1<T> Compile1<T>(string expression) where T : IComputableNumber<T>
     {
-        var exp = ConstructExpTree<T>(expression, 1,out ParameterExpression xVar,out _,out _,out var usedVars);
+        var exp = ConstructExpTree<T>(expression, 1, out var xVar, out _, out _, out var usedVars);
         var expres = Expression.Lambda<Function1<T>>(exp, xVar);
-        return new HasReferenceFunction1<T>(expres.Compile(),usedVars);
+        return new HasReferenceFunction1<T>(expres.Compile(), usedVars);
     }
-    public static bool TryCompile1<T>(string expression, out HasReferenceFunction1<T> expFunc, out Exception? ex) where T : IComputableNumber<T>
+
+    public static bool TryCompile1<T>(string expression, out HasReferenceFunction1<T> expFunc, out Exception? ex)
+        where T : IComputableNumber<T>
     {
         try
         {
@@ -58,13 +63,16 @@ public static class Compiler
             return false;
         }
     }
+
     public static HasReferenceFunction2<T> Compile2<T>(string expression) where T : IComputableNumber<T>
     {
-        var exp = ConstructExpTree<T>(expression, 2,out ParameterExpression xVar,out ParameterExpression yVar,out _,out var usedVars);
+        var exp = ConstructExpTree<T>(expression, 2, out var xVar, out var yVar, out _, out var usedVars);
         var expres = Expression.Lambda<Function2<T>>(exp, xVar, yVar);
-        return new HasReferenceFunction2<T>(expres.Compile(),usedVars);
+        return new HasReferenceFunction2<T>(expres.Compile(), usedVars);
     }
-    public static bool TryCompile2<T>(string expression,out HasReferenceFunction2<T> expFunc, out Exception? ex) where T : IComputableNumber<T>
+
+    public static bool TryCompile2<T>(string expression, out HasReferenceFunction2<T> expFunc, out Exception? ex)
+        where T : IComputableNumber<T>
     {
         try
         {
@@ -79,13 +87,16 @@ public static class Compiler
             return false;
         }
     }
+
     public static HasReferenceFunction3<T> Compile3<T>(string expression) where T : IComputableNumber<T>
     {
-        var exp = ConstructExpTree<T>(expression, 3,out ParameterExpression xVar,out ParameterExpression yVar,out ParameterExpression zVar,out var usedVars);
+        var exp = ConstructExpTree<T>(expression, 3, out var xVar, out var yVar, out var zVar, out var usedVars);
         var expres = Expression.Lambda<Function3<T>>(exp, xVar, yVar, zVar);
-        return new HasReferenceFunction3<T>(expres.Compile(),usedVars);
+        return new HasReferenceFunction3<T>(expres.Compile(), usedVars);
     }
-    public static bool TryCompile3<T>(string expression, out HasReferenceFunction3<T> expFunc, out Exception? ex) where T : IComputableNumber<T>
+
+    public static bool TryCompile3<T>(string expression, out HasReferenceFunction3<T> expFunc, out Exception? ex)
+        where T : IComputableNumber<T>
     {
         try
         {
@@ -100,7 +111,10 @@ public static class Compiler
             return false;
         }
     }
-    public static Expression ConstructExpTree<T>(string expression, [Range(0,3)] uint argsLength,out ParameterExpression xVar,out ParameterExpression yVar,out ParameterExpression zVar,out EnglishCharEnum usedVars) where T : IComputableNumber<T>
+
+    public static Expression ConstructExpTree<T>(string expression, [Range(0, 3)] uint argsLength,
+        out ParameterExpression xVar, out ParameterExpression yVar, out ParameterExpression zVar,
+        out EnglishCharEnum usedVars) where T : IComputableNumber<T>
     {
         if (string.IsNullOrWhiteSpace(expression))
             throw new ArgumentException("Expression cannot be empty", nameof(expression));
@@ -109,192 +123,191 @@ public static class Compiler
         var expStack = new Stack<Expression>();
         var cloneMethod = typeof(T).GetMethod("Clone", BindingFlags.Static | BindingFlags.Public);
         var needClone = cloneMethod != null;
-        xVar= Expression.Parameter(typeof(T), "x");
-        yVar= Expression.Parameter(typeof(T), "y");
-        zVar= Expression.Parameter(typeof(T), "z");
-        var variables= Expression.Constant(EnglishChar.Instance);
+        xVar = Expression.Parameter(typeof(T), "x");
+        yVar = Expression.Parameter(typeof(T), "y");
+        zVar = Expression.Parameter(typeof(T), "z");
+        var variables = Expression.Constant(EnglishChar.Instance);
         foreach (var element in elements)
             switch (element.Type)
             {
                 case ElementType.Number:
-                    {
-                        if (!double.TryParse(element.NameOrValue, out var d))
-                            throw new Exception("无法解析数字: " + element.NameOrValue);
-                        expStack.Push(Expression.Call(GetInfo(T.CreateFromDouble), Expression.Constant(d)));
-                    }
+                {
+                    if (!double.TryParse(element.NameOrValue, out var d))
+                        throw new Exception("无法解析数字: " + element.NameOrValue);
+                    expStack.Push(Expression.Call(GetInfo(T.CreateFromDouble), Expression.Constant(d)));
+                }
                     break;
                 case ElementType.Operator:
+                {
+                    switch (element.NameOrValue)
                     {
-                        switch (element.NameOrValue)
+                        case "Pow":
                         {
-                            case "Pow":
-                                {
-                                    var exp1 = expStack.Pop();
-                                    expStack.Push(Expression.Call(GetInfo(T.Pow), expStack.Pop(), exp1));
-                                }
-                                break;
-                            case "Add":
-                                {
-                                    var exp1 = expStack.Pop();
-                                    expStack.Push(Expression.Add(expStack.Pop(), exp1));
-                                }
-                                break;
-                            case "Subtract":
-                                {
-                                    var exp1 = expStack.Pop();
-                                    expStack.Push(Expression.Subtract(expStack.Pop(), exp1));
-                                }
-                                break;
-                            case "Multiply":
-                                {
-                                    var exp1 = expStack.Pop();
-                                    expStack.Push(Expression.Multiply(expStack.Pop(), exp1));
-                                }
-                                break;
-
-                            case "Divide":
-                                {
-                                    var exp1 = expStack.Pop();
-                                    expStack.Push(Expression.Divide(expStack.Pop(), exp1));
-                                }
-                                break;
-                            case "Modulo":
-                                {
-                                    var exp1 = expStack.Pop();
-                                    expStack.Push(Expression.Modulo(expStack.Pop(), exp1));
-                                }
-                                break;
-                            case "Less":
-                                {
-                                    var exp1 = expStack.Pop();
-                                    expStack.Push(Expression.LessThan(expStack.Pop(), exp1));
-                                }
-                                break;
-
-                            case "Greater":
-                                {
-                                    var exp1 = expStack.Pop();
-                                    expStack.Push(Expression.GreaterThan(expStack.Pop(), exp1));
-                                }
-                                break;
-                            case "Equal":
-                                {
-                                    var exp1 = expStack.Pop();
-                                    expStack.Push(Expression.Equal(expStack.Pop(), exp1));
-                                }
-                                break;
-                            case "LessEqual":
-                                {
-                                    var exp1 = expStack.Pop();
-                                    expStack.Push(Expression.LessThanOrEqual(expStack.Pop(), exp1));
-                                }
-                                break;
-                            case "GreaterEqual":
-                                {
-                                    var exp1 = expStack.Pop();
-                                    expStack.Push(Expression.GreaterThanOrEqual(expStack.Pop(), exp1));
-                                }
-                                break;
-                            case "Union":
-                                {
-                                    var exp1 = expStack.Pop();
-                                    expStack.Push(Expression.Or(expStack.Pop(), exp1));
-                                }
-                                break;
-                            case "Intersect":
-                                {
-                                    var exp1 = expStack.Pop();
-                                    expStack.Push(Expression.And(expStack.Pop(), exp1));
-                                }
-                                break;
-                            case "Neg":
-                                {
-                                    expStack.Push(Expression.Negate(expStack.Pop()));
-                                }
-                                break;
-                            default:
-                                throw new Exception();
+                            var exp1 = expStack.Pop();
+                            expStack.Push(Expression.Call(GetInfo(T.Pow), expStack.Pop(), exp1));
                         }
+                            break;
+                        case "Add":
+                        {
+                            var exp1 = expStack.Pop();
+                            expStack.Push(Expression.Add(expStack.Pop(), exp1));
+                        }
+                            break;
+                        case "Subtract":
+                        {
+                            var exp1 = expStack.Pop();
+                            expStack.Push(Expression.Subtract(expStack.Pop(), exp1));
+                        }
+                            break;
+                        case "Multiply":
+                        {
+                            var exp1 = expStack.Pop();
+                            expStack.Push(Expression.Multiply(expStack.Pop(), exp1));
+                        }
+                            break;
+
+                        case "Divide":
+                        {
+                            var exp1 = expStack.Pop();
+                            expStack.Push(Expression.Divide(expStack.Pop(), exp1));
+                        }
+                            break;
+                        case "Modulo":
+                        {
+                            var exp1 = expStack.Pop();
+                            expStack.Push(Expression.Modulo(expStack.Pop(), exp1));
+                        }
+                            break;
+                        case "Less":
+                        {
+                            var exp1 = expStack.Pop();
+                            expStack.Push(Expression.LessThan(expStack.Pop(), exp1));
+                        }
+                            break;
+
+                        case "Greater":
+                        {
+                            var exp1 = expStack.Pop();
+                            expStack.Push(Expression.GreaterThan(expStack.Pop(), exp1));
+                        }
+                            break;
+                        case "Equal":
+                        {
+                            var exp1 = expStack.Pop();
+                            expStack.Push(Expression.Equal(expStack.Pop(), exp1));
+                        }
+                            break;
+                        case "LessEqual":
+                        {
+                            var exp1 = expStack.Pop();
+                            expStack.Push(Expression.LessThanOrEqual(expStack.Pop(), exp1));
+                        }
+                            break;
+                        case "GreaterEqual":
+                        {
+                            var exp1 = expStack.Pop();
+                            expStack.Push(Expression.GreaterThanOrEqual(expStack.Pop(), exp1));
+                        }
+                            break;
+                        case "Union":
+                        {
+                            var exp1 = expStack.Pop();
+                            expStack.Push(Expression.Or(expStack.Pop(), exp1));
+                        }
+                            break;
+                        case "Intersect":
+                        {
+                            var exp1 = expStack.Pop();
+                            expStack.Push(Expression.And(expStack.Pop(), exp1));
+                        }
+                            break;
+                        case "Neg":
+                        {
+                            expStack.Push(Expression.Negate(expStack.Pop()));
+                        }
+                            break;
+                        default:
+                            throw new Exception();
                     }
+                }
                     break;
                 case ElementType.Variable:
+                {
+                    var name = element.NameOrValue.ToLower();
+                    if (name == "e")
                     {
-                        var name = element.NameOrValue.ToLower();
-                        if (name == "e")
-                            expStack.Push(Expression.Call(GetInfo(T.CreateFromDouble), Expression.Constant(sysMath.E)));
-                        else if (name == "pi")
-                            expStack.Push(Expression.Call(GetInfo(T.CreateFromDouble), Expression.Constant(sysMath.PI)));
-                        else if (name == "x")
-                        {
-                            if (argsLength < 1)
-                            {
-                                throw new Exception("不可使用变量x");
-                            }
-                            expStack.Push(needClone?Expression.Call(cloneMethod, xVar):xVar);
-                        }
-                        else if (name == "y")
-                        {
-                            if (argsLength < 2)
-                            {
-                                throw new Exception("不可使用变量y");
-                            }
-                            expStack.Push(needClone ? Expression.Call(cloneMethod, yVar) : yVar);
-                        }else if(name =="z")
-                        {
-                            if (argsLength < 3)
-                            {
-                                throw new Exception("不可使用变量z");
-                            }
-                            expStack.Push(needClone ? Expression.Call(cloneMethod, zVar) : zVar);
-                        }else if(name.Length==1&&'a'<=name[0]&&name[0]<='z')
-                        {
-                            expStack.Push(Expression.Call(GetInfo(T.CreateFromDouble), Expression.Call(variables, GetInfo(EnglishChar.Instance.GetValue), Expression.Constant(name[0]))));
-                            usedVars |= (EnglishCharEnum)sysMath.Pow(2,name[0] - 'a');
-                        }
-                        else
-                            throw new Exception("未知变量 " + element.NameOrValue);
+                        expStack.Push(Expression.Call(GetInfo(T.CreateFromDouble), Expression.Constant(sysMath.E)));
                     }
+                    else if (name == "pi")
+                    {
+                        expStack.Push(Expression.Call(GetInfo(T.CreateFromDouble), Expression.Constant(sysMath.PI)));
+                    }
+                    else if (name == "x")
+                    {
+                        if (argsLength < 1) throw new Exception("不可使用变量x");
+                        expStack.Push(needClone ? Expression.Call(cloneMethod, xVar) : xVar);
+                    }
+                    else if (name == "y")
+                    {
+                        if (argsLength < 2) throw new Exception("不可使用变量y");
+                        expStack.Push(needClone ? Expression.Call(cloneMethod, yVar) : yVar);
+                    }
+                    else if (name == "z")
+                    {
+                        if (argsLength < 3) throw new Exception("不可使用变量z");
+                        expStack.Push(needClone ? Expression.Call(cloneMethod, zVar) : zVar);
+                    }
+                    else if (name.Length == 1 && 'a' <= name[0] && name[0] <= 'z')
+                    {
+                        expStack.Push(Expression.Call(GetInfo(T.CreateFromDouble),
+                            Expression.Call(variables, GetInfo(EnglishChar.Instance.GetValue),
+                                Expression.Constant(name[0]))));
+                        usedVars |= (EnglishCharEnum)sysMath.Pow(2, name[0] - 'a');
+                    }
+                    else
+                    {
+                        throw new Exception("未知变量 " + element.NameOrValue);
+                    }
+                }
                     break;
                 case ElementType.Function:
-                    {
-                        if (IComputableNumber<T>.MethodDictionary.TryGetValue(element.NameOrValue.ToLower(),
-                                out var method) && method.Method.GetParameters().Length == element.ArgCount)
+                {
+                    if (IComputableNumber<T>.MethodDictionary.TryGetValue(element.NameOrValue.ToLower(),
+                            out var method) && method.Method.GetParameters().Length == element.ArgCount)
+                        switch (element.ArgCount)
                         {
-                            switch (element.ArgCount)
+                            case 1:
+                                expStack.Push(Expression.Call(method.Method, expStack.Pop()));
+                                break;
+                            case 2:
                             {
-                                case 1:
-                                    expStack.Push(Expression.Call(method.Method, expStack.Pop()));
-                                    break;
-                                case 2:
-                                    {
-                                        var exp1 = expStack.Pop();
-                                        expStack.Push(Expression.Call(method.Method, expStack.Pop(), exp1));
-                                    }
-                                    break;
-                                case 3:
-                                    {
-                                        var exp1 = expStack.Pop();
-                                        var exp2 = expStack.Pop();
-                                        expStack.Push(Expression.Call(method.Method, expStack.Pop(), exp2, exp1));
-                                    }
-                                    break;
-                                default:
-                                    throw new Exception(element.NameOrValue + " " + element.ArgCount);
+                                var exp1 = expStack.Pop();
+                                expStack.Push(Expression.Call(method.Method, expStack.Pop(), exp1));
                             }
+                                break;
+                            case 3:
+                            {
+                                var exp1 = expStack.Pop();
+                                var exp2 = expStack.Pop();
+                                expStack.Push(Expression.Call(method.Method, expStack.Pop(), exp2, exp1));
+                            }
+                                break;
+                            default:
+                                throw new Exception(element.NameOrValue + " " + element.ArgCount);
                         }
-                        else
-                        {
-                            throw new Exception("Method not found: " + element.NameOrValue);
-                        }
-                    }
+                    else
+                        throw new Exception("Method not found: " + element.NameOrValue);
+                }
                     break;
                 default:
                     throw new Exception(element.NameOrValue + " " + element.Type);
             }
+
         return expStack.Single();
         //var expres = Expression.Lambda<Function0<T>>(expStack.Single());
         //return expres.Compile();
     }
+
     internal static Element[] ParseTokens(this Token[] Tokens)
     {
         var op = new Stack<OperatorType>();
@@ -609,6 +622,7 @@ public static class Compiler
             JudgeOperator(opStack, expStack, x);
         }
     }
+
     private static MethodInfo GetInfo(Delegate action)
     {
         return action.Method;

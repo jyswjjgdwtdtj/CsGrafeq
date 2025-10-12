@@ -85,7 +85,7 @@ public struct Vec
 
     public Vec Unit()
     {
-        var len=GetLength();
-        return new Vec(X/len, Y/len);
+        var len = GetLength();
+        return new Vec(X / len, Y / len);
     }
 }

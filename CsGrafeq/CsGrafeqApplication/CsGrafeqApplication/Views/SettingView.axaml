@@ -4,20 +4,20 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CsGrafeqApplication.Views.SettingView">
-	<TabControl>
-		<TabItem Header="_General">
-			<TextBlock Text="Nothing currently..."/>
-		</TabItem>
-		<TabItem Header="_Graph">
-			<StackPanel>
-				<CheckBox Name="MovingOp" IsCheckedChanged="MovingOp_OnIsCheckedChanged">
-					<TextBlock Text="Moving Optimization"/>
-				</CheckBox>
-				<CheckBox Name="ZoomingOp" IsCheckedChanged="ZoomingOp_OnIsCheckedChanged">
-					<TextBlock Text="Zooming Optimization"/>
-				</CheckBox>
-			</StackPanel>
-			
-		</TabItem>
-	</TabControl>
+    <TabControl>
+        <TabItem Header="_General">
+            <TextBlock Text="Nothing currently..." />
+        </TabItem>
+        <TabItem Header="_Graph">
+            <StackPanel>
+                <CheckBox Name="MovingOp" IsCheckedChanged="MovingOp_OnIsCheckedChanged">
+                    <TextBlock Text="Moving Optimization" />
+                </CheckBox>
+                <CheckBox Name="ZoomingOp" IsCheckedChanged="ZoomingOp_OnIsCheckedChanged">
+                    <TextBlock Text="Zooming Optimization" />
+                </CheckBox>
+            </StackPanel>
+
+        </TabItem>
+    </TabControl>
 </UserControl>

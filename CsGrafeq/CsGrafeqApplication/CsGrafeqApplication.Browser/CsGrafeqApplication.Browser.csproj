@@ -1,25 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WebAssembly">
-  <PropertyGroup>
-    <TargetFramework>net9.0-browser</TargetFramework>
-    <OutputType>Exe</OutputType>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Nullable>enable</Nullable>
-	  <InvariantGlobalization>true</InvariantGlobalization>
-	  <Nullable>enable</Nullable>
-	  <PublishTrimmed>true</PublishTrimmed>
-	  <PublishTrimmed>True</PublishTrimmed>
-	  <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-	  <LangVersion>Preview</LangVersion>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net9.0-browser</TargetFramework>
+        <OutputType>Exe</OutputType>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <Nullable>enable</Nullable>
+        <InvariantGlobalization>true</InvariantGlobalization>
+        <Nullable>enable</Nullable>
+        <PublishTrimmed>true</PublishTrimmed>
+        <PublishTrimmed>True</PublishTrimmed>
+        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+        <LangVersion>Preview</LangVersion>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Avalonia.Browser" />
-    <PackageReference Include="HarfBuzzSharp.NativeAssets.WebAssembly" />
-    <PackageReference Include="Microsoft.NET.Runtime.WebAssembly.Sdk" />
-    <PackageReference Include="SkiaSharp.NativeAssets.WebAssembly" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Avalonia.Browser"/>
+        <PackageReference Include="HarfBuzzSharp.NativeAssets.WebAssembly"/>
+        <PackageReference Include="Microsoft.NET.Runtime.WebAssembly.Sdk"/>
+        <PackageReference Include="SkiaSharp.NativeAssets.WebAssembly"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\CsGrafeqApplication\CsGrafeqApplication.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\CsGrafeqApplication\CsGrafeqApplication.csproj"/>
+    </ItemGroup>
 </Project>

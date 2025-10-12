@@ -1,48 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using SkiaSharp;
 using static CsGrafeqApplication.Controls.SkiaEx;
-using Math = CsGrafeq.Math;
 
 namespace CsGrafeqApplication.Controls.Displayers;
 
 public class CartesianDisplayer : Displayer
 {
+    private readonly object LockTargetForPreviousBuffer = new();
     private readonly Stopwatch WheelingStopWatch = new();
     private readonly Timer WheelingTimer;
-    public PointL Zero
-    {
-        get
-        {
-            return field;
-        }
-        set
-        {
-            field = value;
-            AxisX = GetAxisXs().ToArray();
-            AxisY= GetAxisYs().ToArray();
-        }
-    }
     public bool DrawAxisGrid = true;
     public bool DrawAxisLine = true;
     public bool DrawAxisNumber = true;
     protected bool MouseOnYAxis, MouseOnXAxis;
-    private SKBitmap PreviousBuffer = new(1,1);
-    private object LockTargetForPreviousBuffer = new();
+    private SKBitmap PreviousBuffer = new(1, 1);
 
     private double PreviousUnitLength;
     private PointL PreviousZero;
 
     public CartesianDisplayer()
     {
-        Zero = new() { X = 500, Y = 250 };
+        Zero = new PointL { X = 500, Y = 250 };
         UnitLength = 20;
         WheelingTimer = new Timer(TimerElapsed, null, 0, 500);
         App.Current.ActualThemeVariantChanged += (s, e) =>
@@ -51,6 +37,17 @@ public class CartesianDisplayer : Displayer
             InvalidateBuffer();
         };
         RefreshPaint();
+    }
+
+    public PointL Zero
+    {
+        get => field;
+        set
+        {
+            field = value;
+            AxisX = GetAxisXs().ToArray();
+            AxisY = GetAxisYs().ToArray();
+        }
     }
 
     /// <summary>
@@ -80,8 +77,13 @@ public class CartesianDisplayer : Displayer
         {
             field = value;
             AxisX = GetAxisXs().ToArray();
-            AxisY= GetAxisYs().ToArray();
-        } } = 20.0001d;
+            AxisY = GetAxisYs().ToArray();
+        }
+    } = 20.0001d;
+
+    public IEnumerable<(double, AxisType)> AxisX { get; private set; }
+
+    public IEnumerable<(double, AxisType)> AxisY { get; private set; }
 
     protected void RefreshPaint()
     {
@@ -121,22 +123,11 @@ public class CartesianDisplayer : Displayer
         return -(d - Zero.Y) / UnitLength;
     }
 
-    public IEnumerable<(double,AxisType)> AxisX
-    {
-        get;
-        private set;
-    }
 
-    public IEnumerable<(double,AxisType)> AxisY
+    public IEnumerable<(double, AxisType)> GetAxisXs()
     {
-        get;
-        private set;
-    }
-    
-
-    public IEnumerable<(double,AxisType)> GetAxisXs()
-    {
-        var zsX = (int)Floor(Log(350 / UnitLength, 10));;
+        var zsX = (int)Floor(Log(350 / UnitLength, 10));
+        ;
         var addnumX = Pow(10D, zsX);
         var addnumDX = Pow(10M, zsX);
         for (var i = Min(Zero.X - addnumX * UnitLength,
@@ -146,9 +137,9 @@ public class CartesianDisplayer : Displayer
         {
             var num = RoundTen((decimal)PixelToMathX(i), -zsX);
             if (num % (10 * addnumDX) == 0)
-                yield return (i,AxisType.Major);
+                yield return (i, AxisType.Major);
             else
-                yield return (i,AxisType.Minor);
+                yield return (i, AxisType.Minor);
         }
 
         for (var i = Max(Zero.X + addnumX * UnitLength,
@@ -158,17 +149,19 @@ public class CartesianDisplayer : Displayer
         {
             var num = RoundTen((decimal)PixelToMathX(i), -zsX);
             if (num % (10 * addnumDX) == 0)
-                yield return (i,AxisType.Major);
+                yield return (i, AxisType.Major);
             else
-                yield return (i,AxisType.Minor);
+                yield return (i, AxisType.Minor);
         }
+
         if (RangeIn(ValidRect.Left, ValidRect.Right, Zero.X))
-            yield return (Zero.X,AxisType.Axes);
+            yield return (Zero.X, AxisType.Axes);
     }
 
-    public IEnumerable<(double,AxisType)> GetAxisYs()
+    public IEnumerable<(double, AxisType)> GetAxisYs()
     {
-        var zsY = (int)Floor(Log(350 / UnitLength, 10));;
+        var zsY = (int)Floor(Log(350 / UnitLength, 10));
+        ;
         var addnumY = Pow(10D, zsY);
         var addnumDY = Pow(10M, zsY);
         for (var i = Min(Zero.Y - addnumY * UnitLength,
@@ -178,9 +171,9 @@ public class CartesianDisplayer : Displayer
         {
             var num = RoundTen((decimal)PixelToMathY(i), -zsY);
             if (num % (10 * addnumDY) == 0)
-                yield return (i,AxisType.Major);
+                yield return (i, AxisType.Major);
             else
-                yield return (i,AxisType.Minor);
+                yield return (i, AxisType.Minor);
         }
 
         for (var i = Max(Zero.Y + addnumY * UnitLength,
@@ -190,12 +183,13 @@ public class CartesianDisplayer : Displayer
         {
             var num = RoundTen((decimal)PixelToMathY(i), -zsY);
             if (num % (10 * addnumDY) == 0)
-                yield return (i,AxisType.Major);
+                yield return (i, AxisType.Major);
             else
-                yield return (i,AxisType.Minor);
+                yield return (i, AxisType.Minor);
         }
+
         if (RangeIn(ValidRect.Left, ValidRect.Right, Zero.Y))
-            yield return (Zero.Y,AxisType.Axes);
+            yield return (Zero.Y, AxisType.Axes);
     }
 
     //不敢动………………
@@ -405,78 +399,74 @@ public class CartesianDisplayer : Displayer
         }
     }
 
-    public override void Zoom(double delta,Avalonia.Point point)
+    public override void Zoom(double delta, Point point)
     {
         if (!WheelingStopWatch.IsRunning)
-            {
-                PreviousUnitLength = UnitLength;
-                PreviousUnitLength = UnitLength;
-                PreviousZero = Zero;
-                WheelingStopWatch.Restart();
-                if (ZoomingOptimization)
+        {
+            PreviousUnitLength = UnitLength;
+            PreviousUnitLength = UnitLength;
+            PreviousZero = Zero;
+            WheelingStopWatch.Restart();
+            if (ZoomingOptimization)
+                lock (LockTargetForPreviousBuffer)
                 {
-                    lock (LockTargetForPreviousBuffer)
-                    {
-                        PreviousBuffer.Dispose();
-                        PreviousBuffer = TotalBuffer.Copy();
-                    }
+                    PreviousBuffer.Dispose();
+                    PreviousBuffer = TotalBuffer.Copy();
                 }
-            }
+        }
 
-            var (x, y) = point;
-            var bzero = Zero;
-            var times_x = (Zero.X - x) / UnitLength;
-            var times_y = (Zero.Y - y) / UnitLength;
-            UnitLength *= delta;
-            UnitLength *= delta;
-            UnitLength = RangeTo(0.01, 1000000, UnitLength);
-            UnitLength = RangeTo(0.01, 1000000, UnitLength);
-            var ratioX = UnitLength / PreviousUnitLength;
-            var ratioY = UnitLength / PreviousUnitLength;
-            Zero = new PointL
-            {
-                X = (long)((long)x - ((long)x - PreviousZero.X) * ratioX),
-                Y = (long)((long)y - ((long)y - PreviousZero.Y) * ratioY)
-            };
-            if ((!ZoomingOptimization) || ratioX > 2 || ratioX < 0.5 || ratioY > 2 || ratioY < 0.5)
-            {
-                WheelingStopWatch.Stop();
-                WheelingStopWatch.Reset();
-                PreviousUnitLength = UnitLength;
-                PreviousUnitLength = UnitLength;
-                PreviousZero = Zero;
-                Invalidate();
-                return;
-            }
+        var (x, y) = point;
+        var bzero = Zero;
+        var times_x = (Zero.X - x) / UnitLength;
+        var times_y = (Zero.Y - y) / UnitLength;
+        UnitLength *= delta;
+        UnitLength *= delta;
+        UnitLength = RangeTo(0.01, 1000000, UnitLength);
+        UnitLength = RangeTo(0.01, 1000000, UnitLength);
+        var ratioX = UnitLength / PreviousUnitLength;
+        var ratioY = UnitLength / PreviousUnitLength;
+        Zero = new PointL
+        {
+            X = (long)((long)x - ((long)x - PreviousZero.X) * ratioX),
+            Y = (long)((long)y - ((long)y - PreviousZero.Y) * ratioY)
+        };
+        if (!ZoomingOptimization || ratioX > 2 || ratioX < 0.5 || ratioY > 2 || ratioY < 0.5)
+        {
+            WheelingStopWatch.Stop();
+            WheelingStopWatch.Reset();
+            PreviousUnitLength = UnitLength;
+            PreviousUnitLength = UnitLength;
+            PreviousZero = Zero;
+            Invalidate();
+            return;
+        }
 
-            lock (TotalBuffer)
+        lock (TotalBuffer)
+        {
+            using (var dc = new SKCanvas(TotalBuffer))
             {
-                using (var dc = new SKCanvas(TotalBuffer))
-                {
-                    dc.Clear(AxisBackground);
-                    dc.DrawBitmap(PreviousBuffer, CreateSKRectWH(
-                        (float)(Zero.X - PreviousZero.X * ratioX),
-                        (float)(Zero.Y - PreviousZero.Y * ratioY),
-                        (float)(ratioX * PreviousBuffer.Width),
-                        (float)(ratioY * PreviousBuffer.Height)), AntiAlias);
-                }
+                dc.Clear(AxisBackground);
+                dc.DrawBitmap(PreviousBuffer, CreateSKRectWH(
+                    (float)(Zero.X - PreviousZero.X * ratioX),
+                    (float)(Zero.Y - PreviousZero.Y * ratioY),
+                    (float)(ratioX * PreviousBuffer.Width),
+                    (float)(ratioY * PreviousBuffer.Height)), AntiAlias);
             }
+        }
 
-            InvalidateVisual();
+        InvalidateVisual();
     }
+
     protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
     {
-        if (CallAddonPointerWheeled(e) == DoNext)
-        {
-            Zoom(System.Math.Pow(1.04,e.Delta.Y), e.GetPosition(this));
-        }
+        if (CallAddonPointerWheeled(e) == DoNext) Zoom(Pow(1.04, e.Delta.Y), e.GetPosition(this));
     }
 
     protected override void OnSizeChanged(SizeChangedEventArgs e)
     {
         base.OnSizeChanged(e);
-        AxisX=GetAxisXs().ToArray();
-        AxisY=GetAxisYs().ToArray();
+        AxisX = GetAxisXs().ToArray();
+        AxisY = GetAxisYs().ToArray();
     }
 }
 
@@ -484,5 +474,5 @@ public enum AxisType
 {
     Axes,
     Major,
-    Minor,
+    Minor
 }

@@ -1,17 +1,21 @@
-﻿using Avalonia;
+﻿using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Browser;
 using Avalonia.ReactiveUI;
 using CsGrafeqApplication;
-using System.Runtime.Versioning;
-using System.Threading.Tasks;
 
-internal sealed partial class Program
+internal sealed class Program
 {
-    private static Task Main(string[] args) => BuildAvaloniaApp()
+    private static Task Main(string[] args)
+    {
+        return BuildAvaloniaApp()
             .WithInterFont()
             .UseReactiveUI()
             .StartBrowserAppAsync("out");
+    }
 
     public static AppBuilder BuildAvaloniaApp()
-        => AppBuilder.Configure<App>();
+    {
+        return AppBuilder.Configure<App>();
+    }
 }

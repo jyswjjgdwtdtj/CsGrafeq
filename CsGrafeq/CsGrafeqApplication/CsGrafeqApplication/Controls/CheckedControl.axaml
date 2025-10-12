@@ -24,6 +24,10 @@
             <Setter Property="Opacity"
                     Value="0.25" />
         </Style>
+        <Style Selector="^:focus-within /template/ Border#BackgroundShower">
+            <Setter Property="Opacity"
+                    Value="0.25" />
+        </Style>
         <Style Selector="^:checked /template/ Border#BackgroundShower">
             <Setter Property="Opacity"
                     Value="0.5" />
@@ -31,9 +35,8 @@
         <Setter Property="Template">
             <ControlTemplate>
                 <Panel>
-                    <Border Name="BackgroundShower" CornerRadius="5" Background="{TemplateBinding Color, Converter={StaticResource UIntColorToBrush},ConverterParameter=255}">
-                        
-                    </Border>
+                    <Border Name="BackgroundShower" CornerRadius="5"
+                            Background="{TemplateBinding Color, Converter={StaticResource UIntColorToBrush},ConverterParameter=255}" />
                     <Border Name="Container" CornerRadius="5">
                         <ContentPresenter Content="{TemplateBinding Content}" />
                     </Border>

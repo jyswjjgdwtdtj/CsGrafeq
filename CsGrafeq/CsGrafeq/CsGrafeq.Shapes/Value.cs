@@ -1,6 +1,4 @@
-﻿using ReactiveUI;
-
-namespace CsGrafeq.Shapes;
+﻿namespace CsGrafeq.Shapes;
 
 public sealed class Value<T> : Shape
 {
@@ -20,7 +18,7 @@ public sealed class Value<T> : Shape
     {
         throw new NotImplementedException();
     }
-    
+
 
     private string IsNullRetEmpty(string str)
     {

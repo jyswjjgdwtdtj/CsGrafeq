@@ -3,18 +3,20 @@ using ReactiveUI;
 
 namespace CsGrafeqApplication.ViewModels;
 
-public class DisplayerContainerViewModel:ViewModelBase
+public class DisplayerContainerViewModel : ViewModelBase
 {
-    public Displayer? Displayer { 
+    public Displayer? Displayer
+    {
         get;
         set => this.RaiseAndSetIfChanged(ref field, value);
     }
 
-    public bool IsOperationVisible{ 
+    public bool IsOperationVisible
+    {
         get;
         set => this.RaiseAndSetIfChanged(ref field, value);
     }
-    
-    public double SplitterThicknessOff { get; } = OS.GetOSType()==OSType.Android?8:2;
-    public double SplitterThicknessOn { get; } = OS.GetOSType()==OSType.Android?8:6;
+
+    public double SplitterThicknessOff { get; } = OS.GetOSType() == OSType.Android ? 8 : 2;
+    public double SplitterThicknessOn { get; } = OS.GetOSType() == OSType.Android ? 8 : 6;
 }

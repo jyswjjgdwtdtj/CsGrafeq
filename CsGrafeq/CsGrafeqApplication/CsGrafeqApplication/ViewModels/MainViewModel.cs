@@ -1,6 +1,4 @@
-﻿using CsGrafeqApplication.Controls.Displayers;
-
-namespace CsGrafeqApplication.ViewModels;
+﻿namespace CsGrafeqApplication.ViewModels;
 
 public class MainViewModel : ViewModelBase
 {

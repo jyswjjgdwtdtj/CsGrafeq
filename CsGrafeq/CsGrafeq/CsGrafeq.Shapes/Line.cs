@@ -1,5 +1,4 @@
 ﻿using CsGrafeq.Shapes.ShapeGetter;
-using ReactiveUI;
 using static CsGrafeq.Shapes.GeometryMath;
 using static CsGrafeq.Shapes.ShapeGetter.LineGetter;
 
@@ -46,6 +45,7 @@ public class Segment : Line
     }
 
     public override string TypeName => "Segment";
+
     public override void RefreshValues()
     {
         Current = LineGetter.GetLine();

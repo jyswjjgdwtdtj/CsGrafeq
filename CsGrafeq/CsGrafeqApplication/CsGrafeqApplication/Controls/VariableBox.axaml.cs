@@ -1,13 +1,12 @@
-using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
-using Avalonia.Input;
 using Avalonia.Interactivity;
 using ReactiveUI;
 
 namespace CsGrafeqApplication.Controls;
+
 [PseudoClasses(":modifying")]
 public class VariableBox : TemplatedControl
 {
@@ -19,18 +18,13 @@ public class VariableBox : TemplatedControl
         AvaloniaProperty.RegisterDirect<VariableBox, double>(
             nameof(Value), o => o.Value, (o, v) => o.Value = v);
 
-    public static readonly DirectProperty<VariableBox, bool> IsModifyStatusProperty = AvaloniaProperty.RegisterDirect<VariableBox, bool>(
-        nameof(IsModifyStatus), o => o.IsModifyStatus, (o, v) => o.IsModifyStatus = v);
+    public static readonly DirectProperty<VariableBox, bool> IsModifyStatusProperty =
+        AvaloniaProperty.RegisterDirect<VariableBox, bool>(
+            nameof(IsModifyStatus), o => o.IsModifyStatus, (o, v) => o.IsModifyStatus = v);
 
-    public static readonly DirectProperty<VariableBox, SliderData> MySliderDataProperty = AvaloniaProperty.RegisterDirect<VariableBox, SliderData>(
-        nameof(MySliderData), o => o.MySliderData);
-    public SliderData MySliderData { get; } = new SliderData();
-    
-    public bool IsModifyStatus
-    {
-        get => field;
-        set => SetAndRaise(IsModifyStatusProperty, ref field, value);
-    }
+    public static readonly DirectProperty<VariableBox, SliderData> MySliderDataProperty =
+        AvaloniaProperty.RegisterDirect<VariableBox, SliderData>(
+            nameof(MySliderData), o => o.MySliderData);
 
     public VariableBox()
     {
@@ -38,11 +32,33 @@ public class VariableBox : TemplatedControl
         MySliderData.Max = 10;
         PropertyChanged += (s, e) =>
         {
-            if (e.Property == IsModifyStatusProperty)
-            {
-                PseudoClasses.Set(":modifying", IsModifyStatus);
-            }
+            if (e.Property == IsModifyStatusProperty) PseudoClasses.Set(":modifying", IsModifyStatus);
         };
+    }
+
+    public SliderData MySliderData { get; } = new();
+
+    public bool IsModifyStatus
+    {
+        get => field;
+        set => SetAndRaise(IsModifyStatusProperty, ref field, value);
+    }
+
+    public double Value
+    {
+        get => MySliderData.Value;
+        set
+        {
+            var old = MySliderData.Value;
+            MySliderData.Value = value;
+            RaisePropertyChanged(ValueProperty, old, value);
+        }
+    }
+
+    public string ValueName
+    {
+        get => field;
+        set => SetAndRaise(ValueNameProperty, ref field, value);
     }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
@@ -67,42 +83,25 @@ public class VariableBox : TemplatedControl
         base.OnLostFocus(e);
         IsModifyStatus = false;
     }
-
-    public double Value
-    {
-        get => MySliderData.Value;
-        set
-        {
-            var old = MySliderData.Value;
-            MySliderData.Value = value;
-            RaisePropertyChanged(ValueProperty, old, value);
-        }
-    }
-
-    public string ValueName
-    {
-        get => field;
-        set => SetAndRaise(ValueNameProperty, ref field, value);
-    }
-
-    
 }
-public class SliderData:ReactiveObject
+
+public class SliderData : ReactiveObject
 {
     public double Min
     {
-        get=>field;
-        set=>this.RaiseAndSetIfChanged(ref field,value);
+        get => field;
+        set => this.RaiseAndSetIfChanged(ref field, value);
     }
 
     public double Max
     {
         get;
-        set=>this.RaiseAndSetIfChanged(ref field,value);
+        set => this.RaiseAndSetIfChanged(ref field, value);
     }
+
     public double Value
     {
-        get=>field;
-        set=>this.RaiseAndSetIfChanged(ref field,value);
+        get => field;
+        set => this.RaiseAndSetIfChanged(ref field, value);
     }
 }

@@ -1,150 +1,139 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <LangVersion>preview</LangVersion>
-    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-	  <IsWindows Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">true</IsWindows>
-	  <IsOSX Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true'">true</IsOSX>
-	  <IsLinux Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'">true</IsLinux>
-	  
-  </PropertyGroup>
-	<PropertyGroup Condition="'$(IsWindows)'=='true'">
-		<DefineConstants>Windows</DefineConstants>
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(IsOSX)'=='true'">
-		<DefineConstants>OSX</DefineConstants>
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(IsLinux)'=='true'">
-		<DefineConstants>Linux</DefineConstants>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	</PropertyGroup>
-	<ItemGroup>
-	  <None Remove="Assets\camera.svg" />
-	  <None Remove="Assets\delete.svg" />
-	  <None Remove="Assets\Github.svg" />
-	  <None Remove="Assets\input.svg" />
-	  <None Remove="Assets\shape.svg" />
-	  <None Remove="Assets\slider.svg" />
-	  <None Remove="Fonts\JETBRAINSMONOREGULAR.TTF" />
-	</ItemGroup>
-  <ItemGroup>
-    <AvaloniaResource Include="Assets\avalonia-logo.ico" />
-    <AvaloniaResource Include="Assets\calc.svg" />
-    <AvaloniaResource Include="Assets\camera.svg" />
-    <AvaloniaResource Include="Assets\delete.svg" />
-    <AvaloniaResource Include="Assets\favicon.ico" />
-    <AvaloniaResource Include="Assets\Github.svg" />
-    <AvaloniaResource Include="Assets\input.svg" />
-    <AvaloniaResource Include="Assets\shape.svg" />
-    <AvaloniaResource Include="Assets\slider.svg" />
-    <None Remove="Fonts\JetBrainsMono-Bold.ttf" />
-    <AvaloniaResource Include="Fonts\JetBrainsMono-Bold.ttf" />
-    <None Remove="Fonts\JetBrainsMono-BoldItalic.ttf" />
-    <AvaloniaResource Include="Fonts\JetBrainsMono-BoldItalic.ttf" />
-    <None Remove="Fonts\JetBrainsMono-ExtraBold.ttf" />
-    <AvaloniaResource Include="Fonts\JetBrainsMono-ExtraBold.ttf" />
-    <None Remove="Fonts\JetBrainsMono-ExtraBoldItalic.ttf" />
-    <AvaloniaResource Include="Fonts\JetBrainsMono-ExtraBoldItalic.ttf" />
-    <None Remove="Fonts\JetBrainsMono-ExtraLight.ttf" />
-    <AvaloniaResource Include="Fonts\JetBrainsMono-ExtraLight.ttf" />
-    <None Remove="Fonts\JetBrainsMono-ExtraLightItalic.ttf" />
-    <AvaloniaResource Include="Fonts\JetBrainsMono-ExtraLightItalic.ttf" />
-    <None Remove="Fonts\JetBrainsMono-Italic.ttf" />
-    <AvaloniaResource Include="Fonts\JetBrainsMono-Italic.ttf" />
-    <None Remove="Fonts\JetBrainsMono-Light.ttf" />
-    <AvaloniaResource Include="Fonts\JetBrainsMono-Light.ttf" />
-    <None Remove="Fonts\JetBrainsMono-LightItalic.ttf" />
-    <AvaloniaResource Include="Fonts\JetBrainsMono-LightItalic.ttf" />
-    <None Remove="Fonts\JetBrainsMono-Medium.ttf" />
-    <AvaloniaResource Include="Fonts\JetBrainsMono-Medium.ttf" />
-    <None Remove="Fonts\JetBrainsMono-MediumItalic.ttf" />
-    <AvaloniaResource Include="Fonts\JetBrainsMono-MediumItalic.ttf" />
-    <None Remove="Fonts\JetBrainsMono-Regular.ttf" />
-    <AvaloniaResource Include="Fonts\JetBrainsMono-Regular.ttf" />
-    <None Remove="Fonts\JetBrainsMono-SemiBold.ttf" />
-    <AvaloniaResource Include="Fonts\JetBrainsMono-SemiBold.ttf" />
-    <None Remove="Fonts\JetBrainsMono-SemiBoldItalic.ttf" />
-    <AvaloniaResource Include="Fonts\JetBrainsMono-SemiBoldItalic.ttf" />
-    <None Remove="Fonts\JetBrainsMono-Thin.ttf" />
-    <AvaloniaResource Include="Fonts\JetBrainsMono-Thin.ttf" />
-    <None Remove="Fonts\JetBrainsMono-ThinItalic.ttf" />
-    <AvaloniaResource Include="Fonts\JetBrainsMono-ThinItalic.ttf" />
-    <None Remove="Assets\csharp.svg" />
-    <AvaloniaResource Include="Assets\csharp.svg" />
-    <None Remove="Assets\error.svg" />
-    <AvaloniaResource Include="Assets\error.svg" />
-    <None Remove="Assets\folder.svg" />
-    <AvaloniaResource Include="Assets\folder.svg" />
-    <None Remove="Assets\keyboard.svg" />
-    <AvaloniaResource Include="Assets\keyboard.svg" />
-    <None Remove="Assets\language.svg" />
-    <AvaloniaResource Include="Assets\language.svg" />
-    <None Remove="Assets\linedown.svg" />
-    <AvaloniaResource Include="Assets\linedown.svg" />
-    <None Remove="Assets\setting.svg" />
-    <AvaloniaResource Include="Assets\setting.svg" />
-    <None Remove="Assets\stepback.svg" />
-    <AvaloniaResource Include="Assets\stepback.svg" />
-    <None Remove="Assets\stepover.svg" />
-    <AvaloniaResource Include="Assets\stepover.svg" />
-    <None Remove="Assets\lineup.svg" />
-    <AvaloniaResource Include="Assets\lineup.svg" />
-    <None Remove="Assets\zoomin.svg" />
-    <AvaloniaResource Include="Assets\zoomin.svg" />
-    <None Remove="Assets\zoomout.svg" />
-    <AvaloniaResource Include="Assets\zoomout.svg" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Addons\GeometryPad\Actions.json" />
-  </ItemGroup>
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <LangVersion>preview</LangVersion>
+        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+        <IsWindows Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">true</IsWindows>
+        <IsOSX Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true'">true</IsOSX>
+        <IsLinux Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'">true</IsLinux>
 
-  <ItemGroup>
-    <PackageReference Include="Avalonia" />
-    <PackageReference Include="Avalonia.Controls.ColorPicker" />
-    <PackageReference Include="Avalonia.Controls.DataGrid" />
-    <PackageReference Include="Avalonia.Controls.TreeDataGrid" />
-    <PackageReference Include="Avalonia.Skia" />
-    <PackageReference Include="Avalonia.Svg.Skia" />
-    <PackageReference Include="Avalonia.Themes.Fluent" />
-    <PackageReference Include="Avalonia.Fonts.Inter" />
-    <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-    <PackageReference Include="Avalonia.Diagnostics">
-      <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
-      <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Avalonia.ReactiveUI" />
-    <PackageReference Include="SkiaSharp" />
-    <PackageReference Include="SkiaSharp.NativeAssets.WebAssembly" />
-  </ItemGroup>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(IsWindows)'=='true'">
+        <DefineConstants>Windows</DefineConstants>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(IsOSX)'=='true'">
+        <DefineConstants>OSX</DefineConstants>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(IsLinux)'=='true'">
+        <DefineConstants>Linux</DefineConstants>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+    <ItemGroup>
+        <None Remove="Assets\camera.svg" />
+        <None Remove="Assets\delete.svg" />
+        <None Remove="Assets\Github.svg" />
+        <None Remove="Assets\input.svg" />
+        <None Remove="Assets\shape.svg" />
+        <None Remove="Assets\slider.svg" />
+        <None Remove="Fonts\JETBRAINSMONOREGULAR.TTF" />
+    </ItemGroup>
+    <ItemGroup>
+        <AvaloniaResource Include="Assets\avalonia-logo.ico" />
+        <AvaloniaResource Include="Assets\calc.svg" />
+        <AvaloniaResource Include="Assets\camera.svg" />
+        <AvaloniaResource Include="Assets\delete.svg" />
+        <AvaloniaResource Include="Assets\favicon.ico" />
+        <AvaloniaResource Include="Assets\Github.svg" />
+        <AvaloniaResource Include="Assets\input.svg" />
+        <AvaloniaResource Include="Assets\shape.svg" />
+        <AvaloniaResource Include="Assets\slider.svg" />
+        <None Remove="Fonts\JetBrainsMono-Bold.ttf" />
+        <AvaloniaResource Include="Fonts\JetBrainsMono-Bold.ttf" />
+        <None Remove="Fonts\JetBrainsMono-BoldItalic.ttf" />
+        <AvaloniaResource Include="Fonts\JetBrainsMono-BoldItalic.ttf" />
+        <None Remove="Fonts\JetBrainsMono-ExtraBold.ttf" />
+        <AvaloniaResource Include="Fonts\JetBrainsMono-ExtraBold.ttf" />
+        <None Remove="Fonts\JetBrainsMono-ExtraBoldItalic.ttf" />
+        <AvaloniaResource Include="Fonts\JetBrainsMono-ExtraBoldItalic.ttf" />
+        <None Remove="Fonts\JetBrainsMono-ExtraLight.ttf" />
+        <AvaloniaResource Include="Fonts\JetBrainsMono-ExtraLight.ttf" />
+        <None Remove="Fonts\JetBrainsMono-ExtraLightItalic.ttf" />
+        <AvaloniaResource Include="Fonts\JetBrainsMono-ExtraLightItalic.ttf" />
+        <None Remove="Fonts\JetBrainsMono-Italic.ttf" />
+        <AvaloniaResource Include="Fonts\JetBrainsMono-Italic.ttf" />
+        <None Remove="Fonts\JetBrainsMono-Light.ttf" />
+        <AvaloniaResource Include="Fonts\JetBrainsMono-Light.ttf" />
+        <None Remove="Fonts\JetBrainsMono-LightItalic.ttf" />
+        <AvaloniaResource Include="Fonts\JetBrainsMono-LightItalic.ttf" />
+        <None Remove="Fonts\JetBrainsMono-Medium.ttf" />
+        <AvaloniaResource Include="Fonts\JetBrainsMono-Medium.ttf" />
+        <None Remove="Fonts\JetBrainsMono-MediumItalic.ttf" />
+        <AvaloniaResource Include="Fonts\JetBrainsMono-MediumItalic.ttf" />
+        <None Remove="Fonts\JetBrainsMono-Regular.ttf" />
+        <AvaloniaResource Include="Fonts\JetBrainsMono-Regular.ttf" />
+        <None Remove="Fonts\JetBrainsMono-SemiBold.ttf" />
+        <AvaloniaResource Include="Fonts\JetBrainsMono-SemiBold.ttf" />
+        <None Remove="Fonts\JetBrainsMono-SemiBoldItalic.ttf" />
+        <AvaloniaResource Include="Fonts\JetBrainsMono-SemiBoldItalic.ttf" />
+        <None Remove="Fonts\JetBrainsMono-Thin.ttf" />
+        <AvaloniaResource Include="Fonts\JetBrainsMono-Thin.ttf" />
+        <None Remove="Fonts\JetBrainsMono-ThinItalic.ttf" />
+        <AvaloniaResource Include="Fonts\JetBrainsMono-ThinItalic.ttf" />
+        <None Remove="Assets\csharp.svg" />
+        <AvaloniaResource Include="Assets\csharp.svg" />
+        <None Remove="Assets\error.svg" />
+        <AvaloniaResource Include="Assets\error.svg" />
+        <None Remove="Assets\folder.svg" />
+        <AvaloniaResource Include="Assets\folder.svg" />
+        <None Remove="Assets\keyboard.svg" />
+        <AvaloniaResource Include="Assets\keyboard.svg" />
+        <None Remove="Assets\language.svg" />
+        <AvaloniaResource Include="Assets\language.svg" />
+        <None Remove="Assets\linedown.svg" />
+        <AvaloniaResource Include="Assets\linedown.svg" />
+        <None Remove="Assets\setting.svg" />
+        <AvaloniaResource Include="Assets\setting.svg" />
+        <None Remove="Assets\stepback.svg" />
+        <AvaloniaResource Include="Assets\stepback.svg" />
+        <None Remove="Assets\stepover.svg" />
+        <AvaloniaResource Include="Assets\stepover.svg" />
+        <None Remove="Assets\lineup.svg" />
+        <AvaloniaResource Include="Assets\lineup.svg" />
+        <None Remove="Assets\zoomin.svg" />
+        <AvaloniaResource Include="Assets\zoomin.svg" />
+        <None Remove="Assets\zoomout.svg" />
+        <AvaloniaResource Include="Assets\zoomout.svg" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Base\CsGrafeq.Base.csproj" />
-    <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Compiler\CsGrafeq.Compiler.csproj" />
-    <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Interval\CsGrafeq.Interval.csproj" />
-    <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Shapes\CsGrafeq.Shapes.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Avalonia" />
+        <PackageReference Include="Avalonia.Controls.ColorPicker" />
+        <PackageReference Include="Avalonia.Controls.DataGrid" />
+        <PackageReference Include="Avalonia.Controls.TreeDataGrid" />
+        <PackageReference Include="Avalonia.Skia" />
+        <PackageReference Include="Avalonia.Svg.Skia" />
+        <PackageReference Include="Avalonia.Themes.Fluent" />
+        <PackageReference Include="Avalonia.Fonts.Inter" />
+        <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+        <PackageReference Include="Avalonia.Diagnostics">
+            <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
+            <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="Avalonia.ReactiveUI" />
+        <PackageReference Include="SkiaSharp" />
+        <PackageReference Include="SkiaSharp.NativeAssets.WebAssembly" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Controls\DisplayerContainer.axaml.cs">
-      <DependentUpon>DisplayerContainer.axaml</DependentUpon>
-    </Compile>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Base\CsGrafeq.Base.csproj" />
+        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Compiler\CsGrafeq.Compiler.csproj" />
+        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Interval\CsGrafeq.Interval.csproj" />
+        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Shapes\CsGrafeq.Shapes.csproj" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
+    <ItemGroup>
+        <Compile Update="Controls\DisplayerContainer.axaml.cs">
+            <DependentUpon>DisplayerContainer.axaml</DependentUpon>
+        </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Properties\" />
+    </ItemGroup>
 </Project>

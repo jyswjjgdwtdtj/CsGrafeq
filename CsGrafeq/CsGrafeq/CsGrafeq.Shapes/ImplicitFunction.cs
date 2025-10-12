@@ -1,5 +1,4 @@
 using CsGrafeq.Interval;
-using CsGrafeq.Interval.Compiler;
 using ReactiveUI;
 
 namespace CsGrafeq.Shapes;
@@ -11,6 +10,7 @@ public class ImplicitFunction : Shape
     {
         Description = "ImplicitFunction";
     }
+
     public bool IsCorrect
     {
         get => field;
@@ -31,7 +31,7 @@ public class ImplicitFunction : Shape
             this.RaiseAndSetIfChanged(ref field, value);
             try
             {
-                Function =CsGrafeq.Interval.Compiler.Compiler.CompileAndTest<IntervalSet>(Expression);
+                Function = Interval.Compiler.Compiler.CompileAndTest<IntervalSet>(Expression);
                 IsCorrect = true;
             }
             catch (Exception ex)

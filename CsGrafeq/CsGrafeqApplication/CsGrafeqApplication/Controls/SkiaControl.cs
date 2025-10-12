@@ -1,27 +1,25 @@
-﻿using Avalonia;
+﻿using System;
+using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Rendering.SceneGraph;
 using Avalonia.Skia;
 using SkiaSharp;
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.Runtime.Intrinsics.Arm;
 
 namespace CsGrafeqApplication.Controls;
 
 /// <summary>
 ///     使用SkiaSharp直接绘制图形
 /// </summary>
-public class SkiaControl :UserControl
+public class SkiaControl : UserControl
 {
     /// <summary>
     ///     用于DrawingContext的Custom方法
     /// </summary>
     private readonly CustomDrawOperation customDrawOper;
+
     public SkiaControl()
     {
         Background = new SolidColorBrush(Colors.Transparent);
@@ -68,20 +66,24 @@ public class SkiaControl :UserControl
 
     private class CustomDrawOperation : ICustomDrawOperation
     {
+        private readonly object BufferLock = new();
         private WriteableBitmap Buffer;
-        private object BufferLock=new object();
+
         public CustomDrawOperation(Rect bounds, uint clearColor = 0x00FFFFFF)
         {
             Bounds = bounds;
             SKDraw += (s, e) => { e.Canvas.Clear(clearColor); };
-            Buffer = new WriteableBitmap(new PixelSize((int)(System.Math.Max((int)bounds.Width,100)), (int)((System.Math.Max((int)bounds.Height,100)))), new Vector(96,96));
+            Buffer = new WriteableBitmap(new PixelSize(Max((int)bounds.Width, 100), Max((int)bounds.Height, 100)),
+                new Vector(96, 96));
         }
 
         public void Dispose()
         {
         }
 
-        public Rect Bounds { get=>field; 
+        public Rect Bounds
+        {
+            get => field;
             set
             {
                 if (field == value) return;
@@ -90,9 +92,11 @@ public class SkiaControl :UserControl
                     if (field.Width < value.Width || field.Height < value.Height)
                     {
                         Buffer.Dispose();
-                        Buffer = new WriteableBitmap(new PixelSize((int)(value.Width), (int)(value.Height)), new Vector(96,96));
+                        Buffer = new WriteableBitmap(new PixelSize((int)value.Width, (int)value.Height),
+                            new Vector(96, 96));
                     }
                 }
+
                 field = value;
             }
         }
@@ -113,14 +117,16 @@ public class SkiaControl :UserControl
             {
                 using (var lb = Buffer.Lock())
                 {
-                    var info = new SKImageInfo(lb.Size.Width, lb.Size.Height, lb.Format.ToSkColorType(), SKAlphaType.Premul);
-                    using (SKSurface surface = SKSurface.Create(info, lb.Address, lb.RowBytes))
+                    var info = new SKImageInfo(lb.Size.Width, lb.Size.Height, lb.Format.ToSkColorType(),
+                        SKAlphaType.Premul);
+                    using (var surface = SKSurface.Create(info, lb.Address, lb.RowBytes))
                     {
-                        using SKCanvas canvas = surface.Canvas;
-                        SKDraw?.Invoke(null,new SKRenderEventArgs(canvas));
+                        using var canvas = surface.Canvas;
+                        SKDraw?.Invoke(null, new SKRenderEventArgs(canvas));
                     }
                 }
-                context.DrawBitmap(Buffer, Bounds,Bounds);
+
+                context.DrawBitmap(Buffer, Bounds, Bounds);
             }
         }
 
@@ -187,7 +193,9 @@ public static class SkiaEx
             2,
             SKColors.Gray
         );
-        TextFont = new SKFont(SKTypeface.FromStream(AssetLoader.Open(new Uri("avares://CsGrafeqApplication/Fonts/JetBrainsMono-Regular.ttf"))));
+        TextFont = new SKFont(
+            SKTypeface.FromStream(
+                AssetLoader.Open(new Uri("avares://CsGrafeqApplication/Fonts/JetBrainsMono-Regular.ttf"))));
         Refresh();
     }
 

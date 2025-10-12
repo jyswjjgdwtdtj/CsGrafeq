@@ -1,7 +1,4 @@
-﻿using System.Net.Mime;
-using Avalonia.Animation;
-using Avalonia.Controls;
-using Avalonia.Interactivity;
+﻿using Avalonia.Controls;
 
 namespace CsGrafeqApplication.Views;
 

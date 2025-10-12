@@ -1,7 +1,7 @@
-using ReactiveUI;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Runtime.CompilerServices;
+using ReactiveUI;
 using sysMath = System.Math;
 
 namespace CsGrafeq;
@@ -30,6 +30,7 @@ public static class ColorExtension
             sysMath.Pow((double)c.B / 255 * 0.6, 2.2), 1 / 2.2);
     }
 }
+
 public static class Extension
 {
     [DoesNotReturn]
@@ -37,6 +38,7 @@ public static class Extension
     {
         throw exception;
     }
+
     public static void Throw<TException>(TException exception) where TException : Exception
     {
         throw exception;
@@ -53,6 +55,7 @@ public static class Extension
     {
         throw new Exception(message);
     }
+
     public static void Throw(string message)
     {
         throw new Exception(message);
@@ -64,12 +67,11 @@ public static class Extension
         if (double.IsNaN(a) && double.IsNaN(b)) return true;
         return false;
     }
-    public static double RaiseAndSetIfChangedDouble<TObj>(this TObj reactiveObject, ref double backingField, double newValue, [CallerMemberName] string? propertyName = null) where TObj : IReactiveObject
+
+    public static double RaiseAndSetIfChangedDouble<TObj>(this TObj reactiveObject, ref double backingField,
+        double newValue, [CallerMemberName] string? propertyName = null) where TObj : IReactiveObject
     {
-        if (CompareDoubleIfBothNaNThenEqual(backingField,newValue))
-        {
-            return newValue;
-        }
+        if (CompareDoubleIfBothNaNThenEqual(backingField, newValue)) return newValue;
 
         reactiveObject.RaisePropertyChanging(propertyName);
         backingField = newValue;

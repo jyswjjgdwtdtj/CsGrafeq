@@ -22,14 +22,14 @@ public class CheckedControl : TemplatedControl
 
     public static readonly StyledProperty<uint> ColorProperty =
         AvaloniaProperty.Register<CheckedControl, uint>(nameof(Color));
-    
-    public static readonly StyledProperty<Flyout?> FlyoutProperty =AvaloniaProperty.Register<CheckedControl, Flyout?>(nameof(Flyout));
+
+    public static readonly StyledProperty<Flyout?> FlyoutProperty =
+        AvaloniaProperty.Register<CheckedControl, Flyout?>(nameof(Flyout));
+
     static CheckedControl()
     {
         AffectsRender<CheckedControl>(IsCheckedProperty, ContentProperty, IsOverProperty);
     }
-    
-    public Flyout? Flyout { get => GetValue(FlyoutProperty); set => SetValue(FlyoutProperty, value); }
 
     public CheckedControl()
     {
@@ -38,10 +38,7 @@ public class CheckedControl : TemplatedControl
             IsChecked = !IsChecked;
             e.Handled = true;
         };
-        DoubleTapped += (s, e) =>
-        {
-            Flyout?.ShowAt(this);
-        };
+        DoubleTapped += (s, e) => { Flyout?.ShowAt(this); };
         PropertyChanged += (s, e) =>
         {
             if (e.Property == IsCheckedProperty) PseudoClasses.Set(":checked", IsChecked);
@@ -49,6 +46,12 @@ public class CheckedControl : TemplatedControl
             if (e.Property == IsOverProperty) PseudoClasses.Set(":over", IsOver);
         };
         Color = 0x050505;
+    }
+
+    public Flyout? Flyout
+    {
+        get => GetValue(FlyoutProperty);
+        set => SetValue(FlyoutProperty, value);
     }
 
     public uint Color

@@ -51,6 +51,7 @@ public class PointGetter_FromTwoLine : PointGetter
         Line1.SubShapes.Add(subShape);
         Line2.SubShapes.Add(subShape);
     }
+
     public override void UnAttach(ShapeChangedHandler handler, GeometryShape subShape)
     {
         Line1.ShapeChanged -= handler;
@@ -99,6 +100,7 @@ public class PointGetter_AxialSymmetryPoint : PointGetter
         Point.SubShapes.Add(subShape);
         Line.SubShapes.Add(subShape);
     }
+
     public override void UnAttach(ShapeChangedHandler handler, GeometryShape subShape)
     {
         Point.ShapeChanged -= handler;
@@ -111,14 +113,16 @@ public class PointGetter_AxialSymmetryPoint : PointGetter
 public abstract class PointGetter_Movable : PointGetter
 {
     public bool Fixed = false;
-    public abstract GeometryShape? On { get; }
+
     public PointGetter_Movable()
     {
-        PointX = new(0, this);
-        PointY = new(0, this);
+        PointX = new ExpNumber(0, this);
+        PointY = new ExpNumber(0, this);
         PointX.UserSetValueStr += XChanged;
         PointY.UserSetValueStr += YChanged;
     }
+
+    public abstract GeometryShape? On { get; }
 
     public ExpNumber PointX { get; init; }
     public ExpNumber PointY { get; init; }
@@ -127,27 +131,31 @@ public abstract class PointGetter_Movable : PointGetter
     public abstract void YChanged();
     public abstract void SetPoint(Vec controlPoint);
     public abstract void SetStringPoint(Vector2<string> point);
+
     public override void Attach(ShapeChangedHandler handler, GeometryShape subShape)
     {
         PointX.NumberChanged += handler;
         PointY.NumberChanged += handler;
     }
+
     public override void UnAttach(ShapeChangedHandler handler, GeometryShape subShape)
     {
         PointX.NumberChanged -= handler;
         PointY.NumberChanged -= handler;
     }
 }
+
 public class PointGetter_FromLocation : PointGetter_Movable
 {
-    public PointGetter_FromLocation((double, double) initial):this(initial.Item1,initial.Item2)
+    public PointGetter_FromLocation((double, double) initial) : this(initial.Item1, initial.Item2)
     {
     }
 
-    public PointGetter_FromLocation(Vec initial):this(initial.X,initial.Y)
-    {  
+    public PointGetter_FromLocation(Vec initial) : this(initial.X, initial.Y)
+    {
     }
-    public PointGetter_FromLocation(double x,double y)
+
+    public PointGetter_FromLocation(double x, double y)
     {
         PointX.SetNumber(x);
         PointY.SetNumber(y);
@@ -161,12 +169,15 @@ public class PointGetter_FromLocation : PointGetter_Movable
     {
         return new Vec(PointX.Value, PointY.Value);
     }
+
     public override void XChanged()
     {
     }
+
     public override void YChanged()
     {
     }
+
     public override void SetPoint(Vec controlPoint)
     {
         PointX.SetNumber(controlPoint.X);
@@ -174,6 +185,7 @@ public class PointGetter_FromLocation : PointGetter_Movable
         this.RaisePropertyChanged(nameof(PointX));
         this.RaisePropertyChanged(nameof(PointY));
     }
+
     public override void SetStringPoint(Vector2<string> point)
     {
         PointX.ValueStr = point.X;
@@ -183,39 +195,37 @@ public class PointGetter_FromLocation : PointGetter_Movable
     }
 }
 
-public abstract class PointGetter_OnShape<T> : PointGetter_Movable where T:GeometryShape
+public abstract class PointGetter_OnShape<T> : PointGetter_Movable where T : GeometryShape
 {
-    protected T OnShape { get; init; }
-    protected bool UseExpression=false;
     protected bool IsPointXPrior = true;
+    protected bool UseExpression;
 
     public PointGetter_OnShape(T shape, Vec InitialPoint)
     {
         OnShape = shape;
         SetPoint(InitialPoint);
     }
+
+    protected T OnShape { get; init; }
     public override GeometryShape On => OnShape;
-    public override string ActionName { get; }="On"+nameof(T);
+    public override string ActionName { get; } = "On" + nameof(T);
     public override GeometryShape[] Parameters => [OnShape];
-    
+
     public sealed override Vec GetPoint()
     {
         Refresh();
         return new Vec(PointX.Value, PointY.Value);
     }
+
     public void Refresh()
     {
         CheckExp();
         if (UseExpression)
         {
             if (IsPointXPrior)
-            {
                 PointY.SetNumber(YFromX(PointX.Value));
-            }
             else
-            {
                 PointX.SetNumber(XFromY(PointY.Value));
-            }
         }
         else
         {
@@ -235,53 +245,60 @@ public abstract class PointGetter_OnShape<T> : PointGetter_Movable where T:Geome
         OnShape.ShapeChanged += handler;
         OnShape.SubShapes.Add(subShape);
     }
+
     public override void UnAttach(ShapeChangedHandler handler, GeometryShape subShape)
     {
         base.UnAttach(handler, subShape);
         OnShape.ShapeChanged -= handler;
         OnShape.SubShapes.Remove(subShape);
     }
+
     protected void CheckExp()
     {
         if (PointX.IsExpression)
         {
             UseExpression = true;
             IsPointXPrior = true;
-        }else if (PointY.IsExpression)
+        }
+        else if (PointY.IsExpression)
         {
             UseExpression = true;
             IsPointXPrior = false;
         }
         else
+        {
             UseExpression = false;
-
+        }
     }
+
     public override void XChanged()
     {
         CheckExp();
         PointY.SetNumber(YFromX(PointX.Value));
     }
+
     public override void YChanged()
     {
         CheckExp();
         PointX.SetNumber(XFromY(PointY.Value));
     }
+
     public override void SetStringPoint(Vector2<string> point)
     {
-        var x=point.X;
-        var y=point.Y;
-        if(double.TryParse(x,out var px))
+        var x = point.X;
+        var y = point.Y;
+        if (double.TryParse(x, out var px))
         {
-            if(double.TryParse(y,out var py))
+            if (double.TryParse(y, out var py))
             {
                 //x,y均为数字
-                UseExpression=false;
-                SetPoint(new Vec(px,py));
+                UseExpression = false;
+                SetPoint(new Vec(px, py));
             }
             else
             {
                 //x为数字，y为表达式
-                PointY.ValueStr=y;
+                PointY.ValueStr = y;
             }
         }
         else
@@ -289,12 +306,11 @@ public abstract class PointGetter_OnShape<T> : PointGetter_Movable where T:Geome
             PointX.ValueStr = x;
         }
     }
-
-
 }
-public sealed class PointGetter_OnLine(Line line, Vec InitialPoint) : PointGetter_OnShape<Line>(line,InitialPoint)
+
+public sealed class PointGetter_OnLine(Line line, Vec InitialPoint) : PointGetter_OnShape<Line>(line, InitialPoint)
 {
-    private readonly Line Line=line;
+    private readonly Line Line = line;
     private double ratio;
 
     private double GetRatio(Vec p)
@@ -325,41 +341,29 @@ public sealed class PointGetter_OnLine(Line line, Vec InitialPoint) : PointGette
         if (double.IsNaN(pointX))
             return pointX;
         var (a, b, c) = Line.Current.GetNormal();
-        if (a == 0)
-        {
-            return c / b;
-        }
-        else if (b == 0)
-        {
-            return double.NaN;
-        }
-        else
-        {
-            return (-c-a*pointX)/b;
-        }
+        if (a == 0) return c / b;
+
+        if (b == 0) return double.NaN;
+
+        return (-c - a * pointX) / b;
     }
+
     protected override double XFromY(double pointY)
     {
         if (double.IsNaN(pointY))
             return pointY;
         var (a, b, c) = Line.Current.GetNormal();
-        if (b == 0)
-        {
-            return c / a;
-        }
-        else if (a == 0)
-        {
-            return double.NaN;
-        }
-        else
-        {
-            return (-c-b*pointY)/a;
-        }
+        if (b == 0) return c / a;
+
+        if (a == 0) return double.NaN;
+
+        return (-c - b * pointY) / a;
     }
+
     public override void SetPoint(Vec controlPoint)
     {
         var p = InternalGetPoint(controlPoint);
-        ratio =GetRatio(p);
+        ratio = GetRatio(p);
         PointX.SetNumber(p.X);
         PointY.SetNumber(p.Y);
     }
@@ -373,26 +377,29 @@ public sealed class PointGetter_OnLine(Line line, Vec InitialPoint) : PointGette
         var t = ((controlPoint.X - v1.X) * dx + (controlPoint.Y - v1.Y) * dy) / (dx * dx + dy * dy);
         return new Vec(v1.X + t * dx, v1.Y + t * dy);
     }
+
     public override void XChanged()
     {
         CheckExp();
         PointY.SuspendNumberChanged();
         PointY.SetNumber(YFromX(PointX.Value));
-        PointY.ResumeNumberChanged(false);
+        PointY.ResumeNumberChanged();
         ratio = GetRatio(new Vec(PointX.Value, PointY.Value));
     }
+
     public override void YChanged()
     {
         CheckExp();
         PointX.SuspendNumberChanged();
         PointX.SetNumber(XFromY(PointY.Value));
-        PointX.ResumeNumberChanged(false);
+        PointX.ResumeNumberChanged();
         ratio = GetRatio(new Vec(PointX.Value, PointY.Value));
     }
 }
-public class PointGetter_OnCircle(Circle circle, Vec InitialPoint) : PointGetter_OnShape<Circle>(circle,InitialPoint)
+
+public class PointGetter_OnCircle(Circle circle, Vec InitialPoint) : PointGetter_OnShape<Circle>(circle, InitialPoint)
 {
-    private readonly Circle Circle=circle;
+    private readonly Circle Circle = circle;
     private double theta;
 
     protected override Vec GetPointWithoutExpression()
@@ -425,58 +432,55 @@ public class PointGetter_OnCircle(Circle circle, Vec InitialPoint) : PointGetter
 
     protected override double YFromX(double x)
     {
-        var r= Circle.InnerCircle.Radius;
-        var cx= Circle.InnerCircle.Center.X;
-        var cy= Circle.InnerCircle.Center.Y;
+        var r = Circle.InnerCircle.Radius;
+        var cx = Circle.InnerCircle.Center.X;
+        var cy = Circle.InnerCircle.Center.Y;
         var val = r * r - (x - cx) * (x - cx);
-        if (val < 0)
-        {
-            return double.NaN;
-        }
-        val=Sqrt(val);
+        if (val < 0) return double.NaN;
+        val = Sqrt(val);
         var y1 = cy + val;
         var y2 = cy - val;
-        return Abs(y1-PointY.Value)<Abs(y2-PointY.Value)?y1:y2;
+        return Abs(y1 - PointY.Value) < Abs(y2 - PointY.Value) ? y1 : y2;
     }
+
     protected override double XFromY(double y)
     {
-        var r= Circle.InnerCircle.Radius;
-        var cx= Circle.InnerCircle.Center.X;
-        var cy= Circle.InnerCircle.Center.Y;
+        var r = Circle.InnerCircle.Radius;
+        var cx = Circle.InnerCircle.Center.X;
+        var cy = Circle.InnerCircle.Center.Y;
         var val = r * r - (y - cy) * (y - cy);
-        if (val < 0)
-        {
-            return double.NaN;
-        }
-        val=Sqrt(val);
+        if (val < 0) return double.NaN;
+        val = Sqrt(val);
         var x1 = cx + val;
         var x2 = cx - val;
-        return Abs(x1-PointX.Value)<Abs(x2-PointX.Value)?x1:x2;
+        return Abs(x1 - PointX.Value) < Abs(x2 - PointX.Value) ? x1 : x2;
     }
+
     public override void XChanged()
     {
         CheckExp();
         PointY.SuspendNumberChanged();
         PointY.SetNumber(YFromX(PointX.Value));
-        PointY.ResumeNumberChanged(false);
+        PointY.ResumeNumberChanged();
         theta = GetTheta(new Vec(PointX.Value, PointY.Value));
     }
+
     public override void YChanged()
     {
         CheckExp();
         PointX.SuspendNumberChanged();
         PointX.SetNumber(XFromY(PointY.Value));
-        PointX.ResumeNumberChanged(false);
-        theta=GetTheta(new Vec(PointX.Value, PointY.Value));
+        PointX.ResumeNumberChanged();
+        theta = GetTheta(new Vec(PointX.Value, PointY.Value));
     }
-    
 }
+
 public class PointGetter_NearestPointOnLine : PointGetter
 {
     private readonly Line Line;
     private readonly Point Point;
 
-    public PointGetter_NearestPointOnLine(Line line, Point point)
+    public PointGetter_NearestPointOnLine(Point point, Line line)
     {
         Line = line;
         Point = point;
@@ -507,6 +511,7 @@ public class PointGetter_NearestPointOnLine : PointGetter
         Line.SubShapes.Add(subShape);
         Point.SubShapes.Add(subShape);
     }
+
     public override void UnAttach(ShapeChangedHandler handler, GeometryShape subShape)
     {
         Line.ShapeChanged -= handler;
@@ -536,6 +541,7 @@ public abstract class PointGetter_FromTwoPoint : PointGetter
         Point1.SubShapes.Add(subShape);
         Point2.SubShapes.Add(subShape);
     }
+
     public override void UnAttach(ShapeChangedHandler handler, GeometryShape subShape)
     {
         Point1.ShapeChanged -= handler;
@@ -572,6 +578,7 @@ public class PointGetter_EndOfLine : PointGetter
         line.ShapeChanged += handler;
         line.SubShapes.Add(subShape);
     }
+
     public override void UnAttach(ShapeChangedHandler handler, GeometryShape subShape)
     {
         line.ShapeChanged -= handler;
@@ -584,12 +591,11 @@ public class PointGetter_MiddlePoint : PointGetter_FromTwoPoint
     public PointGetter_MiddlePoint(Point point1, Point point2) : base(point1, point2)
     {
     }
-
     public override string ActionName => "MidPoint";
 
     public override Vec GetPoint()
     {
-        return (Point1.Location + Point2.Location) / 2;
+        return ((Vec)Point1.Location + Point2.Location) / 2;
     }
 }
 
@@ -637,6 +643,7 @@ public abstract class PointGetter_FromThreePoint : PointGetter
         Point2.SubShapes.Add(subShape);
         Point3.SubShapes.Add(subShape);
     }
+
     public override void UnAttach(ShapeChangedHandler handler, GeometryShape subShape)
     {
         Point1.ShapeChanged -= handler;
@@ -696,9 +703,9 @@ public class PointGetter_InCenter : PointGetter_FromThreePoint
 
     public override Vec GetPoint()
     {
-        var a = (Point2.Location - Point3.Location).GetLength();
-        var b = (Point1.Location - Point3.Location).GetLength();
-        var c = (Point2.Location - Point1.Location).GetLength();
+        var a = ((Vec)Point2.Location - Point3.Location).GetLength();
+        var b = ((Vec)Point1.Location - Point3.Location).GetLength();
+        var c = ((Vec)Point2.Location - Point1.Location).GetLength();
         return new Vec(
             (a * Point1.Location.X + b * Point2.Location.X + c * Point3.Location.X) / (a + b + c),
             (a * Point1.Location.Y + b * Point2.Location.Y + c * Point3.Location.Y) / (a + b + c)
@@ -759,6 +766,7 @@ public class PointGetter_FromLineAndCircle : PointGetter
         Line.SubShapes.Add(subShape);
         Circle.SubShapes.Add(subShape);
     }
+
     public override void UnAttach(ShapeChangedHandler handler, GeometryShape subShape)
     {
         Line.ShapeChanged -= handler;

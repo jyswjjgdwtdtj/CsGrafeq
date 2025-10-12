@@ -7,26 +7,25 @@
              xmlns:ctls="clr-namespace:CsGrafeqApplication.Controls;assembly=CsGrafeqApplication"
              xmlns:shapes="clr-namespace:CsGrafeq.Shapes;assembly=CsGrafeq.Shapes"
              xmlns:getter="clr-namespace:CsGrafeq.Shapes.ShapeGetter;assembly=CsGrafeq.Shapes"
-             xmlns:csgrafeqbase="clr-namespace:CsGrafeq;assembly=CsGrafeq.Base"
-			 xmlns:system="clr-namespace:System"
+             xmlns:system="clr-namespace:System"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="CsGrafeqApplication.Addons.GeometryPad.GeometryPad" x:DataType="vm:GeometryPadViewModel">
+             x:Class="CsGrafeqApplication.Addons.GeometryPad.GeometryPad" x:DataType="geopad:GeometryPadViewModel">
     <UserControl.Styles>
         <Style Selector="Expander.NoBorderExpander">
             <Style Selector="^ /template/ ToggleButton#ExpanderHeader">
                 <Setter Property="BorderThickness" Value="0,1,0,0" />
                 <Setter Property="Background" Value="Transparent" />
             </Style>
-            <Style Selector="^  /template/ Border#ExpanderContent">
+            <Style Selector="^ /template/ Border#ExpanderContent">
                 <Setter Property="BorderThickness" Value="0" />
                 <Setter Property="Background" Value="Transparent" />
             </Style>
         </Style>
         <Style Selector="TextBox">
-            <Setter Property="FontFamily" Value="{StaticResource JetbrainsMono}"></Setter>
+            <Setter Property="FontFamily" Value="{StaticResource JetbrainsMono}" />
         </Style>
         <Style Selector="TextBlock">
-            <Setter Property="FontFamily" Value="{StaticResource JetbrainsMono}"></Setter>
+            <Setter Property="FontFamily" Value="{StaticResource JetbrainsMono}" />
         </Style>
         <Style Selector="TextBox DataValidationErrors">
             <Setter Property="Template">
@@ -130,61 +129,61 @@
     </UserControl.Styles>
     <TabControl TabStripPlacement="Left" Name="TabControl" Margin="0" Padding="0"
                 Background="Transparent">
-		<TabItem>
-			<TabItem.Header>
-				<Svg Path="/Assets/shape.svg" Width="25" Height="25" Margin="0" />
-			</TabItem.Header>
-			<ScrollViewer Name="PART_ActionViewer">
-				<ItemsControl ItemsSource="{CompiledBinding Operations}">
-					<ItemsControl.ItemsPanel>
-						<ItemsPanelTemplate>
-							<VirtualizingStackPanel Orientation="Vertical" />
-						</ItemsPanelTemplate>
-					</ItemsControl.ItemsPanel>
-					<ItemsControl.ItemTemplate>
-						<DataTemplate DataType="geopad:HasNameActionList">
-							<StackPanel Orientation="Vertical">
-								<Expander Classes="NoBorderExpander" BorderThickness="0"
+        <TabItem>
+            <TabItem.Header>
+                <Svg Path="/Assets/shape.svg" Width="25" Height="25" Margin="0" Css="{DynamicResource OppositeCssPathFillString}"/>
+            </TabItem.Header>
+            <ScrollViewer Name="PART_ActionViewer">
+                <ItemsControl ItemsSource="{CompiledBinding Actions}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel Orientation="Vertical" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="geopad:HasNameActionList">
+                            <StackPanel Orientation="Vertical">
+                                <Expander Classes="NoBorderExpander" BorderThickness="0"
                                           IsExpanded="True"
                                           Width="{CompiledBinding $parent[StackPanel].Bounds.Width}"
                                           Padding="0" Background="Transparent">
-									<Expander.Header>
-										<TextBlock Text="{CompiledBinding Name }" Margin="0"
+                                    <Expander.Header>
+                                        <TextBlock Text="{CompiledBinding Name }" Margin="0"
                                                    Padding="0" />
-									</Expander.Header>
-									<Border Padding="10,0" Background="Transparent">
-										<ItemsControl ItemsSource="{CompiledBinding .}">
-											<ItemsControl.ItemsPanel>
-												<ItemsPanelTemplate>
-													<WrapPanel Orientation="Horizontal" ItemSpacing="5"
+                                    </Expander.Header>
+                                    <Border Padding="10,0" Background="Transparent">
+                                        <ItemsControl ItemsSource="{CompiledBinding .}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <WrapPanel Orientation="Horizontal" ItemSpacing="5"
                                                                Background="Transparent" Margin="0" />
-												</ItemsPanelTemplate>
-											</ItemsControl.ItemsPanel>
-											<ItemsControl.ItemTemplate>
-												<DataTemplate>
-													<RadioButton Classes="GeoRadio"
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <RadioButton Classes="GeoRadio"
                                                                  IsCheckedChanged="RadioButtonChecked"
                                                                  Name="{CompiledBinding Name}">
-														<TextBlock VerticalAlignment="Center"
+                                                        <TextBlock VerticalAlignment="Center"
                                                                    HorizontalAlignment="Center"
                                                                    TextWrapping="Wrap" FontSize="11"
                                                                    TextAlignment="Center" Name="RadioText"
                                                                    Text="{CompiledBinding Name}" />
-													</RadioButton>
-												</DataTemplate>
-											</ItemsControl.ItemTemplate>
-										</ItemsControl>
-									</Border>
-								</Expander>
-							</StackPanel>
-						</DataTemplate>
-					</ItemsControl.ItemTemplate>
-				</ItemsControl>
-			</ScrollViewer>
-		</TabItem>
+                                                    </RadioButton>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </Border>
+                                </Expander>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </TabItem>
         <TabItem>
             <TabItem.Header>
-                <Svg Path="/Assets/input.svg" Width="25" Height="25" Margin="0" />
+                <Svg Path="/Assets/input.svg" Width="25" Height="25" Margin="0" Css="{DynamicResource OppositeCssPathFillString}"/>
             </TabItem.Header>
             <DockPanel ZIndex="1" LastChildFill="True">
                 <ScrollViewer ZIndex="1" DockPanel.Dock="Bottom">
@@ -229,12 +228,15 @@
                                                     IsChecked="{CompiledBinding Visible,Mode=TwoWay}"
                                                     Classes="VisibilityCheckBox"
                                                     VerticalAlignment="Center" Margin="5" />
-												<Button DockPanel.Dock="Right" VerticalAlignment="Center" Tag="{CompiledBinding .}" Click="DeleteButtonClicked" Background="{StaticResource HTMedianBrush}">
-													<Svg Path="/Assets/delete.svg" Width="20" Height="20" Margin="0" />
-												</Button>
+                                                <Button DockPanel.Dock="Right" VerticalAlignment="Center"
+                                                        Tag="{CompiledBinding .}" Click="DeleteButtonClicked"
+                                                        Background="{StaticResource HTMedianBrush}">
+                                                    <Svg Path="/Assets/delete.svg" Width="20" Height="20" Margin="0" Css="{DynamicResource OppositeCssPathFillString}"/>
+                                                </Button>
                                                 <ContentControl Content="{CompiledBinding .}">
                                                     <ContentControl.ContentTemplate>
                                                         <geopad:ShapeTemplate>
+                                                            <!--单独的点（PointGetter_FromLocation）-->
                                                             <geopad:ShapeTemplate.LocationPoint>
                                                                 <DataTemplate DataType="shapes:Point">
                                                                     <DockPanel LastChildFill="True">
@@ -262,7 +264,7 @@
                                                                                 Loaded="NumberTextBox_OnLoaded"
                                                                                 Tapped="HandleEvent"
                                                                                 Focusable="True"
-                                                                                IsEnabled="{CompiledBinding IsUserEnabled}"/>
+                                                                                IsEnabled="{CompiledBinding IsUserEnabled}" />
                                                                             <TextBlock Text="," TextAlignment="Left"
                                                                                 VerticalAlignment="Center"
                                                                                 Classes="Big" />
@@ -286,6 +288,7 @@
                                                                     </DockPanel>
                                                                 </DataTemplate>
                                                             </geopad:ShapeTemplate.LocationPoint>
+                                                            <!--在图形上的点（PointGetter_OnShape）-->
                                                             <geopad:ShapeTemplate.ControlledPoint>
                                                                 <DataTemplate DataType="shapes:Point">
                                                                     <Grid ColumnDefinitions="Auto,*"
@@ -300,45 +303,47 @@
                                                                         <DockPanel Grid.Column="1"
                                                                             Grid.Row="0" LastChildFill="True">
                                                                             <StackPanel Orientation="Horizontal"
-                                                                            Background="Transparent" Margin="0,5"
-                                                                            VerticalAlignment="Center" >
-                                                                            <TextBlock Text="=Controlled("
-                                                                                TextAlignment="Left"
-                                                                                VerticalAlignment="Center"
-                                                                                Classes="Big" />
-                                                                            <TextBox
-                                                                                Text="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointX.ValueStr,Mode=TwoWay}"
-                                                                                Classes="CommonTextBox Big"
-                                                                                GotFocus="TextBoxGetFocus"
-                                                                                KeyDown="TextBoxKeyDown"
-                                                                                LostFocus="TextBoxPixelXLostFocus"
-                                                                                PropertyChanged="Number_OnPropertyChanged"
-                                                                                KeyUp="TextBox_OnKeyUp"
-                                                                                Loaded="NumberTextBox_OnLoaded"
-                                                                                Tag="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointX}"
-                                                                                Tapped="HandleEvent" 
-                                                                                Focusable="True"
-                                                                                IsEnabled="{CompiledBinding IsUserEnabled}"/>
-                                                                            <TextBlock Text="," TextAlignment="Left"
-                                                                                VerticalAlignment="Center"
-                                                                                Classes="Big" />
-                                                                            <TextBox
-                                                                                Text="{CompiledBinding  ((getter:PointGetter_Movable)PointGetter).PointY.ValueStr,Mode=TwoWay}"
-                                                                                Classes="CommonTextBox Big"
-                                                                                GotFocus="TextBoxGetFocus"
-                                                                                KeyDown="TextBoxKeyDown"
-                                                                                LostFocus="TextBoxPixelYLostFocus"
-                                                                                PropertyChanged="Number_OnPropertyChanged"
-                                                                                KeyUp="TextBox_OnKeyUp"
-                                                                                Loaded="NumberTextBox_OnLoaded"
-                                                                                Tag="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointX}"
-                                                                                Tapped="HandleEvent" 
-                                                                                Focusable="True"
-                                                                                IsEnabled="{CompiledBinding IsUserEnabled}"/>
-                                                                            <TextBlock Text=")" TextAlignment="Left"
-                                                                                VerticalAlignment="Center"
-                                                                                Classes="Big" />
-                                                                        </StackPanel>
+                                                                                Background="Transparent" Margin="0,5"
+                                                                                VerticalAlignment="Center">
+                                                                                <TextBlock Text="=Controlled("
+                                                                                    TextAlignment="Left"
+                                                                                    VerticalAlignment="Center"
+                                                                                    Classes="Big" />
+                                                                                <TextBox
+                                                                                    Text="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointX.ValueStr,Mode=TwoWay}"
+                                                                                    Classes="CommonTextBox Big"
+                                                                                    GotFocus="TextBoxGetFocus"
+                                                                                    KeyDown="TextBoxKeyDown"
+                                                                                    LostFocus="TextBoxPixelXLostFocus"
+                                                                                    PropertyChanged="Number_OnPropertyChanged"
+                                                                                    KeyUp="TextBox_OnKeyUp"
+                                                                                    Loaded="NumberTextBox_OnLoaded"
+                                                                                    Tag="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointX}"
+                                                                                    Tapped="HandleEvent"
+                                                                                    Focusable="True"
+                                                                                    IsEnabled="{CompiledBinding IsUserEnabled}" />
+                                                                                <TextBlock Text=","
+                                                                                    TextAlignment="Left"
+                                                                                    VerticalAlignment="Center"
+                                                                                    Classes="Big" />
+                                                                                <TextBox
+                                                                                    Text="{CompiledBinding  ((getter:PointGetter_Movable)PointGetter).PointY.ValueStr,Mode=TwoWay}"
+                                                                                    Classes="CommonTextBox Big"
+                                                                                    GotFocus="TextBoxGetFocus"
+                                                                                    KeyDown="TextBoxKeyDown"
+                                                                                    LostFocus="TextBoxPixelYLostFocus"
+                                                                                    PropertyChanged="Number_OnPropertyChanged"
+                                                                                    KeyUp="TextBox_OnKeyUp"
+                                                                                    Loaded="NumberTextBox_OnLoaded"
+                                                                                    Tag="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointX}"
+                                                                                    Tapped="HandleEvent"
+                                                                                    Focusable="True"
+                                                                                    IsEnabled="{CompiledBinding IsUserEnabled}" />
+                                                                                <TextBlock Text=")"
+                                                                                    TextAlignment="Left"
+                                                                                    VerticalAlignment="Center"
+                                                                                    Classes="Big" />
+                                                                            </StackPanel>
                                                                         </DockPanel>
                                                                         <StackPanel
                                                                             DataContext="{CompiledBinding PointGetter}"
@@ -368,6 +373,7 @@
                                                                     </Grid>
                                                                 </DataTemplate>
                                                             </geopad:ShapeTemplate.ControlledPoint>
+                                                            <!--基于其他点运算得得-->
                                                             <geopad:ShapeTemplate.CommonPoint>
                                                                 <DataTemplate DataType="shapes:Point">
                                                                     <Grid ColumnDefinitions="Auto,Auto"
@@ -424,13 +430,13 @@
                                                                                 VerticalAlignment="Center"
                                                                                 Classes="Small" />
                                                                             <TextBlock
-                                                                                Text="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointX.ValueStr,Mode=OneWay}"
+                                                                                Text="{CompiledBinding  Location.X,Mode=OneWay}"
                                                                                 Classes="CommonTextBox Small" />
                                                                             <TextBlock Text="," TextAlignment="Left"
                                                                                 VerticalAlignment="Center"
                                                                                 Classes="Small" />
                                                                             <TextBlock
-                                                                                Text="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointY.ValueStr,Mode=OneWay}"
+                                                                                Text="{CompiledBinding Location.Y,Mode=OneWay}"
                                                                                 Classes="CommonTextBox Small" />
                                                                             <TextBlock Text=")" TextAlignment="Left"
                                                                                 VerticalAlignment="Center"
@@ -439,6 +445,7 @@
                                                                     </Grid>
                                                                 </DataTemplate>
                                                             </geopad:ShapeTemplate.CommonPoint>
+                                                            <!--普通图形-->
                                                             <geopad:ShapeTemplate.Common>
                                                                 <DataTemplate DataType="shapes:GeometryShape">
                                                                     <Grid ColumnDefinitions="Auto,Auto"
@@ -495,6 +502,7 @@
                                                                     </Grid>
                                                                 </DataTemplate>
                                                             </geopad:ShapeTemplate.Common>
+                                                            <!---->
                                                             <geopad:ShapeTemplate.RadiusCircle>
                                                                 <DataTemplate DataType="shapes:Circle">
                                                                     <StackPanel Orientation="Horizontal">
@@ -575,32 +583,54 @@
         </TabItem>
         <TabItem>
             <TabItem.Header>
-				<Svg Path="/Assets/slider.svg" Width="25" Height="25" Margin="0" />
+                <Svg Path="/Assets/slider.svg" Width="25" Height="25" Margin="0" Css="{DynamicResource OppositeCssPathFillString}"/>
             </TabItem.Header>
             <ScrollViewer Name="PART_VariableViewer">
                 <StackPanel Orientation="Vertical">
-                    <ctls:VariableBox ValueName="a" Value="{CompiledBinding Variables.A,Mode=TwoWay}" IsVisible="{CompiledBinding Variables.CharsReferenceCounter[0],Converter={StaticResource IntToBool},Mode=OneWay}"/>
-                    <ctls:VariableBox ValueName="b" Value="{CompiledBinding Variables.B,Mode=TwoWay}" IsVisible="{CompiledBinding Variables.CharsReferenceCounter[1],Converter={StaticResource IntToBool},Mode=OneWay}"/>
-                    <ctls:VariableBox ValueName="c" Value="{CompiledBinding Variables.C,Mode=TwoWay}" IsVisible="{CompiledBinding Variables.CharsReferenceCounter[2],Converter={StaticResource IntToBool},Mode=OneWay}"/>
-                    <ctls:VariableBox ValueName="d" Value="{CompiledBinding Variables.D,Mode=TwoWay}" IsVisible="{CompiledBinding Variables.CharsReferenceCounter[3],Converter={StaticResource IntToBool},Mode=OneWay}"/>
-                    <ctls:VariableBox ValueName="f" Value="{CompiledBinding Variables.F,Mode=TwoWay}" IsVisible="{CompiledBinding Variables.CharsReferenceCounter[5],Converter={StaticResource IntToBool},Mode=OneWay}"/>
-                    <ctls:VariableBox ValueName="g" Value="{CompiledBinding Variables.G,Mode=TwoWay}" IsVisible="{CompiledBinding Variables.CharsReferenceCounter[6],Converter={StaticResource IntToBool},Mode=OneWay}"/>
-                    <ctls:VariableBox ValueName="h" Value="{CompiledBinding Variables.H,Mode=TwoWay}" IsVisible="{CompiledBinding Variables.CharsReferenceCounter[7],Converter={StaticResource IntToBool},Mode=OneWay}"/>
-                    <ctls:VariableBox ValueName="i" Value="{CompiledBinding Variables.I,Mode=TwoWay}" IsVisible="{CompiledBinding Variables.CharsReferenceCounter[8],Converter={StaticResource IntToBool},Mode=OneWay}"/>
-                    <ctls:VariableBox ValueName="j" Value="{CompiledBinding Variables.J,Mode=TwoWay}" IsVisible="{CompiledBinding Variables.CharsReferenceCounter[9],Converter={StaticResource IntToBool},Mode=OneWay}"/>
-                    <ctls:VariableBox ValueName="k" Value="{CompiledBinding Variables.K,Mode=TwoWay}" IsVisible="{CompiledBinding Variables.CharsReferenceCounter[10],Converter={StaticResource IntToBool},Mode=OneWay}"/>
-                    <ctls:VariableBox ValueName="l" Value="{CompiledBinding Variables.L,Mode=TwoWay}" IsVisible="{CompiledBinding Variables.CharsReferenceCounter[11],Converter={StaticResource IntToBool},Mode=OneWay}"/>
-                    <ctls:VariableBox ValueName="m" Value="{CompiledBinding Variables.M,Mode=TwoWay}" IsVisible="{CompiledBinding Variables.CharsReferenceCounter[12],Converter={StaticResource IntToBool},Mode=OneWay}"/>
-                    <ctls:VariableBox ValueName="n" Value="{CompiledBinding Variables.N,Mode=TwoWay}" IsVisible="{CompiledBinding Variables.CharsReferenceCounter[13],Converter={StaticResource IntToBool},Mode=OneWay}"/>
-                    <ctls:VariableBox ValueName="o" Value="{CompiledBinding Variables.O,Mode=TwoWay}" IsVisible="{CompiledBinding Variables.CharsReferenceCounter[14],Converter={StaticResource IntToBool},Mode=OneWay}"/>
-                    <ctls:VariableBox ValueName="p" Value="{CompiledBinding Variables.P,Mode=TwoWay}" IsVisible="{CompiledBinding Variables.CharsReferenceCounter[15],Converter={StaticResource IntToBool},Mode=OneWay}"/>
-                    <ctls:VariableBox ValueName="q" Value="{CompiledBinding Variables.Q,Mode=TwoWay}" IsVisible="{CompiledBinding Variables.CharsReferenceCounter[16],Converter={StaticResource IntToBool},Mode=OneWay}"/>
-                    <ctls:VariableBox ValueName="r" Value="{CompiledBinding Variables.R,Mode=TwoWay}" IsVisible="{CompiledBinding Variables.CharsReferenceCounter[17],Converter={StaticResource IntToBool},Mode=OneWay}"/>
-                    <ctls:VariableBox ValueName="s" Value="{CompiledBinding Variables.S,Mode=TwoWay}" IsVisible="{CompiledBinding Variables.CharsReferenceCounter[18],Converter={StaticResource IntToBool},Mode=OneWay}"/>
-                    <ctls:VariableBox ValueName="t" Value="{CompiledBinding Variables.T,Mode=TwoWay}" IsVisible="{CompiledBinding Variables.CharsReferenceCounter[19],Converter={StaticResource IntToBool},Mode=OneWay}"/>
-                    <ctls:VariableBox ValueName="u" Value="{CompiledBinding Variables.U,Mode=TwoWay}" IsVisible="{CompiledBinding Variables.CharsReferenceCounter[20],Converter={StaticResource IntToBool},Mode=OneWay}"/>
-                    <ctls:VariableBox ValueName="v" Value="{CompiledBinding Variables.V,Mode=TwoWay}" IsVisible="{CompiledBinding Variables.CharsReferenceCounter[21],Converter={StaticResource IntToBool},Mode=OneWay}"/>
-                    <ctls:VariableBox ValueName="w" Value="{CompiledBinding Variables.W,Mode=TwoWay}" IsVisible="{CompiledBinding Variables.CharsReferenceCounter[22],Converter={StaticResource IntToBool},Mode=OneWay}"/>
+                    <ctls:VariableBox ValueName="a" Value="{CompiledBinding Variables.A,Mode=TwoWay}"
+                                      IsVisible="{CompiledBinding Variables.CharsReferenceCounter[0],Converter={StaticResource IntToBool},Mode=OneWay}" />
+                    <ctls:VariableBox ValueName="b" Value="{CompiledBinding Variables.B,Mode=TwoWay}"
+                                      IsVisible="{CompiledBinding Variables.CharsReferenceCounter[1],Converter={StaticResource IntToBool},Mode=OneWay}" />
+                    <ctls:VariableBox ValueName="c" Value="{CompiledBinding Variables.C,Mode=TwoWay}"
+                                      IsVisible="{CompiledBinding Variables.CharsReferenceCounter[2],Converter={StaticResource IntToBool},Mode=OneWay}" />
+                    <ctls:VariableBox ValueName="d" Value="{CompiledBinding Variables.D,Mode=TwoWay}"
+                                      IsVisible="{CompiledBinding Variables.CharsReferenceCounter[3],Converter={StaticResource IntToBool},Mode=OneWay}" />
+                    <ctls:VariableBox ValueName="f" Value="{CompiledBinding Variables.F,Mode=TwoWay}"
+                                      IsVisible="{CompiledBinding Variables.CharsReferenceCounter[5],Converter={StaticResource IntToBool},Mode=OneWay}" />
+                    <ctls:VariableBox ValueName="g" Value="{CompiledBinding Variables.G,Mode=TwoWay}"
+                                      IsVisible="{CompiledBinding Variables.CharsReferenceCounter[6],Converter={StaticResource IntToBool},Mode=OneWay}" />
+                    <ctls:VariableBox ValueName="h" Value="{CompiledBinding Variables.H,Mode=TwoWay}"
+                                      IsVisible="{CompiledBinding Variables.CharsReferenceCounter[7],Converter={StaticResource IntToBool},Mode=OneWay}" />
+                    <ctls:VariableBox ValueName="i" Value="{CompiledBinding Variables.I,Mode=TwoWay}"
+                                      IsVisible="{CompiledBinding Variables.CharsReferenceCounter[8],Converter={StaticResource IntToBool},Mode=OneWay}" />
+                    <ctls:VariableBox ValueName="j" Value="{CompiledBinding Variables.J,Mode=TwoWay}"
+                                      IsVisible="{CompiledBinding Variables.CharsReferenceCounter[9],Converter={StaticResource IntToBool},Mode=OneWay}" />
+                    <ctls:VariableBox ValueName="k" Value="{CompiledBinding Variables.K,Mode=TwoWay}"
+                                      IsVisible="{CompiledBinding Variables.CharsReferenceCounter[10],Converter={StaticResource IntToBool},Mode=OneWay}" />
+                    <ctls:VariableBox ValueName="l" Value="{CompiledBinding Variables.L,Mode=TwoWay}"
+                                      IsVisible="{CompiledBinding Variables.CharsReferenceCounter[11],Converter={StaticResource IntToBool},Mode=OneWay}" />
+                    <ctls:VariableBox ValueName="m" Value="{CompiledBinding Variables.M,Mode=TwoWay}"
+                                      IsVisible="{CompiledBinding Variables.CharsReferenceCounter[12],Converter={StaticResource IntToBool},Mode=OneWay}" />
+                    <ctls:VariableBox ValueName="n" Value="{CompiledBinding Variables.N,Mode=TwoWay}"
+                                      IsVisible="{CompiledBinding Variables.CharsReferenceCounter[13],Converter={StaticResource IntToBool},Mode=OneWay}" />
+                    <ctls:VariableBox ValueName="o" Value="{CompiledBinding Variables.O,Mode=TwoWay}"
+                                      IsVisible="{CompiledBinding Variables.CharsReferenceCounter[14],Converter={StaticResource IntToBool},Mode=OneWay}" />
+                    <ctls:VariableBox ValueName="p" Value="{CompiledBinding Variables.P,Mode=TwoWay}"
+                                      IsVisible="{CompiledBinding Variables.CharsReferenceCounter[15],Converter={StaticResource IntToBool},Mode=OneWay}" />
+                    <ctls:VariableBox ValueName="q" Value="{CompiledBinding Variables.Q,Mode=TwoWay}"
+                                      IsVisible="{CompiledBinding Variables.CharsReferenceCounter[16],Converter={StaticResource IntToBool},Mode=OneWay}" />
+                    <ctls:VariableBox ValueName="r" Value="{CompiledBinding Variables.R,Mode=TwoWay}"
+                                      IsVisible="{CompiledBinding Variables.CharsReferenceCounter[17],Converter={StaticResource IntToBool},Mode=OneWay}" />
+                    <ctls:VariableBox ValueName="s" Value="{CompiledBinding Variables.S,Mode=TwoWay}"
+                                      IsVisible="{CompiledBinding Variables.CharsReferenceCounter[18],Converter={StaticResource IntToBool},Mode=OneWay}" />
+                    <ctls:VariableBox ValueName="t" Value="{CompiledBinding Variables.T,Mode=TwoWay}"
+                                      IsVisible="{CompiledBinding Variables.CharsReferenceCounter[19],Converter={StaticResource IntToBool},Mode=OneWay}" />
+                    <ctls:VariableBox ValueName="u" Value="{CompiledBinding Variables.U,Mode=TwoWay}"
+                                      IsVisible="{CompiledBinding Variables.CharsReferenceCounter[20],Converter={StaticResource IntToBool},Mode=OneWay}" />
+                    <ctls:VariableBox ValueName="v" Value="{CompiledBinding Variables.V,Mode=TwoWay}"
+                                      IsVisible="{CompiledBinding Variables.CharsReferenceCounter[21],Converter={StaticResource IntToBool},Mode=OneWay}" />
+                    <ctls:VariableBox ValueName="w" Value="{CompiledBinding Variables.W,Mode=TwoWay}"
+                                      IsVisible="{CompiledBinding Variables.CharsReferenceCounter[22],Converter={StaticResource IntToBool},Mode=OneWay}" />
                 </StackPanel>
             </ScrollViewer>
         </TabItem>
