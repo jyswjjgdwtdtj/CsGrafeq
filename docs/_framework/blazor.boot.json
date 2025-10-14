@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "CsGrafeqApplication.Browser",
   "resources": {
-    "hash": "sha256-UeAc1DRU7dbaabAnwAiYpuXa6Dzsg0GFhyayQ1qwLV4=",
+    "hash": "sha256-MMz9/Rx5tZ5sY6eDYEvyW+hsVOfMYOkJl/lIKMxGziM=",
     "fingerprinting": {
       "Avalonia.Base.8ut8smrzgf.wasm": "Avalonia.Base.wasm",
       "Avalonia.Controls.63kti4ekqs.wasm": "Avalonia.Controls.wasm",
@@ -221,8 +221,8 @@
       "CsGrafeq.Shapes.jvdop780oo.pdb": "CsGrafeq.Shapes.pdb",
       "dotnet.native.aok5lb3vfm.wasm": "dotnet.native.wasm",
       "dotnet.native.qnz2v1szq8.js": "dotnet.native.js",
-      "CsGrafeqApplication.Browser.a3ojdqrw0y.wasm": "CsGrafeqApplication.Browser.wasm",
-      "CsGrafeqApplication.Browser.5o35m1q40h.pdb": "CsGrafeqApplication.Browser.pdb"
+      "CsGrafeqApplication.Browser.oqh6dfoljh.wasm": "CsGrafeqApplication.Browser.wasm",
+      "CsGrafeqApplication.Browser.1p289d9wj7.pdb": "CsGrafeqApplication.Browser.pdb"
     },
     "jsModuleNative": {
       "dotnet.native.qnz2v1szq8.js": "sha256-BsSZ0S7wusxq4jvl0X3cGo7RJEP5fM7sRhtA+gdIu2Q="
@@ -445,7 +445,7 @@
       "CsGrafeq.Interval.exw5aljvo0.wasm": "sha256-DhzMNs0JILjfcWnFOWEkcB6qnEg5Lp7KYRbWS8+jp3k=",
       "CsGrafeq.Shapes.fuv78y5zwk.wasm": "sha256-93wKiSqcVtU71b86IajtL75YAV8LL3ZfDNTLUXn77uQ=",
       "CsGrafeqApplication.70drujx2hn.wasm": "sha256-lxTpoJHKmEtm+Rq+dWeEnCEN4ueOqOh+t/acgYj3QYU=",
-      "CsGrafeqApplication.Browser.a3ojdqrw0y.wasm": "sha256-toUWqNPgzwlRyhtUsPJXqhelJNoyFgqPvD1+xRYnlT4="
+      "CsGrafeqApplication.Browser.oqh6dfoljh.wasm": "sha256-UCh9ice/ovMCjF1iUg6d1fBy++dcMW++YEfTozSkW7E="
     },
     "pdb": {
       "CsGrafeqApplication.2hlmyaucwv.pdb": "sha256-NsB805MuYuxDL2JsJPkFSWfRbP1dPxYy+cGP7/Zt8uE=",
@@ -453,7 +453,7 @@
       "CsGrafeq.Compiler.mx4vtwl9o1.pdb": "sha256-une6/K5BoSwOtOVoninTRmijjWjuoVHqeaf6ovxA0Pc=",
       "CsGrafeq.Interval.kh2akedvdh.pdb": "sha256-6LjEBuEmJG28VRH8vnkGWVEil0ROSoBnYDfceiN+ltw=",
       "CsGrafeq.Shapes.jvdop780oo.pdb": "sha256-PxH9Kk9ACuox6QAwtpGcCSdcNwnsBBma3NSRxRQwX5U=",
-      "CsGrafeqApplication.Browser.5o35m1q40h.pdb": "sha256-K0QZoWMwgwijRbeT0IuP3x+nGHg/QRsgJ1Y/fLCvy7Q="
+      "CsGrafeqApplication.Browser.1p289d9wj7.pdb": "sha256-pUzVaOt/pAw2kn6hQln4Q9zaq2IZno1JxIUi8CbMme4="
     }
   },
   "cacheBootResources": true,
