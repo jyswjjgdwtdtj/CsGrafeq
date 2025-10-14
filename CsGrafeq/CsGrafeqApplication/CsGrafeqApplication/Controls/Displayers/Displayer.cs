@@ -19,9 +19,9 @@ public abstract class Displayer : SkiaControl
     private bool CanPerform = true;
     protected AvaPoint LastPoint;
     protected PointerPointProperties LastPointerProperties = new();
-    public bool MovingOptimization = false;
     protected SKBitmap TotalBuffer = new(1, 1);
     public bool ZoomingOptimization = false;
+    public bool MovingOptimization = false;
 
     public Displayer()
     {

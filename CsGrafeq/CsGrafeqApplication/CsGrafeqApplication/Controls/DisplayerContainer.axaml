@@ -214,7 +214,7 @@
                         <Button Click="Button_OnClick" HorizontalAlignment="Right" Width="60" Height="30"
                                 HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="40,10"
                                 DockPanel.Dock="Bottom" Content="OK" Background="{DynamicResource CgBackgroundBrush}" />
-                        <Border Name="ContentContainer" Padding="40" Background="White" Margin="15" CornerRadius="5" />
+                        <Border Name="ContentContainer" Padding="40" Background="{DynamicResource CgBackgroundBrush}" Margin="15" CornerRadius="5" />
                     </DockPanel>
                 </Border>
                 <Border Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center"

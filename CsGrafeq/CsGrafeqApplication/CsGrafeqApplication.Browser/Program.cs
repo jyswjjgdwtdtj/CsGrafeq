@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Browser;
-using Avalonia.ReactiveUI;
 using CsGrafeqApplication;
 
 internal sealed class Program
@@ -10,7 +9,6 @@ internal sealed class Program
     {
         return BuildAvaloniaApp()
             .WithInterFont()
-            .UseReactiveUI()
             .StartBrowserAppAsync("out");
     }
 

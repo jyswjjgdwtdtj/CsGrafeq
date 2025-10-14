@@ -10,6 +10,7 @@ using Avalonia.Styling;
 using CsGrafeqApplication.Addons.GeometryPad;
 using CsGrafeqApplication.Controls.Displayers;
 using CsGrafeqApplication.ViewModels;
+using CsGrafeqApplication.Views;
 
 namespace CsGrafeqApplication.Controls;
 
@@ -102,7 +103,7 @@ public partial class DisplayerContainer : UserControl
 
     private void Setting_Clicked(object? sender, RoutedEventArgs e)
     {
-        MsgBox(new Control());
+        MsgBox(new SettingView(VM.Displayer as DisplayControl));
     }
 
     private void StepBack_Clicked(object? sender, RoutedEventArgs e)

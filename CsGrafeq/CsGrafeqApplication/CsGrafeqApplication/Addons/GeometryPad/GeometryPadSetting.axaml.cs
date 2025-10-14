@@ -1,4 +1,6 @@
 using Avalonia.Controls;
+using Avalonia.Interactivity;
+using CsGrafeqApplication.Controls.Displayers;
 
 namespace CsGrafeqApplication.Addons.GeometryPad;
 

@@ -13,13 +13,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia.Browser"/>
-        <PackageReference Include="HarfBuzzSharp.NativeAssets.WebAssembly"/>
-        <PackageReference Include="Microsoft.NET.Runtime.WebAssembly.Sdk"/>
-        <PackageReference Include="SkiaSharp.NativeAssets.WebAssembly"/>
+        <PackageReference Include="Avalonia.Browser" />
+        <PackageReference Include="Avalonia.Skia" />
+        <PackageReference Include="HarfBuzzSharp.NativeAssets.WebAssembly" />
+        <PackageReference Include="Microsoft.NET.Runtime.WebAssembly.Sdk" />
+        <PackageReference Include="SkiaSharp" />
+        <PackageReference Include="SkiaSharp.NativeAssets.WebAssembly" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\CsGrafeqApplication\CsGrafeqApplication.csproj"/>
+        <ProjectReference Include="..\CsGrafeqApplication\CsGrafeqApplication.csproj" />
     </ItemGroup>
 </Project>

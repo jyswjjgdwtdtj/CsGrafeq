@@ -1,6 +1,5 @@
 using Avalonia;
 using Avalonia.iOS;
-using Avalonia.ReactiveUI;
 using Foundation;
 
 namespace CsGrafeqApplication.iOS;
@@ -16,7 +15,6 @@ public class AppDelegate : AvaloniaAppDelegate<App>
     protected override AppBuilder CustomizeAppBuilder(AppBuilder builder)
     {
         return base.CustomizeAppBuilder(builder)
-            .WithInterFont()
-            .UseReactiveUI();
+            .WithInterFont();
     }
 }

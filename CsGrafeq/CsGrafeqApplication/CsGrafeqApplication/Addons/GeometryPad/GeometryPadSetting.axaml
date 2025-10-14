@@ -5,6 +5,7 @@
              xmlns:geometryPad="clr-namespace:CsGrafeqApplication.Addons.GeometryPad"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CsGrafeqApplication.Addons.GeometryPad.GeometryPadSetting"
-             x:DataType="geometryPad:GeometryPadSetting">
-
+             x:DataType="geometryPad:GeometryPadViewModel">
+    <Design.Width>500</Design.Width>
+    <Design.Height>500</Design.Height>
 </UserControl>

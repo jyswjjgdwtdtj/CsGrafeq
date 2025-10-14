@@ -13,10 +13,6 @@ internal class GeometryPadViewModel : ViewModelBase
 {
     public GeometryPadViewModel()
     {
-        App.Current.ActualThemeVariantChanged += (s,e) =>
-        {
-            this.RaisePropertyChanged(nameof(SvgPathCss));
-        };
     }
 
     public string? DebugInfo
@@ -30,10 +26,5 @@ internal class GeometryPadViewModel : ViewModelBase
     internal ShapeList Shapes { get; } = new();
 
     public EnglishChar Variables => EnglishChar.Instance;
-    private ThemeVariant GetThemeVariant() => (App.Current?.ActualThemeVariant ?? ThemeVariant.Light);
-
-    public string SvgPathCss=>
-        GetThemeVariant() == ThemeVariant.Dark
-            ? "path {fill: #ffffff}"
-            : "path {fill: #000000}";
+    
 }
