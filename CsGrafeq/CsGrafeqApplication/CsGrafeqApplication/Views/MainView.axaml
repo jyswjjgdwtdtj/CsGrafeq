@@ -7,6 +7,14 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CsGrafeqApplication.Views.MainView"
              x:DataType="vm:MainViewModel">
+	<UserControl.Styles>
+		<Style Selector="TextBlock">
+			<Setter Property="FontFamily" Value="{StaticResource MapleMono}"/>
+		</Style>
+		<Style Selector="TextBox">
+			<Setter Property="FontFamily" Value="{StaticResource MapleMono}"/>
+		</Style>
+	</UserControl.Styles>
     <Design.DataContext>
         <vm:MainViewModel />
     </Design.DataContext>

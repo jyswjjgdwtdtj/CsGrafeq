@@ -163,6 +163,10 @@ public abstract class Addon : UserControl
         Owner?.Invalidate();
     }
 
+    public abstract void Delete();
+    public abstract void SelectAll();
+    public abstract void DeSelectAll();
+
     private class OnceLock
     {
         public bool Value { get; private set; }

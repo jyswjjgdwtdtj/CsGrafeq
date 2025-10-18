@@ -7,7 +7,7 @@
         <IsWindows Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">true</IsWindows>
         <IsOSX Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true'">true</IsOSX>
         <IsLinux Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'">true</IsLinux>
-
+		<InvariantGlobalization>false</InvariantGlobalization>
     </PropertyGroup>
     <PropertyGroup Condition="'$(IsWindows)'=='true'">
         <DefineConstants>Windows</DefineConstants>
@@ -31,7 +31,7 @@
         <None Remove="Assets\input.svg" />
         <None Remove="Assets\shape.svg" />
         <None Remove="Assets\slider.svg" />
-        <None Remove="Fonts\JETBRAINSMONOREGULAR.TTF" />
+        <None Remove="Fonts\MapleMono-CN-Regular.ttf" />
     </ItemGroup>
     <ItemGroup>
         <AvaloniaResource Include="Assets\avalonia-logo.ico" />
@@ -43,38 +43,6 @@
         <AvaloniaResource Include="Assets\input.svg" />
         <AvaloniaResource Include="Assets\shape.svg" />
         <AvaloniaResource Include="Assets\slider.svg" />
-        <None Remove="Fonts\JetBrainsMono-Bold.ttf" />
-        <AvaloniaResource Include="Fonts\JetBrainsMono-Bold.ttf" />
-        <None Remove="Fonts\JetBrainsMono-BoldItalic.ttf" />
-        <AvaloniaResource Include="Fonts\JetBrainsMono-BoldItalic.ttf" />
-        <None Remove="Fonts\JetBrainsMono-ExtraBold.ttf" />
-        <AvaloniaResource Include="Fonts\JetBrainsMono-ExtraBold.ttf" />
-        <None Remove="Fonts\JetBrainsMono-ExtraBoldItalic.ttf" />
-        <AvaloniaResource Include="Fonts\JetBrainsMono-ExtraBoldItalic.ttf" />
-        <None Remove="Fonts\JetBrainsMono-ExtraLight.ttf" />
-        <AvaloniaResource Include="Fonts\JetBrainsMono-ExtraLight.ttf" />
-        <None Remove="Fonts\JetBrainsMono-ExtraLightItalic.ttf" />
-        <AvaloniaResource Include="Fonts\JetBrainsMono-ExtraLightItalic.ttf" />
-        <None Remove="Fonts\JetBrainsMono-Italic.ttf" />
-        <AvaloniaResource Include="Fonts\JetBrainsMono-Italic.ttf" />
-        <None Remove="Fonts\JetBrainsMono-Light.ttf" />
-        <AvaloniaResource Include="Fonts\JetBrainsMono-Light.ttf" />
-        <None Remove="Fonts\JetBrainsMono-LightItalic.ttf" />
-        <AvaloniaResource Include="Fonts\JetBrainsMono-LightItalic.ttf" />
-        <None Remove="Fonts\JetBrainsMono-Medium.ttf" />
-        <AvaloniaResource Include="Fonts\JetBrainsMono-Medium.ttf" />
-        <None Remove="Fonts\JetBrainsMono-MediumItalic.ttf" />
-        <AvaloniaResource Include="Fonts\JetBrainsMono-MediumItalic.ttf" />
-        <None Remove="Fonts\JetBrainsMono-Regular.ttf" />
-        <AvaloniaResource Include="Fonts\JetBrainsMono-Regular.ttf" />
-        <None Remove="Fonts\JetBrainsMono-SemiBold.ttf" />
-        <AvaloniaResource Include="Fonts\JetBrainsMono-SemiBold.ttf" />
-        <None Remove="Fonts\JetBrainsMono-SemiBoldItalic.ttf" />
-        <AvaloniaResource Include="Fonts\JetBrainsMono-SemiBoldItalic.ttf" />
-        <None Remove="Fonts\JetBrainsMono-Thin.ttf" />
-        <AvaloniaResource Include="Fonts\JetBrainsMono-Thin.ttf" />
-        <None Remove="Fonts\JetBrainsMono-ThinItalic.ttf" />
-        <AvaloniaResource Include="Fonts\JetBrainsMono-ThinItalic.ttf" />
         <None Remove="Assets\csharp.svg" />
         <AvaloniaResource Include="Assets\csharp.svg" />
         <None Remove="Assets\error.svg" />
@@ -99,6 +67,15 @@
         <AvaloniaResource Include="Assets\zoomin.svg" />
         <None Remove="Assets\zoomout.svg" />
         <AvaloniaResource Include="Assets\zoomout.svg" />
+        <None Remove="Assets\trash.svg" />
+        <AvaloniaResource Include="Assets\trash.svg" />
+        <None Remove="Assets\selectall.svg" />
+        <AvaloniaResource Include="Assets\selectall.svg" />
+        <None Remove="Assets\deselectall.svg" />
+        <AvaloniaResource Include="Assets\deselectall.svg" />
+        <AvaloniaResource Include="Fonts\MapleMono-CN-Regular.ttf">
+          <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+        </AvaloniaResource>
     </ItemGroup>
 
     <ItemGroup>
@@ -131,12 +108,31 @@
         <Compile Update="Controls\DisplayerContainer.axaml.cs">
             <DependentUpon>DisplayerContainer.axaml</DependentUpon>
         </Compile>
+        <Compile Update="Properties\Resources.Designer.cs">
+          <DesignTime>True</DesignTime>
+          <AutoGen>True</AutoGen>
+          <DependentUpon>Resources.resx</DependentUpon>
+        </Compile>
         <Compile Update="Views\SettingView.axaml.cs">
           <DependentUpon>SettingView.axaml</DependentUpon>
+        </Compile>
+        <Compile Update="Controls\ShownControl.cs">
+          <DependentUpon>ShownControl.axaml</DependentUpon>
         </Compile>
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Properties\" />
+      <EmbeddedResource Update="Properties\Resources.zh-hans.resx">
+        <LastGenOutput>Resources.zh-cn.Designer.cs</LastGenOutput>
+        <Generator>ResXFileCodeGenerator</Generator>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Properties\Resources.resx">
+        <Generator>PublicResXFileCodeGenerator</Generator>
+        <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Properties\Resources.en-us.resx">
+        <LastGenOutput>Resources.en-us.Designer.cs</LastGenOutput>
+        <Generator>ResXFileCodeGenerator</Generator>
+      </EmbeddedResource>
     </ItemGroup>
 </Project>

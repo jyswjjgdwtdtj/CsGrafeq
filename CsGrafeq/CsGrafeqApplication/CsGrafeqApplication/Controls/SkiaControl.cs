@@ -1,12 +1,16 @@
-﻿using System;
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using Avalonia.Media.TextFormatting;
 using Avalonia.Platform;
 using Avalonia.Rendering.SceneGraph;
 using Avalonia.Skia;
 using SkiaSharp;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace CsGrafeqApplication.Controls;
 
@@ -163,7 +167,7 @@ public static class SkiaEx
     public static SKPaint FilledTranparentGrey =
         new() { IsAntialias = true, Color = new SKColor(0x80, 0x80, 0x80, 70) };
 
-    public static SKFont TextFont;
+    public static SKFont MapleMono,SimSun,TextFontPaint;
     public static SKPaint FilledGray1 = new() { IsAntialias = true, Color = new SKColor(190, 190, 190) };
     public static SKPaint FilledGray2 = new() { IsAntialias = true, Color = new SKColor(128, 128, 128) };
     public static SKPaint ShadowFilledBlack = new() { IsAntialias = true, Color = SKColors.Black };
@@ -193,12 +197,11 @@ public static class SkiaEx
             2,
             SKColors.Gray
         );
-        TextFont = new SKFont(
-            SKTypeface.FromStream(
-                AssetLoader.Open(new Uri("avares://CsGrafeqApplication/Fonts/JetBrainsMono-Regular.ttf"))));
+        var fontMngr = SKFontManager.Default;
+        MapleMono=new SKFont(fontMngr.CreateTypeface(AssetLoader.Open(new Uri("avares://CsGrafeqApplication/Fonts/MapleMono-CN-Regular.ttf"))));
+        SimSun = new SKFont(SKFontManager.Default.GetFontStyles(SKFontManager.Default.FontFamilies.ToList().IndexOf("宋体")).CreateTypeface(0));
         Refresh();
     }
-
     public static void Refresh()
     {
         object? temp;
@@ -260,6 +263,7 @@ public static class SkiaEx
 
     public static void DrawBubble(this SKCanvas dc, string s, SKPoint point, SKPaint back, SKPaint fore)
     {
+        var TextFont = MapleMono;
         var size = new SKSize();
         size.Width = TextFont.MeasureText(s, FilledBlack);
         size.Height = TextFont.Size;

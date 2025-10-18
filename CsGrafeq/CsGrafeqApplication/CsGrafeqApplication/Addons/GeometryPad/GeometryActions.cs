@@ -15,140 +15,140 @@ internal static class GeometryActions
     /// </summary>
     public static AvaloniaList<HasNameActionList> Actions { get; } = new()
     {
-        new HasNameActionList("Edit")
+        new HasNameActionList(new MultiLanguageData(){English = "Edit",Chinese = "编辑"})
         {
             new ActionData
             {
-                Name = "Move",
-                Description = "Move the selected point",
+                Name = new MultiLanguageData { English = "Move", Chinese = "移动" },
+                Description = new MultiLanguageData { English = "Move the selected point", Chinese = "移动选定的点" },
                 GetterConstructor = null,
                 Args = [],
                 Self=ShownShapeArg.None
             },
             new ActionData
             {
-                Name = "Select",
-                Description = "Select shapes",
+                Name = new MultiLanguageData { English = "Select", Chinese = "选择" },
+                Description = new MultiLanguageData { English = "Select shapes", Chinese = "选择图形" },
                 GetterConstructor = null,
                 Args = [],
                 Self=ShownShapeArg.None
             }
         },
 
-        new HasNameActionList("Point")
+        new HasNameActionList(new MultiLanguageData(){English = "Point",Chinese = "点"})
         {
             new ActionData
             {
-                Name = "Put",
-                Description = "Put a point to axis",
+                Name = new MultiLanguageData { English = "Put", Chinese = "放置" },
+                Description = new MultiLanguageData { English = "Put a point to axis", Chinese = "在坐标系中放置一个点" },
                 GetterConstructor = null,
                 Args = [],
                 Self=ShownShapeArg.Point
             },
             new ActionData
             {
-                Name = "Middle",
-                Description = "Put the middle of two points",
+                Name = new MultiLanguageData { English = "Middle", Chinese = "中点" },
+                Description = new MultiLanguageData { English = "Put the middle of two points", Chinese = "放置两点的中点" },
                 GetterConstructor = ConstructorInvoker.Create(typeof(PointGetter_MiddlePoint).GetConstructors().FirstOrDefault()), // ctor(Point, Point)
                 Args = [ ShapeArg.Point, ShapeArg.Point ],
                 Self=ShownShapeArg.Point
             },
             new ActionData
             {
-                Name = "Median Center",
-                Description = "Put the median center of three points",
+                Name = new MultiLanguageData { English = "Median Center", Chinese = "重心" },
+                Description = new MultiLanguageData { English = "Put the median center of three points", Chinese = "放置三点的重心（质心）" },
                 GetterConstructor = ConstructorInvoker.Create(typeof(PointGetter_MedianCenter).GetConstructors().FirstOrDefault()), // ctor(Point, Point, Point)
                 Args = [ ShapeArg.Point, ShapeArg.Point, ShapeArg.Point ],
                 Self=ShownShapeArg.Point
             },
             new ActionData
             {
-                Name = "Out Center",
-                Description = "Put the median center of three points",
+                Name = new MultiLanguageData { English = "Out Center", Chinese = "外心" },
+                Description = new MultiLanguageData { English = "Put the median center of three points", Chinese = "放置三点的外心（外接圆心）" },
                 GetterConstructor = ConstructorInvoker.Create(typeof(PointGetter_OutCenter).GetConstructors().FirstOrDefault()), // ctor(Point, Point, Point)
                 Args = [ ShapeArg.Point, ShapeArg.Point, ShapeArg.Point ],
                 Self=ShownShapeArg.Point
             },
             new ActionData
             {
-                Name = "In Center",
-                Description = "Put the in center of three points",
+                Name = new MultiLanguageData { English = "In Center", Chinese = "内心" },
+                Description = new MultiLanguageData { English = "Put the in center of three points", Chinese = "放置三点的内心（内切圆心）" },
                 GetterConstructor = ConstructorInvoker.Create(typeof(PointGetter_InCenter).GetConstructors().FirstOrDefault()), // ctor(Point, Point, Point)
                 Args = [ ShapeArg.Point, ShapeArg.Point, ShapeArg.Point ],
                 Self=ShownShapeArg.Point
             },
             new ActionData
             {
-                Name = "Ortho Center",
-                Description = "Put the ortho center of three points",
+                Name = new MultiLanguageData { English = "Ortho Center", Chinese = "垂心" },
+                Description = new MultiLanguageData { English = "Put the ortho center of three points", Chinese = "放置三点的垂心" },
                 GetterConstructor = ConstructorInvoker.Create(typeof(PointGetter_OrthoCenter).GetConstructors().FirstOrDefault()), // ctor(Point, Point, Point)
                 Args = [ ShapeArg.Point, ShapeArg.Point, ShapeArg.Point ],
                 Self=ShownShapeArg.Point
             },
             new ActionData
             {
-                Name = "Axial Symmetry",
-                Description = "Put the axial symmetry of a point from a line",
+                Name = new MultiLanguageData { English = "Axial Symmetry", Chinese = "轴对称" },
+                Description = new MultiLanguageData { English = "Put the axial symmetry of a point from a line", Chinese = "根据直线放置点的轴对称点" },
                 GetterConstructor = ConstructorInvoker.Create(typeof(PointGetter_AxialSymmetryPoint).GetConstructors().FirstOrDefault()), // ctor(Point, Line)
                 Args = [ ShapeArg.Point, ShapeArg.Line ],
                 Self=ShownShapeArg.Point
             },
             new ActionData
             {
-                Name = "Nearest",
-                Description = "Put the nearest point of a shape from a points",
+                Name = new MultiLanguageData { English = "Nearest", Chinese = "最近点" },
+                Description = new MultiLanguageData { English = "Put the nearest point of a shape from a points", Chinese = "放置点到图形上的最近点" },
                 GetterConstructor = ConstructorInvoker.Create(typeof(PointGetter_NearestPointOnLine).GetConstructors().FirstOrDefault()), // ctor(Line, Point)
                 Args = [  ShapeArg.Point, ShapeArg.Line ],
                 Self=ShownShapeArg.Point
             }
         },
 
-        new HasNameActionList("Line")
+        new HasNameActionList(new MultiLanguageData(){English = "Line",Chinese = "线"})
         {
             new ActionData
             {
-                Name = "Straight",
-                Description = "Create a straight line from two points",
+                Name = new MultiLanguageData { English = "Straight", Chinese = "直线" },
+                Description = new MultiLanguageData { English = "Create a straight line from two points", Chinese = "由两点创建直线" },
                 GetterConstructor = ConstructorInvoker.Create(typeof(LineGetter_Connected).GetConstructors().FirstOrDefault()), // ctor(Point, Point)
                 Args = [ ShapeArg.Point, ShapeArg.Point ],
                 Self=ShownShapeArg.Straight
             },
             new ActionData
             {
-                Name = "Half",
-                Description = "Create a half line from two points",
+                Name = new MultiLanguageData { English = "Half", Chinese = "射线" },
+                Description = new MultiLanguageData { English = "Create a half line from two points", Chinese = "由两点创建半直线" },
                 GetterConstructor = ConstructorInvoker.Create(typeof(LineGetter_Half).GetConstructors().FirstOrDefault()), // ctor(Point, Point)
                 Args = [ ShapeArg.Point, ShapeArg.Point ],
                 Self=ShownShapeArg.Half
             },
             new ActionData
             {
-                Name = "Segment",
-                Description = "Create a line segment from two points",
+                Name = new MultiLanguageData { English = "Segment", Chinese = "线段" },
+                Description = new MultiLanguageData { English = "Create a line segment from two points", Chinese = "由两点创建线段" },
                 GetterConstructor = ConstructorInvoker.Create(typeof(LineGetter_Segment).GetConstructors().FirstOrDefault()), // ctor(Point, Point)
                 Args = [ ShapeArg.Point, ShapeArg.Point ],
                 Self=ShownShapeArg.Segment
             },
             new ActionData
             {
-                Name = "Vertical",
-                Description = "Create a vertical line of a line from a point",
+                Name = new MultiLanguageData { English = "Vertical", Chinese = "垂线" },
+                Description = new MultiLanguageData { English = "Create a vertical line of a line from a point", Chinese = "根据一条直线和一点创建垂线" },
                 GetterConstructor = ConstructorInvoker.Create(typeof(LineGetter_Vertical).GetConstructors().FirstOrDefault()), // ctor(Line, Point)
                 Args = [ ShapeArg.Point,ShapeArg.Line ],
                 Self=ShownShapeArg.Straight
             },
             new ActionData
             {
-                Name = "Parallel",
-                Description = "Create a parallel line of a line from a point",
+                Name = new MultiLanguageData { English = "Parallel", Chinese = "平行线" },
+                Description = new MultiLanguageData { English = "Create a parallel line of a line from a point", Chinese = "根据一条直线和一点创建平行线" },
                 GetterConstructor = ConstructorInvoker.Create(typeof(LineGetter_Parallel).GetConstructors().FirstOrDefault()), // ctor(Line, Point)
                 Args = [ ShapeArg.Point,ShapeArg.Line ],
                 Self=ShownShapeArg.Straight
             },
             new ActionData
             {
-                Name = "Fitted",
-                Description = "Create a fitted straight line from points \n select the first selected point to finish choosing",
+                Name = new MultiLanguageData { English = "Fitted", Chinese = "拟合直线" },
+                Description = new MultiLanguageData { English = "Create a fitted straight line from points \n select the first selected point to finish choosing", Chinese = "由多个点拟合直线\n选中第一个点以结束选择" },
                 GetterConstructor = ConstructorInvoker.Create(typeof(LineGetter_Fitted).GetConstructors().FirstOrDefault()), // ctor(Point[])
                 Args = [ ShapeArg.Point ],
                 IsMultiPoint = true,
@@ -156,20 +156,20 @@ internal static class GeometryActions
             },
             new ActionData
             {
-                Name = "Perpendicular Bisector",
-                Description = "Create a perpendicular bisector from two points",
+                Name = new MultiLanguageData { English = "Perpendicular Bisector", Chinese = "垂直平分线" },
+                Description = new MultiLanguageData { English = "Create a perpendicular bisector from two points", Chinese = "由两点创建垂直平分线" },
                 GetterConstructor = ConstructorInvoker.Create(typeof(LineGetter_PerpendicularBisector).GetConstructors().FirstOrDefault()), // ctor(Point, Point)
                 Args = [ ShapeArg.Point, ShapeArg.Point ],
                 Self=ShownShapeArg.Straight
             }
         },
 
-        new HasNameActionList("Polygon")
+        new HasNameActionList(new MultiLanguageData(){English = "Polygon",Chinese = "多边形"})
         {
             new ActionData
             {
-                Name = "Polygon",
-                Description = "Create a polygon\nselect the first selected point to finish choosing",
+                Name = new MultiLanguageData { English = "Polygon", Chinese = "多边形" },
+                Description = new MultiLanguageData { English = "Create a polygon\nselect the first selected point to finish choosing", Chinese = "创建多边形\n选中第一个点以结束选择" },
                 GetterConstructor = ConstructorInvoker.Create(typeof(PolygonGetter).GetConstructors().FirstOrDefault()), // ctor(Point[])
                 Args = [ ShapeArg.Point ] ,
                 IsMultiPoint = true,
@@ -177,40 +177,40 @@ internal static class GeometryActions
             }
         },
 
-        new HasNameActionList("Circle")
+        new HasNameActionList(new MultiLanguageData(){English = "Circle",Chinese = "圆"})
         {
             new ActionData
             {
-                Name = "Three Points",
-                Description = "Create a circle from three points",
+                Name = new MultiLanguageData { English = "Three Points", Chinese = "三点圆" },
+                Description = new MultiLanguageData { English = "Create a circle from three points", Chinese = "由三点创建圆" },
                 GetterConstructor = ConstructorInvoker.Create(typeof(CircleGetter_FromThreePoint).GetConstructors().FirstOrDefault()), // ctor(Point, Point, Point)
                 Args = [ ShapeArg.Point, ShapeArg.Point, ShapeArg.Point ],
                 Self=ShownShapeArg.Circle
             },
             new ActionData
             {
-                Name = "Center and Point",
-                Description = "Create a circle from a center and a point",
+                Name = new MultiLanguageData { English = "Center and Point", Chinese = "圆心与一点" },
+                Description = new MultiLanguageData { English = "Create a circle from a center and a point", Chinese = "由圆心和一点创建圆" },
                 GetterConstructor = ConstructorInvoker.Create(typeof(CircleGetter_FromCenterAndPoint).GetConstructors().FirstOrDefault()), // ctor(Point, Point)
                 Args = [ ShapeArg.Point, ShapeArg.Point ],
                 Self=ShownShapeArg.Circle
             },
             new ActionData
             {
-                Name = "Center and Radius",
-                Description = "Create a circle from center and radius",
+                Name = new MultiLanguageData { English = "Center and Radius", Chinese = "圆心与半径" },
+                Description = new MultiLanguageData { English = "Create a circle from center and radius", Chinese = "由圆心和半径创建圆" },
                 GetterConstructor = ConstructorInvoker.Create(typeof(CircleGetter_FromCenterAndRadius).GetConstructors().FirstOrDefault()), // ctor(Point)
                 Args = [ ShapeArg.Point],
                 Self=ShownShapeArg.Circle
             },
         },
 
-        new HasNameActionList("Angle")
+        new HasNameActionList(new MultiLanguageData(){English = "Angle",Chinese = "角"})
         {
             new ActionData
             {
-                Name = "Angle",
-                Description = "Create an angle",
+                Name = new MultiLanguageData { English = "Angle", Chinese = "角" },
+                Description = new MultiLanguageData { English = "Create an angle", Chinese = "创建一个角" },
                 GetterConstructor = ConstructorInvoker.Create(typeof(AngleGetter_FromThreePoint).GetConstructors().FirstOrDefault()), // ctor(Point anglePoint, Point point1, Point point2)
                 Args = [ ShapeArg.Point, ShapeArg.Point, ShapeArg.Point ],
                 Self=ShownShapeArg.Angle

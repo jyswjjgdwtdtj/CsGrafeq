@@ -31,6 +31,7 @@ public abstract class Displayer : SkiaControl
         GestureRecognizers.Add(new PinchGestureRecognizer());
         AddHandler(Gestures.ScrollGestureEvent, (s, e) => { Zoom(Pow(1.04, e.Delta.Y), Bounds.Center); });
         AddHandler(Gestures.PinchEvent, (s, e) => { Zoom(e.Scale - 1, e.ScaleOrigin); });
+        Languages.LanguageChanged += Invalidate;
     }
 
     [Content] public AddonList Addons { get; } = new();

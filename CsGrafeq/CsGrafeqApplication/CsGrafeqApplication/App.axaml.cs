@@ -3,6 +3,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using CsGrafeqApplication.ViewModels;
 using CsGrafeqApplication.Views;
+using System.Threading;
 
 namespace CsGrafeqApplication;
 
@@ -10,6 +11,7 @@ public class App : Application
 {
     public override void Initialize()
     {
+        Languages.SetLanguage("zh-hans");
         AvaloniaXamlLoader.Load(this);
     }
 

@@ -19,6 +19,8 @@ using AvaRect = Avalonia.Rect;
 using AvaSize = Avalonia.Size;
 using GeoHalf = CsGrafeq.Shapes.Half;
 using static CsGrafeqApplication.AvaloniaMath;
+using static CsGrafeqApplication.Properties.Resources;
+using static CsGrafeqApplication.Properties.Resources;
 
 namespace CsGrafeqApplication.Addons.GeometryPad;
 
@@ -90,36 +92,45 @@ public partial class GeometryPad : Addon
 
     public override string Name => "GeometryPad";
 
-    public void SetAction(string geoPadAction)
+    internal void SetAction(ActionData ad)
     {
-        if (GeoPadAction.Name == geoPadAction)
+        if (GeoPadAction==ad)
             return;
-        GeoPadAction = Actions.Find(data => data.Name == geoPadAction);
+        GeoPadAction = ad;
         Shapes.ClearSelected();
     }
 
     #region KeyAction
 
+    public override void Delete()
+    {
+        List<GeometryShape> todelete = new();
+        foreach (var shape in Shapes.GetSelectedShapes<GeometryShape>().ToArray())
+            if (shape.Selected)
+            {
+                todelete.Add(shape);
+            }
+
+        if (todelete.Count > 0) DoGeoShapesDelete(todelete.ToArray());
+    }
+
+    public override void SelectAll()
+    {
+        foreach (var shape in Shapes.OfType<GeometryShape>().ToArray())
+            shape.Selected = true;
+    }
+
+    public override void DeSelectAll()
+    {
+        foreach (var shape in Shapes.OfType<GeometryShape>().ToArray())
+            shape.Selected = false;
+    }
     protected override bool KeyDown(KeyEventArgs e)
     {
         Owner.Suspend();
         var res = DoNext;
         switch (e.Key)
         {
-            case Key.Delete:
-            {
-                List<GeometryShape> todelete = new();
-                foreach (var shape in Shapes.GetSelectedShapes<GeometryShape>().ToArray())
-                    if (shape.Selected)
-                    {
-                        todelete.Add(shape);
-
-                        res &= Intercept;
-                    }
-
-                if (todelete.Count > 0) DoGeoShapesDelete(todelete.ToArray());
-            }
-                break;
             case Key.Tab:
             {
                 foreach (var shape in Shapes.GetSelectedShapes<GeometryShape>().ToArray())
@@ -129,36 +140,6 @@ public partial class GeometryPad : Addon
                         shape.Selected = false;
                         foreach (var subshape in shape.SubShapes) subshape.Selected = true;
                     }
-            }
-                break;
-            case Key.A:
-            {
-                if (e.KeyModifiers == KeyModifiers.Control)
-                {
-                    res &= Intercept;
-                    foreach (var shape in Shapes.OfType<GeometryShape>().ToArray())
-                        shape.Selected = true;
-                }
-            }
-                break;
-            case Key.B:
-            {
-                if (e.KeyModifiers == KeyModifiers.Control)
-                {
-                    res &= Intercept;
-                    foreach (var shape in Shapes.OfType<GeometryShape>().ToArray())
-                        shape.Selected = false;
-                }
-            }
-                break;
-            case Key.Z:
-            {
-                if (e.KeyModifiers == KeyModifiers.Control) CmdManager.UnDo();
-            }
-                break;
-            case Key.Y:
-            {
-                if (e.KeyModifiers == KeyModifiers.Control) CmdManager.ReDo();
             }
                 break;
         }
@@ -223,7 +204,7 @@ public partial class GeometryPad : Addon
     {
         PointerProperties = e.Properties;
         PointerPressedPos = e.Location;
-        if (GeoPadAction.Name == "Select")
+        if (GeoPadAction.Name.English == "Select")
         {
             Shapes.ClearSelected();
         }
@@ -256,7 +237,7 @@ public partial class GeometryPad : Addon
         PointerProperties = e.Properties;
         Owner.Suspend();
         PointerMovedPos = e.Location;
-        if (GeoPadAction.Name == "Select" && e.Properties.IsLeftButtonPressed)
+        if (GeoPadAction.Name.English == "Select" && e.Properties.IsLeftButtonPressed)
         {
             Owner.Resume(false);
             Owner.Invalidate(this);
@@ -335,7 +316,7 @@ public partial class GeometryPad : Addon
         Owner.Suspend();
         PointerReleasedPos = e.Location;
         var disp = (Owner as DisplayControl)!;
-        if (GeoPadAction.Name == "Select")
+        if (GeoPadAction.Name.English == "Select")
         {
             var rect = RegulateRectangle(new AvaRect(PointerPressedPos,
                 new AvaSize(PointerReleasedPos.X - PointerPressedPos.X, PointerReleasedPos.Y - PointerPressedPos.Y)));
@@ -439,7 +420,7 @@ public partial class GeometryPad : Addon
         Owner.Suspend();
         using (var ec=new ExitController(() => Owner.Resume()))
         {
-            if (GeoPadAction.Name == "Put")
+            if (GeoPadAction.Name.English == "Put")
             {
                 Shapes.ClearSelected();
                 PutPoint(e.Location).Selected = true;
@@ -471,13 +452,13 @@ public partial class GeometryPad : Addon
             {
                 polygon.Selected = !polygon.Selected;
             }
-            else if (GeoPadAction.Args.Contains(ShapeArg.Point) && GeoPadAction.Name != "Move" &&
-                     GeoPadAction.Name != "Select")
+            else if (GeoPadAction.Args.Contains(ShapeArg.Point) && GeoPadAction.Name.English != "Move" &&
+                     GeoPadAction.Name.English != "Select")
             {
                 PutPoint(e.Location).Selected = true;
             }
 
-            if (GeoPadAction.Name != "Move" && GeoPadAction.Name != "Select")
+            if (GeoPadAction.Name.English != "Move" && GeoPadAction.Name.English != "Select")
             {
                 if (!GeoPadAction.Args.Contains(ShapeArg.Point))
                     Shapes.ClearSelected<GeoPoint>();
@@ -516,7 +497,7 @@ public partial class GeometryPad : Addon
                     }
                 return Intercept;
             }
-            if (GeoPadAction.Name == "Select" || GeoPadAction.Name == "Move")
+            if (GeoPadAction.Name.English == "Select" || GeoPadAction.Name.English == "Move")
             {
                 return Intercept;
             }
@@ -574,7 +555,7 @@ public partial class GeometryPad : Addon
         dc.ClipRect(rect);
         //RenderFunction(dc, new SKRectI((int)rect.Left, (int)rect.Top, (int)rect.Right, (int)rect.Bottom));
         RenderShapes(dc, rect, Shapes.GetShapes<GeometryShape>());
-        if (GeoPadAction.Name == "Select" && PointerProperties.IsLeftButtonPressed)
+        if (GeoPadAction.Name.English == "Select" && PointerProperties.IsLeftButtonPressed)
         {
             var selrect = RegulateRectangle(new AvaRect(PointerPressedPos,
                 new AvaSize(PointerMovedPos.X - PointerPressedPos.X, PointerMovedPos.Y - PointerPressedPos.Y)));
@@ -642,7 +623,7 @@ public partial class GeometryPad : Addon
                         else
                             dc.DrawLine(MathToPixelSK(vs.Item1), MathToPixelSK(vs.Item2), StrokePaintMain);
 
-                        dc.DrawBubble($"Straight:{s.Name}", MathToPixelSK((s.Current.Point1 + s.Current.Point2) / 2),
+                        dc.DrawBubble($"{Properties.Resources.StraightText}:{s.Name}", MathToPixelSK((s.Current.Point1 + s.Current.Point2) / 2),
                             BubbleBack, PaintMain);
                     }
                         break;
@@ -655,7 +636,7 @@ public partial class GeometryPad : Addon
                         else
                             dc.DrawLine(MathToPixelSK(v1), MathToPixelSK(v2), StrokePaintMain);
 
-                        dc.DrawBubble($"Segment:{s.Name}", MathToPixelSK((s.Current.Point1 + s.Current.Point2) / 2),
+                        dc.DrawBubble($"{SegmentText}:{s.Name}", MathToPixelSK((s.Current.Point1 + s.Current.Point2) / 2),
                             BubbleBack, PaintMain);
                     }
                         break;
@@ -690,7 +671,7 @@ public partial class GeometryPad : Addon
                         else
                             dc.DrawLine(MathToPixelSK(v1), MathToPixelSK(p), StrokePaintMain);
 
-                        dc.DrawBubble($"Half:{h.Name}", MathToPixelSK((h.Current.Point1 + h.Current.Point2) / 2),
+                        dc.DrawBubble($"{HalfLineText}:{h.Name}", MathToPixelSK((h.Current.Point1 + h.Current.Point2) / 2),
                             BubbleBack, PaintMain);
                     }
                         break;
@@ -723,7 +704,7 @@ public partial class GeometryPad : Addon
                                 dc.DrawPath(path, StrokeMain);
                         }
 
-                        dc.DrawBubble($"Polygon:{polygon.Name}",
+                        dc.DrawBubble($"{PolygonText}:{polygon.Name}",
                             MathToPixelSK((polygon.Locations[0] + polygon.Locations[1]) / 2) - new SKPoint(0, 20),
                             BubbleBack, PaintMain);
                     }
@@ -739,7 +720,7 @@ public partial class GeometryPad : Addon
                             dc.DrawOval(pf, s, StrokeMain);
 
                         var r2 = cs.Radius * Sqrt(2) / 2;
-                        dc.DrawBubble($"Circle:{circle.Name}",
+                        dc.DrawBubble($"{CircleText}:{circle.Name}",
                             MathToPixelSK(circle.InnerCircle.Center + new Vec(-r2, r2)), BubbleBack, PaintMain);
                     }
                         break;
@@ -784,13 +765,13 @@ public partial class GeometryPad : Addon
                 StrokePaint.Color = new SKColor(p.Color).WithAlpha(255);
                 var index = 0;
                 var loc = MathToPixelSK(p.Location);
-                dc.DrawBubble("Point:" + p.Name, loc.OffSetBy(2, 2 + 20 * index++), BubbleBack, PaintMain);
+                dc.DrawBubble($"{PointText}:" + p.Name, loc.OffSetBy(2, 2 + 20 * index++), BubbleBack, PaintMain);
                 if (p == MovingPoint)
                 {
                     dc.DrawOval(loc, new SKSize(4, 4), FilledMedian);
                     dc.DrawOval(loc, new SKSize(7, 7), StrokeMedian);
                     dc.DrawBubble(
-                        $"({p.Location.X},{p.Location.Y}) {(p.PointGetter is PointGetter_Movable ? "" : "Unmovable")}",
+                        $"({System.Math.Round(MovingPoint.Location.X,8)},{System.Math.Round(MovingPoint.Location.Y,8)}) {(MovingPoint.PointGetter is PointGetter_Movable ? "" : CantBeMovedText)}",
                         loc.OffSetBy(2, 2 + 20 * index++), BubbleBack, PaintMain);
                 }
                 else if (p.Selected)
@@ -1351,8 +1332,8 @@ public partial class GeometryPad : Addon
         if (sender is RadioButton rb)
             if (rb.IsChecked == true)
             {
-                SetAction(rb.Name);
-                Static.Info(new TextBlock { Text = GeoPadAction.Description });
+                SetAction((ActionData)rb.Tag);
+                Static.Info(new TextBlock { Text = GeoPadAction.Description.Data });
             }
     }
 

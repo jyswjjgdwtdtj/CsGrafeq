@@ -3,7 +3,7 @@
         <OutputType Condition="'$(Configuration.toUpper())' != 'DEBUG'">WinExe</OutputType>
         <OutputType Condition="'$(Configuration.toUpper())' == 'DEBUG'">Exe</OutputType>
         <TargetFramework>net9.0</TargetFramework>
-        <InvariantGlobalization>true</InvariantGlobalization>
+        <InvariantGlobalization>false</InvariantGlobalization>
         <Nullable>enable</Nullable>
         <PublishAot Condition="'$(Configuration.toUpper())' != 'DEBUG'">true</PublishAot>
         <PublishAot Condition="'$(Configuration.toUpper())' == 'DEBUG'">false</PublishAot>
@@ -30,6 +30,7 @@
 
     <ItemGroup>
         <PackageReference Include="Avalonia.Desktop"/>
-        <PackageReference Include="PublishAotCompressed"/>
+        <!--<PackageReference Include="PublishAotCompressed"/>-->
+	    <!--会报毒。。。-->
     </ItemGroup>
 </Project>

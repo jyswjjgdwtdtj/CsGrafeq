@@ -108,12 +108,12 @@ public partial class DisplayerContainer : UserControl
 
     private void StepBack_Clicked(object? sender, RoutedEventArgs e)
     {
-        VM.Displayer.Addons[0].CmdManager.UnDo();
+        VM.Displayer.Addons[0].Undo();
     }
 
     private void StepOver_Clicked(object? sender, RoutedEventArgs e)
     {
-        VM.Displayer.Addons[0].CmdManager.ReDo();
+        VM.Displayer.Addons[0].Redo();
     }
 
     private void ZoomOut_Clicked(object? sender, RoutedEventArgs e)
@@ -124,5 +124,25 @@ public partial class DisplayerContainer : UserControl
     private void ZoomIn_Clicked(object? sender, RoutedEventArgs e)
     {
         VM.Displayer.Zoom(1.05, Bounds.Center);
+    }
+
+    private void Delete_Clicked(object? sender, RoutedEventArgs e)
+    {
+        VM.Displayer.Addons[0].Delete();
+    }
+
+    private void SelectAll_Clicked(object? sender, RoutedEventArgs e)
+    {
+        VM.Displayer.Addons[0].SelectAll();
+    }
+    private void DeSelectAll_Clicked(object? sender, RoutedEventArgs e)
+    {
+        VM.Displayer.Addons[0].DeSelectAll();
+    }
+
+    private void LanguageSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        Languages.SetLanguage(Languages.AllowedLanguages[(sender as ComboBox)?.SelectedIndex??0]);
+        
     }
 }

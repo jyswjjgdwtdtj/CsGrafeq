@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Reflection;
 using CsGrafeq.Collections;
 
@@ -10,8 +11,8 @@ internal class ActionData
     public bool IsMultiPoint = false;
     public required ConstructorInvoker GetterConstructor { get; init; }
     public required List<ShapeArg> Args { get; init; }
-    public required string Name { get; init; }
-    public required string Description { get; init; }
+    public required MultiLanguageData Name { get; init; }
+    public required MultiLanguageData Description { get; init; }
     public required ShownShapeArg Self { get; init; }
 }
 
@@ -37,9 +38,11 @@ internal enum ShownShapeArg
     Angle= 0b1000000
 }
 
-internal class HasNameActionList : HasNameList<ActionData>
+internal class HasNameActionList : ObservableCollection<ActionData>
 {
-    public HasNameActionList(string name) : base(name)
+    public MultiLanguageData Name { get; init; }
+    public HasNameActionList(MultiLanguageData multiLanguageData)
     {
+        Name=multiLanguageData;
     }
 }

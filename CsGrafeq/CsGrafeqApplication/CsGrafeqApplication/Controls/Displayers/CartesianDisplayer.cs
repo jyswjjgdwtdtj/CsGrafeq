@@ -290,6 +290,7 @@ public class CartesianDisplayer : Displayer
 
     protected void RenderAxisNumber(SKCanvas dc)
     {
+        var TextFont = MapleMono;
         if (!DrawAxisNumber)
             return;
         var width = Bounds.Width;
@@ -300,7 +301,7 @@ public class CartesianDisplayer : Displayer
         var addnumY = Pow(10D, zsY);
         var addnumDX = Pow(10M, zsX);
         var addnumDY = Pow(10M, zsY);
-        var p = RangeTo(-3, height - TextFont.Size + 1, Zero.Y);
+        var p = RangeTo(1, height - TextFont.Size-2, Zero.Y);
         var fff = 1f / 4f * TextFont.Size;
         for (var i = Min(Zero.X - addnumX * UnitLength,
                  MathToPixelX(RoundTen(PixelToMathX(ValidRect.Right), -zsX)));

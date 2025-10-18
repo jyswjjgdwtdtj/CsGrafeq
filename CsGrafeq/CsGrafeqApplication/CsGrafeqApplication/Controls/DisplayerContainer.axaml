@@ -5,15 +5,17 @@
              xmlns:vm="clr-namespace:CsGrafeqApplication.ViewModels"
              xmlns:addons="clr-namespace:CsGrafeqApplication.Addons"
              xmlns:controls="clr-namespace:CsGrafeqApplication.Controls"
+             xmlns:properties="clr-namespace:CsGrafeqApplication.Properties"
+             xmlns:csgrafeqapp="clr-namespace:CsGrafeqApplication"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CsGrafeqApplication.Controls.DisplayerContainer"
              x:DataType="vm:DisplayerContainerViewModel">
     <UserControl.Styles>
         <Style Selector="Svg.F">
-            <Setter Property="Css" Value="{DynamicResource OppositeCssPathFillString}"></Setter>
+            <Setter Property="Css" Value="{DynamicResource OppositeCssPathFillString}" />
         </Style>
         <Style Selector="Svg.S">
-            <Setter Property="Css" Value="{DynamicResource OppositeCssPathStrokeString}"></Setter>
+            <Setter Property="Css" Value="{DynamicResource OppositeCssPathStrokeString}" />
         </Style>
     </UserControl.Styles>
     <Panel Name="PART_Container" IsTabStop="False">
@@ -127,73 +129,144 @@
         </Grid>
         <Grid ColumnDefinitions="*,52" RowDefinitions="*,52" ZIndex="2" Name="SettingDockPanel"
               VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-            <ToggleButton Grid.Column="1" Grid.Row="1" Name="SettingToggle">
-                <ToggleButton.Styles>
-                    <Style Selector="ToggleButton">
-                        <Style Selector="^:checked">
-                            <Setter Property="Template">
-                                <ControlTemplate>
-                                    <Border Margin="10" CornerRadius="5" Background="{StaticResource HTMedianBrush}">
-                                        <Svg Path="/Assets/lineup.svg" Width="32" Height="32" Margin="0" Classes="F"/>
-                                    </Border>
-                                </ControlTemplate>
-                            </Setter>
+            <Border Grid.Column="1" Grid.Row="1">
+                <ToggleButton Name="SettingToggle">
+                    <ToggleButton.Styles>
+                        <Style Selector="ToggleButton">
+                            <Style Selector="^:checked">
+                                <Setter Property="Template">
+                                    <ControlTemplate>
+                                        <Border Margin="10" CornerRadius="5"
+                                                Background="{StaticResource HTMedianBrush}">
+                                            <Svg Path="/Assets/lineup.svg" Width="32" Height="32" Margin="0"
+                                                 Classes="F" />
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter>
+                            </Style>
+                            <Style Selector="^:unchecked">
+                                <Setter Property="Template">
+                                    <ControlTemplate>
+                                        <Border Margin="10" CornerRadius="5"
+                                                Background="{StaticResource HTMedianBrush}">
+                                            <Svg Path="/Assets/linedown.svg" Width="32" Height="32" Margin="0"
+                                                 Classes="F" />
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter>
+                            </Style>
                         </Style>
-                        <Style Selector="^:unchecked">
-                            <Setter Property="Template">
-                                <ControlTemplate>
-                                    <Border Margin="10" CornerRadius="5" Background="{StaticResource HTMedianBrush}">
-                                        <Svg Path="/Assets/linedown.svg" Width="32" Height="32" Margin="0" Classes="F"/>
-                                    </Border>
-                                </ControlTemplate>
-                            </Setter>
-                        </Style>
-                    </Style>
-                </ToggleButton.Styles>
-            </ToggleButton>
-            <controls:ShownControl Grid.Column="1" Grid.Row="0" VerticalAlignment="Bottom"
-                                   IsShown="{CompiledBinding #SettingToggle.IsChecked,Mode=OneWay}"
-                                   TargetHeight="300" Margin="0" Padding="0" Duration="0.2">
-                <controls:ShownControl.Template>
-                    <ControlTemplate>
-                        <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" Name="SettingStackPanel"
-                                    Spacing="5" Margin="0" HorizontalAlignment="Center">
-                            <StackPanel.Styles>
-                                <Style Selector="Button">
-                                    <Setter Property="Background" Value="{StaticResource HTMedianBrush}" />
-                                    <Setter Property="Padding" Value="0" />
-                                    <Setter Property="CornerRadius" Value="4" />
-                                    <Setter Property="Margin" Value="0" />
-                                </Style>
-                                <Style Selector="RepeatButton">
-                                    <Setter Property="Background" Value="{StaticResource HTMedianBrush}" />
-                                    <Setter Property="Padding" Value="0" />
-                                    <Setter Property="CornerRadius" Value="4" />
-                                    <Setter Property="Margin" Value="0" />
-                                </Style>
-                            </StackPanel.Styles>
-                            <Button Click="Setting_Clicked">
-                                <Svg Path="/Assets/setting.svg" Width="32" Height="32" Margin="0" Classes="F"/>
-                            </Button>
-                            <RepeatButton Click="StepBack_Clicked">
-                                <Svg Path="/Assets/stepback.svg" Width="32" Height="32" Margin="0" Classes="F"/>
-                            </RepeatButton>
-                            <RepeatButton Click="StepOver_Clicked">
-                                <Svg Path="/Assets/stepover.svg" Width="32" Height="32" Margin="0" Classes="F"/>
-                            </RepeatButton>
-                            <RepeatButton Click="ZoomOut_Clicked">
-                                <Svg Path="/Assets/zoomout.svg" Width="32" Height="32" Margin="0" Classes="S"/>
-                            </RepeatButton>
-                            <RepeatButton Click="ZoomIn_Clicked">
-                                <Svg Path="/Assets/zoomin.svg" Width="32" Height="32" Margin="0" Classes="S"/>
-                            </RepeatButton>
-                            <Button>
-                                <Svg Path="/Assets/language.svg" Width="32" Height="32" Margin="0" Classes="F"/>
-                            </Button>
-                        </StackPanel>
-                    </ControlTemplate>
-                </controls:ShownControl.Template>
-            </controls:ShownControl>
+                    </ToggleButton.Styles>
+                </ToggleButton>
+            </Border>
+            <Border Grid.Column="0" Grid.Row="1">
+                <controls:ShownControl
+                    IsShown="{CompiledBinding #SettingToggle.IsChecked,Mode=OneWay}"
+                    Margin="0" Padding="0" Duration="0.2" HorizontalAlignment="Right" Orientation="Horizontal">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch" Name="SettingStackPanelHor"
+                                Spacing="5" Margin="0" HorizontalAlignment="Stretch">
+                        <StackPanel.Styles>
+                            <Style Selector="Button">
+                                <Setter Property="Background" Value="{StaticResource HTMedianBrush}" />
+                                <Setter Property="Padding" Value="0" />
+                                <Setter Property="CornerRadius" Value="4" />
+                                <Setter Property="Margin" Value="0" />
+                            </Style>
+                            <Style Selector="RepeatButton">
+                                <Setter Property="Background" Value="{StaticResource HTMedianBrush}" />
+                                <Setter Property="Padding" Value="0" />
+                                <Setter Property="CornerRadius" Value="4" />
+                                <Setter Property="Margin" Value="0" />
+                            </Style>
+                        </StackPanel.Styles>
+                        <RepeatButton Click="StepBack_Clicked" HotKey="Ctrl+Z">
+                            <ToolTip.Tip>
+								<TextBlock Text="{CompiledBinding MultiLanguageResources.UndoText.Data}"></TextBlock>
+                            </ToolTip.Tip>
+                            <Svg Path="/Assets/stepback.svg" Width="32" Height="32" Margin="0" Classes="F"  />
+                        </RepeatButton>
+                        <RepeatButton Click="StepOver_Clicked" HotKey="Ctrl+Y">
+                            <ToolTip.Tip>
+                                <TextBlock Text="{CompiledBinding MultiLanguageResources.RedoText.Data}"></TextBlock>
+                            </ToolTip.Tip>
+                            <Svg Path="/Assets/stepover.svg" Width="32" Height="32" Margin="0" Classes="F" />
+                        </RepeatButton>
+                        <RepeatButton Click="ZoomOut_Clicked" HotKey="Ctrl+Down">
+                            <ToolTip.Tip>
+                                <TextBlock Text="{CompiledBinding MultiLanguageResources.ZoomOutText.Data}"></TextBlock>
+                            </ToolTip.Tip>
+                            <Svg Path="/Assets/zoomout.svg" Width="32" Height="32" Margin="0" Classes="S" />
+                        </RepeatButton>
+                        <RepeatButton Click="ZoomIn_Clicked" HotKey="Ctrl+Up">
+                            <ToolTip.Tip>
+                                <TextBlock Text="{CompiledBinding MultiLanguageResources.ZoomInText.Data}"></TextBlock>
+                            </ToolTip.Tip>
+                            <Svg Path="/Assets/zoomin.svg" Width="32" Height="32" Margin="0" Classes="S" />
+                        </RepeatButton>
+                        <Button Click="Delete_Clicked" HotKey="Delete">
+                            <ToolTip.Tip>
+                                <TextBlock Text="{CompiledBinding MultiLanguageResources.DeleteText.Data}"></TextBlock>
+                            </ToolTip.Tip>
+                            <Svg Path="/Assets/trash.svg" Width="32" Height="32" Margin="0" Classes="S" />
+                        </Button>
+                        <Button Click="SelectAll_Clicked" HotKey="Ctrl+A">
+                            <ToolTip.Tip>
+                                <TextBlock Text="{CompiledBinding MultiLanguageResources.SelectAllText.Data}"></TextBlock>
+                            </ToolTip.Tip>
+                            <Svg Path="/Assets/selectall.svg" Width="32" Height="32" Margin="0" Classes="F"/>
+                        </Button>
+                        <Button Click="DeSelectAll_Clicked" HotKey="Ctrl+B">
+                            <ToolTip.Tip>
+                                <TextBlock Text="{CompiledBinding MultiLanguageResources.DeselectAllText.Data}"></TextBlock>
+                            </ToolTip.Tip>
+                            <Svg Path="/Assets/deselectall.svg" Width="32" Height="32" Margin="0" Classes="F" />
+                        </Button>
+                    </StackPanel>
+                </controls:ShownControl>
+            </Border>
+            <Border Grid.Column="1" Grid.Row="0">
+                <controls:ShownControl VerticalAlignment="Bottom" Orientation="Vertical"
+                                       IsShown="{CompiledBinding #SettingToggle.IsChecked,Mode=OneWay}"
+                                       Margin="0" Padding="0" Duration="0.2">
+                    <StackPanel Orientation="Vertical" Name="SettingStackPanel"
+                                Spacing="5" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Stretch">
+                        <StackPanel.Styles>
+                            <Style Selector="Button">
+                                <Setter Property="Background" Value="{StaticResource HTMedianBrush}" />
+                                <Setter Property="Padding" Value="0" />
+                                <Setter Property="CornerRadius" Value="4" />
+                                <Setter Property="Margin" Value="0" />
+                            </Style>
+                            <Style Selector="RepeatButton">
+                                <Setter Property="Background" Value="{StaticResource HTMedianBrush}" />
+                                <Setter Property="Padding" Value="0" />
+                                <Setter Property="CornerRadius" Value="4" />
+                                <Setter Property="Margin" Value="0" />
+                            </Style>
+                        </StackPanel.Styles>
+                        <Button Click="Setting_Clicked">
+                            <ToolTip.Tip>
+                                <TextBlock Text="{CompiledBinding MultiLanguageResources.SettingText.Data}"></TextBlock>
+                            </ToolTip.Tip>
+                            <Svg Path="/Assets/setting.svg" Width="32" Height="32" Margin="0" Classes="F" />
+                        </Button>
+                        <Button>
+                            <ToolTip.Tip>
+                                <TextBlock Text="{CompiledBinding MultiLanguageResources.LanguageText.Data}"></TextBlock>
+                            </ToolTip.Tip>
+                            <Button.Flyout>
+                                <Flyout Placement="Left">
+                                    <ComboBox SelectedIndex="{x:Static csgrafeqapp:Languages.CurrentLanguageIndex}" SelectionChanged="LanguageSelectionChanged">
+                                        <ComboBoxItem><TextBlock Text="en-us (English)"/></ComboBoxItem>
+                                        <ComboBoxItem><TextBlock Text="zh-hans (Chinese)"/></ComboBoxItem>
+                                    </ComboBox>
+                                </Flyout>
+                            </Button.Flyout>
+                            <Svg Path="/Assets/language.svg" Width="32" Height="32" Margin="0" Classes="F" />
+                        </Button>
+                    </StackPanel>
+                </controls:ShownControl>
+            </Border>
         </Grid>
         <Border ZIndex="3" Name="PopupBack">
             <Grid>
@@ -214,7 +287,8 @@
                         <Button Click="Button_OnClick" HorizontalAlignment="Right" Width="60" Height="30"
                                 HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="40,10"
                                 DockPanel.Dock="Bottom" Content="OK" Background="{DynamicResource CgBackgroundBrush}" />
-                        <Border Name="ContentContainer" Padding="40" Background="{DynamicResource CgBackgroundBrush}" Margin="15" CornerRadius="5" />
+                        <Border Name="ContentContainer" Padding="40" Background="{DynamicResource CgBackgroundBrush}"
+                                Margin="15" CornerRadius="5" />
                     </DockPanel>
                 </Border>
                 <Border Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center"

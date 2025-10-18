@@ -22,10 +22,10 @@
             </Style>
         </Style>
         <Style Selector="TextBox">
-            <Setter Property="FontFamily" Value="{StaticResource JetbrainsMono}" />
+            <Setter Property="FontFamily" Value="{StaticResource MapleMono}" />
         </Style>
         <Style Selector="TextBlock">
-            <Setter Property="FontFamily" Value="{StaticResource JetbrainsMono}" />
+            <Setter Property="FontFamily" Value="{StaticResource MapleMono}" />
         </Style>
         <Style Selector="TextBox DataValidationErrors">
             <Setter Property="Template">
@@ -148,14 +148,14 @@
                                           Width="{CompiledBinding $parent[StackPanel].Bounds.Width}"
                                           Padding="0" Background="Transparent">
                                     <Expander.Header>
-                                        <TextBlock Text="{CompiledBinding Name }" Margin="0"
+                                        <TextBlock Text="{CompiledBinding Name.Data }" Margin="0"
                                                    Padding="0" />
                                     </Expander.Header>
                                     <Border Padding="10,0" Background="Transparent">
                                         <ItemsControl ItemsSource="{CompiledBinding .}">
                                             <ItemsControl.ItemsPanel>
                                                 <ItemsPanelTemplate>
-                                                    <WrapPanel Orientation="Horizontal" ItemSpacing="5"
+                                                    <WrapPanel Orientation="Horizontal" ItemSpacing="5" LineSpacing="5"
                                                                Background="Transparent" Margin="0" />
                                                 </ItemsPanelTemplate>
                                             </ItemsControl.ItemsPanel>
@@ -163,12 +163,12 @@
                                                 <DataTemplate>
                                                     <RadioButton Classes="GeoRadio"
                                                                  IsCheckedChanged="RadioButtonChecked"
-                                                                 Name="{CompiledBinding Name}">
+                                                                 Tag="{CompiledBinding .}">
                                                         <TextBlock VerticalAlignment="Center"
                                                                    HorizontalAlignment="Center"
                                                                    TextWrapping="Wrap" FontSize="11"
                                                                    TextAlignment="Center" Name="RadioText"
-                                                                   Text="{CompiledBinding Name}" />
+                                                                   Text="{CompiledBinding Name.Data}" />
                                                     </RadioButton>
                                                 </DataTemplate>
                                             </ItemsControl.ItemTemplate>

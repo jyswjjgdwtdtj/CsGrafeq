@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using CsGrafeqApplication.Controls.Displayers;
+using CsGrafeqApplication.ViewModels;
 
 namespace CsGrafeqApplication.Views;
 
@@ -12,6 +13,7 @@ public partial class SettingView : UserControl
     public SettingView(DisplayControl displayControl)
     {
         InitializeComponent();
+        DataContext = new ViewModelBase();
         this.displayControl = displayControl;
         MovingOp.IsChecked=displayControl.MovingOptimization;
         ZoomingOp.IsChecked=displayControl.ZoomingOptimization;
