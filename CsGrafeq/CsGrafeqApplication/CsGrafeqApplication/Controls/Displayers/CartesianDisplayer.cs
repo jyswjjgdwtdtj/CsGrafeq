@@ -399,7 +399,11 @@ public class CartesianDisplayer : Displayer
             Invalidate();
         }
     }
-
+    /// <summary>
+    /// newvalue=unitlength*delta
+    /// </summary>
+    /// <param name="delta"></param>
+    /// <param name="point"></param>
     public override void Zoom(double delta, Point point)
     {
         if (!WheelingStopWatch.IsRunning)
@@ -460,7 +464,10 @@ public class CartesianDisplayer : Displayer
 
     protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
     {
-        if (CallAddonPointerWheeled(e) == DoNext) Zoom(Pow(1.04, e.Delta.Y), e.GetPosition(this));
+        if (CallAddonPointerWheeled(e) == DoNext)
+        {
+            Zoom(Pow(1.04, e.Delta.Y), e.GetPosition(this));
+        }
     }
 
     protected override void OnSizeChanged(SizeChangedEventArgs e)

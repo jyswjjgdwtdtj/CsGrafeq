@@ -7,6 +7,7 @@
     <!-- Avalonia packages -->
     <!-- Important: keep version in sync! -->
     <PackageVersion Include="Avalonia" Version="11.3.7" />
+    <PackageVersion Include="Avalonia.Browser.Blazor" Version="11.3.7" />
     <PackageVersion Include="Avalonia.Controls.ColorPicker" Version="11.3.7" />
     <PackageVersion Include="Avalonia.Controls.DataGrid" Version="11.3.7" />
     <PackageVersion Include="Avalonia.Controls.ItemsRepeater" Version="11.1.5" />
@@ -23,7 +24,7 @@
     <PackageVersion Include="Avalonia.ReactiveUI" Version="11.3.7" />
     <PackageVersion Include="HarfBuzzSharp" Version="8.3.1.2" />
     <PackageVersion Include="HarfBuzzSharp.NativeAssets.WebAssembly" Version="8.3.1.2" />
-    <PackageVersion Include="Microsoft.NET.Runtime.WebAssembly.Sdk" Version="9.0.9" />
+    <PackageVersion Include="Microsoft.NET.Runtime.WebAssembly.Sdk" Version="9.0.10" />
     <PackageVersion Include="PublishAotCompressed" Version="1.0.5" />
     <PackageVersion Include="SkiaSharp" Version="3.119.1" />
     <PackageVersion Include="SkiaSharp.HarfBuzz" Version="3.119.1" />

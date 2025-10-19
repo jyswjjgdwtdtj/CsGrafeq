@@ -12,141 +12,127 @@ public abstract class Addon : UserControl
     public const bool DoNext = true;
     public const bool Intercept = false;
     public readonly CommandManager CmdManager = new();
-    private readonly OnceLock IsLoaded = new();
-
-    private Displayer? _Owner;
+    private readonly OnceLock IsAddonLoaded = new();
 
     //Addon内部勿动
     public SKBitmap Bitmap = new();
-    public bool IsEnabled = true;
+    public bool IsAddonEnabled { get; set; } = true;
 
     public virtual Displayer? Owner
     {
-        get => _Owner;
+        get => field;
         set
         {
-            _Owner = value;
-            IsLoaded.SetValueTrue();
+            field = value;
+            IsAddonLoaded.SetValueTrue();
         }
     }
 
-    public abstract string Name { get; }
+    public abstract string AddonName { get; }
 
-    public Control Setting { get; init; }
+    public Control? Setting { get; init; }
     protected abstract void Render(SKCanvas dc, SKRect rect);
 
-    internal void AddonRender(SKCanvas dc, SKRect rect)
+    internal void CallAddonRender(SKCanvas dc, SKRect rect)
     {
-        if (IsLoaded.Value)
+        if (IsAddonLoaded.Value)
             Render(dc, rect);
     }
 
-    internal bool AddonKeyPress(KeyEventArgs e)
+    internal bool CallAddonKeyDown(KeyEventArgs e)
     {
-        if (!IsLoaded.Value || !IsEnabled)
+        if (!IsAddonLoaded.Value || !IsAddonEnabled ||Owner==null)
             return DoNext;
-        return KeyPress(e);
+        return AddonKeyDown(e);
     }
 
-    internal bool AddonKeyDown(KeyEventArgs e)
+    internal bool CallAddonKeyUp(KeyEventArgs e)
     {
-        if (!IsLoaded.Value || !IsEnabled)
+        if (!IsAddonLoaded.Value || !IsAddonEnabled ||Owner==null)
             return DoNext;
-        return KeyDown(e);
+        return AddonKeyUp(e);
     }
 
-    internal bool AddonKeyUp(KeyEventArgs e)
+    internal bool CallAddonPointerMoved(AddonPointerEventArgs e)
     {
-        if (!IsLoaded.Value || !IsEnabled)
+        if (!IsAddonLoaded.Value || !IsAddonEnabled ||Owner==null)
             return DoNext;
-        return KeyUp(e);
+        return AddonPointerMoved(e);
     }
 
-    internal bool AddonPointerMoved(AddonPointerEventArgs e)
+    internal bool CallAddonPointerPressed(AddonPointerEventArgs e)
     {
-        if (!IsLoaded.Value || !IsEnabled)
+        if (!IsAddonLoaded.Value || !IsAddonEnabled ||Owner==null)
             return DoNext;
-        return PointerMoved(e);
+        return AddonPointerPressed(e);
     }
 
-    internal bool AddonPointerPressed(AddonPointerEventArgs e)
+    internal bool CallAddonPointerReleased(AddonPointerEventArgs e)
     {
-        if (!IsLoaded.Value || !IsEnabled)
+        if (!IsAddonLoaded.Value || !IsAddonEnabled ||Owner==null)
             return DoNext;
-        return PointerPressed(e);
+        return AddonPointerReleased(e);
     }
 
-    internal bool AddonPointerReleased(AddonPointerEventArgs e)
+    internal bool CallAddonPointerWheeled(AddonPointerWheelEventArgs e)
     {
-        if (!IsLoaded.Value || !IsEnabled)
+        if (!IsAddonLoaded.Value || !IsAddonEnabled ||Owner==null)
             return DoNext;
-        return PointerReleased(e);
+        return AddonPointerWheeled(e);
     }
 
-    internal bool AddonPointerWheeled(AddonPointerWheelEventArgs e)
+    internal bool CallAddonPointerTapped(AddonPointerEventArgsBase e)
     {
-        if (!IsLoaded.Value || !IsEnabled)
+        if (!IsAddonLoaded.Value || !IsAddonEnabled ||Owner==null)
             return DoNext;
-        return PointerWheeled(e);
+        return AddonPointerTapped(e);
     }
 
-    internal bool AddonPointerTapped(AddonPointerEventArgsBase e)
+    internal bool CallAddonPointerDoubleTapped(AddonPointerEventArgsBase e)
     {
-        if (!IsLoaded.Value || !IsEnabled)
+        if (!IsAddonLoaded.Value || !IsAddonEnabled ||Owner==null)
             return DoNext;
-        return PointerTapped(e);
-    }
-
-    internal bool AddonPointerDoubleTapped(AddonPointerEventArgsBase e)
-    {
-        if (!IsLoaded.Value || !IsEnabled)
-            return DoNext;
-        return PointerDoubleTapped(e);
+        return AddonPointerDoubleTapped(e);
     }
 
     //true代表可继续传递
     //false代表拦截
-    protected virtual bool KeyDown(KeyEventArgs e)
+    protected virtual bool AddonKeyDown(KeyEventArgs e)
     {
         return DoNext;
     }
 
-    protected virtual bool KeyUp(KeyEventArgs e)
+    protected virtual bool AddonKeyUp(KeyEventArgs e)
     {
         return DoNext;
     }
 
-    protected virtual bool KeyPress(KeyEventArgs e)
+    protected virtual bool AddonPointerReleased(AddonPointerEventArgs e)
     {
         return DoNext;
     }
 
-    protected virtual bool PointerReleased(AddonPointerEventArgs e)
+    protected virtual bool AddonPointerPressed(AddonPointerEventArgs e)
     {
         return DoNext;
     }
 
-    protected virtual bool PointerPressed(AddonPointerEventArgs e)
+    protected virtual bool AddonPointerMoved(AddonPointerEventArgs e)
     {
         return DoNext;
     }
 
-    protected virtual bool PointerMoved(AddonPointerEventArgs e)
+    protected virtual bool AddonPointerTapped(AddonPointerEventArgsBase e)
     {
         return DoNext;
     }
 
-    protected virtual bool PointerTapped(AddonPointerEventArgsBase e)
+    protected virtual bool AddonPointerDoubleTapped(AddonPointerEventArgsBase e)
     {
         return DoNext;
     }
 
-    protected virtual bool PointerDoubleTapped(AddonPointerEventArgsBase e)
-    {
-        return DoNext;
-    }
-
-    protected virtual bool PointerWheeled(AddonPointerWheelEventArgs e)
+    protected virtual bool AddonPointerWheeled(AddonPointerWheelEventArgs e)
     {
         return DoNext;
     }
@@ -195,7 +181,6 @@ public abstract class Addon : UserControl
     public class AddonPointerEventArgs : AddonPointerEventArgsBase
     {
         public readonly PointerPointProperties Properties;
-        public readonly double X, Y;
 
         public AddonPointerEventArgs(double x, double y, PointerPointProperties properties, KeyModifiers modifiers) :
             base(x, y, modifiers)

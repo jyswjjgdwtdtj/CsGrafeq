@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net9.0-android</TargetFramework>
+        <TargetFramework>net10.0-android</TargetFramework>
         <SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
         <Nullable>enable</Nullable>
         <ApplicationId>com.JYSW.CsGrafeq</ApplicationId>
         <ApplicationVersion>1</ApplicationVersion>
-        <ApplicationDisplayVersion>0.0.2</ApplicationDisplayVersion>
+        <ApplicationDisplayVersion>0.0.4</ApplicationDisplayVersion>
         <AndroidPackageFormat>apk</AndroidPackageFormat>
         <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
         <UseAppHost>true</UseAppHost>

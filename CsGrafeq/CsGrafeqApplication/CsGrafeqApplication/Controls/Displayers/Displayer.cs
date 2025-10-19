@@ -1,14 +1,15 @@
-﻿using System.Collections.Specialized;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Input.GestureRecognizers;
 using Avalonia.Metadata;
 using CsGrafeqApplication.Addons;
 using SkiaSharp;
-using AvaPoint = Avalonia.Point;
+using System;
+using System.Collections.Specialized;
 using AddonPointerEventArgs = CsGrafeqApplication.Addons.Addon.AddonPointerEventArgs;
-using AddonPointerWheelEventArgs = CsGrafeqApplication.Addons.Addon.AddonPointerWheelEventArgs;
 using AddonPointerEventArgsBase = CsGrafeqApplication.Addons.Addon.AddonPointerEventArgsBase;
+using AddonPointerWheelEventArgs = CsGrafeqApplication.Addons.Addon.AddonPointerWheelEventArgs;
+using AvaPoint = Avalonia.Point;
 
 namespace CsGrafeqApplication.Controls.Displayers;
 
@@ -30,7 +31,7 @@ public abstract class Displayer : SkiaControl
             { CanHorizontallyScroll = false, CanVerticallyScroll = false });
         GestureRecognizers.Add(new PinchGestureRecognizer());
         AddHandler(Gestures.ScrollGestureEvent, (s, e) => { Zoom(Pow(1.04, e.Delta.Y), Bounds.Center); });
-        AddHandler(Gestures.PinchEvent, (s, e) => { Zoom(e.Scale - 1, e.ScaleOrigin); });
+        AddHandler(Gestures.PinchEvent, (s, e) => { Zoom(e.Scale, e.ScaleOrigin); });
         Languages.LanguageChanged += Invalidate;
     }
 
@@ -79,7 +80,7 @@ public abstract class Displayer : SkiaControl
         var loc = LastPoint;
         var args = new AddonPointerEventArgs(loc.X, loc.Y, e.Properties, e.KeyModifiers);
         foreach (var addon in Addons)
-            if (addon.AddonPointerPressed(args) == Intercept)
+            if (addon.CallAddonPointerPressed(args) == Intercept)
                 return Intercept;
         return DoNext;
     }
@@ -91,7 +92,7 @@ public abstract class Displayer : SkiaControl
         var loc = LastPoint;
         var args = new AddonPointerEventArgs(loc.X, loc.Y, e.Properties, e.KeyModifiers);
         foreach (var addon in Addons)
-            if (addon.AddonPointerMoved(args) == Intercept)
+            if (addon.CallAddonPointerMoved(args) == Intercept)
                 return Intercept;
         return DoNext;
     }
@@ -103,7 +104,7 @@ public abstract class Displayer : SkiaControl
         var loc = LastPoint;
         var args = new AddonPointerEventArgs(loc.X, loc.Y, e.Properties, e.KeyModifiers);
         foreach (var addon in Addons)
-            if (addon.AddonPointerReleased(args) == Intercept)
+            if (addon.CallAddonPointerReleased(args) == Intercept)
                 return Intercept;
         return DoNext;
     }
@@ -116,7 +117,7 @@ public abstract class Displayer : SkiaControl
         var args = new AddonPointerWheelEventArgs(loc.X, loc.Y, e.Properties, e.KeyModifiers,
             new Vec(e.Delta.X, e.Delta.Y));
         foreach (var addon in Addons)
-            if (addon.AddonPointerWheeled(args) == Intercept)
+            if (addon.CallAddonPointerWheeled(args) == Intercept)
                 return Intercept;
         return DoNext;
     }
@@ -128,7 +129,7 @@ public abstract class Displayer : SkiaControl
         var loc = e.GetPosition(this);
         var args = new AddonPointerEventArgsBase(loc.X, loc.Y, e.KeyModifiers);
         foreach (var addon in Addons)
-            if (addon.AddonPointerTapped(args) == Intercept)
+            if (addon.CallAddonPointerTapped(args) == Intercept)
                 return Intercept;
         return DoNext;
     }
@@ -138,7 +139,7 @@ public abstract class Displayer : SkiaControl
         var loc = e.GetPosition(this);
         var args = new AddonPointerEventArgsBase(loc.X, loc.Y, e.KeyModifiers);
         foreach (var addon in Addons)
-            if (addon.AddonPointerDoubleTapped(args) == Intercept)
+            if (addon.CallAddonPointerDoubleTapped(args) == Intercept)
                 return Intercept;
         return DoNext;
     }
@@ -146,15 +147,7 @@ public abstract class Displayer : SkiaControl
     protected bool CallAddonKeyDown(KeyEventArgs e)
     {
         foreach (var addon in Addons)
-            if (addon.AddonKeyDown(e) == Intercept)
-                return Intercept;
-        return DoNext;
-    }
-
-    protected bool CallAddonKeyPress(KeyEventArgs e)
-    {
-        foreach (var addon in Addons)
-            if (addon.AddonKeyPress(e) == Intercept)
+            if (addon.CallAddonKeyDown(e) == Intercept)
                 return Intercept;
         return DoNext;
     }
@@ -162,7 +155,7 @@ public abstract class Displayer : SkiaControl
     protected bool CallAddonKeyUp(KeyEventArgs e)
     {
         foreach (var addon in Addons)
-            if (addon.AddonKeyUp(e) == Intercept)
+            if (addon.CallAddonKeyUp(e) == Intercept)
                 return Intercept;
         return DoNext;
     }
@@ -194,7 +187,7 @@ public abstract class Displayer : SkiaControl
             using (var dc = new SKCanvas(addon.Bitmap))
             {
                 dc.Clear();
-                addon.AddonRender(dc, Bounds.ToSKRect());
+                addon.CallAddonRender(dc, Bounds.ToSKRect());
             }
 
         CompoundBuffer();
@@ -209,7 +202,7 @@ public abstract class Displayer : SkiaControl
             using (var dc = new SKCanvas(i.Bitmap))
             {
                 dc.Clear(SKColors.Transparent);
-                i.AddonRender(dc, Bounds.ToSKRect());
+                i.CallAddonRender(dc, Bounds.ToSKRect());
             }
 
         CompoundBuffer();
@@ -224,7 +217,7 @@ public abstract class Displayer : SkiaControl
             using (var dc = new SKCanvas(i.Bitmap))
             {
                 dc.Clear(SKColors.Transparent);
-                i.AddonRender(dc, Bounds.ToSKRect());
+                i.CallAddonRender(dc, Bounds.ToSKRect());
             }
 
         CompoundBuffer();

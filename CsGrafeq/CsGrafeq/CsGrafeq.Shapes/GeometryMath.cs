@@ -5,17 +5,6 @@ namespace CsGrafeq.Shapes;
 
 public static class GeometryMath
 {
-    public static (Vec, Vec) GetPointFromCircleAndLine(Vec v1, Vec v2, Vec cp, double radius)
-    {
-        var dx = v2.X - v1.X;
-        var dy = v2.Y - v1.Y;
-        var t = ((cp.X - v1.X) * dx + (cp.Y - v1.Y) * dy) / (dx * dx + dy * dy);
-        var nv = new Vec(v1.X + t * dx, v1.Y + t * dy);
-        var m = new Vec(dx, dy).Unit() * Sqrt(radius * radius - Pow((cp - nv).GetLength(), 2));
-        v1 = nv - m;
-        v2 = nv + m;
-        return (v1, v2);
-    }
 
     public static (Vec, Vec) GetValidVec(Vec v1, Vec v2, Vec v3, Vec v4)
     {
@@ -52,36 +41,25 @@ public static class GeometryMath
         return new Vec(x, y);
     }
 
-    public static Vec GetIntersectionPoint(Vec s1, Vec e1, Vec s2, Vec e2)
-    {
-        double k1, k2;
-        k1 = (s1.Y - e1.Y) / (s1.X - e1.X);
-        k2 = (s2.Y - e2.Y) / (s2.X - e2.X);
-        if (k1 == k2)
-            return Vec.Invalid;
-        if (s1.X == e1.X) return new Vec(s1.X, k2 * s1.X - k2 * s2.X + s2.Y);
-        if (s2.X == e2.X) return new Vec(s2.X, k1 * s2.X - k1 * s1.X + s1.Y);
-        var x = (k1 * s1.X - s1.Y + s2.Y - k2 * s2.X) / (k1 - k2);
-        return new Vec(x, k1 * x - k1 * s1.X + s1.Y);
-    }
+    
 
     /// <summary>
     ///     ss,se为线段 s,e为直线
     /// </summary>
-    public static Vec GetIntersectionLSAndSL(Vec ss, Vec es, Vec s, Vec e)
+    public static Vec GetIntersectionOfSegmentAndLine(Vec segmentStart, Vec segmentEnd, Vec lineStart, Vec lineEnd)
     {
-        var j = GetIntersectionPoint(ss, es, s, e);
-        if (RangeIn(ss.X, es.X, j.X) && RangeIn(ss.Y, es.Y, j.Y)) return j;
+        var j = IntersectionMath.FromTwoLine(segmentStart, segmentEnd, lineStart, lineEnd);
+        if (RangeIn(segmentStart.X, segmentEnd.X, j.X) && RangeIn(segmentStart.Y, segmentEnd.Y, j.Y)) return j;
         return new Vec(double.NaN, double.NaN);
     }
 
-    public static Vec GetIntersectionSLAndSL(Vec ss, Vec es, Vec s, Vec e)
+    public static Vec GetIntersectionOfTwoSegments(Vec s1, Vec e1, Vec s2, Vec e2)
     {
-        var j = GetIntersectionPoint(ss, es, s, e);
-        if (RangeIn(ss.X, es.X, j.X) &&
-            RangeIn(ss.Y, es.Y, j.Y) &&
-            RangeIn(s.X, e.X, j.X) &&
-            RangeIn(s.Y, e.Y, j.Y))
+        var j = IntersectionMath.FromTwoLine(s1, e1, s2, e2);
+        if (RangeIn(s1.X, e1.X, j.X) &&
+            RangeIn(s1.Y, e1.Y, j.Y) &&
+            RangeIn(s2.X, e2.X, j.X) &&
+            RangeIn(s2.Y, e2.Y, j.Y))
             return j;
         return new Vec(double.NaN, double.NaN);
     }

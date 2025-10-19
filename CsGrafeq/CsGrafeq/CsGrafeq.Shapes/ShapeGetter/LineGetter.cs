@@ -7,99 +7,9 @@ public abstract class LineGetter : GeometryGetter
 {
     public override string ActionName => "Line";
     public override GeometryShape[] Parameters => [];
-    public abstract TwoPoint GetLine();
+    public abstract LineStruct GetLine();
 
-    public readonly struct TwoPoint
-    {
-        public readonly Vec Point1, Point2;
-
-        public TwoPoint(Vec point1, Vec point2)
-        {
-            Point1 = point1;
-            Point2 = point2;
-        }
-
-        public (double a, double b, double c) GetNormal()
-        {
-            if (Point1.X == Point2.X)
-                return (1, 0, -Point2.X);
-            if (Point1.Y == Point2.Y)
-                return (0, 1, -Point2.Y);
-            return (Point2.Y - Point1.Y, Point1.X - Point2.X, Point2.X * Point1.Y - Point1.X * Point2.Y);
-        }
-
-        public string ExpStr
-        {
-            get
-            {
-                var (a, b, c) = GetNormal();
-                var sb = new StringBuilder();
-                if (a == 0)
-                {
-                    //do nothing
-                }
-                else if (a == 1)
-                {
-                    sb.Append("x");
-                }
-                else if (a == -1)
-                {
-                    sb.Append("-x");
-                }
-                else
-                {
-                    sb.Append(a + "x");
-                }
-
-                if (b == 0)
-                {
-                    //do nothing
-                }
-                else if (b == 1)
-                {
-                    sb.Append("+y");
-                }
-                else if (b == -1)
-                {
-                    sb.Append("-y");
-                }
-                else if (b > 0)
-                {
-                    sb.Append("+" + b + "y");
-                }
-                else
-                {
-                    sb.Append(b + "y");
-                }
-
-                if (c == 0)
-                {
-                    //do nothing
-                }
-                else if (c == 1)
-                {
-                    sb.Append("+1");
-                }
-                else if (c == -1)
-                {
-                    sb.Append("-1");
-                }
-                else if (c > 0)
-                {
-                    sb.Append("+" + c);
-                }
-                else
-                {
-                    sb.Append(c);
-                }
-
-                sb.Append("=0");
-                return sb.ToString();
-            }
-        }
-
-        public double Distance => (Point1 - Point2).GetLength();
-    }
+    
 }
 
 public abstract class LineGetter_TwoPoint : LineGetter
@@ -139,9 +49,9 @@ public class LineGetter_Connected : LineGetter_TwoPoint
 
     public override string ActionName => "Staight";
 
-    public override TwoPoint GetLine()
+    public override LineStruct GetLine()
     {
-        return new TwoPoint(Point1.Location, Point2.Location);
+        return new LineStruct(Point1.Location, Point2.Location);
     }
 }
 
@@ -174,7 +84,7 @@ public class LineGetter_PerpendicularBisector : LineGetter_TwoPoint
 
     public override string ActionName => "PerpendicularBisector";
 
-    public override TwoPoint GetLine()
+    public override LineStruct GetLine()
     {
         var RealPoint1 = (Vec)Point1.Location;
         var RealPoint2 = (Vec)Point2.Location;
@@ -187,7 +97,7 @@ public class LineGetter_PerpendicularBisector : LineGetter_TwoPoint
             p2 = new Vec(p1.X + Cos(theta), p1.Y - Cos(theta) / k);
         else
             p2 = new Vec(p1.X - Cos(theta), p1.Y + Cos(theta) / k);
-        return new TwoPoint(p1, p2);
+        return new LineStruct(p1, p2);
     }
 }
 
@@ -225,7 +135,7 @@ public class LineGetter_AngleBisector : LineGetter
         AnglePoint.SubShapes.Remove(subShape);
     }
 
-    public override TwoPoint GetLine()
+    public override LineStruct GetLine()
     {
         var p1 = (Vec)Point1.Location;
         var p2 = (Vec)Point2.Location;
@@ -241,7 +151,7 @@ public class LineGetter_AngleBisector : LineGetter
             v2 = new Vec(ap.X, ap.Y - 1);
         else
             v2 = new Vec(ap.X - Cos(theta), ap.Y - Sin(theta));
-        return new TwoPoint(v1, v2);
+        return new LineStruct(v1, v2);
     }
 }
 
@@ -283,7 +193,7 @@ public class LineGetter_Vertical : LineGetter_PointAndLine
 
     public override string ActionName => "Vertical";
 
-    public override TwoPoint GetLine()
+    public override LineStruct GetLine()
     {
         var v1 = Point.Location;
         Vec v2;
@@ -294,7 +204,7 @@ public class LineGetter_Vertical : LineGetter_PointAndLine
             v2 = new Vec(v1.X + Cos(theta), v1.Y - Cos(theta) / k);
         else
             v2 = new Vec(v1.X - Cos(theta), v1.Y + Cos(theta) / k);
-        return new TwoPoint(v1, v2);
+        return new LineStruct(v1, v2);
     }
 }
 
@@ -306,7 +216,7 @@ public class LineGetter_Parallel : LineGetter_PointAndLine
 
     public override string ActionName => "Parallel";
 
-    public override TwoPoint GetLine()
+    public override LineStruct GetLine()
     {
         var v1 = Point.Location;
         Vec v2;
@@ -320,7 +230,7 @@ public class LineGetter_Parallel : LineGetter_PointAndLine
             v2 = new Vec(v1.X + Cos(theta), v1.Y + Cos(theta) * k);
         else
             v2 = new Vec(v1.X - Cos(theta), v1.Y - Cos(theta) * k);
-        return new TwoPoint(v1, v2);
+        return new LineStruct(v1, v2);
     }
 }
 
@@ -335,7 +245,7 @@ public class LineGetter_Fitted : LineGetter
     public Point[] Points { get; init; }
     public override GeometryShape[] Parameters => [..Points];
 
-    public override TwoPoint GetLine()
+    public override LineStruct GetLine()
     {
         double meanX = 0, meanY = 0;
         var Vecs = new Vec[Points.Length];
@@ -371,7 +281,7 @@ public class LineGetter_Fitted : LineGetter
             Point2 = new Vec(2, 2 * m + b);
         }
 
-        return new TwoPoint(Point1, Point2);
+        return new LineStruct(Point1, Point2);
     }
 
     public override void Attach(ShapeChangedHandler handler, GeometryShape subShape)

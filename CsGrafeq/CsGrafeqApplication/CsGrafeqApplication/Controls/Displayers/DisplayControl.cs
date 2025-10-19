@@ -1,7 +1,8 @@
 ﻿using Avalonia.Input;
 using SkiaSharp;
-using static CsGrafeqApplication.Controls.SkiaEx;
+using System;
 using static CsGrafeq.Extension;
+using static CsGrafeqApplication.Controls.SkiaEx;
 
 namespace CsGrafeqApplication.Controls.Displayers;
 
@@ -23,7 +24,6 @@ public class DisplayControl : CartesianDisplayer
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         if (!e.Pointer.IsPrimary) return;
-        Focus();
         StopWheeling();
         if (CallAddonPointerPressed(e) == DoNext)
         {
@@ -33,15 +33,13 @@ public class DisplayControl : CartesianDisplayer
                 MouseDownPos = new PointL { X = (long)p.X, Y = (long)p.Y };
                 MouseDownZeroPos = Zero;
             }
-
             LastZeroPos = Zero;
+            base.OnPointerPressed(e);
         }
         else
         {
             CompoundBuffer();
         }
-
-        Focus();
     }
 
     protected override void OnPointerMoved(PointerEventArgs e)
@@ -87,7 +85,7 @@ public class DisplayControl : CartesianDisplayer
                                         newbmpcanvas.Clear(SKColors.Transparent);
                                         newbmpcanvas.DrawBitmap(i.Bitmap, Zero.X - LastZeroPos.X,
                                             Zero.Y - LastZeroPos.Y);
-                                        RenderMovedPlace(newbmpcanvas, i.AddonRender);
+                                        RenderMovedPlace(newbmpcanvas, i.CallAddonRender);
                                     }
 
                                     i.Bitmap.Dispose();
@@ -102,7 +100,7 @@ public class DisplayControl : CartesianDisplayer
                                 foreach (var i in Addons)
                                 {
                                     dc.DrawBitmap(i.Bitmap, Zero.X - LastZeroPos.X, Zero.Y - LastZeroPos.Y);
-                                    RenderMovedPlace(dc, i.AddonRender);
+                                    RenderMovedPlace(dc, i.CallAddonRender);
                                 }
                             }
 
@@ -113,6 +111,7 @@ public class DisplayControl : CartesianDisplayer
                     InvalidateVisual();
                 }
             }
+            base.OnPointerMoved(e);
         }
         else
         {
@@ -132,6 +131,7 @@ public class DisplayControl : CartesianDisplayer
         {
             if (LastZeroPos != Zero) Invalidate();
             LastZeroPos = Zero;
+            base.OnPointerReleased(e);
         }
         else
         {
@@ -190,17 +190,26 @@ public class DisplayControl : CartesianDisplayer
     {
         if (CallAddonKeyDown(e) == DoNext)
         {
+            base.OnKeyDown(e);
+        }
+        else
+        {
+            e.Handled = true;
         }
 
-        e.Handled = true;
     }
 
     protected override void OnKeyUp(KeyEventArgs e)
     {
         if (CallAddonKeyUp(e) == DoNext)
         {
+            base.OnKeyUp(e);
+        }
+        else
+        {
+
+            e.Handled = true;
         }
 
-        e.Handled = true;
     }
 }

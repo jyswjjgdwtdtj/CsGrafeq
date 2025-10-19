@@ -5,6 +5,7 @@ namespace CsGrafeq.Shapes;
 
 public abstract class GeometryShape : Shape
 {
+    public readonly static GeometryShape Null= new NullGeometryShape();
     public List<GeometryShape> SubShapes = new();
     public abstract GeometryGetter Getter { get; }
 

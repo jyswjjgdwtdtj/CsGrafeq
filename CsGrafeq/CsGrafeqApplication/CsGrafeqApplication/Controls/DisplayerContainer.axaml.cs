@@ -3,6 +3,7 @@ using System.Threading;
 using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
@@ -27,6 +28,7 @@ public partial class DisplayerContainer : UserControl
 
     public DisplayerContainer()
     {
+        KeyDown += GlobalKeyDown;
         DataContext = VM;
         VM.Displayer = new DisplayControl { Addons = { new GeometryPad() } };
         InitializeComponent();
@@ -100,7 +102,100 @@ public partial class DisplayerContainer : UserControl
         MsgBoxContainer.IsVisible = false;
         PopupBack.Background = null;
     }
-
+    private void GlobalKeyDown(object? sender, KeyEventArgs e)
+    {
+        switch (e.Key)
+        {
+            case Key.Delete:
+                {
+                    if (e.KeyModifiers == KeyModifiers.None)
+                    {
+                        Delete_Clicked(sender, e);
+                        e.Handled = true;
+                    }
+                }
+                break;
+            case Key.A:
+                {
+                    if (e.KeyModifiers == KeyModifiers.Control)
+                    {
+                        SelectAll_Clicked(sender, e);
+                        e.Handled = true;
+                    }
+                }
+                break;
+            case Key.OemComma: // Ctrl + ,
+                {
+                    if (e.KeyModifiers == KeyModifiers.Control)
+                    {
+                        Setting_Clicked(sender, e);
+                        e.Handled = true;
+                    }
+                }
+                break;
+            case Key.Z: // Ctrl+Z ³·Ïú
+                {
+                    if (e.KeyModifiers == KeyModifiers.Control)
+                    {
+                        StepBack_Clicked(sender, e);
+                        e.Handled = true;
+                    }
+                    if (e.KeyModifiers == (KeyModifiers.Control | KeyModifiers.Shift))
+                    {
+                        StepOver_Clicked(sender, e);
+                        e.Handled = true;
+                    }
+                }
+                break;
+            case Key.Y: // Ctrl+Y ÖØ×ö
+                {
+                    if (e.KeyModifiers == KeyModifiers.Control)
+                    {
+                        StepOver_Clicked(sender, e);
+                        e.Handled = true;
+                    }
+                }
+                break;
+            case Key.OemPlus: // Ctrl + +
+            case Key.Add:
+                {
+                    if (e.KeyModifiers == KeyModifiers.Control)
+                    {
+                        ZoomIn_Clicked(sender, e);
+                        e.Handled = true;
+                    }
+                }
+                break;
+            case Key.OemMinus: // Ctrl + -
+            case Key.Subtract:
+                {
+                    if (e.KeyModifiers == KeyModifiers.Control)
+                    {
+                        ZoomOut_Clicked(sender, e);
+                        e.Handled = true;
+                    }
+                }
+                break;
+            case Key.Escape:
+                {
+                    if (e.KeyModifiers == KeyModifiers.None)
+                    {
+                        DeSelectAll_Clicked(sender, e);
+                        e.Handled = true;
+                    }
+                }
+                break;
+            case Key.B:
+                {
+                    if (e.KeyModifiers == KeyModifiers.Control)
+                    {
+                        DeSelectAll_Clicked(sender, e);
+                        e.Handled = true;
+                    }
+                }
+                break;
+        }
+    }
     private void Setting_Clicked(object? sender, RoutedEventArgs e)
     {
         MsgBox(new SettingView(VM.Displayer as DisplayControl));
@@ -142,7 +237,7 @@ public partial class DisplayerContainer : UserControl
 
     private void LanguageSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        Languages.SetLanguage(Languages.AllowedLanguages[(sender as ComboBox)?.SelectedIndex??0]);
-        
+        Languages.SetLanguage(Languages.AllowedLanguages[(sender as ComboBox)?.SelectedIndex ?? 0]);
+
     }
 }

@@ -19,8 +19,6 @@ using AvaRect = Avalonia.Rect;
 using AvaSize = Avalonia.Size;
 using GeoHalf = CsGrafeq.Shapes.Half;
 using static CsGrafeqApplication.AvaloniaMath;
-using static CsGrafeqApplication.Properties.Resources;
-using static CsGrafeqApplication.Properties.Resources;
 
 namespace CsGrafeqApplication.Addons.GeometryPad;
 
@@ -28,14 +26,14 @@ public partial class GeometryPad : Addon
 {
     private static readonly double PointerTouchRange = OS.GetOSType() == OSType.Android ? 15 : 5;
     private readonly List<ActionData> Actions = new();
-    private Func<Vec, AvaPoint> MathToPixel;
-    protected Func<Vec, SKPoint> MathToPixelSK;
     private GeoPoint? MovingPoint;
-    private Vector2<string> MovingPointEndPos;
-    private Vector2<string> MovingPointStartPos;
-    protected Func<AvaPoint, Vec> PixelToMath;
-    protected Func<SKPoint, Vec> PixelToMathSK;
-    protected Func<double, double> PixelToMathX, PixelToMathY, MathToPixelX, MathToPixelY;
+    private Vector2<string> MovingPointEndPos=new("0","0");
+    private Vector2<string> MovingPointStartPos = new("0", "0");
+    protected Func<AvaPoint, Vec> PixelToMath=VoidFunc<AvaPoint,Vec>;
+    protected Func<SKPoint, Vec> PixelToMathSK= VoidFunc<SKPoint, Vec>;
+    private Func<Vec, AvaPoint> MathToPixel=VoidFunc<Vec,AvaPoint>;
+    protected Func<Vec, SKPoint> MathToPixelSK=VoidFunc<Vec,SKPoint>;
+    protected Func<double, double> PixelToMathX=VoidFunc<double,double>, PixelToMathY=VoidFunc<double, double>, MathToPixelX=VoidFunc<double, double>, MathToPixelY=VoidFunc<double, double>;
     private AvaPoint PointerMovedPos;
     private Vec PointerPressedMovingPointPos;
     private AvaPoint PointerPressedPos;
@@ -52,7 +50,7 @@ public partial class GeometryPad : Addon
         foreach (var i in VM!.Actions)
         foreach (var j in i)
             Actions!.Add(j);
-        GeoPadAction = Actions.FirstOrDefault();
+        GeoPadAction = Actions.First();
         Shapes.CollectionChanged += (s, e) => { Owner?.Invalidate(this); };
         Shapes.OnShapeChanged += () => { Owner?.Invalidate(this); };
 #if DEBUG
@@ -63,6 +61,10 @@ public partial class GeometryPad : Addon
         var c1 = AddShape(new Circle(new CircleGetter_FromCenterAndRadius(p1)));
 #endif
         InitializeComponent();
+    }
+    private static TOutput VoidFunc<TInput, TOutput>(TInput d) where TOutput : struct
+    {
+        return default;
     }
 
     internal ActionData GeoPadAction { get; private set; }
@@ -76,21 +78,23 @@ public partial class GeometryPad : Addon
         {
             if (!(value is CartesianDisplayer))
                 throw new Exception();
+            if(value == null)
+                throw new ArgumentNullException(nameof(value));
             base.Owner = value;
-            PixelToMathX = Owner.PixelToMathX;
-            PixelToMathY = Owner.PixelToMathY;
-            PixelToMath = Owner.PixelToMath;
-            PixelToMathSK = Owner.PixelToMath;
-            MathToPixelX = Owner.MathToPixelX;
-            MathToPixelY = Owner.MathToPixelY;
-            MathToPixel = Owner.MathToPixel;
-            MathToPixelSK = Owner.MathToPixelSK;
+            PixelToMathX = value.PixelToMathX;
+            PixelToMathY = value.PixelToMathY;
+            PixelToMath = value.PixelToMath;
+            PixelToMathSK = value.PixelToMath;
+            MathToPixelX = value.MathToPixelX;
+            MathToPixelY = value.MathToPixelY;
+            MathToPixel = value.MathToPixel;
+            MathToPixelSK = value.MathToPixelSK;
 #if DEBUG
 #endif
         }
     }
 
-    public override string Name => "GeometryPad";
+    public override string AddonName => "GeometryPad";
 
     internal void SetAction(ActionData ad)
     {
@@ -125,8 +129,9 @@ public partial class GeometryPad : Addon
         foreach (var shape in Shapes.OfType<GeometryShape>().ToArray())
             shape.Selected = false;
     }
-    protected override bool KeyDown(KeyEventArgs e)
+    protected override bool AddonKeyDown(KeyEventArgs e)
     {
+        if (Owner == null) return DoNext;
         Owner.Suspend();
         var res = DoNext;
         switch (e.Key)
@@ -136,7 +141,7 @@ public partial class GeometryPad : Addon
                 foreach (var shape in Shapes.GetSelectedShapes<GeometryShape>().ToArray())
                     if (shape.Selected)
                     {
-                        res &= Intercept;
+                        res = Intercept;
                         shape.Selected = false;
                         foreach (var subshape in shape.SubShapes) subshape.Selected = true;
                     }
@@ -165,7 +170,7 @@ public partial class GeometryPad : Addon
         public readonly string PreviousText;
 
         public TextChangedCommand(string previous, string current, ExpNumber target, TextBox tb)
-            : base(null, _ => { }, _ => { }, _ => { })
+            : base(new object(), _ => { }, _ => { }, _ => { })
         {
             PreviousText = previous;
             CurrentText = current;
@@ -200,8 +205,9 @@ public partial class GeometryPad : Addon
 
     private bool IsMovingPointMovable;
 
-    protected override bool PointerPressed(AddonPointerEventArgs e)
+    protected override bool AddonPointerPressed(AddonPointerEventArgs e)
     {
+        if (Owner == null) return DoNext;
         PointerProperties = e.Properties;
         PointerPressedPos = e.Location;
         if (GeoPadAction.Name.English == "Select")
@@ -232,8 +238,9 @@ public partial class GeometryPad : Addon
         return DoNext;
     }
 
-    protected override bool PointerMoved(AddonPointerEventArgs e)
+    protected override bool AddonPointerMoved(AddonPointerEventArgs e)
     {
+        if (Owner == null) return DoNext;
         PointerProperties = e.Properties;
         Owner.Suspend();
         PointerMovedPos = e.Location;
@@ -310,8 +317,9 @@ public partial class GeometryPad : Addon
         return DoNext;
     }
 
-    protected override bool PointerReleased(AddonPointerEventArgs e)
+    protected override bool AddonPointerReleased(AddonPointerEventArgs e)
     {
+        if (Owner == null) return DoNext;
         PointerProperties = e.Properties;
         Owner.Suspend();
         PointerReleasedPos = e.Location;
@@ -341,10 +349,10 @@ public partial class GeometryPad : Addon
                         var RB = new Vec(Owner.PixelToMathX(rect.Right), Owner.PixelToMathY(rect.Top));
                         var LB = new Vec(Owner.PixelToMathX(rect.Left), Owner.PixelToMathY(rect.Top));
                         var vs = GetValidVec(
-                            GetIntersectionLSAndSL(LT, RT, v1, v2),
-                            GetIntersectionLSAndSL(RT, RB, v1, v2),
-                            GetIntersectionLSAndSL(RB, LB, v1, v2),
-                            GetIntersectionLSAndSL(LB, LT, v1, v2)
+                            GetIntersectionOfSegmentAndLine(LT, RT, v1, v2),
+                            GetIntersectionOfSegmentAndLine(RT, RB, v1, v2),
+                            GetIntersectionOfSegmentAndLine(RB, LB, v1, v2),
+                            GetIntersectionOfSegmentAndLine(LB, LT, v1, v2)
                         );
                         vs.Item1 = l.CheckIsValid(vs.Item1) ? vs.Item1 : Vec.Invalid;
                         vs.Item2 = l.CheckIsValid(vs.Item2) ? vs.Item2 : Vec.Invalid;
@@ -415,15 +423,16 @@ public partial class GeometryPad : Addon
         return Intercept;
     }
 
-    protected override bool PointerTapped(AddonPointerEventArgsBase e)
+    protected override bool AddonPointerTapped(AddonPointerEventArgsBase e)
     {
+        if (Owner == null) return DoNext;
         Owner.Suspend();
         using (var ec=new ExitController(() => Owner.Resume()))
         {
             if (GeoPadAction.Name.English == "Put")
             {
                 Shapes.ClearSelected();
-                PutPoint(e.Location).Selected = true;
+                PutPoint(e.Location)?.Selected = true;
                 return Intercept;
             }
 
@@ -455,7 +464,7 @@ public partial class GeometryPad : Addon
             else if (GeoPadAction.Args.Contains(ShapeArg.Point) && GeoPadAction.Name.English != "Move" &&
                      GeoPadAction.Name.English != "Select")
             {
-                PutPoint(e.Location).Selected = true;
+                PutPoint(e.Location)?.Selected = true;
             }
 
             if (GeoPadAction.Name.English != "Move" && GeoPadAction.Name.English != "Select")
@@ -536,7 +545,7 @@ public partial class GeometryPad : Addon
                         return 0;
                     return 1;
                 });
-                var shape=GeometryActions.CreateShape(GeoPadAction.Self,(Getter)GeoPadAction.GetterConstructor.Invoke(SAll.Select(o => (object)o).ToArray()));
+                var shape=GeometryActions.CreateShape(GeoPadAction.Self,(Getter)GeoPadAction.GetterConstructor.Invoke(SAll?.Select(o => (object?)o)?.ToArray() ?? []));
                 AddShape(shape);
                 Shapes.ClearSelected();
             }
@@ -550,6 +559,7 @@ public partial class GeometryPad : Addon
 
     protected override void Render(SKCanvas dc, SKRect rect)
     {
+        if (Owner is null) return;
         rect.Intersect(Owner.ValidRect.ToSKRect());
         dc.Save();
         dc.ClipRect(rect);
@@ -559,7 +569,6 @@ public partial class GeometryPad : Addon
         {
             var selrect = RegulateRectangle(new AvaRect(PointerPressedPos,
                 new AvaSize(PointerMovedPos.X - PointerPressedPos.X, PointerMovedPos.Y - PointerPressedPos.Y)));
-            dc.DrawRect(selrect.ToSKRect(), FilledTpMedian);
             dc.DrawRect(selrect.ToSKRect(), StrokeMedian);
         }
 
@@ -573,7 +582,7 @@ public partial class GeometryPad : Addon
         var RT = new Vec(PixelToMathX(rect.Right), PixelToMathY(rect.Bottom));
         var RB = new Vec(PixelToMathX(rect.Right), PixelToMathY(rect.Top));
         var LB = new Vec(PixelToMathX(rect.Left), PixelToMathY(rect.Top));
-        var cd = Owner as CartesianDisplayer;
+        var cd = (CartesianDisplayer)Owner;
         using (SKPaint TPFilledPaint = new() { IsAntialias = true },
                FilledPaint = new() { IsAntialias = true },
                StrokePaint = new() { IsStroke = true, IsAntialias = true },
@@ -613,10 +622,10 @@ public partial class GeometryPad : Addon
                         var v1 = s.Current.Point1;
                         var v2 = s.Current.Point2;
                         var vs = GetValidVec(
-                            GetIntersectionLSAndSL(LT, RT, v1, v2),
-                            GetIntersectionLSAndSL(RT, RB, v1, v2),
-                            GetIntersectionLSAndSL(RB, LB, v1, v2),
-                            GetIntersectionLSAndSL(LB, LT, v1, v2)
+                            GetIntersectionOfSegmentAndLine(LT, RT, v1, v2),
+                            GetIntersectionOfSegmentAndLine(RT, RB, v1, v2),
+                            GetIntersectionOfSegmentAndLine(RB, LB, v1, v2),
+                            GetIntersectionOfSegmentAndLine(LB, LT, v1, v2)
                         );
                         if (s.Selected)
                             dc.DrawLine(MathToPixelSK(vs.Item1), MathToPixelSK(vs.Item2), StrokePaint);
@@ -636,7 +645,7 @@ public partial class GeometryPad : Addon
                         else
                             dc.DrawLine(MathToPixelSK(v1), MathToPixelSK(v2), StrokePaintMain);
 
-                        dc.DrawBubble($"{SegmentText}:{s.Name}", MathToPixelSK((s.Current.Point1 + s.Current.Point2) / 2),
+                        dc.DrawBubble($"{MultiLanguageResources.Instance.SegmentText}:{s.Name}", MathToPixelSK((s.Current.Point1 + s.Current.Point2) / 2),
                             BubbleBack, PaintMain);
                     }
                         break;
@@ -645,10 +654,10 @@ public partial class GeometryPad : Addon
                         var v1 = h.Current.Point1;
                         var v2 = h.Current.Point2;
                         var vs = GetValidVec(
-                            GetIntersectionLSAndSL(LT, RT, v1, v2),
-                            GetIntersectionLSAndSL(RT, RB, v1, v2),
-                            GetIntersectionLSAndSL(RB, LB, v1, v2),
-                            GetIntersectionLSAndSL(LB, LT, v1, v2)
+                            GetIntersectionOfSegmentAndLine(LT, RT, v1, v2),
+                            GetIntersectionOfSegmentAndLine(RT, RB, v1, v2),
+                            GetIntersectionOfSegmentAndLine(RB, LB, v1, v2),
+                            GetIntersectionOfSegmentAndLine(LB, LT, v1, v2)
                         );
                         Vec p;
                         if (v1.X == v2.X)
@@ -671,7 +680,7 @@ public partial class GeometryPad : Addon
                         else
                             dc.DrawLine(MathToPixelSK(v1), MathToPixelSK(p), StrokePaintMain);
 
-                        dc.DrawBubble($"{HalfLineText}:{h.Name}", MathToPixelSK((h.Current.Point1 + h.Current.Point2) / 2),
+                        dc.DrawBubble($"{MultiLanguageResources.Instance.HalfLineText}:{h.Name}", MathToPixelSK((h.Current.Point1 + h.Current.Point2) / 2),
                             BubbleBack, PaintMain);
                     }
                         break;
@@ -704,7 +713,7 @@ public partial class GeometryPad : Addon
                                 dc.DrawPath(path, StrokeMain);
                         }
 
-                        dc.DrawBubble($"{PolygonText}:{polygon.Name}",
+                        dc.DrawBubble($"{MultiLanguageResources.Instance.PolygonText}:{polygon.Name}",
                             MathToPixelSK((polygon.Locations[0] + polygon.Locations[1]) / 2) - new SKPoint(0, 20),
                             BubbleBack, PaintMain);
                     }
@@ -720,7 +729,7 @@ public partial class GeometryPad : Addon
                             dc.DrawOval(pf, s, StrokeMain);
 
                         var r2 = cs.Radius * Sqrt(2) / 2;
-                        dc.DrawBubble($"{CircleText}:{circle.Name}",
+                        dc.DrawBubble($"{MultiLanguageResources.Instance.CircleText}:{circle.Name}",
                             MathToPixelSK(circle.InnerCircle.Center + new Vec(-r2, r2)), BubbleBack, PaintMain);
                     }
                         break;
@@ -765,13 +774,13 @@ public partial class GeometryPad : Addon
                 StrokePaint.Color = new SKColor(p.Color).WithAlpha(255);
                 var index = 0;
                 var loc = MathToPixelSK(p.Location);
-                dc.DrawBubble($"{PointText}:" + p.Name, loc.OffSetBy(2, 2 + 20 * index++), BubbleBack, PaintMain);
+                dc.DrawBubble($"{MultiLanguageResources.Instance.PointText}:" + p.Name, loc.OffSetBy(2, 2 + 20 * index++), BubbleBack, PaintMain);
                 if (p == MovingPoint)
                 {
                     dc.DrawOval(loc, new SKSize(4, 4), FilledMedian);
                     dc.DrawOval(loc, new SKSize(7, 7), StrokeMedian);
                     dc.DrawBubble(
-                        $"({System.Math.Round(MovingPoint.Location.X,8)},{System.Math.Round(MovingPoint.Location.Y,8)}) {(MovingPoint.PointGetter is PointGetter_Movable ? "" : CantBeMovedText)}",
+                        $"({System.Math.Round(MovingPoint.Location.X,8)},{System.Math.Round(MovingPoint.Location.Y,8)}) {(MovingPoint.PointGetter is PointGetter_Movable ? "" : MultiLanguageResources.Instance.CantBeMovedText)}",
                         loc.OffSetBy(2, 2 + 20 * index++), BubbleBack, PaintMain);
                 }
                 else if (p.Selected)
@@ -916,23 +925,22 @@ public partial class GeometryPad : Addon
 
         if (s1 is Line l1 && s2 is Circle c1)
         {
-            Vec v1, v2;
-            (v1, v2) = GetPointFromCircleAndLine(l1.Current.Point1, l1.Current.Point2, c1.InnerCircle.Center,
-                c1.InnerCircle.Radius);
-            return new PointGetter_FromLineAndCircle(l1, c1,
-                (MathToPixel(v1) - Location).GetLength() < (MathToPixel(v2) - Location).GetLength());
+            (s1, s2) = (s2, s1);
         }
 
         if (s1 is Circle c2 && s2 is Line l2)
         {
             Vec v1, v2;
-            (v1, v2) = GetPointFromCircleAndLine(l2.Current.Point1, l2.Current.Point2, c2.InnerCircle.Center,
-                c2.InnerCircle.Radius);
+            (v1, v2) = IntersectionMath.FromLineAndCircle(l2.Current, c2.InnerCircle);
             return new PointGetter_FromLineAndCircle(l2, c2,
                 (MathToPixel(v1) - Location).GetLength() < (MathToPixel(v2) - Location).GetLength());
         }
-
-        //暂不支持
+        else if(s1 is Circle c3 && s2 is Circle c4)
+        {
+            Vec v1, v2;
+            (v1, v2) = IntersectionMath.FromTwoCircle(c3.InnerCircle,c4.InnerCircle);
+            return new PointGetter_FromTwoCircle((Circle)s1, (Circle)s2, (MathToPixel(v1) - Location).GetLength() < (MathToPixel(v2) - Location).GetLength());
+        }
         return null;
     }
 
@@ -945,68 +953,8 @@ public partial class GeometryPad : Addon
         Fixed
     }
 
-    protected PGType GetNewPointGetterTypeFromLocation(AvaPoint Location)
-    {
-        var disp = (Owner as DisplayControl)!;
-        var mathcursor = PixelToMath(Location);
-        var shapes = new List<(double, Shape)>();
-        foreach (var geoshape in Shapes.GetShapes<GeometryShape>())
-            if (geoshape is Line || geoshape is Circle)
-            {
-                var dist = ((geoshape.NearestOf(mathcursor) - mathcursor) * disp.UnitLength).GetLength();
-                if (dist < 5) shapes.Add((dist, geoshape));
-            }
-
-        var ss = shapes.OrderBy(key => key.Item1).ToArray();
-        if (ss.Length == 0) return PGType.Location;
-
-        if (ss.Length == 1)
-        {
-            var shape = ss[0].Item2;
-            if (shape is GeoCircle)
-                return PGType.OnCircle;
-            if (shape is GeoLine)
-                return PGType.OnLine;
-            return PGType.Location;
-        }
-
-        var s1 = ss[0].Item2;
-        var s2 = ss[1].Item2;
-        if (s1 is Line && s2 is Line) return PGType.Fixed;
-
-        if (s1 is Line l1 && s2 is Circle c1)
-        {
-            Vec v1, v2;
-            (v1, v2) = GetPointFromCircleAndLine(l1.Current.Point1, l1.Current.Point2, c1.InnerCircle.Center,
-                c1.InnerCircle.Radius);
-            return PGType.Fixed;
-        }
-
-        if (s1 is Circle c2 && s2 is Line l2)
-        {
-            Vec v1, v2;
-            (v1, v2) = GetPointFromCircleAndLine(l2.Current.Point1, l2.Current.Point2, c2.InnerCircle.Center,
-                c2.InnerCircle.Radius);
-            return PGType.Fixed;
-        }
-
-        //暂不支持
-        return PGType.None;
-    }
-
-    protected PGType GetPGType(PointGetter pg)
-    {
-        if (pg is PointGetter_FromLocation)
-            return PGType.Location;
-        if (pg is PointGetter_OnLine)
-            return PGType.OnLine;
-        //if (pg is PointGetter_OnCircle)
-        //    return PGType.OnCircle;
-        return PGType.Fixed;
-    }
-
     /// <summary>
-    ///     当于xy两个方向的线距离均小于5时 会吸附到交点上
+    ///     当xy两个方向的线距离均小于5时 会吸附到交点上
     /// </summary>
     protected AvaPoint FindNearestPointOnTwoAxisLine(AvaPoint location)
     {
@@ -1073,7 +1021,7 @@ public partial class GeometryPad : Addon
 
     public bool TryGetShape<T>(AvaPoint Location, out T shape) where T : GeometryShape
     {
-        shape = GetShape<T>(Location);
+        shape = GetShape<T>(Location)!;
         return shape != null;
     }
 
@@ -1180,7 +1128,7 @@ public partial class GeometryPad : Addon
             point.PointGetter = previous;
             previous.Attach(point.RefreshValues, point);
             point.RefreshValues();
-        }, o => { next = null; }, true);
+        }, o => { }, true);
     }
 
     #endregion
@@ -1330,9 +1278,9 @@ public partial class GeometryPad : Addon
     public void RadioButtonChecked(object? sender, RoutedEventArgs e)
     {
         if (sender is RadioButton rb)
-            if (rb.IsChecked == true)
+            if (rb.IsChecked == true&& rb.Tag is ActionData ad)
             {
-                SetAction((ActionData)rb.Tag);
+                SetAction(ad);
                 Static.Info(new TextBlock { Text = GeoPadAction.Description.Data });
             }
     }

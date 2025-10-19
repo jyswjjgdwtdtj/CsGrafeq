@@ -2,7 +2,7 @@
     <PropertyGroup>
         <OutputType Condition="'$(Configuration.toUpper())' != 'DEBUG'">WinExe</OutputType>
         <OutputType Condition="'$(Configuration.toUpper())' == 'DEBUG'">Exe</OutputType>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <InvariantGlobalization>false</InvariantGlobalization>
         <Nullable>enable</Nullable>
         <PublishAot Condition="'$(Configuration.toUpper())' != 'DEBUG'">true</PublishAot>
@@ -17,20 +17,24 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\CsGrafeqApplication\CsGrafeqApplication.csproj"/>
+        <ProjectReference Include="..\CsGrafeqApplication\CsGrafeqApplication.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Remove="Packaging.Targets"/>
+        <PackageReference Remove="Packaging.Targets" />
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="favicon.ico"/>
+        <Content Include="favicon.ico" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia.Desktop"/>
+        <PackageReference Include="Avalonia.Desktop" />
         <!--<PackageReference Include="PublishAotCompressed"/>-->
 	    <!--会报毒。。。-->
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Properties\" />
     </ItemGroup>
 </Project>

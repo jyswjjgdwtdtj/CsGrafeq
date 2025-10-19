@@ -167,7 +167,7 @@ public static class SkiaEx
     public static SKPaint FilledTranparentGrey =
         new() { IsAntialias = true, Color = new SKColor(0x80, 0x80, 0x80, 70) };
 
-    public static SKFont MapleMono,SimSun,TextFontPaint;
+    public static SKFont MapleMono;
     public static SKPaint FilledGray1 = new() { IsAntialias = true, Color = new SKColor(190, 190, 190) };
     public static SKPaint FilledGray2 = new() { IsAntialias = true, Color = new SKColor(128, 128, 128) };
     public static SKPaint ShadowFilledBlack = new() { IsAntialias = true, Color = SKColors.Black };
@@ -199,7 +199,6 @@ public static class SkiaEx
         );
         var fontMngr = SKFontManager.Default;
         MapleMono=new SKFont(fontMngr.CreateTypeface(AssetLoader.Open(new Uri("avares://CsGrafeqApplication/Fonts/MapleMono-CN-Regular.ttf"))));
-        SimSun = new SKFont(SKFontManager.Default.GetFontStyles(SKFontManager.Default.FontFamilies.ToList().IndexOf("宋体")).CreateTypeface(0));
         Refresh();
     }
     public static void Refresh()

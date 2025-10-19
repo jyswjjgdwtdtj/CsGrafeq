@@ -21,5 +21,10 @@ namespace CsGrafeqApplication
             this.PropertyChanged+=(s,e)=> Data = Languages.CurrentLanguage == "en-us" ? English : Chinese;
             
         }
+
+        public override string ToString()
+        {
+            return Data;
+        }
     }
 }
