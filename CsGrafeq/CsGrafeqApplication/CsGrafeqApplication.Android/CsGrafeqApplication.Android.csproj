@@ -20,11 +20,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia.Android"/>
-        <PackageReference Include="Xamarin.AndroidX.Core.SplashScreen"/>
+        <PackageReference Include="Avalonia.Android" />
+        <PackageReference Include="SkiaSharp.NativeAssets.Android" />
+        <PackageReference Include="Xamarin.AndroidX.Core.SplashScreen" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\CsGrafeqApplication\CsGrafeqApplication.csproj"/>
+        <ProjectReference Include="..\CsGrafeqApplication\CsGrafeqApplication.csproj" />
     </ItemGroup>
 </Project>

@@ -13,7 +13,7 @@ using AvaPoint = Avalonia.Point;
 
 namespace CsGrafeqApplication.Controls.Displayers;
 
-public abstract class Displayer : SkiaControl
+public abstract class Displayer : SKCanvasView
 {
     public const bool DoNext = true;
     public const bool Intercept = false;
@@ -39,7 +39,7 @@ public abstract class Displayer : SkiaControl
 
     public DisplayerContainer Owner { get; set; }
 
-    protected sealed override void OnSkiaRender(SKRenderEventArgs e)
+    protected override sealed void OnSkiaRender(SKRenderEventArgs e)
     {
         var dc = e.Canvas;
         lock (TotalBuffer)

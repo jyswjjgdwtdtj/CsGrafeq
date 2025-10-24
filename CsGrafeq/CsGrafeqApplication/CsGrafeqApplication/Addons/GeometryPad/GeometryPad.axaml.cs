@@ -9,16 +9,17 @@ using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using CsGrafeq.Shapes;
 using CsGrafeq.Shapes.ShapeGetter;
+using CsGrafeqApplication.Controls;
 using CsGrafeqApplication.Controls.Displayers;
 using CsGrafeqApplication.ViewModels;
 using SkiaSharp;
-using static CsGrafeqApplication.Controls.SkiaEx;
 using static CsGrafeq.Shapes.GeometryMath;
 using AvaPoint = Avalonia.Point;
 using AvaRect = Avalonia.Rect;
 using AvaSize = Avalonia.Size;
 using GeoHalf = CsGrafeq.Shapes.Half;
 using static CsGrafeqApplication.AvaloniaMath;
+using static CsGrafeqApplication.Controls.SkiaEx;
 
 namespace CsGrafeqApplication.Addons.GeometryPad;
 
@@ -560,7 +561,7 @@ public partial class GeometryPad : Addon
     protected override void Render(SKCanvas dc, SKRect rect)
     {
         if (Owner is null) return;
-        rect.Intersect(Owner.ValidRect.ToSKRect());
+        //rect.Intersect(Owner.ValidRect.ToSKRect());
         dc.Save();
         dc.ClipRect(rect);
         //RenderFunction(dc, new SKRectI((int)rect.Left, (int)rect.Top, (int)rect.Right, (int)rect.Bottom));

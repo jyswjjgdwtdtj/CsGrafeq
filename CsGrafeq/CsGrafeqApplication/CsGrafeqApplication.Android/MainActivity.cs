@@ -3,6 +3,7 @@ using Android.Content.PM;
 using Avalonia;
 using Avalonia.Android;
 
+
 namespace CsGrafeqApplication.Android;
 
 [Activity(
