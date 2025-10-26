@@ -12,9 +12,11 @@ global using CsGrafeq;
 global using static CsGrafeq.Math;
 global using static System.Math;
 using System.Collections.Generic;
+using System.Collections;
 using System.Runtime.CompilerServices;
 using Avalonia.Controls;
 using Avalonia.Threading;
+using System;
 
 namespace CsGrafeqApplication;
 

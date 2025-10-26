@@ -59,7 +59,7 @@ public partial class DisplayerContainer : UserControl
                 previousWidth = PART_Grid.ColumnDefinitions[0].ActualWidth;
                 PART_Grid.ColumnDefinitions[0].Width = new GridLength(0, GridUnitType.Pixel);
                 Splitter.IsVisible = false;
-                VM.Displayer.Invalidate();
+                VM.Displayer.AskForRender();
             }
             else
             {
@@ -76,7 +76,6 @@ public partial class DisplayerContainer : UserControl
     protected override void OnSizeChanged(SizeChangedEventArgs e)
     {
         base.OnSizeChanged(e);
-        VM.Displayer.InvalidateBuffer();
     }
 
     private void MsgBox(Control content)

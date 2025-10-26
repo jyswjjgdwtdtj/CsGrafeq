@@ -8,6 +8,7 @@
              xmlns:shapes="clr-namespace:CsGrafeq.Shapes;assembly=CsGrafeq.Shapes"
              xmlns:getter="clr-namespace:CsGrafeq.Shapes.ShapeGetter;assembly=CsGrafeq.Shapes"
              xmlns:system="clr-namespace:System"
+             xmlns:shapes1="clr-namespace:CsGrafeq.Shapes"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CsGrafeqApplication.Addons.GeometryPad.GeometryPad" x:DataType="geopad:GeometryPadViewModel">
     <UserControl.Styles>
@@ -31,19 +32,24 @@
             <Setter Property="Template">
                 <ControlTemplate>
                     <DockPanel LastChildFill="True">
-                        <ContentControl IsVisible="False" />
                         <ContentPresenter Background="{TemplateBinding Background}"
                                           BorderThickness="{TemplateBinding BorderThickness}"
                                           CornerRadius="{TemplateBinding CornerRadius}"
                                           ContentTemplate="{TemplateBinding ContentTemplate}"
                                           Content="{TemplateBinding Content}"
                                           Padding="{TemplateBinding Padding}" />
-                        <DockPanel.Styles>
-                            <Style Selector="Border#PART_BorderElement">
-                                <Setter Property="IsVisible" Value="False" />
-                                <Setter Property="Opacity" Value="0" />
-                            </Style>
-                        </DockPanel.Styles>
+                    </DockPanel>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="TextBox.NoDataValidation DataValidationErrors">
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <DockPanel LastChildFill="True">
+                        <ContentPresenter CornerRadius="{TemplateBinding CornerRadius}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          Content="{TemplateBinding Content}"
+                                          Padding="{TemplateBinding Padding}" />
                     </DockPanel>
                 </ControlTemplate>
             </Setter>
@@ -131,62 +137,21 @@
                 Background="Transparent">
         <TabItem>
             <TabItem.Header>
-                <Svg Path="/Assets/shape.svg" Width="25" Height="25" Margin="0" Css="{DynamicResource OppositeCssPathFillString}"/>
-            </TabItem.Header>
-            <ScrollViewer Name="PART_ActionViewer">
-                <ItemsControl ItemsSource="{CompiledBinding Actions}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <VirtualizingStackPanel Orientation="Vertical" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate DataType="geopad:HasNameActionList">
-                            <StackPanel Orientation="Vertical">
-                                <Expander Classes="NoBorderExpander" BorderThickness="0"
-                                          IsExpanded="True"
-                                          Width="{CompiledBinding $parent[StackPanel].Bounds.Width}"
-                                          Padding="0" Background="Transparent">
-                                    <Expander.Header>
-                                        <TextBlock Text="{CompiledBinding Name.Data }" Margin="0"
-                                                   Padding="0" />
-                                    </Expander.Header>
-                                    <Border Padding="10,0" Background="Transparent">
-                                        <ItemsControl ItemsSource="{CompiledBinding .}">
-                                            <ItemsControl.ItemsPanel>
-                                                <ItemsPanelTemplate>
-                                                    <WrapPanel Orientation="Horizontal" ItemSpacing="5" LineSpacing="5"
-                                                               Background="Transparent" Margin="0" />
-                                                </ItemsPanelTemplate>
-                                            </ItemsControl.ItemsPanel>
-                                            <ItemsControl.ItemTemplate>
-                                                <DataTemplate>
-                                                    <RadioButton Classes="GeoRadio"
-                                                                 IsCheckedChanged="RadioButtonChecked"
-                                                                 Tag="{CompiledBinding .}">
-                                                        <TextBlock VerticalAlignment="Center"
-                                                                   HorizontalAlignment="Center"
-                                                                   TextWrapping="Wrap" FontSize="11"
-                                                                   TextAlignment="Center" Name="RadioText"
-                                                                   Text="{CompiledBinding Name.Data}" />
-                                                    </RadioButton>
-                                                </DataTemplate>
-                                            </ItemsControl.ItemTemplate>
-                                        </ItemsControl>
-                                    </Border>
-                                </Expander>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
-        </TabItem>
-        <TabItem>
-            <TabItem.Header>
                 <Svg Path="/Assets/input.svg" Width="25" Height="25" Margin="0" Css="{DynamicResource OppositeCssPathFillString}"/>
             </TabItem.Header>
             <DockPanel ZIndex="1" LastChildFill="True">
-                <ScrollViewer ZIndex="1" DockPanel.Dock="Bottom">
+                <Border DockPanel.Dock="Top" HorizontalAlignment="Stretch">
+                    <DockPanel LastChildFill="True" HorizontalAlignment="Stretch" Margin="5">
+                        <Border Width="30" Height="30" DockPanel.Dock="Left">
+                            <Svg Path="/Assets/add.svg" Width="25" Height="25" Margin="0" VerticalAlignment="Center" HorizontalAlignment="Center"></Svg>
+                        </Border>
+                        <Border>
+                            <TextBox BorderThickness="0" Classes="NoDataValidation" AcceptsReturn="False" AcceptsTab="False" KeyUp="NewFuncOnClick" Name="NewFuncTextBox">
+                            </TextBox>
+                        </Border>
+                    </DockPanel>
+                </Border>
+                <ScrollViewer ZIndex="1">
                     <ItemsControl ItemsSource="{CompiledBinding Shapes}" Padding="0,0,0,5" Name="ShapeItemsControl">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -246,7 +211,7 @@
                                                                             Height="20"
                                                                             Margin="0"
                                                                             DockPanel.Dock="Left"
-                                                                            Tapped="HandleEvent" />
+                                                                            Tapped="EventHandledTrue" />
                                                                         <StackPanel Orientation="Horizontal">
                                                                             <TextBlock Text="=Point("
                                                                                 TextAlignment="Left"
@@ -262,7 +227,7 @@
                                                                                 PropertyChanged="Number_OnPropertyChanged"
                                                                                 KeyUp="TextBox_OnKeyUp"
                                                                                 Loaded="NumberTextBox_OnLoaded"
-                                                                                Tapped="HandleEvent"
+                                                                                Tapped="EventHandledTrue"
                                                                                 Focusable="True"
                                                                                 IsEnabled="{CompiledBinding IsUserEnabled}" />
                                                                             <TextBlock Text="," TextAlignment="Left"
@@ -278,7 +243,7 @@
                                                                                 Tag="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointY}"
                                                                                 PropertyChanged="Number_OnPropertyChanged"
                                                                                 KeyUp="TextBox_OnKeyUp"
-                                                                                Tapped="HandleEvent"
+                                                                                Tapped="EventHandledTrue"
                                                                                 Focusable="True"
                                                                                 IsEnabled="{CompiledBinding IsUserEnabled}" />
                                                                             <TextBlock Text=")" TextAlignment="Left"
@@ -299,7 +264,7 @@
                                                                             Classes="CommonTextBox Big"
                                                                             Grid.Column="0" Grid.Row="0" Height="20"
                                                                             Margin="0"
-                                                                            Tapped="HandleEvent" />
+                                                                            Tapped="EventHandledTrue" />
                                                                         <DockPanel Grid.Column="1"
                                                                             Grid.Row="0" LastChildFill="True">
                                                                             <StackPanel Orientation="Horizontal"
@@ -319,7 +284,7 @@
                                                                                     KeyUp="TextBox_OnKeyUp"
                                                                                     Loaded="NumberTextBox_OnLoaded"
                                                                                     Tag="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointX}"
-                                                                                    Tapped="HandleEvent"
+                                                                                    Tapped="EventHandledTrue"
                                                                                     Focusable="True"
                                                                                     IsEnabled="{CompiledBinding IsUserEnabled}" />
                                                                                 <TextBlock Text=","
@@ -336,7 +301,7 @@
                                                                                     KeyUp="TextBox_OnKeyUp"
                                                                                     Loaded="NumberTextBox_OnLoaded"
                                                                                     Tag="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointX}"
-                                                                                    Tapped="HandleEvent"
+                                                                                    Tapped="EventHandledTrue"
                                                                                     Focusable="True"
                                                                                     IsEnabled="{CompiledBinding IsUserEnabled}" />
                                                                                 <TextBlock Text=")"
@@ -457,7 +422,7 @@
                                                                             Classes="CommonTextBox Big"
                                                                             Grid.Column="0" Grid.Row="0" Height="20"
                                                                             Margin="0"
-                                                                            Tapped="HandleEvent" />
+                                                                            Tapped="EventHandledTrue" />
                                                                         <StackPanel Orientation="Horizontal"
                                                                             Background="Transparent" Margin="0,5"
                                                                             VerticalAlignment="Center" Grid.Column="1"
@@ -511,7 +476,7 @@
                                                                             Classes="CommonTextBox Big"
                                                                             Height="20"
                                                                             Margin="0"
-                                                                            Tapped="HandleEvent" />
+                                                                            Tapped="EventHandledTrue" />
                                                                         <StackPanel Orientation="Horizontal">
                                                                             <TextBlock Text="=Circle("
                                                                                 TextAlignment="Left"
@@ -540,7 +505,7 @@
                                                                                 LostFocus="NumberLostFocus"
                                                                                 Tag="{CompiledBinding Path=.}"
                                                                                 PropertyChanged="Number_OnPropertyChanged"
-                                                                                Tapped="HandleEvent"
+                                                                                Tapped="EventHandledTrue"
                                                                                 DataContext="{CompiledBinding Path=((getter:CircleGetter_FromCenterAndRadius)Getter).Radius}" />
                                                                             <TextBlock Text=")" TextAlignment="Left"
                                                                                 VerticalAlignment="Center"
@@ -557,29 +522,100 @@
                                     </DataTemplate>
                                 </geopad:GeoShapeAndElseTemplate.IsGeometryShape>
                                 <geopad:GeoShapeAndElseTemplate.IsElse>
-                                    <!--暂时没有-->
-                                    <!--<DataTemplate DataType="shapes:ImplicitFunction">
+                                    <DataTemplate DataType="shapes1:ImplicitFunction">
                                         <Border
                                             Background="{CompiledBinding Color,Converter={StaticResource UIntColorToBrush},ConverterParameter=140}"
-                                            CornerRadius="5" BorderThickness="0">
-                                            <StackPanel Orientation="Horizontal"
-                                                        Background="Transparent" Margin="5"
-                                                        VerticalAlignment="Center">
+                                            Height="{CompiledBinding IsDeleted,Converter={StaticResource BoolToDouble},ConverterParameter='70',Mode=OneWay}"
+                                            CornerRadius="5" BorderThickness="0" Tapped="ImpFuncOnTapped">
+                                            <FlyoutBase.AttachedFlyout>
+                                                <Flyout ShowMode="Standard" Placement="BottomEdgeAlignedLeft">
+                                                    <Grid ColumnDefinitions="80,120" RowDefinitions="Auto"
+                                                          RowSpacing="3">
+                                                        <TextBlock Grid.Row="0" Grid.Column="0"
+                                                                   VerticalAlignment="Center">
+                                                            Color:
+                                                        </TextBlock>
+                                                        <ColorPicker Grid.Column="1" Grid.Row="0"
+                                                                     Color="{CompiledBinding Color,Converter={StaticResource UIntToColor}}"
+                                                                     IsAlphaVisible="False"
+                                                                     IsAccentColorsVisible="False" />
+                                                    </Grid>
+                                                </Flyout>
+                                            </FlyoutBase.AttachedFlyout>
+                                            <DockPanel LastChildFill="True">
                                                 <CheckBox
                                                     IsChecked="{CompiledBinding Visible,Mode=TwoWay}"
-                                                    Classes="VisibilityCheckBox" />
+                                                    Classes="VisibilityCheckBox"
+                                                    VerticalAlignment="Center" Margin="5" />
+                                                <Button DockPanel.Dock="Right" VerticalAlignment="Center"
+                                                        Tag="{CompiledBinding .}" Click="DeleteButtonClicked"
+                                                        Background="{StaticResource HTMedianBrush}">
+                                                    <Svg Path="/Assets/delete.svg" Width="20" Height="20" Margin="0" Css="{DynamicResource OppositeCssPathFillString}"/>
+                                                </Button>
                                                 <TextBox
                                                     Text="{CompiledBinding Expression,Mode=TwoWay}"
-                                                    Classes="CommonTextBox Big" />
-                                            </StackPanel>
+                                                    Classes="CommonTextBox Big" HorizontalAlignment="Left"/>
+                                            </DockPanel>
                                         </Border>
-                                    </DataTemplate>-->
+                                    </DataTemplate>
                                 </geopad:GeoShapeAndElseTemplate.IsElse>
                             </geopad:GeoShapeAndElseTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </ScrollViewer>
             </DockPanel>
+        </TabItem>
+        <TabItem>
+            <TabItem.Header>
+                <Svg Path="/Assets/shape.svg" Width="25" Height="25" Margin="0" Css="{DynamicResource OppositeCssPathFillString}"/>
+            </TabItem.Header>
+            <ScrollViewer Name="PART_ActionViewer">
+                <ItemsControl ItemsSource="{CompiledBinding Actions}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel Orientation="Vertical" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="geopad:HasNameActionList">
+                            <StackPanel Orientation="Vertical">
+                                <Expander Classes="NoBorderExpander" BorderThickness="0"
+                                          IsExpanded="True"
+                                          Width="{CompiledBinding $parent[StackPanel].Bounds.Width}"
+                                          Padding="0" Background="Transparent">
+                                    <Expander.Header>
+                                        <TextBlock Text="{CompiledBinding Name.Data }" Margin="0"
+                                                   Padding="0" />
+                                    </Expander.Header>
+                                    <Border Padding="10,0" Background="Transparent">
+                                        <ItemsControl ItemsSource="{CompiledBinding .}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <WrapPanel Orientation="Horizontal" ItemSpacing="5" LineSpacing="5"
+                                                               Background="Transparent" Margin="0" />
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <RadioButton Classes="GeoRadio"
+                                                                 IsCheckedChanged="RadioButtonChecked"
+                                                                 Tag="{CompiledBinding .}">
+                                                        <TextBlock VerticalAlignment="Center"
+                                                                   HorizontalAlignment="Center"
+                                                                   TextWrapping="Wrap" FontSize="11"
+                                                                   TextAlignment="Center" Name="RadioText"
+                                                                   Text="{CompiledBinding Name.Data}" />
+                                                    </RadioButton>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </Border>
+                                </Expander>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
         </TabItem>
         <TabItem>
             <TabItem.Header>

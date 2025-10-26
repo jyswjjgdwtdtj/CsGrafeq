@@ -1,25 +1,32 @@
 #define TEST_MEMORY_LEAK
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
+using CsGrafeq.Interval;
 using CsGrafeq.Shapes;
 using CsGrafeq.Shapes.ShapeGetter;
 using CsGrafeqApplication.Controls;
 using CsGrafeqApplication.Controls.Displayers;
 using CsGrafeqApplication.ViewModels;
 using SkiaSharp;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Collections;
+using System.Linq;
+using System.Reactive.Concurrency;
+using System.Threading.Tasks;
 using static CsGrafeq.Shapes.GeometryMath;
+using static CsGrafeqApplication.AvaloniaMath;
+using static CsGrafeqApplication.Controls.SkiaEx;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 using AvaPoint = Avalonia.Point;
 using AvaRect = Avalonia.Rect;
 using AvaSize = Avalonia.Size;
 using GeoHalf = CsGrafeq.Shapes.Half;
-using static CsGrafeqApplication.AvaloniaMath;
-using static CsGrafeqApplication.Controls.SkiaEx;
 
 namespace CsGrafeqApplication.Addons.GeometryPad;
 
@@ -41,6 +48,7 @@ public partial class GeometryPad : Addon
     private PointerPointProperties PointerProperties;
     private AvaPoint PointerReleasedPos;
     private GeometryPadViewModel VM;
+    private Renderable MainRenderTarget=new();
 
     public GeometryPad()
     {
@@ -52,14 +60,42 @@ public partial class GeometryPad : Addon
         foreach (var j in i)
             Actions!.Add(j);
         GeoPadAction = Actions.First();
-        Shapes.CollectionChanged += (s, e) => { Owner?.Invalidate(this); };
-        Shapes.OnShapeChanged += () => { Owner?.Invalidate(this); };
+        Shapes.CollectionChanged += (s, e) =>
+        {
+            if (Shapes.GetShapes<ImplicitFunction>().Count() > 0)
+            {
+                Owner?.MovingOptimization = true;
+                Owner?.ZoomingOptimization = true;
+            }
+            var newshapes = (e.NewItems as IEnumerable)?.OfType<Shape>()??[];
+            var newfuncs = newshapes.OfType<ImplicitFunction>();
+            foreach(var fn in newfuncs)
+            {
+                fn.RenderTarget.Changed = true;
+            }
+            if (newshapes.Any(o => o is GeometryShape))
+            {
+                MainRenderTarget.Changed = true;
+            }
+            Owner?.AskForRender();
+        };
+        Shapes.OnShapeChanged += (sp) =>
+        {
+            if (sp is ImplicitFunction impf)
+                impf.RenderTarget.Changed = true;
+            else if(sp is GeometryShape gs)
+                MainRenderTarget.Changed=true;
+            Owner?.AskForRender();
+        };
+        Layers.Add(MainRenderTarget);
+        MainRenderTarget.OnRender += Renderable_OnRender;
 #if DEBUG
         var p1 = AddShape(new GeoPoint(new PointGetter_FromLocation((0.5, 0.5))));
         var p2 = AddShape(new GeoPoint(new PointGetter_FromLocation((1.5, 1.5))));
         var s1 = AddShape(new Straight(new LineGetter_Connected(p1, p2)));
         var p3 = AddShape(new GeoPoint(new PointGetter_OnLine(s1, (0, 0))));
         var c1 = AddShape(new Circle(new CircleGetter_FromCenterAndRadius(p1)));
+        var ip1 = AddShape(CreateImpFunc("y=x+1"));
 #endif
         InitializeComponent();
     }
@@ -90,8 +126,11 @@ public partial class GeometryPad : Addon
             MathToPixelY = value.MathToPixelY;
             MathToPixel = value.MathToPixel;
             MathToPixelSK = value.MathToPixelSK;
-#if DEBUG
-#endif
+            if (Shapes.GetShapes<ImplicitFunction>().Count() > 0)
+            {
+                Owner?.MovingOptimization = true;
+                Owner?.ZoomingOptimization = true;
+            }
         }
     }
 
@@ -133,7 +172,6 @@ public partial class GeometryPad : Addon
     protected override bool AddonKeyDown(KeyEventArgs e)
     {
         if (Owner == null) return DoNext;
-        Owner.Suspend();
         var res = DoNext;
         switch (e.Key)
         {
@@ -150,8 +188,7 @@ public partial class GeometryPad : Addon
                 break;
         }
 
-        if (res == Intercept) Owner.Invalidate();
-        Owner.Resume();
+        if (res == Intercept) MainRenderTarget.Changed = true;
         return res;
     }
 
@@ -163,9 +200,12 @@ public partial class GeometryPad : Addon
             return null;
         Shapes.Add(shape);
         DoShapeAdd(shape);
+        if(shape is ImplicitFunction impf)
+        {
+            Layers.Add(impf.RenderTarget);
+        }
         return shape;
     }
-
     private class TextChangedCommand : CommandManager.Command
     {
         public readonly string PreviousText;
@@ -243,18 +283,15 @@ public partial class GeometryPad : Addon
     {
         if (Owner == null) return DoNext;
         PointerProperties = e.Properties;
-        Owner.Suspend();
         PointerMovedPos = e.Location;
         if (GeoPadAction.Name.English == "Select" && e.Properties.IsLeftButtonPressed)
         {
-            Owner.Resume(false);
-            Owner.Invalidate(this);
+            MainRenderTarget.Changed = true;
             return Intercept;
         }
 
         if (MovingPoint == null)
         {
-            Owner.Resume(false);
             return DoNext;
         }
 
@@ -309,12 +346,9 @@ public partial class GeometryPad : Addon
 
                 MovingPoint.RefreshValues();
             }
-
-            Owner.Resume();
+            MainRenderTarget.Changed = true;
             return Intercept;
         }
-
-        Owner.Resume(false);
         return DoNext;
     }
 
@@ -322,7 +356,6 @@ public partial class GeometryPad : Addon
     {
         if (Owner == null) return DoNext;
         PointerProperties = e.Properties;
-        Owner.Suspend();
         PointerReleasedPos = e.Location;
         var disp = (Owner as DisplayControl)!;
         if (GeoPadAction.Name.English == "Select")
@@ -399,14 +432,13 @@ public partial class GeometryPad : Addon
                         break;
                 }
 
-            Owner.Resume();
+            MainRenderTarget.Changed = true;
             PointerPressedPos = new AvaPoint(double.NaN, double.NaN);
             return Intercept;
         }
 
         if (MovingPoint == null)
         {
-            Owner.Resume();
             return DoNext;
         }
 
@@ -420,15 +452,12 @@ public partial class GeometryPad : Addon
         }
 
         MovingPoint = null;
-        Owner.Resume();
         return Intercept;
     }
 
     protected override bool AddonPointerTapped(AddonPointerEventArgsBase e)
     {
         if (Owner == null) return DoNext;
-        Owner.Suspend();
-        using (var ec=new ExitController(() => Owner.Resume()))
         {
             if (GeoPadAction.Name.English == "Put")
             {
@@ -558,13 +587,13 @@ public partial class GeometryPad : Addon
 
     #region RenderAction
 
-    protected override void Render(SKCanvas dc, SKRect rect)
+    protected void Renderable_OnRender(SKCanvas dc, SKRect rect)
     {
         if (Owner is null) return;
         //rect.Intersect(Owner.ValidRect.ToSKRect());
         dc.Save();
         dc.ClipRect(rect);
-        //RenderFunction(dc, new SKRectI((int)rect.Left, (int)rect.Top, (int)rect.Right, (int)rect.Bottom));
+        //RenderFunction(dc, new SKRectI((int)rect.Left, (int)rect.Top, (int)rect.Right, (int)rect.Bottom),Shapes.GetShapes<ImplicitFunction>());
         RenderShapes(dc, rect, Shapes.GetShapes<GeometryShape>());
         if (GeoPadAction.Name.English == "Select" && PointerProperties.IsLeftButtonPressed)
         {
@@ -804,39 +833,39 @@ public partial class GeometryPad : Addon
             }
         }
     }
-
-    /*private void RenderFunction(SKCanvas dc, SKRectI rect,IEnumerable<ImplicitFunction> funcs)
+    private int cnt = 0;
+    private void RenderFunction(SKCanvas dc, SKRectI rect,ImplicitFunction impFunc)
     {
-        foreach (var impfunc in funcs)
+        if (!impFunc.IsCorrect)
+            return;
+        if (impFunc.IsDeleted)
+            return;
+        var RectToCalc = new ConcurrentBag<SKRectI> { rect };
+        var RectToRenderRect = new ConcurrentBag<SKRectI>();
+        var RectToRenderPoint = new ConcurrentBag<SKPoint>();
+        var paint = new SKPaint { Color = new SKColor(impFunc.Color) };
+        do
         {
-            var RectToCalc = new ConcurrentBag<SKRectI> { rect };
-            var RectToRenderRect = new ConcurrentBag<SKRectI>();
-            var RectToRenderPoint = new ConcurrentBag<SKPoint>();
-            var paint = new SKPaint { Color = new SKColor(impfunc.Color) };
-            var func = impfunc.Function;
-            do
+            var paint1 = new SKPaint { Color = ColorExtension.GetRandomColor() };
+            var rs = RectToCalc.ToArray();
+            RectToCalc.Clear();
+            Action<int> atn = idx => RenderRectIntervalSet(dc, rs[idx], RectToCalc, RectToRenderRect,
+                RectToRenderPoint, paint1, impFunc.Function, false);
+            for (var i = 0; i < rs.Length; i += 100)
             {
-                var paint1 = new SKPaint { Color = ColorExtension.GetRandomColor() };
-                var rs = RectToCalc.ToArray();
-                RectToCalc.Clear();
-                Action<int> atn = idx => RenderRectIntervalSet(dc, rs[idx], RectToCalc, RectToRenderRect,
-                    RectToRenderPoint, paint1, func, false);
-                for (var i = 0; i < rs.Length; i += 100)
-                {
-                    Parallel.For(i, Min(i + 100, rs.Length), atn);
-                    foreach (var r in RectToRenderRect) dc.DrawRect(r, paint);
-                    foreach (var point in RectToRenderPoint) dc.DrawRect(CreateSKRectWH(point.X, point.Y, 1, 1), paint);
-                    //dc.DrawPoint(point, paint);
-                    RectToRenderRect.Clear();
-                    RectToRenderPoint.Clear();
-                }
-            } while (RectToCalc.Count != 0);
-        }
-    }*/
+                Parallel.For(i, Min(i + 100, rs.Length), atn);
+                foreach (var r in RectToRenderRect) dc.DrawRect(r, paint);
+                foreach (var point in RectToRenderPoint) dc.DrawPoint(point.X, point.Y, paint);
+                //dc.DrawPoint(point, paint);
+                RectToRenderRect.Clear();
+                RectToRenderPoint.Clear();
+            }
+        } while (RectToCalc.Count != 0);
+    }
 
-    /*private void RenderRectIntervalSet(SKCanvas dc, SKRectI r, ConcurrentBag<SKRectI> RectToCalc,
+    private void RenderRectIntervalSet(SKCanvas dc, SKRectI r, ConcurrentBag<SKRectI> RectToCalc,
         ConcurrentBag<SKRectI> RectToRender, ConcurrentBag<SKPoint> RectToRenderPoint, SKPaint paint,
-        IntervalHandler<IntervalSet> func, bool checkpixel)
+        HasReferenceIntervalSetFunc<IntervalSet> func, bool checkpixel)
     {
         //dc.DrawRect(r,paint);
         if (r.Height == 0 || r.Width == 0)
@@ -852,17 +881,17 @@ public partial class GeometryPad : Addon
         for (var i = r.Left; i < r.Right; i += dx)
         {
             var di = i;
-            var xmin = PixelToMathX(i);
-            var xmax = PixelToMathX(i + dx);
-            var xi =IntervalSet.Create(xmin, xmax,Def.TT);
+            var xmin = Owner.PixelToMathX(i);
+            var xmax = Owner.PixelToMathX(i + dx);
+            var xi = IntervalSet.Create(xmin, xmax, Def.TT);
             for (var j = r.Top; j < r.Bottom; j += dy)
             {
                 var dj = j;
-                var ymin = PixelToMathY(j);
-                var ymax = PixelToMathY(j + dy);
-                var yi = IntervalSet.Create(ymin, ymax,Def.TT);
-                Def result = func.Invoke(xi, yi);
-                if (result ==Def.TT)
+                var ymin = Owner.PixelToMathY(j);
+                var ymax = Owner.PixelToMathY(j + dy);
+                var yi = IntervalSet.Create(ymin, ymax, Def.TT);
+                Def result = func.Function.Invoke(xi, yi);
+                if (result == Def.TT)
                 {
                     if (isPixel)
                         RectToRenderPoint.Add(new SKPoint(di, dj));
@@ -879,7 +908,7 @@ public partial class GeometryPad : Addon
                 }
             }
         }
-    }*/
+    }
 
     #endregion
 
@@ -1072,6 +1101,36 @@ public partial class GeometryPad : Addon
         );
     }
 
+    private void DoShapeDelete(Shape shape)
+    {
+        if (shape is GeometryShape geo)
+        {
+            DoGeoShapesDelete([geo]);
+        }
+        else
+        {
+            CmdManager.Do(
+                shape,
+                o =>
+                {
+                    shape.IsDeleted = true;
+                    ShapeItemsControl.InvalidateArrange();
+                },
+                o =>
+                {
+                    shape.IsDeleted = true;
+                    ShapeItemsControl.InvalidateArrange();
+                },
+                o => { Shapes.Remove(shape);
+                    if (shape is ImplicitFunction impf)
+                    {
+                        Layers.Remove(impf.RenderTarget);
+                    }
+                    shape.Dispose();
+                }, true
+            );
+        }
+    }
     private void DoGeoShapesDelete(IEnumerable<GeometryShape> shapes)
     {
         var ss = shapes.Select(s => ShapeList.GetAllChildren(s)).JoinToOne().Distinct().ToArray();
@@ -1097,7 +1156,14 @@ public partial class GeometryPad : Addon
 
                 ShapeItemsControl.InvalidateArrange();
             },
-            o => { }, true
+            o =>
+            {
+                foreach (var geometryShape in ss)
+                {
+                    Shapes.Remove(geometryShape);
+                    geometryShape.Dispose();
+                }
+            }, true
         );
     }
 
@@ -1180,7 +1246,13 @@ public partial class GeometryPad : Addon
     {
         if (sender is Button btn)
             if (btn.Tag is GeometryShape shape)
+            {
                 DoGeoShapesDelete([shape]);
+            }
+            else if(btn.Tag is Shape s)
+            {
+                DoShapeDelete(s);
+            }
     }
 
     private void NumberTextBox_OnLoaded(object? sender, RoutedEventArgs e)
@@ -1198,11 +1270,6 @@ public partial class GeometryPad : Addon
 
     public void NumberLostFocus(object? sender, RoutedEventArgs e)
     {
-    }
-
-    public void HandleEvent(object? sender, RoutedEventArgs e)
-    {
-        e.Handled = true;
     }
 
     public void TextBoxKeyDown(object? sender, KeyEventArgs e)
@@ -1287,4 +1354,27 @@ public partial class GeometryPad : Addon
     }
 
     #endregion
+
+    private void NewFuncOnClick(object? sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter && e.KeyModifiers == KeyModifiers.None &&!string.IsNullOrWhiteSpace(NewFuncTextBox.Text))
+        {
+            AddShape(CreateImpFunc(NewFuncTextBox.Text));
+            NewFuncTextBox.Text = "";
+        }
+    }
+
+    private void ImpFuncOnTapped(object? sender, TappedEventArgs e)
+    {
+        if (sender is Border border)
+        {
+            FlyoutBase.ShowAttachedFlyout(border);
+        }
+    }
+    private ImplicitFunction CreateImpFunc(string expression)
+    {
+        var ins= new ImplicitFunction(expression);
+        ins.RenderTarget.OnRender += (dc,s)=>RenderFunction(dc,new SKRectI((int)s.Left,(int)s.Top,(int)s.Right,(int)s.Bottom),ins);
+        return ins;
+    }
 }

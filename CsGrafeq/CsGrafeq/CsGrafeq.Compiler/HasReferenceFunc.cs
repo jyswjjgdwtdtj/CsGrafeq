@@ -10,13 +10,17 @@ public delegate T Function2<T>(T arg1, T arg2) where T : IComputableNumber<T>;
 
 public delegate T Function3<T>(T arg1, T arg2, T arg3) where T : IComputableNumber<T>;
 
-public class HasReferenceFunction : IDisposable
+public class HasReferenceFunction<T> : IDisposable where T:Delegate
 {
+    public readonly T Function;
     private readonly bool Disposed = false;
     public readonly EnglishCharEnum Reference;
 
-    public HasReferenceFunction(EnglishCharEnum reference)
+    public HasReferenceFunction(T function,EnglishCharEnum reference)
     {
+        this.Function = function;
+        if(function==null)
+            throw new ArgumentNullException(nameof(function));
         Reference = reference;
         EnglishChar.Instance.AddReference(reference);
     }
@@ -35,46 +39,15 @@ public class HasReferenceFunction : IDisposable
         Dispose();
     }
 }
-
-public class HasReferenceFunction0<T> : HasReferenceFunction where T : IComputableNumber<T>
+public class HasReferenceFunction0<T>(Function0<T> function, EnglishCharEnum reference) : HasReferenceFunction<Function0<T>>(function, reference) where T : IComputableNumber<T>
 {
-    public readonly Function0<T> Function;
-
-    public HasReferenceFunction0(Function0<T> function, EnglishCharEnum reference) : base(reference)
-    {
-        Function = function;
-    }
 }
-
-public class HasReferenceFunction1<T> : HasReferenceFunction where T : IComputableNumber<T>
+public class HasReferenceFunction1<T>(Function1<T> function, EnglishCharEnum reference) : HasReferenceFunction<Function1<T>>(function, reference) where T : IComputableNumber<T>
 {
-    public readonly Function1<T> Function;
-    public readonly EnglishCharEnum Reference;
-
-    public HasReferenceFunction1(Function1<T> function, EnglishCharEnum reference) : base(reference)
-    {
-        Function = function;
-    }
 }
-
-public class HasReferenceFunction2<T> : HasReferenceFunction where T : IComputableNumber<T>
+public class HasReferenceFunction2<T>(Function2<T> function, EnglishCharEnum reference) : HasReferenceFunction<Function2<T>>(function, reference) where T : IComputableNumber<T>
 {
-    public readonly Function2<T> Function;
-    public readonly EnglishCharEnum Reference;
-
-    public HasReferenceFunction2(Function2<T> function, EnglishCharEnum reference) : base(reference)
-    {
-        Function = function;
-    }
 }
-
-public class HasReferenceFunction3<T> : HasReferenceFunction where T : IComputableNumber<T>
+public class HasReferenceFunction3<T>(Function3<T> function, EnglishCharEnum reference) : HasReferenceFunction<Function3<T>>(function, reference) where T : IComputableNumber<T>
 {
-    public readonly Function3<T> Function;
-    public readonly EnglishCharEnum Reference;
-
-    public HasReferenceFunction3(Function3<T> function, EnglishCharEnum reference) : base(reference)
-    {
-        Function = function;
-    }
 }

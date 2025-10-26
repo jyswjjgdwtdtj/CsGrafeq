@@ -4,18 +4,20 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using CsGrafeqApplication.Controls.Displayers;
 using SkiaSharp;
+using System.Collections.Generic;
 
 namespace CsGrafeqApplication.Addons;
 
 public abstract class Addon : UserControl
 {
+    public bool Changed { get; set; } = false;
     public const bool DoNext = true;
     public const bool Intercept = false;
     public readonly CommandManager CmdManager = new();
     private readonly OnceLock IsAddonLoaded = new();
+    internal readonly List<Renderable> Layers = new List<Renderable>();
 
     //Addon内部勿动
-    public SKBitmap Bitmap = new();
     public bool IsAddonEnabled { get; set; } = true;
 
     public virtual Displayer? Owner
@@ -31,12 +33,16 @@ public abstract class Addon : UserControl
     public abstract string AddonName { get; }
 
     public Control? Setting { get; init; }
-    protected abstract void Render(SKCanvas dc, SKRect rect);
 
     internal void CallAddonRender(SKCanvas dc, SKRect rect)
     {
         if (IsAddonLoaded.Value)
-            Render(dc, rect);
+        {
+            foreach(var layer in Layers)
+            {
+                layer.Render(dc, rect);
+            }
+        }
     }
 
     internal bool CallAddonKeyDown(KeyEventArgs e)
@@ -140,13 +146,11 @@ public abstract class Addon : UserControl
     public void Undo()
     {
         CmdManager.UnDo();
-        Owner?.Invalidate();
     }
 
     public void Redo()
     {
         CmdManager.ReDo();
-        Owner?.Invalidate();
     }
 
     public abstract void Delete();

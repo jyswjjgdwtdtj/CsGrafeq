@@ -14,4 +14,8 @@
         <ProjectReference Include="..\CsGrafeq.Compiler\CsGrafeq.Compiler.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="FastExpressionCompiler" Version="5.3.0" />
+    </ItemGroup>
+
 </Project>

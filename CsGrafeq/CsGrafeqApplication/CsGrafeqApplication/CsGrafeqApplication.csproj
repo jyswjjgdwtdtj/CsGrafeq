@@ -76,6 +76,8 @@
         <AvaloniaResource Include="Fonts\MapleMono-CN-Regular.ttf">
           <CopyToOutputDirectory>Never</CopyToOutputDirectory>
         </AvaloniaResource>
+        <None Remove="Assets\add.svg" />
+        <AvaloniaResource Include="Assets\add.svg" />
     </ItemGroup>
 
     <ItemGroup>

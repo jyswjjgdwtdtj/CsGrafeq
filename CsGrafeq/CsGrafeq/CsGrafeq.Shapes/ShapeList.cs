@@ -9,11 +9,11 @@ public class ShapeList : ObservableCollection<Shape>
 {
     private static readonly StringBuilder sb = new();
     private readonly DistinctList<GeometryShape> SelectedShapes = new();
-    public event Action? OnShapeChanged;
+    public event Action<Shape>? OnShapeChanged;
 
-    private void ShapeChanged()
+    private void ShapeChanged(Shape sp)
     {
-        OnShapeChanged?.Invoke();
+        OnShapeChanged?.Invoke(sp);
     }
 
     public void ClearSelected()
@@ -29,7 +29,7 @@ public class ShapeList : ObservableCollection<Shape>
 
     public new void Add(Shape shape)
     {
-        shape.ShapeChanged += ShapeChanged;
+        shape.ShapeChanged += ()=>ShapeChanged(shape);
         if (shape is GeometryShape s)
             AddGeometry(s);
         else
@@ -110,7 +110,7 @@ public class ShapeList : ObservableCollection<Shape>
         return sb.ToString();
     }
 
-    public void Invalidate()
+    public void InvalidateBuffers()
     {
         var newarr = new Shape[Count];
         CopyTo(newarr, 0);

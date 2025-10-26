@@ -128,7 +128,6 @@ public class SKCanvasView: UserControl
                     using (var surface = SKSurface.Create(info, lb.Address, lb.RowBytes))
                     {
                         using var canvas = surface.Canvas;
-                        canvas.Scale(2f);
                         SKDraw?.Invoke(null, new SKRenderEventArgs(canvas));
                     }
                 }

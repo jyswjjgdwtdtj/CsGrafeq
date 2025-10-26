@@ -37,4 +37,8 @@ public abstract class GeometryShape : Shape
     public abstract Vec NearestOf(Vec vec);
     public abstract void RefreshValues();
     public event ShapeChangedHandler<bool>? SelectedChanged;
+    public override void Dispose()
+    {
+        
+    }
 }

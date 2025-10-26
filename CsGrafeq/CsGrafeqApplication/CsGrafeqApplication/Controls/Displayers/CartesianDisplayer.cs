@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -34,7 +35,7 @@ public class CartesianDisplayer : Displayer
         App.Current.ActualThemeVariantChanged += (s, e) =>
         {
             RefreshPaint();
-            InvalidateBuffer();
+            ForceToRender();
         };
         RefreshPaint();
     }
@@ -364,8 +365,8 @@ public class CartesianDisplayer : Displayer
         dc.DrawText("0", new SKPoint(Zero.X + 3, Zero.Y + TextFont.Size), SKTextAlign.Left, TextFont,
             AxisPaintMain);
     }
-
-    public override void CompoundBuffer()
+    private int cnt = 0;
+    public override void CompoundBuffers()
     {
         lock (TotalBuffer)
         {
@@ -373,8 +374,13 @@ public class CartesianDisplayer : Displayer
             {
                 dc.Clear(AxisBackground);
                 RenderAxisLine(dc);
-                foreach (var i in Addons) dc.DrawBitmap(i.Bitmap, new SKPoint(0, 0));
-
+                foreach (var i in Addons)
+                {
+                    foreach(var layer in i.Layers)
+                    {
+                        dc.DrawBitmap(layer.Bitmap, 0, 0);
+                    }
+                }
                 RenderAxisNumber(dc);
             }
         }
@@ -386,7 +392,7 @@ public class CartesianDisplayer : Displayer
         {
             WheelingStopWatch.Stop();
             WheelingStopWatch.Reset();
-            Dispatcher.UIThread.InvokeAsync(Invalidate);
+            Dispatcher.UIThread.InvokeAsync(ForceToRender);
         }
     }
 
@@ -396,7 +402,7 @@ public class CartesianDisplayer : Displayer
         {
             WheelingStopWatch.Stop();
             WheelingStopWatch.Reset();
-            Invalidate();
+            ForceToRender();
         }
     }
     /// <summary>
@@ -442,7 +448,7 @@ public class CartesianDisplayer : Displayer
             PreviousUnitLength = UnitLength;
             PreviousUnitLength = UnitLength;
             PreviousZero = Zero;
-            Invalidate();
+            ForceToRender();
             return;
         }
 
@@ -467,6 +473,10 @@ public class CartesianDisplayer : Displayer
         if (CallAddonPointerWheeled(e) == DoNext)
         {
             Zoom(Pow(1.04, e.Delta.Y), e.GetPosition(this));
+        }
+        else
+        {
+            AskForRender();
         }
     }
 

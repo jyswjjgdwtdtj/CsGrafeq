@@ -33,23 +33,22 @@ public struct Def
         return !(lhs == rhs);
     }
 
-    public static Def And(Def lhs, Def rhs)
+    public static Def operator &(Def lhs, Def rhs)
     {
         return new Def { First = lhs.First && rhs.First, Second = lhs.Second && rhs.Second };
     }
 
-    public static Def Or(Def lhs, Def rhs)
+    public static Def operator |(Def lhs, Def rhs)
     {
         return new Def { First = lhs.First || rhs.First, Second = lhs.Second || rhs.Second };
     }
-
-    public static Def operator &(Def lhs, Def rhs)
+    public static Def And(Def lhs, Def rhs)
     {
-        return And(lhs, rhs);
+        return lhs & rhs;
+    }
+    public static Def Or(Def lhs, Def rhs)
+    {
+        return lhs | rhs;
     }
 
-    public static Def operator |(Def lhs, Def rhs)
-    {
-        return Or(lhs, rhs);
-    }
 }

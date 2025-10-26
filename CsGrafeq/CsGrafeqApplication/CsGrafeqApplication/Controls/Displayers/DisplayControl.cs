@@ -1,4 +1,6 @@
-﻿using Avalonia.Input;
+﻿using Avalonia;
+using Avalonia.Input;
+using CsGrafeq.Compiler;
 using SkiaSharp;
 using System;
 using static CsGrafeq.Extension;
@@ -38,7 +40,7 @@ public class DisplayControl : CartesianDisplayer
         }
         else
         {
-            CompoundBuffer();
+            AskForRender();
         }
     }
 
@@ -69,38 +71,42 @@ public class DisplayControl : CartesianDisplayer
                         {
                             dc.Clear(AxisBackground);
                             RenderAxisLine(dc);
-                            if (!MovingOptimization || (LastZeroPos - Zero).Length > 30)
+                            if (false)//&&(!MovingOptimization || (LastZeroPos - Zero).Length > 30))
                             {
-                                foreach (var i in Addons)
+                                foreach (var adn in Addons)
                                 {
-                                    if (i.Bitmap.Width != TotalBuffer.Width || i.Bitmap.Height != TotalBuffer.Height)
+                                    foreach(var rt in adn.Layers)
                                     {
-                                        Throw("Bitmap size mismatch");
-                                        return;
+                                        var i = rt.Bitmap;
+                                        if (i.Width != TotalBuffer.Width || i.Height != TotalBuffer.Height)
+                                        {
+                                            Throw("Bitmap size mismatch");
+                                            return;
+                                        }
+                                        var newbmp = i.Copy();
+                                        using (var canvas = new SKCanvas(i))
+                                        {
+                                            canvas.Clear(SKColors.Transparent);
+                                            canvas.DrawBitmap(newbmp, Zero.X - LastZeroPos.X,
+                                                Zero.Y - LastZeroPos.Y);
+                                            RenderMovedPlace(canvas, rt.Render);
+                                        }
+                                        newbmp.Dispose();
+                                        dc.DrawBitmap(i, 0, 0);
                                     }
-
-                                    var newbmp = new SKBitmap(TotalBuffer.Width, TotalBuffer.Height);
-                                    using (var newbmpcanvas = new SKCanvas(newbmp))
-                                    {
-                                        newbmpcanvas.Clear(SKColors.Transparent);
-                                        newbmpcanvas.DrawBitmap(i.Bitmap, Zero.X - LastZeroPos.X,
-                                            Zero.Y - LastZeroPos.Y);
-                                        RenderMovedPlace(newbmpcanvas, i.CallAddonRender);
-                                    }
-
-                                    i.Bitmap.Dispose();
-                                    i.Bitmap = newbmp;
-                                    dc.DrawBitmap(i.Bitmap, 0, 0);
                                 }
-
                                 LastZeroPos = Zero;
                             }
                             else
                             {
-                                foreach (var i in Addons)
+                                foreach (var adn in Addons)
                                 {
-                                    dc.DrawBitmap(i.Bitmap, Zero.X - LastZeroPos.X, Zero.Y - LastZeroPos.Y);
-                                    RenderMovedPlace(dc, i.CallAddonRender);
+                                    foreach(var layer in adn.Layers)
+                                    {
+                                        var j = layer.Bitmap;
+                                        dc.DrawBitmap(j, Zero.X - LastZeroPos.X, Zero.Y - LastZeroPos.Y);
+                                        //RenderMovedPlace(dc,layer.Render);
+                                    }
                                 }
                             }
 
@@ -115,11 +121,8 @@ public class DisplayControl : CartesianDisplayer
         }
         else
         {
-            CompoundBuffer();
-            InvalidateVisual();
+            AskForRender();
         }
-
-        Focus();
     }
 
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
@@ -129,17 +132,14 @@ public class DisplayControl : CartesianDisplayer
         StopWheeling();
         if (CallAddonPointerReleased(e) == DoNext)
         {
-            if (LastZeroPos != Zero) Invalidate();
-            LastZeroPos = Zero;
-            base.OnPointerReleased(e);
-        }
+            if (LastZeroPos != Zero) ForceToRender();
+			LastZeroPos = Zero;
+			base.OnPointerReleased(e);
+		}
         else
         {
-            CompoundBuffer();
-            InvalidateVisual();
+            AskForRender();
         }
-
-        Focus();
     }
 
     protected virtual void OnPointerTapped(TappedEventArgs e)
@@ -156,34 +156,7 @@ public class DisplayControl : CartesianDisplayer
 
     private void RenderMovedPlace(SKCanvas dc, RenderHandler rm)
     {
-        var width = (float)Bounds.Width;
-        var height = (float)Bounds.Height;
-        if (Zero.X < LastZeroPos.X)
-        {
-            rm.Invoke(dc, CreateSKRectWH(width - LastZeroPos.X + Zero.X, 0, width, height));
-            if (Zero.Y < LastZeroPos.Y)
-                rm.Invoke(dc,
-                    CreateSKRectWH(0, height - LastZeroPos.Y + Zero.Y, width - LastZeroPos.X + Zero.X, height));
-            else if (Zero.Y > LastZeroPos.Y)
-                rm.Invoke(dc, CreateSKRectWH(0, 0, width - LastZeroPos.X + Zero.X, Zero.Y - LastZeroPos.Y));
-        }
-        else if (Zero.X > LastZeroPos.X)
-        {
-            rm.Invoke(dc, CreateSKRectWH(0, 0, (int)(Zero.X - LastZeroPos.X), height));
-            if (Zero.Y < LastZeroPos.Y)
-                rm.Invoke(dc,
-                    CreateSKRectWH((int)(Zero.X - LastZeroPos.X), (int)(height - LastZeroPos.Y + Zero.Y), width,
-                        height));
-            else if (Zero.Y > LastZeroPos.Y)
-                rm.Invoke(dc, CreateSKRectWH((int)(Zero.X - LastZeroPos.X), 0, width, (int)(Zero.Y - LastZeroPos.Y)));
-        }
-        else
-        {
-            if (Zero.Y < LastZeroPos.Y)
-                rm.Invoke(dc, CreateSKRectWH(0, (int)(height - LastZeroPos.Y + Zero.Y), width, height));
-            else if (Zero.Y > LastZeroPos.Y)
-                rm.Invoke(dc, CreateSKRectWH(0, 0, width, (int)(Zero.Y - LastZeroPos.Y)));
-        }
+        RenderExtension.RenderMovedPlace(dc, rm,Bounds.Size,new Point(Zero.X,Zero.Y),new Point(LastZeroPos.X,LastZeroPos.Y));
     }
 
     protected override void OnKeyDown(KeyEventArgs e)
@@ -195,6 +168,7 @@ public class DisplayControl : CartesianDisplayer
         else
         {
             e.Handled = true;
+            AskForRender();
         }
 
     }
@@ -207,8 +181,8 @@ public class DisplayControl : CartesianDisplayer
         }
         else
         {
-
             e.Handled = true;
+            AskForRender();
         }
 
     }

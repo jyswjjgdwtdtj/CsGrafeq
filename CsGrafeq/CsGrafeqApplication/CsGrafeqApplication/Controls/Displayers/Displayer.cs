@@ -2,10 +2,15 @@
 using Avalonia.Input;
 using Avalonia.Input.GestureRecognizers;
 using Avalonia.Metadata;
+using Avalonia.Threading;
 using CsGrafeqApplication.Addons;
+using DynamicData;
+using FastExpressionCompiler;
 using SkiaSharp;
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Threading;
 using AddonPointerEventArgs = CsGrafeqApplication.Addons.Addon.AddonPointerEventArgs;
 using AddonPointerEventArgsBase = CsGrafeqApplication.Addons.Addon.AddonPointerEventArgsBase;
 using AddonPointerWheelEventArgs = CsGrafeqApplication.Addons.Addon.AddonPointerWheelEventArgs;
@@ -17,12 +22,14 @@ public abstract class Displayer : SKCanvasView
 {
     public const bool DoNext = true;
     public const bool Intercept = false;
-    private bool CanPerform = true;
     protected AvaPoint LastPoint;
     protected PointerPointProperties LastPointerProperties = new();
     protected SKBitmap TotalBuffer = new(1, 1);
-    public bool ZoomingOptimization = false;
-    public bool MovingOptimization = false;
+    private Clock RenderClock = new Clock(1);
+    public bool ZoomingOptimization { get; set; } = false;
+    public bool MovingOptimization { get; set; }= false;
+    public bool ZOPEnable { get; set; } = true;
+    public bool MOPEnable  { get; set; } = true;
 
     public Displayer()
     {
@@ -32,7 +39,8 @@ public abstract class Displayer : SKCanvasView
         GestureRecognizers.Add(new PinchGestureRecognizer());
         AddHandler(Gestures.ScrollGestureEvent, (s, e) => { Zoom(Pow(1.04, e.Delta.Y), Bounds.Center); });
         AddHandler(Gestures.PinchEvent, (s, e) => { Zoom(e.Scale, e.ScaleOrigin); });
-        Languages.LanguageChanged += Invalidate;
+        Languages.LanguageChanged += ForceToRender;
+        RenderClock.OnElapsed += Render;
     }
 
     [Content] public AddonList Addons { get; } = new();
@@ -169,90 +177,99 @@ public abstract class Displayer : SKCanvasView
                 {
                     TotalBuffer.Dispose();
                     TotalBuffer = new SKBitmap((int)e.NewSize.Width, (int)e.NewSize.Height);
-                    foreach (var i in Addons)
+                    foreach (var adn in Addons)
                     {
-                        i.Bitmap.Dispose();
-                        i.Bitmap = new SKBitmap((int)e.NewSize.Width, (int)e.NewSize.Height);
+                        foreach (var layer in adn.Layers)
+                        {
+                            layer.Bitmap.Dispose();
+                            layer.Bitmap = new SKBitmap((int)e.NewSize.Width, (int)e.NewSize.Height);
+                        }
                     }
-
-                    Invalidate();
+                    ForceToRender();
                 }
     }
-
-    public void Invalidate(Addon addon)
+    protected void Invalidate()
     {
-        if (!CanPerform)
-            return;
-        if (Addons.Contains(addon))
-            using (var dc = new SKCanvas(addon.Bitmap))
-            {
-                dc.Clear();
-                addon.CallAddonRender(dc, Bounds.ToSKRect());
-            }
+        foreach(var i in Addons)
+        {
+            Invalidate(i);
+        }
+    }
+    protected void Invalidate(Renderable layer)
+    {
+        using (var dc = new SKCanvas(layer.Bitmap))
+        {
+            dc.Clear();
+            layer.Render(dc, Bounds.ToSKRect());
+        }
+        layer.Changed = false;
+    }
 
-        CompoundBuffer();
+    protected void Invalidate(Addon adn)
+    {
+        foreach (var layer in adn.Layers)
+            Invalidate(layer);
+        adn.Changed = false;
+    }
+    protected void ForceToRender()
+    {
+        RenderClock.Cancel();
+        Invalidate();
+        CompoundBuffers();
         InvalidateVisual();
     }
-
-    public void Invalidate()
+    private void Render()
     {
-        if (!CanPerform)
-            return;
-        foreach (var i in Addons)
-            using (var dc = new SKCanvas(i.Bitmap))
+        bool paintflag = false;
+        foreach (var adn in Addons)
+        {
+            if (adn.Changed)
             {
-                dc.Clear(SKColors.Transparent);
-                i.CallAddonRender(dc, Bounds.ToSKRect());
+                paintflag = true;
+                adn.Changed = false;
+                Invalidate(adn);
             }
-
-        CompoundBuffer();
-        InvalidateVisual();
-    }
-
-    public void InvalidateNotUpdate()
-    {
-        if (!CanPerform)
-            return;
-        foreach (var i in Addons)
-            using (var dc = new SKCanvas(i.Bitmap))
+            else
             {
-                dc.Clear(SKColors.Transparent);
-                i.CallAddonRender(dc, Bounds.ToSKRect());
+                foreach (var layer in adn.Layers)
+                {
+                    if (layer.Changed)
+                    {
+                        paintflag = true;
+                        layer.Changed = false;
+                        Invalidate(layer);
+                    }
+                }
             }
-
-        CompoundBuffer();
+        }
+        if (paintflag)
+        {
+            CompoundBuffers();
+            Dispatcher.UIThread.InvokeAsync(InvalidateVisual);
+        }
     }
-
-    public void InvalidateBuffer()
+    internal void AskForRender()
     {
-        if (!CanPerform)
-            return;
-        CompoundBuffer();
-        InvalidateVisual();
+        RenderClock.Touch();
     }
-
     private void ChildrenChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         foreach (var adn in Addons)
-            if (adn.Owner == null)
+            if (adn.Owner != this)
             {
-                adn.Bitmap = new SKBitmap((int)Max(Bounds.Width, 1), (int)Max(Bounds.Height, 1));
-                adn.Owner = this;
-                Invalidate(adn);
+                foreach(var i in adn.Layers)
+                {
+                    i.Bitmap?.Dispose();
+                    i.Bitmap = new SKBitmap((int)Max(Bounds.Width, 1), (int)Max(Bounds.Height, 1));
+                    adn.Owner = this;
+                }
             }
     }
-
-    public abstract void CompoundBuffer();
-
-    public void Suspend()
-    {
-        CanPerform = false;
-    }
-
-    public void Resume(bool perform = true)
-    {
-        CanPerform = true;
-        if (perform)
-            Invalidate();
-    }
+    /// <summary>
+    /// 将每个Addon中的层合成入总缓冲区
+    /// </summary>
+    public abstract void CompoundBuffers();
+    public List<Renderable> NeedRenderingLayers=new();
+    public List<Addon> NeedRenderingAddons=new();
+    public bool NeedRenderingAll = false;
 }

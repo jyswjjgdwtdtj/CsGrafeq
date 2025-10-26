@@ -10,7 +10,6 @@ public partial class MainView : UserControl
         InitializeComponent();
         this.KeyDown += Global.CallKeyDown;
         this.KeyUp += Global.CallKeyUp;
-        this.KeyDown += (s, e) => { Console.WriteLine(11); };
     }
 
 }
