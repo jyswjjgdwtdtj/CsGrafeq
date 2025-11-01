@@ -113,7 +113,8 @@ public class CircleGetter_FromCenterAndPoint : CircleGetter
 
     public override CircleStruct GetCircle()
     {
-        return new CircleStruct { Center = Center.Location, Radius = ((Vec)Center.Location - Point.Location).GetLength() };
+        return new CircleStruct
+            { Center = Center.Location, Radius = ((Vec)Center.Location - Point.Location).GetLength() };
     }
 
     public override void Attach(ShapeChangedHandler handler, GeometryShape subShape)

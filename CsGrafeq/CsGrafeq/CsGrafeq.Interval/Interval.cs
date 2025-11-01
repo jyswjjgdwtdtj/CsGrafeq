@@ -1,15 +1,14 @@
-﻿using _Interval = CsGrafeq.Interval.Interface.IInterval<CsGrafeq.Interval.Interval>;
-using static CsGrafeq.Interval.Def;
-using static CsGrafeq.Interval.Extensions.IntervalExtension;
-using sysMath = System.Math;
+﻿using static CsGrafeq.Interval.Def;
 
 namespace CsGrafeq.Interval;
 
-public readonly struct Interval : _Interval
+public readonly struct Interval //: _Interval
 {
     public Interval()
     {
     }
+
+    private static readonly Interval InValid = Create(double.NaN, double.NaN, FF);
 
     public double Sup { get; init; }
     public double Inf { get; init; }
@@ -78,13 +77,13 @@ public readonly struct Interval : _Interval
     public static Interval operator +(Interval left, Interval right)
     {
         return left.IsInValid || left.IsInValid
-            ? _Interval.InValid
+            ? InValid
             : new Interval { Inf = left.Inf + right.Inf, Sup = left.Sup + right.Sup, Def = left.Def & right.Def };
     }
 
     public static Interval operator -(Interval num)
     {
-        if (num.IsInValid) return _Interval.InValid;
+        if (num.IsInValid) return InValid;
         return Create(-num.Sup, -num.Inf, num.Def);
     }
 
@@ -95,7 +94,7 @@ public readonly struct Interval : _Interval
 
     public static Interval operator *(Interval left, Interval right)
     {
-        if (left.IsInValid || right.IsInValid) return _Interval.InValid;
+        if (left.IsInValid || right.IsInValid) return InValid;
         var def = left.Def & right.Def;
         if (left.Inf > 0 && right.Inf > 0)
             return new Interval { Inf = left.Inf * right.Inf, Sup = left.Sup * right.Sup, Def = def };
@@ -108,14 +107,14 @@ public readonly struct Interval : _Interval
 
     public static Interval operator /(Interval left, Interval right)
     {
-        if (left.IsInValid || right.IsInValid) return _Interval.InValid;
+        if (left.IsInValid || right.IsInValid) return InValid;
         if (right.ContainsEqual(0))
             return new Interval
                 { Inf = double.NegativeInfinity, Sup = double.PositiveInfinity, Def = left.Def & right.Def };
         return Create(1 / right.Inf, 1 / right.Sup, right.Def) * left;
     }
 
-    public static Interval operator %(Interval a, Interval b)
+    /*public static Interval operator %(Interval a, Interval b)
     {
         if (b.Inf == b.Sup)
         {
@@ -128,9 +127,9 @@ public readonly struct Interval : _Interval
         }
 
         return a - b * Floor(a / b);
-    }
+    }*/
 
-    public static Interval Pow(Interval i1, Interval i2)
+    /*public static Interval Pow(Interval i1, Interval i2)
     {
         return Exp(Ln(i1) * i2);
     }
@@ -143,7 +142,7 @@ public readonly struct Interval : _Interval
     public static Interval Ceil(Interval i1)
     {
         return new Interval { Inf = sysMath.Ceiling(i1.Inf), Sup = sysMath.Ceiling(i1.Sup), Def = i1.Def };
-    }
+    }*/
 
     public static Def operator ==(Interval i1, Interval i2)
     {
@@ -191,17 +190,17 @@ public readonly struct Interval : _Interval
         return (i1 > i2) | (i1 == i2);
     }
 
-    public static Interval Sgn(Interval i)
+    /*public static Interval Sgn(Interval i)
     {
         if (i.IsInValid)
-            return _Interval.InValid;
+            return InValid;
         return new Interval { Inf = sysMath.Sign(i.Inf), Sup = sysMath.Sign(i.Sup), Def = i.Def };
     }
 
     public static Interval Abs(Interval i)
     {
         if (i.IsInValid)
-            return _Interval.InValid;
+            return InValid;
         if (i.ContainsEqual(0)) return new Interval { Inf = 0, Sup = sysMath.Max(-i.Inf, i.Sup), Def = i.Def };
 
         if (i.Sup < 0) return new Interval { Inf = -i.Sup, Sup = -i.Inf, Def = i.Def };
@@ -212,7 +211,7 @@ public readonly struct Interval : _Interval
     public static Interval Median(Interval i1, Interval i2, Interval i3)
     {
         if (i1.IsInValid || i2.IsInValid || i3.IsInValid)
-            return _Interval.InValid;
+            return InValid;
         return new Interval
         {
             Def = i1.Def & i2.Def & i3.Def,
@@ -224,16 +223,16 @@ public readonly struct Interval : _Interval
     public static Interval Exp(Interval i)
     {
         if (i.IsInValid)
-            return _Interval.InValid;
+            return InValid;
         return new Interval { Inf = sysMath.Pow(double.E, i.Inf), Sup = sysMath.Pow(double.E, i.Sup), Def = i.Def };
     }
 
     public static Interval Ln(Interval i)
     {
         if (i.IsInValid)
-            return _Interval.InValid;
+            return InValid;
         if (i.Sup <= 0)
-            return _Interval.InValid;
+            return InValid;
         if (i.Inf > 0)
         {
             return new Interval { Inf = sysMath.Log(i.Inf), Sup = sysMath.Log(i.Sup), Def = i.Def };
@@ -246,9 +245,9 @@ public readonly struct Interval : _Interval
     public static Interval Lg(Interval i)
     {
         if (i.IsInValid)
-            return _Interval.InValid;
+            return InValid;
         if (i.Sup <= 0)
-            return _Interval.InValid;
+            return InValid;
         if (i.Inf > 0)
         {
             return new Interval { Inf = sysMath.Log10(i.Inf), Sup = sysMath.Log10(i.Sup), Def = i.Def };
@@ -266,9 +265,9 @@ public readonly struct Interval : _Interval
     public static Interval Sqrt(Interval i)
     {
         if (i.IsInValid)
-            return _Interval.InValid;
+            return InValid;
         if (i.Sup <= 0)
-            return _Interval.InValid;
+            return InValid;
         if (i.Inf > 0)
         {
             return new Interval { Inf = sysMath.Sqrt(i.Inf), Sup = sysMath.Sqrt(i.Sup), Def = i.Def };
@@ -300,7 +299,7 @@ public readonly struct Interval : _Interval
     public static Interval GCD(Interval i1, Interval i2)
     {
         if (i1.IsInValid || i2.IsInValid)
-            return _Interval.InValid;
+            return InValid;
         if (!(i1.TryGetInteger(out _) && i2.TryGetInteger(out _)))
             return new Interval { Inf = double.NegativeInfinity, Sup = double.PositiveInfinity, Def = i1.Def & i2.Def };
         double value = Math.GCD((int)i1.Inf, (int)i2.Inf);
@@ -310,7 +309,7 @@ public readonly struct Interval : _Interval
     public static Interval LCM(Interval i1, Interval i2)
     {
         if (i1.IsInValid || i2.IsInValid)
-            return _Interval.InValid;
+            return InValid;
         if (!(i1.TryGetInteger(out _) && i2.TryGetInteger(out _)))
             return new Interval { Inf = double.NegativeInfinity, Sup = double.PositiveInfinity, Def = i1.Def & i2.Def };
         double value = Math.LCM((int)i1.Inf, (int)i2.Inf);
@@ -348,7 +347,7 @@ public readonly struct Interval : _Interval
 
     public static Interval Tan(Interval i)
     {
-        if (i.IsInValid) return _Interval.InValid;
+        if (i.IsInValid) return InValid;
         var l = sysMath.Floor((i.Sup + sysMath.PI / 2) / sysMath.PI);
         var r = sysMath.Floor((i.Inf + sysMath.PI / 2) / sysMath.PI);
         if (l - r == 1)
@@ -365,7 +364,7 @@ public readonly struct Interval : _Interval
     public static Interval ArcTan(Interval i)
     {
         if (i.IsInValid)
-            return _Interval.InValid;
+            return InValid;
         return new Interval { Inf = sysMath.Atan(i.Inf), Sup = sysMath.Atan(i.Sup), Def = i.Def };
         ;
     }
@@ -373,9 +372,9 @@ public readonly struct Interval : _Interval
     public static Interval ArcSin(Interval i)
     {
         if (i.IsInValid)
-            return _Interval.InValid;
+            return InValid;
         if (i.Sup < -1 || i.Inf > 1)
-            return _Interval.InValid;
+            return InValid;
         return new Interval
         {
             Inf = sysMath.Asin(sysMath.Max(i.Inf, -1)),
@@ -387,9 +386,9 @@ public readonly struct Interval : _Interval
     public static Interval ArcCos(Interval i)
     {
         if (i.IsInValid)
-            return _Interval.InValid;
+            return InValid;
         if (i.Sup < -1 || i.Inf > 1)
-            return _Interval.InValid;
+            return InValid;
         return new Interval
         {
             Inf = sysMath.Acos(sysMath.Min(i.Sup, 1)),
@@ -401,7 +400,7 @@ public readonly struct Interval : _Interval
     public static Interval Sinh(Interval i)
     {
         if (i.IsInValid)
-            return _Interval.InValid;
+            return InValid;
         return new Interval { Inf = sysMath.Sinh(i.Inf), Sup = sysMath.Sinh(i.Sup), Def = i.Def };
         ;
         ;
@@ -410,7 +409,7 @@ public readonly struct Interval : _Interval
     public static Interval Cosh(Interval i)
     {
         if (i.IsInValid)
-            return _Interval.InValid;
+            return InValid;
         if (i.ContainsEqual(0))
             return new Interval { Inf = 1, Sup = sysMath.Cosh(sysMath.Max(i.Sup, -i.Inf)), Def = i.Def };
 
@@ -420,14 +419,14 @@ public readonly struct Interval : _Interval
     public static Interval Tanh(Interval i)
     {
         if (i.IsInValid)
-            return _Interval.InValid;
+            return InValid;
         return new Interval { Inf = sysMath.Tanh(i.Inf), Sup = sysMath.Tanh(i.Sup), Def = i.Def };
     }
 
     public static Interval ArcTanh(Interval i)
     {
         if (i.IsInValid || i.Sup < -1 || i.Inf > 1)
-            return _Interval.InValid;
+            return InValid;
         return new Interval
         {
             Inf = i.Inf < -1 ? double.NegativeInfinity : sysMath.Atanh(i.Inf),
@@ -438,14 +437,14 @@ public readonly struct Interval : _Interval
     public static Interval ArcSinh(Interval i)
     {
         if (i.IsInValid)
-            return _Interval.InValid;
+            return InValid;
         return new Interval { Inf = sysMath.Asinh(i.Inf), Sup = sysMath.Asinh(i.Sup), Def = i.Def };
     }
 
     public static Interval ArcCosh(Interval i)
     {
         if (i.IsInValid || i.Sup < 1)
-            return _Interval.InValid;
+            return InValid;
         var res = new Range { Inf = i.Inf, Sup = i.Sup };
         var def = i.Def;
         if (res.Inf < 1)
@@ -457,5 +456,5 @@ public readonly struct Interval : _Interval
         res.Inf = sysMath.Acosh(i.Inf);
         res.Inf = sysMath.Acosh(i.Sup);
         return new Interval { Inf = res.Inf, Sup = res.Sup, Def = def };
-    }
+    }*/
 }

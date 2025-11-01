@@ -5,13 +5,12 @@ using System.Reflection.Emit;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Windows.Forms;
 using System.Collections;
 using System.Linq.Expressions;
 
 namespace CsGrafeq
 {
-    internal static class ExpressionCompiler
+    public static class ExpressionCompiler
     {
         private static bool[] usedconst;
         public static CompileResult Compile(string Expression)
@@ -200,14 +199,14 @@ namespace CsGrafeq
         private static readonly MethodInfoHelper NumberMethods = new MethodInfoHelper(typeof(NumberMath));
         private static readonly StringBuilder sb = new StringBuilder();
         private static int stacklength = 0;
-        internal static string Record
+        public static string Record
         {
             get { return sb.ToString(); }
         }
         static ExpressionCompiler()
         {
         }
-        internal static Element[] ParseTokens(this Token[] Tokens)
+        public static Element[] ParseTokens(this Token[] Tokens)
         {
             Stack<OperatorType> op = new Stack<OperatorType>();
             Stack<Element> exp = new Stack<Element>();
@@ -337,8 +336,6 @@ namespace CsGrafeq
                 case ElementType.Operator:
                     {
                         MethodInfo mf = mih.GetMethod(ele.NameOrValue);
-                        if (mf == null)
-                            MessageBox.Show(ele.NameOrValue);
                         IL.Emit(OpCodes.Call, mf);
                         stacklength -= mf.GetParameters().Length;
                         sb.AppendLine("call oper:" + ele.NameOrValue);
@@ -446,7 +443,7 @@ namespace CsGrafeq
             //if (stacklength != 1)
             //    throw new Exception("缺少运算符或函数"+stacklength);
         }
-        internal static Token[] GetTokens(this string script)//词法分析器
+        public static Token[] GetTokens(this string script)//词法分析器
         {
             script += '#';
             int loc = 0;
@@ -694,7 +691,7 @@ namespace CsGrafeq
                 return null;
             }
         }
-        internal struct CompileResult
+        public struct CompileResult
         {
             public IntervalSetImpFunctionDelegate IntervalSetImpFunctionDelegate;
             public MarchingSquaresDelegate MarchingSquaresDelegate;
@@ -707,7 +704,7 @@ namespace CsGrafeq
             }
         }
         #endregion
-        internal class ILRecorder
+        public class ILRecorder
         {
             private ILGenerator IL;
             private StringBuilder sb = new StringBuilder();
@@ -777,9 +774,9 @@ namespace CsGrafeq
     }
     public class CompileInfo
     {
-        internal char[] parameters=new char[] { 'x','y'};
-        internal ConstantMode constantMode=ConstantMode.Array;
-        internal Type mathclass;
+        public char[] parameters=new char[] { 'x','y'};
+        public ConstantMode constantMode=ConstantMode.Array;
+        public Type mathclass;
         public CompileInfo(char[] parameters, ConstantMode constantMode, Type mathclass)
         {
             List<char> list = new List<char>();
@@ -831,7 +828,7 @@ namespace CsGrafeq
         Equal, Less, Greater, LessEqual, GreaterEqual,
         Union, Intersect
     }
-    internal enum TokenType
+    public enum TokenType
     {
         Add, Subtract, Multiply, Divide, Pow, Mod,
         LeftBracket, RightBracket, Start, Neg,
@@ -839,7 +836,7 @@ namespace CsGrafeq
         VariableOrFunction, Number, Comma,
         Err_UnDefined
     }
-    internal struct Token
+    public struct Token
     {
         public TokenType type;
         public string NameOrValue;
@@ -848,7 +845,7 @@ namespace CsGrafeq
             return type.ToString() + " " + NameOrValue;
         }
     }
-    internal struct Element
+    public struct Element
     {
         public ElementType type;
         public string NameOrValue;

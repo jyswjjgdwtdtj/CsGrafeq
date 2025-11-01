@@ -3,22 +3,22 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
-using Avalonia.Platform;
 using Avalonia.Rendering.SceneGraph;
 using Avalonia.Skia;
 using SkiaSharp;
 
 namespace CsGrafeqApplication.Controls;
+
 /// <summary>
-/// A Xaml canvas control that can be drawn on using SkiaSharp drawing commands
-/// which facilitates porting from existing Xamarin Forms applications.
+///     A Xaml canvas control that can be drawn on using SkiaSharp drawing commands
+///     which facilitates porting from existing Xamarin Forms applications.
 /// </summary>
 /// <remarks>
-/// See: https://github.com/mono/SkiaSharp/blob/main/source/SkiaSharp.Views/SkiaSharp.Views.UWP/SKXamlCanvas.cs.
-/// <see cref="Decorator"/> was used instead of <see cref="Canvas"/>,
-/// because <see cref="Decorator"/> facilitates the relative positioning of any additional controls.
+///     See: https://github.com/mono/SkiaSharp/blob/main/source/SkiaSharp.Views/SkiaSharp.Views.UWP/SKXamlCanvas.cs.
+///     <see cref="Decorator" /> was used instead of <see cref="Canvas" />,
+///     because <see cref="Decorator" /> facilitates the relative positioning of any additional controls.
 /// </remarks>
-public class SKCanvasView: UserControl
+public class SKCanvasView : UserControl
 {
     /// <summary>
     ///     用于DrawingContext的Custom方法
@@ -73,7 +73,6 @@ public class SKCanvasView: UserControl
     {
         private readonly object BufferLock = new();
         private WriteableBitmap Buffer;
-        public Vector Dpi { get; set; }=new Vector(300, 300);
 
         public CustomDrawOperation(Rect bounds, uint clearColor = 0x00FFFFFF)
         {
@@ -82,6 +81,8 @@ public class SKCanvasView: UserControl
             Buffer = new WriteableBitmap(new PixelSize(Max((int)bounds.Width, 100), Max((int)bounds.Height, 100)),
                 Dpi);
         }
+
+        public Vector Dpi { get; } = new(300, 300);
 
         public void Dispose()
         {
@@ -131,6 +132,7 @@ public class SKCanvasView: UserControl
                         SKDraw?.Invoke(null, new SKRenderEventArgs(canvas));
                     }
                 }
+
                 context.DrawBitmap(Buffer, Bounds, Bounds);
             }
         }

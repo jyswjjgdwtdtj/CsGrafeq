@@ -5,12 +5,11 @@
              xmlns:vm="clr-namespace:CsGrafeqApplication.ViewModels"
              xmlns:addons="clr-namespace:CsGrafeqApplication.Addons"
              xmlns:controls="clr-namespace:CsGrafeqApplication.Controls"
-             xmlns:properties="clr-namespace:CsGrafeqApplication.Properties"
              xmlns:csgrafeqapp="clr-namespace:CsGrafeqApplication"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CsGrafeqApplication.Controls.DisplayerContainer"
              x:DataType="vm:DisplayerContainerViewModel"
-			 Focusable="True">
+             Focusable="True">
     <UserControl.Styles>
         <Style Selector="Svg.F">
             <Setter Property="Css" Value="{DynamicResource OppositeCssPathFillString}" />
@@ -182,43 +181,43 @@
                         </StackPanel.Styles>
                         <RepeatButton Click="StepBack_Clicked">
                             <ToolTip.Tip>
-								<TextBlock Text="{CompiledBinding MultiLanguageResources.UndoText.Data}"></TextBlock>
+                                <TextBlock Text="{CompiledBinding MultiLanguageResources.UndoText.Data}" />
                             </ToolTip.Tip>
-                            <Svg Path="/Assets/stepback.svg" Width="32" Height="32" Margin="0" Classes="F"  />
+                            <Svg Path="/Assets/stepback.svg" Width="32" Height="32" Margin="0" Classes="F" />
                         </RepeatButton>
                         <RepeatButton Click="StepOver_Clicked">
                             <ToolTip.Tip>
-                                <TextBlock Text="{CompiledBinding MultiLanguageResources.RedoText.Data}"></TextBlock>
+                                <TextBlock Text="{CompiledBinding MultiLanguageResources.RedoText.Data}" />
                             </ToolTip.Tip>
                             <Svg Path="/Assets/stepover.svg" Width="32" Height="32" Margin="0" Classes="F" />
                         </RepeatButton>
                         <RepeatButton Click="ZoomOut_Clicked">
                             <ToolTip.Tip>
-                                <TextBlock Text="{CompiledBinding MultiLanguageResources.ZoomOutText.Data}"></TextBlock>
+                                <TextBlock Text="{CompiledBinding MultiLanguageResources.ZoomOutText.Data}" />
                             </ToolTip.Tip>
                             <Svg Path="/Assets/zoomout.svg" Width="32" Height="32" Margin="0" Classes="S" />
                         </RepeatButton>
                         <RepeatButton Click="ZoomIn_Clicked">
                             <ToolTip.Tip>
-                                <TextBlock Text="{CompiledBinding MultiLanguageResources.ZoomInText.Data}"></TextBlock>
+                                <TextBlock Text="{CompiledBinding MultiLanguageResources.ZoomInText.Data}" />
                             </ToolTip.Tip>
                             <Svg Path="/Assets/zoomin.svg" Width="32" Height="32" Margin="0" Classes="S" />
                         </RepeatButton>
                         <Button Click="Delete_Clicked">
                             <ToolTip.Tip>
-                                <TextBlock Text="{CompiledBinding MultiLanguageResources.DeleteText.Data}"></TextBlock>
+                                <TextBlock Text="{CompiledBinding MultiLanguageResources.DeleteText.Data}" />
                             </ToolTip.Tip>
                             <Svg Path="/Assets/trash.svg" Width="32" Height="32" Margin="0" Classes="S" />
                         </Button>
                         <Button Click="SelectAll_Clicked">
                             <ToolTip.Tip>
-                                <TextBlock Text="{CompiledBinding MultiLanguageResources.SelectAllText.Data}"></TextBlock>
+                                <TextBlock Text="{CompiledBinding MultiLanguageResources.SelectAllText.Data}" />
                             </ToolTip.Tip>
-                            <Svg Path="/Assets/selectall.svg" Width="32" Height="32" Margin="0" Classes="F"/>
+                            <Svg Path="/Assets/selectall.svg" Width="32" Height="32" Margin="0" Classes="F" />
                         </Button>
                         <Button Click="DeSelectAll_Clicked">
                             <ToolTip.Tip>
-                                <TextBlock Text="{CompiledBinding MultiLanguageResources.DeselectAllText.Data}"></TextBlock>
+                                <TextBlock Text="{CompiledBinding MultiLanguageResources.DeselectAllText.Data}" />
                             </ToolTip.Tip>
                             <Svg Path="/Assets/deselectall.svg" Width="32" Height="32" Margin="0" Classes="F" />
                         </Button>
@@ -247,19 +246,24 @@
                         </StackPanel.Styles>
                         <Button Click="Setting_Clicked">
                             <ToolTip.Tip>
-                                <TextBlock Text="{CompiledBinding MultiLanguageResources.SettingText.Data}"></TextBlock>
+                                <TextBlock Text="{CompiledBinding MultiLanguageResources.SettingText.Data}" />
                             </ToolTip.Tip>
                             <Svg Path="/Assets/setting.svg" Width="32" Height="32" Margin="0" Classes="F" />
                         </Button>
                         <Button>
                             <ToolTip.Tip>
-                                <TextBlock Text="{CompiledBinding MultiLanguageResources.LanguageText.Data}"></TextBlock>
+                                <TextBlock Text="{CompiledBinding MultiLanguageResources.LanguageText.Data}" />
                             </ToolTip.Tip>
                             <Button.Flyout>
                                 <Flyout Placement="Left">
-                                    <ComboBox SelectedIndex="{x:Static csgrafeqapp:Languages.CurrentLanguageIndex}" SelectionChanged="LanguageSelectionChanged">
-                                        <ComboBoxItem><TextBlock Text="en-us (English)"/></ComboBoxItem>
-                                        <ComboBoxItem><TextBlock Text="zh-hans (Chinese)"/></ComboBoxItem>
+                                    <ComboBox SelectedIndex="{x:Static csgrafeqapp:Languages.CurrentLanguageIndex}"
+                                              SelectionChanged="LanguageSelectionChanged">
+                                        <ComboBoxItem>
+                                            <TextBlock Text="en-us (English)" />
+                                        </ComboBoxItem>
+                                        <ComboBoxItem>
+                                            <TextBlock Text="zh-hans (Chinese)" />
+                                        </ComboBoxItem>
                                     </ComboBox>
                                 </Flyout>
                             </Button.Flyout>

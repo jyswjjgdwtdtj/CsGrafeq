@@ -5,7 +5,7 @@ namespace CsGrafeq.Shapes;
 
 public abstract class GeometryShape : Shape
 {
-    public readonly static GeometryShape Null= new NullGeometryShape();
+    public static readonly GeometryShape Null = new NullGeometryShape();
     public List<GeometryShape> SubShapes = new();
     public abstract GeometryGetter Getter { get; }
 
@@ -37,8 +37,8 @@ public abstract class GeometryShape : Shape
     public abstract Vec NearestOf(Vec vec);
     public abstract void RefreshValues();
     public event ShapeChangedHandler<bool>? SelectedChanged;
+
     public override void Dispose()
     {
-        
     }
 }

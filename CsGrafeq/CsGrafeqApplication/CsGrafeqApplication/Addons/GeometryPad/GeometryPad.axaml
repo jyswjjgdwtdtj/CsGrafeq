@@ -2,12 +2,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:vm="clr-namespace:CsGrafeqApplication.ViewModels"
              xmlns:geopad="clr-namespace:CsGrafeqApplication.Addons.GeometryPad;assembly=CsGrafeqApplication"
              xmlns:ctls="clr-namespace:CsGrafeqApplication.Controls;assembly=CsGrafeqApplication"
              xmlns:shapes="clr-namespace:CsGrafeq.Shapes;assembly=CsGrafeq.Shapes"
              xmlns:getter="clr-namespace:CsGrafeq.Shapes.ShapeGetter;assembly=CsGrafeq.Shapes"
-             xmlns:system="clr-namespace:System"
              xmlns:shapes1="clr-namespace:CsGrafeq.Shapes"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CsGrafeqApplication.Addons.GeometryPad.GeometryPad" x:DataType="geopad:GeometryPadViewModel">
@@ -137,17 +135,22 @@
                 Background="Transparent">
         <TabItem>
             <TabItem.Header>
-                <Svg Path="/Assets/input.svg" Width="25" Height="25" Margin="0" Css="{DynamicResource OppositeCssPathFillString}"/>
+                <Svg Path="/Assets/input.svg" Width="25" Height="25" Margin="0"
+                     Css="{DynamicResource OppositeCssPathFillString}" />
             </TabItem.Header>
             <DockPanel ZIndex="1" LastChildFill="True">
                 <Border DockPanel.Dock="Top" HorizontalAlignment="Stretch">
                     <DockPanel LastChildFill="True" HorizontalAlignment="Stretch" Margin="5">
                         <Border Width="30" Height="30" DockPanel.Dock="Left">
-                            <Svg Path="/Assets/add.svg" Width="25" Height="25" Margin="0" VerticalAlignment="Center" HorizontalAlignment="Center"></Svg>
+                            <Svg Path="/Assets/add.svg" Width="25" Height="25" Margin="0" VerticalAlignment="Center"
+                                 HorizontalAlignment="Center" />
                         </Border>
-                        <Border>
-                            <TextBox BorderThickness="0" Classes="NoDataValidation" AcceptsReturn="False" AcceptsTab="False" KeyUp="NewFuncOnClick" Name="NewFuncTextBox">
-                            </TextBox>
+                        <Border Background="{DynamicResource CgBackgroundBrush}"
+                                BorderBrush="{DynamicResource CgHTCtPureBackgroundBrush}" BorderThickness="1"
+                                CornerRadius="5">
+                            <TextBox BorderThickness="0" Classes="NoDataValidation" AcceptsReturn="False"
+                                     AcceptsTab="False" KeyUp="NewFuncOnClick" Name="NewFuncTextBox"
+                                     PropertyChanged="NewFuncPropertyChanged" />
                         </Border>
                     </DockPanel>
                 </Border>
@@ -196,7 +199,8 @@
                                                 <Button DockPanel.Dock="Right" VerticalAlignment="Center"
                                                         Tag="{CompiledBinding .}" Click="DeleteButtonClicked"
                                                         Background="{StaticResource HTMedianBrush}">
-                                                    <Svg Path="/Assets/delete.svg" Width="20" Height="20" Margin="0" Css="{DynamicResource OppositeCssPathFillString}"/>
+                                                    <Svg Path="/Assets/delete.svg" Width="20" Height="20" Margin="0"
+                                                         Css="{DynamicResource OppositeCssPathFillString}" />
                                                 </Button>
                                                 <ContentControl Content="{CompiledBinding .}">
                                                     <ContentControl.ContentTemplate>
@@ -214,41 +218,39 @@
                                                                             Tapped="EventHandledTrue" />
                                                                         <StackPanel Orientation="Horizontal">
                                                                             <TextBlock Text="=Point("
-                                                                                TextAlignment="Left"
-                                                                                VerticalAlignment="Center"
-                                                                                Classes="Big" />
+                                                                                    TextAlignment="Left"
+                                                                                    VerticalAlignment="Center"
+                                                                                    Classes="Big" />
                                                                             <TextBox
                                                                                 Text="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointX.ValueStr,Mode=TwoWay}"
                                                                                 Classes="CommonTextBox Big"
-                                                                                GotFocus="TextBoxGetFocus"
+
                                                                                 KeyDown="TextBoxKeyDown"
-                                                                                LostFocus="TextBoxPixelXLostFocus"
+
                                                                                 Tag="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointX}"
                                                                                 PropertyChanged="Number_OnPropertyChanged"
-                                                                                KeyUp="TextBox_OnKeyUp"
                                                                                 Loaded="NumberTextBox_OnLoaded"
                                                                                 Tapped="EventHandledTrue"
                                                                                 Focusable="True"
                                                                                 IsEnabled="{CompiledBinding IsUserEnabled}" />
                                                                             <TextBlock Text="," TextAlignment="Left"
-                                                                                VerticalAlignment="Center"
-                                                                                Classes="Big" />
+                                                                                    VerticalAlignment="Center"
+                                                                                    Classes="Big" />
                                                                             <TextBox
                                                                                 Text="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointY.ValueStr,Mode=TwoWay}"
                                                                                 Classes="CommonTextBox Big"
-                                                                                GotFocus="TextBoxGetFocus"
+
                                                                                 Loaded="NumberTextBox_OnLoaded"
                                                                                 KeyDown="TextBoxKeyDown"
-                                                                                LostFocus="TextBoxPixelYLostFocus"
+
                                                                                 Tag="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointY}"
                                                                                 PropertyChanged="Number_OnPropertyChanged"
-                                                                                KeyUp="TextBox_OnKeyUp"
                                                                                 Tapped="EventHandledTrue"
                                                                                 Focusable="True"
                                                                                 IsEnabled="{CompiledBinding IsUserEnabled}" />
                                                                             <TextBlock Text=")" TextAlignment="Left"
-                                                                                VerticalAlignment="Center"
-                                                                                Classes="Big" />
+                                                                                    VerticalAlignment="Center"
+                                                                                    Classes="Big" />
                                                                         </StackPanel>
                                                                     </DockPanel>
                                                                 </DataTemplate>
@@ -266,10 +268,11 @@
                                                                             Margin="0"
                                                                             Tapped="EventHandledTrue" />
                                                                         <DockPanel Grid.Column="1"
-                                                                            Grid.Row="0" LastChildFill="True">
+                                                                                Grid.Row="0" LastChildFill="True">
                                                                             <StackPanel Orientation="Horizontal"
-                                                                                Background="Transparent" Margin="0,5"
-                                                                                VerticalAlignment="Center">
+                                                                                    Background="Transparent"
+                                                                                    Margin="0,5"
+                                                                                    VerticalAlignment="Center">
                                                                                 <TextBlock Text="=Controlled("
                                                                                     TextAlignment="Left"
                                                                                     VerticalAlignment="Center"
@@ -277,11 +280,8 @@
                                                                                 <TextBox
                                                                                     Text="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointX.ValueStr,Mode=TwoWay}"
                                                                                     Classes="CommonTextBox Big"
-                                                                                    GotFocus="TextBoxGetFocus"
                                                                                     KeyDown="TextBoxKeyDown"
-                                                                                    LostFocus="TextBoxPixelXLostFocus"
                                                                                     PropertyChanged="Number_OnPropertyChanged"
-                                                                                    KeyUp="TextBox_OnKeyUp"
                                                                                     Loaded="NumberTextBox_OnLoaded"
                                                                                     Tag="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointX}"
                                                                                     Tapped="EventHandledTrue"
@@ -294,11 +294,8 @@
                                                                                 <TextBox
                                                                                     Text="{CompiledBinding  ((getter:PointGetter_Movable)PointGetter).PointY.ValueStr,Mode=TwoWay}"
                                                                                     Classes="CommonTextBox Big"
-                                                                                    GotFocus="TextBoxGetFocus"
                                                                                     KeyDown="TextBoxKeyDown"
-                                                                                    LostFocus="TextBoxPixelYLostFocus"
                                                                                     PropertyChanged="Number_OnPropertyChanged"
-                                                                                    KeyUp="TextBox_OnKeyUp"
                                                                                     Loaded="NumberTextBox_OnLoaded"
                                                                                     Tag="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointX}"
                                                                                     Tapped="EventHandledTrue"
@@ -317,14 +314,14 @@
                                                                             VerticalAlignment="Center" Grid.Column="1"
                                                                             Grid.Row="1">
                                                                             <TextBlock Text="On " TextAlignment="Left"
-                                                                                VerticalAlignment="Center"
-                                                                                Classes="Small" />
+                                                                                    VerticalAlignment="Center"
+                                                                                    Classes="Small" />
                                                                             <TextBlock
                                                                                 Text="{CompiledBinding On.TypeName,Mode=TwoWay,DataType=getter:PointGetter_Movable}"
                                                                                 Classes="CommonTextBox Small" />
                                                                             <TextBlock Text=" " TextAlignment="Left"
-                                                                                VerticalAlignment="Center"
-                                                                                Classes="Small" />
+                                                                                    VerticalAlignment="Center"
+                                                                                    Classes="Small" />
                                                                             <ctls:CheckedControl
                                                                                 IsChecked="{CompiledBinding On.Selected, Mode=TwoWay,DataType=getter:PointGetter_Movable}"
                                                                                 IsOver="{CompiledBinding On.PointerOver, Mode=OneWayToSource,DataType=getter:PointGetter_Movable}"
@@ -350,20 +347,21 @@
                                                                             Grid.Column="0" Grid.Row="0" Height="20"
                                                                             Margin="0" />
                                                                         <StackPanel Orientation="Horizontal"
-                                                                            Background="Transparent" Margin="0,5"
-                                                                            VerticalAlignment="Center" Grid.Column="1"
-                                                                            Grid.Row="0">
-                                                                            <TextBlock Text="=" TextAlignment="Left"
+                                                                                Background="Transparent" Margin="0,5"
                                                                                 VerticalAlignment="Center"
-                                                                                Classes="Big" />
+                                                                                Grid.Column="1"
+                                                                                Grid.Row="0">
+                                                                            <TextBlock Text="=" TextAlignment="Left"
+                                                                                    VerticalAlignment="Center"
+                                                                                    Classes="Big" />
                                                                             <TextBlock
                                                                                 Text="{CompiledBinding PointGetter.ActionName}"
                                                                                 TextAlignment="Left"
                                                                                 VerticalAlignment="Center"
                                                                                 Classes="Big" />
                                                                             <TextBlock Text="(" TextAlignment="Left"
-                                                                                VerticalAlignment="Center"
-                                                                                Classes="Big" />
+                                                                                    VerticalAlignment="Center"
+                                                                                    Classes="Big" />
                                                                             <ContentControl
                                                                                 Content="{CompiledBinding PointGetter.Parameters}">
                                                                                 <ContentControl.ContentTemplate>
@@ -384,28 +382,29 @@
                                                                                 </ContentControl.ContentTemplate>
                                                                             </ContentControl>
                                                                             <TextBlock Text=")" TextAlignment="Left"
-                                                                                VerticalAlignment="Center"
-                                                                                Classes="Big" />
+                                                                                    VerticalAlignment="Center"
+                                                                                    Classes="Big" />
                                                                         </StackPanel>
                                                                         <StackPanel Orientation="Horizontal"
-                                                                            Background="Transparent" Margin="5"
-                                                                            VerticalAlignment="Center" Grid.Column="1"
-                                                                            Grid.Row="1">
-                                                                            <TextBlock Text="=(" TextAlignment="Left"
+                                                                                Background="Transparent" Margin="5"
                                                                                 VerticalAlignment="Center"
-                                                                                Classes="Small" />
+                                                                                Grid.Column="1"
+                                                                                Grid.Row="1">
+                                                                            <TextBlock Text="=(" TextAlignment="Left"
+                                                                                    VerticalAlignment="Center"
+                                                                                    Classes="Small" />
                                                                             <TextBlock
                                                                                 Text="{CompiledBinding  Location.X,Mode=OneWay}"
                                                                                 Classes="CommonTextBox Small" />
                                                                             <TextBlock Text="," TextAlignment="Left"
-                                                                                VerticalAlignment="Center"
-                                                                                Classes="Small" />
+                                                                                    VerticalAlignment="Center"
+                                                                                    Classes="Small" />
                                                                             <TextBlock
                                                                                 Text="{CompiledBinding Location.Y,Mode=OneWay}"
                                                                                 Classes="CommonTextBox Small" />
                                                                             <TextBlock Text=")" TextAlignment="Left"
-                                                                                VerticalAlignment="Center"
-                                                                                Classes="Small" />
+                                                                                    VerticalAlignment="Center"
+                                                                                    Classes="Small" />
                                                                         </StackPanel>
                                                                     </Grid>
                                                                 </DataTemplate>
@@ -424,20 +423,21 @@
                                                                             Margin="0"
                                                                             Tapped="EventHandledTrue" />
                                                                         <StackPanel Orientation="Horizontal"
-                                                                            Background="Transparent" Margin="0,5"
-                                                                            VerticalAlignment="Center" Grid.Column="1"
-                                                                            Grid.Row="0">
-                                                                            <TextBlock Text="=" TextAlignment="Left"
+                                                                                Background="Transparent" Margin="0,5"
                                                                                 VerticalAlignment="Center"
-                                                                                Classes="Big" />
+                                                                                Grid.Column="1"
+                                                                                Grid.Row="0">
+                                                                            <TextBlock Text="=" TextAlignment="Left"
+                                                                                    VerticalAlignment="Center"
+                                                                                    Classes="Big" />
                                                                             <TextBlock
                                                                                 Text="{CompiledBinding Getter.ActionName}"
                                                                                 TextAlignment="Left"
                                                                                 VerticalAlignment="Center"
                                                                                 Classes="Big" />
                                                                             <TextBlock Text="(" TextAlignment="Left"
-                                                                                VerticalAlignment="Center"
-                                                                                Classes="Big" />
+                                                                                    VerticalAlignment="Center"
+                                                                                    Classes="Big" />
                                                                             <ContentControl
                                                                                 Content="{CompiledBinding Getter.Parameters}">
                                                                                 <ContentControl.ContentTemplate>
@@ -458,12 +458,12 @@
                                                                                 </ContentControl.ContentTemplate>
                                                                             </ContentControl>
                                                                             <TextBlock Text=")" TextAlignment="Left"
-                                                                                VerticalAlignment="Center"
-                                                                                Classes="Big" />
+                                                                                    VerticalAlignment="Center"
+                                                                                    Classes="Big" />
                                                                         </StackPanel>
                                                                         <TextBlock Text="{CompiledBinding Description}"
-                                                                            Grid.Column="1" Grid.Row="1"
-                                                                            Classes="Small" />
+                                                                                Grid.Column="1" Grid.Row="1"
+                                                                                Classes="Small" />
                                                                     </Grid>
                                                                 </DataTemplate>
                                                             </geopad:ShapeTemplate.Common>
@@ -479,11 +479,11 @@
                                                                             Tapped="EventHandledTrue" />
                                                                         <StackPanel Orientation="Horizontal">
                                                                             <TextBlock Text="=Circle("
-                                                                                TextAlignment="Left"
-                                                                                Classes="Big"
-                                                                                VerticalAlignment="Center" />
+                                                                                    TextAlignment="Left"
+                                                                                    Classes="Big"
+                                                                                    VerticalAlignment="Center" />
                                                                             <TextBlock Text="Center:" Classes="Prompt"
-                                                                                VerticalAlignment="Center" />
+                                                                                    VerticalAlignment="Center" />
                                                                             <ctls:CheckedControl
                                                                                 IsChecked="{CompiledBinding Selected, Mode=TwoWay}"
                                                                                 IsOver="{CompiledBinding PointerOver, Mode=OneWayToSource}"
@@ -496,20 +496,19 @@
                                                                                     Classes="Small" />
                                                                             </ctls:CheckedControl>
                                                                             <TextBlock Text="," TextAlignment="Left"
-                                                                                VerticalAlignment="Center"
-                                                                                Classes="Big" />
+                                                                                    VerticalAlignment="Center"
+                                                                                    Classes="Big" />
                                                                             <TextBox
-                                                                                GotFocus="TextBoxGetFocus"
+
                                                                                 Text="{CompiledBinding ValueStr,Mode=TwoWay}"
                                                                                 Classes="CommonTextBox Big"
-                                                                                LostFocus="NumberLostFocus"
                                                                                 Tag="{CompiledBinding Path=.}"
                                                                                 PropertyChanged="Number_OnPropertyChanged"
                                                                                 Tapped="EventHandledTrue"
                                                                                 DataContext="{CompiledBinding Path=((getter:CircleGetter_FromCenterAndRadius)Getter).Radius}" />
                                                                             <TextBlock Text=")" TextAlignment="Left"
-                                                                                VerticalAlignment="Center"
-                                                                                Classes="Big" />
+                                                                                    VerticalAlignment="Center"
+                                                                                    Classes="Big" />
                                                                         </StackPanel>
                                                                     </StackPanel>
                                                                 </DataTemplate>
@@ -526,6 +525,7 @@
                                         <Border
                                             Background="{CompiledBinding Color,Converter={StaticResource UIntColorToBrush},ConverterParameter=140}"
                                             Height="{CompiledBinding IsDeleted,Converter={StaticResource BoolToDouble},ConverterParameter='70',Mode=OneWay}"
+                                            IsVisible="{CompiledBinding IsDeleted,Converter={StaticResource Not}}"
                                             CornerRadius="5" BorderThickness="0" Tapped="ImpFuncOnTapped">
                                             <FlyoutBase.AttachedFlyout>
                                                 <Flyout ShowMode="Standard" Placement="BottomEdgeAlignedLeft">
@@ -549,12 +549,16 @@
                                                     VerticalAlignment="Center" Margin="5" />
                                                 <Button DockPanel.Dock="Right" VerticalAlignment="Center"
                                                         Tag="{CompiledBinding .}" Click="DeleteButtonClicked"
+                                                        Tapped="EventHandledTrue"
                                                         Background="{StaticResource HTMedianBrush}">
-                                                    <Svg Path="/Assets/delete.svg" Width="20" Height="20" Margin="0" Css="{DynamicResource OppositeCssPathFillString}"/>
+                                                    <Svg Path="/Assets/delete.svg" Width="20" Height="20" Margin="0"
+                                                         Css="{DynamicResource OppositeCssPathFillString}" />
                                                 </Button>
                                                 <TextBox
                                                     Text="{CompiledBinding Expression,Mode=TwoWay}"
-                                                    Classes="CommonTextBox Big" HorizontalAlignment="Left"/>
+                                                    Tapped="EventHandledTrue" PropertyChanged="ImpFuncPropertyChanged"
+                                                    Tag="{CompiledBinding .}" Loaded="ImpFuncLoaded"
+                                                    Classes="CommonTextBox Big" HorizontalAlignment="Left" />
                                             </DockPanel>
                                         </Border>
                                     </DataTemplate>
@@ -567,7 +571,8 @@
         </TabItem>
         <TabItem>
             <TabItem.Header>
-                <Svg Path="/Assets/shape.svg" Width="25" Height="25" Margin="0" Css="{DynamicResource OppositeCssPathFillString}"/>
+                <Svg Path="/Assets/shape.svg" Width="25" Height="25" Margin="0"
+                     Css="{DynamicResource OppositeCssPathFillString}" />
             </TabItem.Header>
             <ScrollViewer Name="PART_ActionViewer">
                 <ItemsControl ItemsSource="{CompiledBinding Actions}">
@@ -619,7 +624,8 @@
         </TabItem>
         <TabItem>
             <TabItem.Header>
-                <Svg Path="/Assets/slider.svg" Width="25" Height="25" Margin="0" Css="{DynamicResource OppositeCssPathFillString}"/>
+                <Svg Path="/Assets/slider.svg" Width="25" Height="25" Margin="0"
+                     Css="{DynamicResource OppositeCssPathFillString}" />
             </TabItem.Header>
             <ScrollViewer Name="PART_VariableViewer">
                 <StackPanel Orientation="Vertical">

@@ -1,17 +1,16 @@
-﻿using System.Numerics;
-using CsGrafeq.Interfaces;
+﻿using CsGrafeq.Interfaces;
 using ReactiveUI;
 
 namespace CsGrafeq;
 
-public class Vector2<T>: ReactiveObject,IPoint<T>
+public class Vector2<T> : ReactiveObject, IPoint<T>
 {
-
     public Vector2(T x, T y)
     {
         X = x;
         Y = y;
     }
+
     public T X
     {
         get => field;
@@ -33,10 +32,10 @@ public class Vector2<T>: ReactiveObject,IPoint<T>
 
 public class Vector2Double : Vector2<double>
 {
-    public Vector2Double(double x, double y):base(x,y)
+    public Vector2Double(double x, double y) : base(x, y)
     {
-        
     }
+
     public static implicit operator Vec(Vector2Double vec)
     {
         return new Vec(vec.X, vec.Y);
@@ -44,7 +43,7 @@ public class Vector2Double : Vector2<double>
 
     public static implicit operator Vector2Double(Vec vec)
     {
-        return new  Vector2Double(vec.X, vec.Y);
+        return new Vector2Double(vec.X, vec.Y);
     }
 
     public void SetValue(Vec vec)

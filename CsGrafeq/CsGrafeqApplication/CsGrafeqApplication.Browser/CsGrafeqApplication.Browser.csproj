@@ -8,15 +8,15 @@
         <Nullable>enable</Nullable>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
         <LangVersion>Preview</LangVersion>
-		<WasmBuildNative>true</WasmBuildNative>
+        <WasmBuildNative>true</WasmBuildNative>
     </PropertyGroup>
     <ItemGroup>
-      <PackageReference Include="Avalonia.Browser" />
-      <PackageReference Include="HarfBuzzSharp.NativeAssets.WebAssembly" />
-      <PackageReference Include="SkiaSharp.NativeAssets.WebAssembly" />
+        <PackageReference Include="Avalonia.Browser"/>
+        <PackageReference Include="HarfBuzzSharp.NativeAssets.WebAssembly"/>
+        <PackageReference Include="SkiaSharp.NativeAssets.WebAssembly"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\CsGrafeqApplication\CsGrafeqApplication.csproj" />
+        <ProjectReference Include="..\CsGrafeqApplication\CsGrafeqApplication.csproj"/>
     </ItemGroup>
 </Project>

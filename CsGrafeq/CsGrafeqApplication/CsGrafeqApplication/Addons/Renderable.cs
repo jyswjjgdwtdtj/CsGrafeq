@@ -1,27 +1,70 @@
-﻿using SkiaSharp;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
+using SkiaSharp;
 
-namespace CsGrafeqApplication.Addons
+namespace CsGrafeqApplication.Addons;
+
+public class Renderable : IDisposable
 {
-    public class Renderable:IDisposable
+    private readonly object BitmapLock = new();
+    private SKBitmap Bitmap = new(1, 1);
+    public bool Changed { get; set; } = false;
+
+    public void Dispose()
     {
-        public bool Changed { get; set; } = false;
-        internal SKBitmap Bitmap = new();
-        internal event Action<SKCanvas, SKRect>? OnRender;
-        internal void Render(SKCanvas dc, SKRect rect)
+        Bitmap?.Dispose();
+        GC.SuppressFinalize(this);
+    }
+
+    public void SetBitmapSize(SKSizeI size)
+    {
+        lock (BitmapLock)
         {
-            OnRender?.Invoke(dc, rect);
+            Bitmap.Dispose();
+            Bitmap = new SKBitmap(int.Max(size.Width, 1), int.Max(size.Height, 1));
         }
-        public void Dispose()
+    }
+
+    public SKCanvas GetBitmapCanvas()
+    {
+        lock (BitmapLock)
         {
-            Bitmap?.Dispose();
-            GC.SuppressFinalize(this);
+            return new SKCanvas(Bitmap);
         }
-        ~Renderable()
+    }
+
+    public SKSizeI GetSize()
+    {
+        lock (BitmapLock)
         {
-            Dispose();
+            return new SKSizeI(Bitmap.Width, Bitmap.Height);
         }
+    }
+
+    public SKBitmap GetCopy()
+    {
+        lock (BitmapLock)
+        {
+            return Bitmap.Copy();
+        }
+    }
+
+    public void DrawBitmap(SKCanvas canvas, int x, int y)
+    {
+        lock (BitmapLock)
+        {
+            canvas.DrawBitmap(Bitmap, x, y);
+        }
+    }
+
+    internal event Action<SKCanvas, SKRect>? OnRender;
+
+    internal void Render(SKCanvas dc, SKRect rect)
+    {
+        OnRender?.Invoke(dc, rect);
+    }
+
+    ~Renderable()
+    {
+        Dispose();
     }
 }

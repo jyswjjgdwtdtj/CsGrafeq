@@ -1,5 +1,4 @@
 ﻿using ReactiveUI;
-using System;
 using static CsGrafeq.Math;
 using static CsGrafeq.Shapes.GeometryMath;
 using static System.Math;
@@ -10,6 +9,7 @@ namespace CsGrafeq.Shapes.ShapeGetter;
 public abstract class PointGetter : GeometryGetter
 {
     public abstract Vec GetPoint();
+
     public static implicit operator PointGetter(Vec f)
     {
         return new PointGetter_FromLocation(f);
@@ -67,6 +67,7 @@ public class PointGetter_AxialSymmetryPoint : PointGetter
 }
 
 #region Movable
+
 public abstract class PointGetter_Movable : PointGetter
 {
     public bool Fixed = false;
@@ -151,6 +152,7 @@ public class PointGetter_FromLocation : PointGetter_Movable
         this.RaisePropertyChanged(nameof(PointY));
     }
 }
+
 public abstract class PointGetter_OnShape<T> : PointGetter_Movable where T : GeometryShape
 {
     protected bool IsPointXPrior = true;
@@ -430,8 +432,11 @@ public class PointGetter_OnCircle(Circle circle, Vec InitialPoint) : PointGetter
         theta = GetTheta(new Vec(PointX.Value, PointY.Value));
     }
 }
+
 #endregion
+
 #region FromPointAndLine
+
 public class PointGetter_NearestPointOnLine : PointGetter
 {
     private readonly Line Line;
@@ -477,7 +482,9 @@ public class PointGetter_NearestPointOnLine : PointGetter
         Point.SubShapes.Remove(subShape);
     }
 }
+
 #endregion
+
 #region FromTwoPoints
 
 public abstract class PointGetter_FromTwoPoint : PointGetter
@@ -550,6 +557,7 @@ public class PointGetter_MiddlePoint : PointGetter_FromTwoPoint
     public PointGetter_MiddlePoint(Point point1, Point point2) : base(point1, point2)
     {
     }
+
     public override string ActionName => "MidPoint";
 
     public override Vec GetPoint()
@@ -557,7 +565,9 @@ public class PointGetter_MiddlePoint : PointGetter_FromTwoPoint
         return ((Vec)Point1.Location + Point2.Location) / 2;
     }
 }
+
 #endregion
+
 /* public class PointGetter_FromTwoPointAndAngle : PointGetter_FromTwoPoint
  {
      private AngleGetter AngleGetter;
@@ -578,7 +588,9 @@ public class PointGetter_MiddlePoint : PointGetter_FromTwoPoint
          return new Vec(Point1.Location.X+Math.Cos(theta)*distance,Point1.Location.Y+Math.Sin(theta)*distance);
      }
  }*/
+
 #region FromThreePoints
+
 public abstract class PointGetter_FromThreePoint : PointGetter
 {
     protected Point Point1, Point2, Point3;
@@ -702,15 +714,17 @@ public class PointGetter_OutCenter : PointGetter_FromThreePoint
 #endregion
 
 #region Intersection
-public abstract class PointGetter_Intersection<TShape1,TShape2>(TShape1 shape1,TShape2 shape2,bool isFirst)
+
+public abstract class PointGetter_Intersection<TShape1, TShape2>(TShape1 shape1, TShape2 shape2, bool isFirst)
     : PointGetter
-    where TShape1:GeometryShape
-    where TShape2:GeometryShape 
+    where TShape1 : GeometryShape
+    where TShape2 : GeometryShape
 {
-    protected readonly TShape1 Shape1=shape1;
-    protected readonly TShape2 Shape2=shape2;
-    protected readonly bool IsFirst=isFirst;
-    public override GeometryShape[] Parameters => [Shape1,Shape2];
+    protected readonly bool IsFirst = isFirst;
+    protected readonly TShape1 Shape1 = shape1;
+    protected readonly TShape2 Shape2 = shape2;
+    public override GeometryShape[] Parameters => [Shape1, Shape2];
+
     public override void Attach(ShapeChangedHandler handler, GeometryShape subShape)
     {
         Shape1.ShapeChanged += handler;
@@ -727,27 +741,33 @@ public abstract class PointGetter_Intersection<TShape1,TShape2>(TShape1 shape1,T
         Shape2.ShapeChanged -= handler;
     }
 }
-public class PointGetter_FromLineAndCircle(Line line,Circle circle,bool isFirst) : PointGetter_Intersection<Line,Circle>(line,circle,isFirst)
-{
 
+public class PointGetter_FromLineAndCircle(Line line, Circle circle, bool isFirst)
+    : PointGetter_Intersection<Line, Circle>(line, circle, isFirst)
+{
     public override string ActionName => "LineAndCircle";
+
     public override Vec GetPoint()
     {
         var vs = IntersectionMath.FromLineAndCircle(line.Current, circle.InnerCircle);
-        var v=IsFirst?vs.v1:vs.v2;
+        var v = IsFirst ? vs.v1 : vs.v2;
         return line.CheckIsValid(v) ? v : Vec.Invalid;
     }
 }
-public class PointGetter_FromTwoCircle(Circle shape1, Circle shape2,bool isFirst) : PointGetter_Intersection<Circle,Circle>(shape1,shape2,isFirst)
+
+public class PointGetter_FromTwoCircle(Circle shape1, Circle shape2, bool isFirst)
+    : PointGetter_Intersection<Circle, Circle>(shape1, shape2, isFirst)
 {
     public override string ActionName => "TwoCircle";
+
     public sealed override Vec GetPoint()
     {
         var vs = IntersectionMath.FromTwoCircle(shape1.InnerCircle, shape2.InnerCircle);
         return IsFirst ? vs.v1 : vs.v2;
     }
 }
-public class PointGetter_FromTwoLine(Line line1,Line line2) : PointGetter_Intersection<Line,Line>(line1,line2,false)
+
+public class PointGetter_FromTwoLine(Line line1, Line line2) : PointGetter_Intersection<Line, Line>(line1, line2, false)
 {
     public override string ActionName => "Intersect";
 

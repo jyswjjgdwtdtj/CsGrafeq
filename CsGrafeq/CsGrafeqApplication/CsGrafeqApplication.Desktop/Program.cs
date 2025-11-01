@@ -1,6 +1,5 @@
 ﻿using System;
 using Avalonia;
-using ReactiveUI;
 
 namespace CsGrafeqApplication.Desktop;
 

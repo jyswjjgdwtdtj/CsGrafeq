@@ -3,7 +3,6 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using CsGrafeqApplication.ViewModels;
 using CsGrafeqApplication.Views;
-using System.Threading;
 
 namespace CsGrafeqApplication;
 

@@ -1,16 +1,12 @@
-﻿using Avalonia.Controls;
+﻿using System.Collections.Generic;
+using System.Collections.Specialized;
+using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Input.GestureRecognizers;
 using Avalonia.Metadata;
 using Avalonia.Threading;
 using CsGrafeqApplication.Addons;
-using DynamicData;
-using FastExpressionCompiler;
 using SkiaSharp;
-using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Threading;
 using AddonPointerEventArgs = CsGrafeqApplication.Addons.Addon.AddonPointerEventArgs;
 using AddonPointerEventArgsBase = CsGrafeqApplication.Addons.Addon.AddonPointerEventArgsBase;
 using AddonPointerWheelEventArgs = CsGrafeqApplication.Addons.Addon.AddonPointerWheelEventArgs;
@@ -22,14 +18,13 @@ public abstract class Displayer : SKCanvasView
 {
     public const bool DoNext = true;
     public const bool Intercept = false;
+    private readonly Clock RenderClock = new(1);
     protected AvaPoint LastPoint;
     protected PointerPointProperties LastPointerProperties = new();
+    public List<Addon> NeedRenderingAddons = new();
+    public bool NeedRenderingAll = false;
+    public List<Renderable> NeedRenderingLayers = new();
     protected SKBitmap TotalBuffer = new(1, 1);
-    private Clock RenderClock = new Clock(1);
-    public bool ZoomingOptimization { get; set; } = false;
-    public bool MovingOptimization { get; set; }= false;
-    public bool ZOPEnable { get; set; } = true;
-    public bool MOPEnable  { get; set; } = true;
 
     public Displayer()
     {
@@ -43,11 +38,16 @@ public abstract class Displayer : SKCanvasView
         RenderClock.OnElapsed += Render;
     }
 
+    public bool ZoomingOptimization { get; set; } = false;
+    public bool MovingOptimization { get; set; } = false;
+    public bool ZOPEnable { get; set; } = true;
+    public bool MOPEnable { get; set; } = true;
+
     [Content] public AddonList Addons { get; } = new();
 
     public DisplayerContainer Owner { get; set; }
 
-    protected override sealed void OnSkiaRender(SKRenderEventArgs e)
+    protected sealed override void OnSkiaRender(SKRenderEventArgs e)
     {
         var dc = e.Canvas;
         lock (TotalBuffer)
@@ -178,30 +178,26 @@ public abstract class Displayer : SKCanvasView
                     TotalBuffer.Dispose();
                     TotalBuffer = new SKBitmap((int)e.NewSize.Width, (int)e.NewSize.Height);
                     foreach (var adn in Addons)
-                    {
-                        foreach (var layer in adn.Layers)
-                        {
-                            layer.Bitmap.Dispose();
-                            layer.Bitmap = new SKBitmap((int)e.NewSize.Width, (int)e.NewSize.Height);
-                        }
-                    }
+                    foreach (var layer in adn.Layers)
+                        layer.SetBitmapSize(new SKSizeI((int)e.NewSize.Width, (int)e.NewSize.Height));
+
                     ForceToRender();
                 }
     }
+
     protected void Invalidate()
     {
-        foreach(var i in Addons)
-        {
-            Invalidate(i);
-        }
+        foreach (var i in Addons) Invalidate(i);
     }
+
     protected void Invalidate(Renderable layer)
     {
-        using (var dc = new SKCanvas(layer.Bitmap))
+        using (var dc = layer.GetBitmapCanvas())
         {
             dc.Clear();
             layer.Render(dc, Bounds.ToSKRect());
         }
+
         layer.Changed = false;
     }
 
@@ -211,6 +207,7 @@ public abstract class Displayer : SKCanvasView
             Invalidate(layer);
         adn.Changed = false;
     }
+
     protected void ForceToRender()
     {
         RenderClock.Cancel();
@@ -218,11 +215,11 @@ public abstract class Displayer : SKCanvasView
         CompoundBuffers();
         InvalidateVisual();
     }
+
     private void Render()
     {
-        bool paintflag = false;
+        var paintflag = false;
         foreach (var adn in Addons)
-        {
             if (adn.Changed)
             {
                 paintflag = true;
@@ -232,44 +229,39 @@ public abstract class Displayer : SKCanvasView
             else
             {
                 foreach (var layer in adn.Layers)
-                {
                     if (layer.Changed)
                     {
                         paintflag = true;
                         layer.Changed = false;
                         Invalidate(layer);
                     }
-                }
             }
-        }
+
         if (paintflag)
         {
             CompoundBuffers();
             Dispatcher.UIThread.InvokeAsync(InvalidateVisual);
         }
     }
+
     internal void AskForRender()
     {
         RenderClock.Touch();
     }
+
     private void ChildrenChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         foreach (var adn in Addons)
             if (adn.Owner != this)
-            {
-                foreach(var i in adn.Layers)
+                foreach (var i in adn.Layers)
                 {
-                    i.Bitmap?.Dispose();
-                    i.Bitmap = new SKBitmap((int)Max(Bounds.Width, 1), (int)Max(Bounds.Height, 1));
+                    i.SetBitmapSize(new SKSizeI((int)Max(Bounds.Width, 1), (int)Max(Bounds.Height, 1)));
                     adn.Owner = this;
                 }
-            }
     }
+
     /// <summary>
-    /// 将每个Addon中的层合成入总缓冲区
+    ///     将每个Addon中的层合成入总缓冲区
     /// </summary>
     public abstract void CompoundBuffers();
-    public List<Renderable> NeedRenderingLayers=new();
-    public List<Addon> NeedRenderingAddons=new();
-    public bool NeedRenderingAll = false;
 }

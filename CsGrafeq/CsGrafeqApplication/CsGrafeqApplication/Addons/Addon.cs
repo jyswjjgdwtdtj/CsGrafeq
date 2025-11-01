@@ -1,21 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using CsGrafeqApplication.Controls.Displayers;
 using SkiaSharp;
-using System.Collections.Generic;
 
 namespace CsGrafeqApplication.Addons;
 
 public abstract class Addon : UserControl
 {
-    public bool Changed { get; set; } = false;
     public const bool DoNext = true;
     public const bool Intercept = false;
     public readonly CommandManager CmdManager = new();
     private readonly OnceLock IsAddonLoaded = new();
-    internal readonly List<Renderable> Layers = new List<Renderable>();
+    internal readonly List<Renderable> Layers = new();
+    public bool Changed { get; set; } = false;
 
     //Addon内部勿动
     public bool IsAddonEnabled { get; set; } = true;
@@ -37,66 +37,62 @@ public abstract class Addon : UserControl
     internal void CallAddonRender(SKCanvas dc, SKRect rect)
     {
         if (IsAddonLoaded.Value)
-        {
-            foreach(var layer in Layers)
-            {
+            foreach (var layer in Layers)
                 layer.Render(dc, rect);
-            }
-        }
     }
 
     internal bool CallAddonKeyDown(KeyEventArgs e)
     {
-        if (!IsAddonLoaded.Value || !IsAddonEnabled ||Owner==null)
+        if (!IsAddonLoaded.Value || !IsAddonEnabled || Owner == null)
             return DoNext;
         return AddonKeyDown(e);
     }
 
     internal bool CallAddonKeyUp(KeyEventArgs e)
     {
-        if (!IsAddonLoaded.Value || !IsAddonEnabled ||Owner==null)
+        if (!IsAddonLoaded.Value || !IsAddonEnabled || Owner == null)
             return DoNext;
         return AddonKeyUp(e);
     }
 
     internal bool CallAddonPointerMoved(AddonPointerEventArgs e)
     {
-        if (!IsAddonLoaded.Value || !IsAddonEnabled ||Owner==null)
+        if (!IsAddonLoaded.Value || !IsAddonEnabled || Owner == null)
             return DoNext;
         return AddonPointerMoved(e);
     }
 
     internal bool CallAddonPointerPressed(AddonPointerEventArgs e)
     {
-        if (!IsAddonLoaded.Value || !IsAddonEnabled ||Owner==null)
+        if (!IsAddonLoaded.Value || !IsAddonEnabled || Owner == null)
             return DoNext;
         return AddonPointerPressed(e);
     }
 
     internal bool CallAddonPointerReleased(AddonPointerEventArgs e)
     {
-        if (!IsAddonLoaded.Value || !IsAddonEnabled ||Owner==null)
+        if (!IsAddonLoaded.Value || !IsAddonEnabled || Owner == null)
             return DoNext;
         return AddonPointerReleased(e);
     }
 
     internal bool CallAddonPointerWheeled(AddonPointerWheelEventArgs e)
     {
-        if (!IsAddonLoaded.Value || !IsAddonEnabled ||Owner==null)
+        if (!IsAddonLoaded.Value || !IsAddonEnabled || Owner == null)
             return DoNext;
         return AddonPointerWheeled(e);
     }
 
     internal bool CallAddonPointerTapped(AddonPointerEventArgsBase e)
     {
-        if (!IsAddonLoaded.Value || !IsAddonEnabled ||Owner==null)
+        if (!IsAddonLoaded.Value || !IsAddonEnabled || Owner == null)
             return DoNext;
         return AddonPointerTapped(e);
     }
 
     internal bool CallAddonPointerDoubleTapped(AddonPointerEventArgsBase e)
     {
-        if (!IsAddonLoaded.Value || !IsAddonEnabled ||Owner==null)
+        if (!IsAddonLoaded.Value || !IsAddonEnabled || Owner == null)
             return DoNext;
         return AddonPointerDoubleTapped(e);
     }

@@ -13,10 +13,10 @@ using static CsGrafeq.ExMethods;
 namespace CsGrafeq
 {
     [Obsolete("", true)]
-    internal delegate (bool, bool) IntervalImpFunctionDelegate(Interval i1, Interval i2, double[] constlist);
-    internal delegate (bool, bool) IntervalSetImpFunctionDelegate(IntervalSet i1, IntervalSet i2, double[] constlist);
-    internal delegate int NumberImpFunctionDelegate(double n1, double n2, double[] constlist);
-    internal delegate bool MarchingSquaresDelegate(double left,double top,double right,double bottom,double[] constlist);
+    public delegate (bool, bool) IntervalImpFunctionDelegate(Interval i1, Interval i2, double[] constlist);
+    public delegate (bool, bool) IntervalSetImpFunctionDelegate(IntervalSet i1, IntervalSet i2, double[] constlist);
+    public delegate int NumberImpFunctionDelegate(double n1, double n2, double[] constlist);
+    public delegate bool MarchingSquaresDelegate(double left,double top,double right,double bottom,double[] constlist);
 
     public abstract class Function : IDisposable
     {

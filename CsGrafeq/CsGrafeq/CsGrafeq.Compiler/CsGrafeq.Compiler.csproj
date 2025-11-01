@@ -12,7 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="FastExpressionCompiler" Version="5.3.0" />
+        <PackageReference Include="FastExpressionCompiler" Version="5.3.0"/>
     </ItemGroup>
 
 </Project>

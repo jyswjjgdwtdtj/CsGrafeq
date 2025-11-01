@@ -10,12 +10,12 @@ public sealed class Value<T> : Shape
         Name = IsNullRetEmpty(_Value.ToString());
         Visible = false;
     }
-    public override void Dispose()
-    {
-        
-    }
 
     public override string TypeName { get; } = typeof(T).GetType().Name;
+
+    public override void Dispose()
+    {
+    }
 
     public override void InvokeEvent()
     {

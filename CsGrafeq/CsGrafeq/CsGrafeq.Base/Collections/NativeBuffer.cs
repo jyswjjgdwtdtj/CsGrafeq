@@ -54,7 +54,7 @@ public class NativeBuffer<T> : IDisposable where T : struct
     public unsafe ref T First => ref *pointer;
     public unsafe ref T Last => ref *(pointer + Length - 1);
 
-    public void Dispose()
+    public virtual void Dispose()
     {
         unsafe
         {
@@ -65,6 +65,8 @@ public class NativeBuffer<T> : IDisposable where T : struct
                 pointer = (T*)0;
             }
         }
+
+        GC.SuppressFinalize(this);
     }
 
     [DoesNotReturn]

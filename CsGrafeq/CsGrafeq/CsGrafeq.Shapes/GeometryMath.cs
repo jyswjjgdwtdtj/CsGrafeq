@@ -1,11 +1,9 @@
-﻿using static System.Math;
-using static CsGrafeq.Math;
+﻿using static CsGrafeq.Math;
 
 namespace CsGrafeq.Shapes;
 
 public static class GeometryMath
 {
-
     public static (Vec, Vec) GetValidVec(Vec v1, Vec v2, Vec v3, Vec v4)
     {
         var vs = new Vec[4] { v1, v2, v3, v4 };
@@ -41,7 +39,6 @@ public static class GeometryMath
         return new Vec(x, y);
     }
 
-    
 
     /// <summary>
     ///     ss,se为线段 s,e为直线

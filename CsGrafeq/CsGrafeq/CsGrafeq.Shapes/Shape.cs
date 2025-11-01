@@ -7,7 +7,7 @@ public delegate void ShapeChangedHandler<T>(Shape shape, T args);
 
 public delegate void ShapeChangedHandler<T1, T2>(T1 shape, T2 args) where T1 : Shape;
 
-public abstract class Shape : ReactiveObject,IDisposable
+public abstract class Shape : ReactiveObject, IDisposable
 {
     protected bool CanInteract = true;
 
@@ -72,11 +72,12 @@ public abstract class Shape : ReactiveObject,IDisposable
         }
     } = true;
 
+    public abstract void Dispose();
+
     public virtual void InvokeEvent()
     {
         ShapeChanged?.Invoke();
     }
 
     public event ShapeChangedHandler? ShapeChanged;
-    public abstract void Dispose();
 }

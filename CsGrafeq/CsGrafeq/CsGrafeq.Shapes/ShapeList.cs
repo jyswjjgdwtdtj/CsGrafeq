@@ -29,7 +29,7 @@ public class ShapeList : ObservableCollection<Shape>
 
     public new void Add(Shape shape)
     {
-        shape.ShapeChanged += ()=>ShapeChanged(shape);
+        shape.ShapeChanged += () => ShapeChanged(shape);
         if (shape is GeometryShape s)
             AddGeometry(s);
         else

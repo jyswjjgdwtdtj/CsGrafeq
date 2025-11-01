@@ -10,9 +10,8 @@
          https://docs.avaloniaui.net/docs/guides/styles-and-resources/how-to-use-theme-variants
   -->
     <Design.PreviewWith>
-		<Border Width="100" Height="50">
-            <controls:CheckedControl>
-            </controls:CheckedControl>
+        <Border Width="100" Height="50">
+            <controls:CheckedControl />
         </Border>
     </Design.PreviewWith>
     <ControlTheme x:Key="{x:Type controls:CheckedControl}" TargetType="controls:CheckedControl">

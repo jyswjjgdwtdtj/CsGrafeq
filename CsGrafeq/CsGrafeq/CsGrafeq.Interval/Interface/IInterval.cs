@@ -5,7 +5,7 @@ namespace CsGrafeq.Interval.Interface;
 
 public interface IInterval
 {
-    public Def Def { get; }
+    Def Def { get; }
 }
 
 public interface IInterval<T> : IRange, IComputableNumber<T>, IInterval, INeedClone<T> where T : IInterval<T>

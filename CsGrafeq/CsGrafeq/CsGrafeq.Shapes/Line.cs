@@ -1,7 +1,6 @@
-﻿using CsGrafeq.Shapes.ShapeGetter;
-using System.Text;
+﻿using System.Text;
+using CsGrafeq.Shapes.ShapeGetter;
 using static CsGrafeq.Shapes.GeometryMath;
-using static CsGrafeq.Shapes.ShapeGetter.LineGetter;
 
 namespace CsGrafeq.Shapes;
 
@@ -87,6 +86,7 @@ public class Straight : Line
         return FuzzyOnStraight(Current.Point1, Current.Point2, vec);
     }
 }
+
 public readonly struct LineStruct
 {
     public readonly Vec Point1, Point2;

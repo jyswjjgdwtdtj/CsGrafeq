@@ -1,10 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Input;
-using CsGrafeq.Compiler;
 using SkiaSharp;
-using System;
 using static CsGrafeq.Extension;
-using static CsGrafeqApplication.Controls.SkiaEx;
 
 namespace CsGrafeqApplication.Controls.Displayers;
 
@@ -35,6 +32,7 @@ public class DisplayControl : CartesianDisplayer
                 MouseDownPos = new PointL { X = (long)p.X, Y = (long)p.Y };
                 MouseDownZeroPos = Zero;
             }
+
             LastZeroPos = Zero;
             base.OnPointerPressed(e);
         }
@@ -71,45 +69,38 @@ public class DisplayControl : CartesianDisplayer
                         {
                             dc.Clear(AxisBackground);
                             RenderAxisLine(dc);
-                            if (false)//&&(!MovingOptimization || (LastZeroPos - Zero).Length > 30))
+                            if (false) //&&(!MovingOptimization || (LastZeroPos - Zero).Length > 30))
                             {
                                 foreach (var adn in Addons)
+                                foreach (var rt in adn.Layers)
                                 {
-                                    foreach(var rt in adn.Layers)
+                                    var size = rt.GetSize();
+                                    if (size.Width != TotalBuffer.Width || size.Height != TotalBuffer.Height)
                                     {
-                                        var i = rt.Bitmap;
-                                        if (i.Width != TotalBuffer.Width || i.Height != TotalBuffer.Height)
-                                        {
-                                            Throw("Bitmap size mismatch");
-                                            return;
-                                        }
-                                        var newbmp = i.Copy();
-                                        using (var canvas = new SKCanvas(i))
-                                        {
-                                            canvas.Clear(SKColors.Transparent);
-                                            canvas.DrawBitmap(newbmp, Zero.X - LastZeroPos.X,
-                                                Zero.Y - LastZeroPos.Y);
-                                            RenderMovedPlace(canvas, rt.Render);
-                                        }
-                                        newbmp.Dispose();
-                                        dc.DrawBitmap(i, 0, 0);
+                                        Throw("Bitmap size mismatch");
+                                        return;
                                     }
+
+                                    var newbmp = rt.GetCopy();
+                                    using (var canvas = rt.GetBitmapCanvas())
+                                    {
+                                        canvas.Clear(SKColors.Transparent);
+                                        canvas.DrawBitmap(newbmp, Zero.X - LastZeroPos.X,
+                                            Zero.Y - LastZeroPos.Y);
+                                        RenderMovedPlace(canvas, rt.Render);
+                                    }
+
+                                    newbmp.Dispose();
+                                    rt.DrawBitmap(dc, 0, 0);
                                 }
+
                                 LastZeroPos = Zero;
                             }
-                            else
-                            {
-                                foreach (var adn in Addons)
-                                {
-                                    foreach(var layer in adn.Layers)
-                                    {
-                                        var j = layer.Bitmap;
-                                        dc.DrawBitmap(j, Zero.X - LastZeroPos.X, Zero.Y - LastZeroPos.Y);
-                                        //RenderMovedPlace(dc,layer.Render);
-                                    }
-                                }
-                            }
 
+                            foreach (var adn in Addons)
+                            foreach (var layer in adn.Layers)
+                                layer.DrawBitmap(dc, (int)(Zero.X - LastZeroPos.X), (int)(Zero.Y - LastZeroPos.Y));
+                            //RenderMovedPlace(dc,layer.Render);
                             RenderAxisNumber(dc);
                         }
                     }
@@ -117,6 +108,7 @@ public class DisplayControl : CartesianDisplayer
                     InvalidateVisual();
                 }
             }
+
             base.OnPointerMoved(e);
         }
         else
@@ -133,9 +125,9 @@ public class DisplayControl : CartesianDisplayer
         if (CallAddonPointerReleased(e) == DoNext)
         {
             if (LastZeroPos != Zero) ForceToRender();
-			LastZeroPos = Zero;
-			base.OnPointerReleased(e);
-		}
+            LastZeroPos = Zero;
+            base.OnPointerReleased(e);
+        }
         else
         {
             AskForRender();
@@ -156,7 +148,8 @@ public class DisplayControl : CartesianDisplayer
 
     private void RenderMovedPlace(SKCanvas dc, RenderHandler rm)
     {
-        RenderExtension.RenderMovedPlace(dc, rm,Bounds.Size,new Point(Zero.X,Zero.Y),new Point(LastZeroPos.X,LastZeroPos.Y));
+        RenderExtension.RenderMovedPlace(dc, rm, Bounds.Size, new Point(Zero.X, Zero.Y),
+            new Point(LastZeroPos.X, LastZeroPos.Y));
     }
 
     protected override void OnKeyDown(KeyEventArgs e)
@@ -170,7 +163,6 @@ public class DisplayControl : CartesianDisplayer
             e.Handled = true;
             AskForRender();
         }
-
     }
 
     protected override void OnKeyUp(KeyEventArgs e)
@@ -184,6 +176,5 @@ public class DisplayControl : CartesianDisplayer
             e.Handled = true;
             AskForRender();
         }
-
     }
 }

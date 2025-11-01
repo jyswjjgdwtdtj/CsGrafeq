@@ -16,24 +16,24 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\CsGrafeqApplication\CsGrafeqApplication.csproj" />
+        <ProjectReference Include="..\CsGrafeqApplication\CsGrafeqApplication.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Remove="Packaging.Targets" />
+        <PackageReference Remove="Packaging.Targets"/>
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="favicon.ico" />
+        <Content Include="favicon.ico"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia.Desktop" />
+        <PackageReference Include="Avalonia.Desktop"/>
         <!--<PackageReference Include="PublishAotCompressed"/>-->
-	    <!--会报毒。。。-->
+        <!--会报毒。。。-->
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Properties\" />
+        <Folder Include="Properties\"/>
     </ItemGroup>
 </Project>

@@ -61,7 +61,8 @@ public class AngleGetter_FromThreePoint : AngleGetter
 
     public override AngleData GetAngle()
     {
-        var aa = (((Vec)Point2.Location - AnglePoint.Location).Arg2() - ((Vec)Point1.Location - AnglePoint.Location).Arg2()) /
+        var aa = (((Vec)Point2.Location - AnglePoint.Location).Arg2() -
+                  ((Vec)Point1.Location - AnglePoint.Location).Arg2()) /
             PI * 180;
         aa = aa % 360;
         if (aa > 180)

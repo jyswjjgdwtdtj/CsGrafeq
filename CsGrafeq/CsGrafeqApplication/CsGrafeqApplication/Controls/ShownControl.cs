@@ -22,21 +22,17 @@ public class ShownControl : TemplatedControl
         AvaloniaProperty.Register<ShownControl, Orientation>(
             nameof(Orientation), Orientation.Vertical);
 
-    public static readonly DirectProperty<ShownControl, Control> ChildProperty = AvaloniaProperty.RegisterDirect<ShownControl, Control>(
-        nameof(Child), o => o.Child, (o, v) => o.Child = v);
-    [Content]
-    public Control Child
-    {
-        get => field;
-        set => SetAndRaise(ChildProperty, ref field, value);
-    }
+    public static readonly DirectProperty<ShownControl, Control> ChildProperty =
+        AvaloniaProperty.RegisterDirect<ShownControl, Control>(
+            nameof(Child), o => o.Child, (o, v) => o.Child = v);
+
     private static readonly Animation AnimHeightToZero = new()
     {
         Duration = TimeSpan.FromSeconds(0),
         FillMode = FillMode.Forward,
         Children =
         {
-            new KeyFrame()
+            new KeyFrame
             {
                 Cue = new Cue(0),
                 Setters =
@@ -44,7 +40,7 @@ public class ShownControl : TemplatedControl
                     new Setter(HeightProperty, 1d)
                 }
             },
-            new KeyFrame()
+            new KeyFrame
             {
                 Cue = new Cue(1),
                 Setters =
@@ -54,13 +50,14 @@ public class ShownControl : TemplatedControl
             }
         }
     };
+
     private static readonly Animation AnimWidthToZero = new()
     {
         Duration = TimeSpan.FromSeconds(0),
         FillMode = FillMode.Forward,
         Children =
         {
-            new KeyFrame()
+            new KeyFrame
             {
                 Cue = new Cue(0),
                 Setters =
@@ -68,7 +65,7 @@ public class ShownControl : TemplatedControl
                     new Setter(WidthProperty, 1d)
                 }
             },
-            new KeyFrame()
+            new KeyFrame
             {
                 Cue = new Cue(1),
                 Setters =
@@ -78,17 +75,17 @@ public class ShownControl : TemplatedControl
             }
         }
     };
-    private readonly Animation AnimBackVer = new();
-    private readonly Animation AnimToVer = new();
+
     private readonly Animation AnimBackHor = new();
+    private readonly Animation AnimBackVer = new();
     private readonly Animation AnimToHor = new();
-    private readonly Setter TargetSetterVer = new(HeightProperty, 300d);
+    private readonly Animation AnimToVer = new();
     private readonly Setter TargetSetterHor = new(WidthProperty, 300d);
-    private CancellationTokenSource LastCancellationToken=new();
+    private readonly Setter TargetSetterVer = new(HeightProperty, 300d);
+    private CancellationTokenSource LastCancellationToken = new();
 
     static ShownControl()
     {
-        
     }
 
     public ShownControl()
@@ -104,7 +101,7 @@ public class ShownControl : TemplatedControl
             }
             else if (e.Property == IsShownProperty)
             {
-                Child?.Measure(new Size(10000,10000));
+                Child?.Measure(new Size(10000, 10000));
                 if (Orientation == Orientation.Vertical)
                     TargetSetterVer.Value = Child?.DesiredSize.Height ?? 0d;
                 else
@@ -117,24 +114,23 @@ public class ShownControl : TemplatedControl
                 {
                     LastCancellationToken.Cancel();
                     LastCancellationToken = new CancellationTokenSource();
-                    if(Orientation == Orientation.Vertical)
+                    if (Orientation == Orientation.Vertical)
                         if (IsShown)
                             AnimToVer.RunAsync(this, LastCancellationToken.Token);
                         else
-                            AnimBackVer.RunAsync(this,LastCancellationToken.Token);
+                            AnimBackVer.RunAsync(this, LastCancellationToken.Token);
+                    else if (IsShown)
+                        AnimToHor.RunAsync(this, LastCancellationToken.Token);
                     else
-                    if (IsShown)
-                        AnimToHor.RunAsync(this,LastCancellationToken.Token);
-                    else
-                        AnimBackHor.RunAsync(this,LastCancellationToken.Token);
+                        AnimBackHor.RunAsync(this, LastCancellationToken.Token);
                 }
             }
 
             if (e.Property == ChildProperty)
             {
-                this.LogicalChildren.Clear();
-                if(Child!= null)
-                    this.LogicalChildren.Add(Child);
+                LogicalChildren.Clear();
+                if (Child != null)
+                    LogicalChildren.Add(Child);
             }
         };
         AddHandler(LoadedEvent, (s, e) =>
@@ -143,35 +139,42 @@ public class ShownControl : TemplatedControl
             {
                 if (Orientation == Orientation.Vertical)
                 {
-                    this.Height = 0;
-                    this.Width = double.NaN;
+                    Height = 0;
+                    Width = double.NaN;
                 }
                 else
                 {
-                    this.Height = double.NaN;
-                    this.Width = 0;
+                    Height = double.NaN;
+                    Width = 0;
                 }
             }
         });
         AnimToVer.Duration = TimeSpan.FromSeconds(0.05);
         AnimToVer.FillMode = FillMode.Forward;
-        AnimToVer.Children.Add(new KeyFrame(){Cue = new Cue(0),Setters = { new Setter(HeightProperty, 0d)}});
-        AnimToVer.Children.Add(new KeyFrame(){Cue = new Cue(1),Setters = {TargetSetterVer}});
+        AnimToVer.Children.Add(new KeyFrame { Cue = new Cue(0), Setters = { new Setter(HeightProperty, 0d) } });
+        AnimToVer.Children.Add(new KeyFrame { Cue = new Cue(1), Setters = { TargetSetterVer } });
 
         AnimBackVer.Duration = TimeSpan.FromSeconds(0.05);
         AnimBackVer.FillMode = FillMode.Forward;
-        AnimBackVer.Children.Add(new KeyFrame(){Cue = new Cue(0),Setters = { TargetSetterVer}});
-        AnimBackVer.Children.Add(new KeyFrame(){Cue = new Cue(1),Setters = {new Setter(HeightProperty, 0d)}});
-        
+        AnimBackVer.Children.Add(new KeyFrame { Cue = new Cue(0), Setters = { TargetSetterVer } });
+        AnimBackVer.Children.Add(new KeyFrame { Cue = new Cue(1), Setters = { new Setter(HeightProperty, 0d) } });
+
         AnimToHor.Duration = TimeSpan.FromSeconds(0.05);
         AnimToHor.FillMode = FillMode.Forward;
-        AnimToHor.Children.Add(new KeyFrame(){Cue = new Cue(0),Setters = { new Setter(WidthProperty, 0d)}});
-        AnimToHor.Children.Add(new KeyFrame(){Cue = new Cue(1),Setters = {TargetSetterHor}});
+        AnimToHor.Children.Add(new KeyFrame { Cue = new Cue(0), Setters = { new Setter(WidthProperty, 0d) } });
+        AnimToHor.Children.Add(new KeyFrame { Cue = new Cue(1), Setters = { TargetSetterHor } });
 
         AnimBackHor.Duration = TimeSpan.FromSeconds(0.05);
         AnimBackHor.FillMode = FillMode.Forward;
-        AnimBackHor.Children.Add(new KeyFrame(){Cue = new Cue(0),Setters = { TargetSetterHor}});
-        AnimBackHor.Children.Add(new KeyFrame(){Cue = new Cue(1),Setters = {new Setter(WidthProperty, 0d)}});
+        AnimBackHor.Children.Add(new KeyFrame { Cue = new Cue(0), Setters = { TargetSetterHor } });
+        AnimBackHor.Children.Add(new KeyFrame { Cue = new Cue(1), Setters = { new Setter(WidthProperty, 0d) } });
+    }
+
+    [Content]
+    public Control Child
+    {
+        get => field;
+        set => SetAndRaise(ChildProperty, ref field, value);
     }
 
     public double Duration
@@ -179,6 +182,7 @@ public class ShownControl : TemplatedControl
         get => GetValue(DurationProperty);
         set => SetValue(DurationProperty, value);
     }
+
     public bool IsShown
     {
         get => GetValue(IsShownProperty);

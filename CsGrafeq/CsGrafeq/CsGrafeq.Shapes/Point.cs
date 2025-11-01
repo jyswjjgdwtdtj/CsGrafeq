@@ -21,7 +21,7 @@ public class Point : GeometryShape
         set => this.RaiseAndSetIfChanged(ref field, value);
     }
 
-    public Vector2Double Location { get; } = new(0,0);
+    public Vector2Double Location { get; } = new(0, 0);
 
     public override PointGetter Getter => PointGetter;
 
@@ -30,7 +30,7 @@ public class Point : GeometryShape
     public override void RefreshValues()
     {
         var loc = PointGetter.GetPoint();
-        Location.SetValue(loc.X,loc.Y);
+        Location.SetValue(loc.X, loc.Y);
         InvokeEvent();
     }
 

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -302,7 +301,7 @@ public class CartesianDisplayer : Displayer
         var addnumY = Pow(10D, zsY);
         var addnumDX = Pow(10M, zsX);
         var addnumDY = Pow(10M, zsY);
-        var p = RangeTo(1, height - TextFont.Size-2, Zero.Y);
+        var p = RangeTo(1, height - TextFont.Size - 2, Zero.Y);
         var fff = 1f / 4f * TextFont.Size;
         for (var i = Min(Zero.X - addnumX * UnitLength,
                  MathToPixelX(RoundTen(PixelToMathX(ValidRect.Right), -zsX)));
@@ -365,7 +364,7 @@ public class CartesianDisplayer : Displayer
         dc.DrawText("0", new SKPoint(Zero.X + 3, Zero.Y + TextFont.Size), SKTextAlign.Left, TextFont,
             AxisPaintMain);
     }
-    private int cnt = 0;
+
     public override void CompoundBuffers()
     {
         lock (TotalBuffer)
@@ -375,12 +374,9 @@ public class CartesianDisplayer : Displayer
                 dc.Clear(AxisBackground);
                 RenderAxisLine(dc);
                 foreach (var i in Addons)
-                {
-                    foreach(var layer in i.Layers)
-                    {
-                        dc.DrawBitmap(layer.Bitmap, 0, 0);
-                    }
-                }
+                foreach (var layer in i.Layers)
+                    layer.DrawBitmap(dc, 0, 0);
+
                 RenderAxisNumber(dc);
             }
         }
@@ -405,8 +401,9 @@ public class CartesianDisplayer : Displayer
             ForceToRender();
         }
     }
+
     /// <summary>
-    /// newvalue=unitlength*delta
+    ///     newvalue=unitlength*delta
     /// </summary>
     /// <param name="delta"></param>
     /// <param name="point"></param>
@@ -471,13 +468,9 @@ public class CartesianDisplayer : Displayer
     protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
     {
         if (CallAddonPointerWheeled(e) == DoNext)
-        {
             Zoom(Pow(1.04, e.Delta.Y), e.GetPosition(this));
-        }
         else
-        {
             AskForRender();
-        }
     }
 
     protected override void OnSizeChanged(SizeChangedEventArgs e)

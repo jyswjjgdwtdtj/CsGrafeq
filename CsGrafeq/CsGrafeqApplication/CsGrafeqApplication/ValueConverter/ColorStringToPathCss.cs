@@ -8,10 +8,7 @@ internal class ColorStringToPathCss : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is string str)
-        {
-            return $"path {{fill:{str}}}";
-        }
+        if (value is string str) return $"path {{fill:{str}}}";
         return null;
     }
 

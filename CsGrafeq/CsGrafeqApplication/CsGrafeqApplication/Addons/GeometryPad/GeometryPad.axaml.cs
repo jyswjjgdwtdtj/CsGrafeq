@@ -1,4 +1,8 @@
-#define TEST_MEMORY_LEAK
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
@@ -8,21 +12,11 @@ using Avalonia.LogicalTree;
 using CsGrafeq.Interval;
 using CsGrafeq.Shapes;
 using CsGrafeq.Shapes.ShapeGetter;
-using CsGrafeqApplication.Controls;
 using CsGrafeqApplication.Controls.Displayers;
-using CsGrafeqApplication.ViewModels;
 using SkiaSharp;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Collections;
-using System.Linq;
-using System.Reactive.Concurrency;
-using System.Threading.Tasks;
 using static CsGrafeq.Shapes.GeometryMath;
 using static CsGrafeqApplication.AvaloniaMath;
 using static CsGrafeqApplication.Controls.SkiaEx;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using AvaPoint = Avalonia.Point;
 using AvaRect = Avalonia.Rect;
 using AvaSize = Avalonia.Size;
@@ -34,27 +28,32 @@ public partial class GeometryPad : Addon
 {
     private static readonly double PointerTouchRange = OS.GetOSType() == OSType.Android ? 15 : 5;
     private readonly List<ActionData> Actions = new();
+    private readonly Renderable MainRenderTarget = new();
+    private readonly GeometryPadViewModel VM;
+    private Func<Vec, AvaPoint> MathToPixel = VoidFunc<Vec, AvaPoint>;
+    protected Func<Vec, SKPoint> MathToPixelSK = VoidFunc<Vec, SKPoint>;
     private GeoPoint? MovingPoint;
-    private Vector2<string> MovingPointEndPos=new("0","0");
+    private Vector2<string> MovingPointEndPos = new("0", "0");
     private Vector2<string> MovingPointStartPos = new("0", "0");
-    protected Func<AvaPoint, Vec> PixelToMath=VoidFunc<AvaPoint,Vec>;
-    protected Func<SKPoint, Vec> PixelToMathSK= VoidFunc<SKPoint, Vec>;
-    private Func<Vec, AvaPoint> MathToPixel=VoidFunc<Vec,AvaPoint>;
-    protected Func<Vec, SKPoint> MathToPixelSK=VoidFunc<Vec,SKPoint>;
-    protected Func<double, double> PixelToMathX=VoidFunc<double,double>, PixelToMathY=VoidFunc<double, double>, MathToPixelX=VoidFunc<double, double>, MathToPixelY=VoidFunc<double, double>;
+    protected Func<AvaPoint, Vec> PixelToMath = VoidFunc<AvaPoint, Vec>;
+    protected Func<SKPoint, Vec> PixelToMathSK = VoidFunc<SKPoint, Vec>;
+
+    protected Func<double, double> PixelToMathX = VoidFunc<double, double>,
+        PixelToMathY = VoidFunc<double, double>,
+        MathToPixelX = VoidFunc<double, double>,
+        MathToPixelY = VoidFunc<double, double>;
+
     private AvaPoint PointerMovedPos;
     private Vec PointerPressedMovingPointPos;
     private AvaPoint PointerPressedPos;
     private PointerPointProperties PointerProperties;
     private AvaPoint PointerReleasedPos;
-    private GeometryPadViewModel VM;
-    private Renderable MainRenderTarget=new();
 
     public GeometryPad()
     {
         Setting = new GeometryPadSetting(this);
         InputMethod.SetIsInputMethodEnabled(this, false);
-        DataContext=VM = new GeometryPadViewModel();
+        DataContext = VM = new GeometryPadViewModel();
         Shapes = VM!.Shapes;
         foreach (var i in VM!.Actions)
         foreach (var j in i)
@@ -67,24 +66,24 @@ public partial class GeometryPad : Addon
                 Owner?.MovingOptimization = true;
                 Owner?.ZoomingOptimization = true;
             }
-            var newshapes = (e.NewItems as IEnumerable)?.OfType<Shape>()??[];
+
+            var newshapes = e.NewItems?.OfType<Shape>() ?? [];
             var newfuncs = newshapes.OfType<ImplicitFunction>();
-            foreach(var fn in newfuncs)
+            foreach (var fn in newfuncs)
             {
                 fn.RenderTarget.Changed = true;
+                fn.RenderTarget.SetBitmapSize(MainRenderTarget.GetSize());
             }
-            if (newshapes.Any(o => o is GeometryShape))
-            {
-                MainRenderTarget.Changed = true;
-            }
+
+            if (newshapes.Any(o => o is GeometryShape)) MainRenderTarget.Changed = true;
             Owner?.AskForRender();
         };
-        Shapes.OnShapeChanged += (sp) =>
+        Shapes.OnShapeChanged += sp =>
         {
             if (sp is ImplicitFunction impf)
                 impf.RenderTarget.Changed = true;
-            else if(sp is GeometryShape gs)
-                MainRenderTarget.Changed=true;
+            else if (sp is GeometryShape gs)
+                MainRenderTarget.Changed = true;
             Owner?.AskForRender();
         };
         Layers.Add(MainRenderTarget);
@@ -99,10 +98,6 @@ public partial class GeometryPad : Addon
 #endif
         InitializeComponent();
     }
-    private static TOutput VoidFunc<TInput, TOutput>(TInput d) where TOutput : struct
-    {
-        return default;
-    }
 
     internal ActionData GeoPadAction { get; private set; }
 
@@ -115,7 +110,7 @@ public partial class GeometryPad : Addon
         {
             if (!(value is CartesianDisplayer))
                 throw new Exception();
-            if(value == null)
+            if (value == null)
                 throw new ArgumentNullException(nameof(value));
             base.Owner = value;
             PixelToMathX = value.PixelToMathX;
@@ -136,63 +131,18 @@ public partial class GeometryPad : Addon
 
     public override string AddonName => "GeometryPad";
 
+    private static TOutput VoidFunc<TInput, TOutput>(TInput d) where TOutput : struct
+    {
+        return default;
+    }
+
     internal void SetAction(ActionData ad)
     {
-        if (GeoPadAction==ad)
+        if (GeoPadAction == ad)
             return;
         GeoPadAction = ad;
         Shapes.ClearSelected();
     }
-
-    #region KeyAction
-
-    public override void Delete()
-    {
-        List<GeometryShape> todelete = new();
-        foreach (var shape in Shapes.GetSelectedShapes<GeometryShape>().ToArray())
-            if (shape.Selected)
-            {
-                todelete.Add(shape);
-            }
-
-        if (todelete.Count > 0) DoGeoShapesDelete(todelete.ToArray());
-    }
-
-    public override void SelectAll()
-    {
-        foreach (var shape in Shapes.OfType<GeometryShape>().ToArray())
-            shape.Selected = true;
-    }
-
-    public override void DeSelectAll()
-    {
-        foreach (var shape in Shapes.OfType<GeometryShape>().ToArray())
-            shape.Selected = false;
-    }
-    protected override bool AddonKeyDown(KeyEventArgs e)
-    {
-        if (Owner == null) return DoNext;
-        var res = DoNext;
-        switch (e.Key)
-        {
-            case Key.Tab:
-            {
-                foreach (var shape in Shapes.GetSelectedShapes<GeometryShape>().ToArray())
-                    if (shape.Selected)
-                    {
-                        res = Intercept;
-                        shape.Selected = false;
-                        foreach (var subshape in shape.SubShapes) subshape.Selected = true;
-                    }
-            }
-                break;
-        }
-
-        if (res == Intercept) MainRenderTarget.Changed = true;
-        return res;
-    }
-
-    #endregion
 
     public T? AddShape<T>(T shape) where T : Shape
     {
@@ -200,12 +150,74 @@ public partial class GeometryPad : Addon
             return null;
         Shapes.Add(shape);
         DoShapeAdd(shape);
-        if(shape is ImplicitFunction impf)
-        {
-            Layers.Add(impf.RenderTarget);
-        }
+        if (shape is ImplicitFunction impf) Layers.Add(impf.RenderTarget);
         return shape;
     }
+
+    private void NewFuncOnClick(object? sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter && e.KeyModifiers == KeyModifiers.None &&
+            !string.IsNullOrWhiteSpace(NewFuncTextBox.Text) && IntervalCompiler.TryCompile(NewFuncTextBox.Text))
+        {
+            AddShape(CreateImpFunc(NewFuncTextBox.Text));
+            NewFuncTextBox.Text = "";
+        }
+    }
+
+    private void ImpFuncOnTapped(object? sender, TappedEventArgs e)
+    {
+        if (sender is Border border) FlyoutBase.ShowAttachedFlyout(border);
+    }
+
+    private ImplicitFunction CreateImpFunc(string expression)
+    {
+        var ins = new ImplicitFunction(expression);
+        ins.RenderTarget.OnRender += (dc, s) =>
+            RenderFunction(dc, new SKRectI((int)s.Left, (int)s.Top, (int)s.Right, (int)s.Bottom), ins);
+        return ins;
+    }
+
+    private void NewFuncPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+    {
+        if (sender is TextBox tb)
+            if (e.Property == TextBox.TextProperty)
+            {
+                if (tb.Text == "" || IntervalCompiler.TryCompile(tb.Text))
+                    DataValidationErrors.ClearErrors(tb);
+                else
+                    DataValidationErrors.SetError(tb, new Exception());
+            }
+    }
+
+    /// <summary>
+    ///     阻止默认的Redo Undo操作
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void ImpFuncLoaded(object? sender, RoutedEventArgs e)
+    {
+        if (sender is TextBox tb) tb.AddHandler(KeyDownEvent, TunnelTextBoxKeyDown, RoutingStrategies.Tunnel);
+    }
+
+    /// <summary>
+    ///     监听隐函数控件表达式变化 设置是否错误
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void ImpFuncPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+    {
+        if (sender is TextBox tb)
+            if (e.Property == TextBox.TextProperty)
+                if ((string)e.NewValue != (string)e.OldValue)
+                {
+                    if (tb.Text == "" || IntervalCompiler.TryCompile(tb.Text))
+                        DataValidationErrors.ClearErrors(tb);
+                    else
+                        DataValidationErrors.SetError(tb, new Exception());
+                    DoFuncTextChange(tb, (string)e.NewValue, (string)e.OldValue);
+                }
+    }
+
     private class TextChangedCommand : CommandManager.Command
     {
         public readonly string PreviousText;
@@ -240,6 +252,55 @@ public partial class GeometryPad : Addon
         public string CurrentText { get; init; }
         public ExpNumber Number { get; init; }
     }
+
+    #region KeyAction
+
+    public override void Delete()
+    {
+        List<GeometryShape> todelete = new();
+        foreach (var shape in Shapes.GetSelectedShapes<GeometryShape>().ToArray())
+            if (shape.Selected)
+                todelete.Add(shape);
+
+        if (todelete.Count > 0) DoGeoShapesDelete(todelete.ToArray());
+    }
+
+    public override void SelectAll()
+    {
+        foreach (var shape in Shapes.OfType<GeometryShape>().ToArray())
+            shape.Selected = true;
+    }
+
+    public override void DeSelectAll()
+    {
+        foreach (var shape in Shapes.OfType<GeometryShape>().ToArray())
+            shape.Selected = false;
+    }
+
+    protected override bool AddonKeyDown(KeyEventArgs e)
+    {
+        if (Owner == null) return DoNext;
+        var res = DoNext;
+        switch (e.Key)
+        {
+            case Key.Tab:
+            {
+                foreach (var shape in Shapes.GetSelectedShapes<GeometryShape>().ToArray())
+                    if (shape.Selected)
+                    {
+                        res = Intercept;
+                        shape.Selected = false;
+                        foreach (var subshape in shape.SubShapes) subshape.Selected = true;
+                    }
+            }
+                break;
+        }
+
+        if (res == Intercept) MainRenderTarget.Changed = true;
+        return res;
+    }
+
+    #endregion
 
 
     #region PointerAction
@@ -290,10 +351,7 @@ public partial class GeometryPad : Addon
             return Intercept;
         }
 
-        if (MovingPoint == null)
-        {
-            return DoNext;
-        }
+        if (MovingPoint == null) return DoNext;
 
         if (e.Properties.IsLeftButtonPressed)
         {
@@ -346,9 +404,11 @@ public partial class GeometryPad : Addon
 
                 MovingPoint.RefreshValues();
             }
+
             MainRenderTarget.Changed = true;
             return Intercept;
         }
+
         return DoNext;
     }
 
@@ -437,10 +497,7 @@ public partial class GeometryPad : Addon
             return Intercept;
         }
 
-        if (MovingPoint == null)
-        {
-            return DoNext;
-        }
+        if (MovingPoint == null) return DoNext;
 
         if (PointerReleasedPos != PointerPressedPos)
             Shapes.ClearSelected();
@@ -508,6 +565,7 @@ public partial class GeometryPad : Addon
                 if (!GeoPadAction.Args.Contains(ShapeArg.Polygon))
                     Shapes.ClearSelected<GeoPolygon>();
             }
+
             var SAll = Shapes.GetSelectedShapes<GeometryShape>().ToList();
             var SPoints = Shapes.GetSelectedShapes<GeoPoint>().ToArray();
             var SLines = Shapes.GetSelectedShapes<GeoLine>().ToArray();
@@ -526,7 +584,8 @@ public partial class GeometryPad : Addon
                 if (plen > 2)
                     if (selectfirst)
                     {
-                        var shape = GeometryActions.CreateShape(GeoPadAction.Self, (Getter)GeoPadAction.GetterConstructor.Invoke(SPoints.ToArray()));
+                        var shape = GeometryActions.CreateShape(GeoPadAction.Self,
+                            (Getter)GeoPadAction.GetterConstructor.Invoke(SPoints.ToArray()));
                         AddShape(shape);
                         Shapes.ClearSelected();
                     }
@@ -534,23 +593,23 @@ public partial class GeometryPad : Addon
                     {
                         Shapes.ClearSelected<GeoPoint>();
                     }
+
                 return Intercept;
             }
-            if (GeoPadAction.Name.English == "Select" || GeoPadAction.Name.English == "Move")
-            {
-                return Intercept;
-            }
+
+            if (GeoPadAction.Name.English == "Select" || GeoPadAction.Name.English == "Move") return Intercept;
             //==========================
             if (needplen < plen || needclen < clen || needllen < llen || needpolen < polen)
             {
                 Shapes.ClearSelected();
                 return Intercept;
             }
+
             int GetIndex(GeometryShape s)
             {
                 switch (s)
                 {
-                    case GeoPoint _: 
+                    case GeoPoint _:
                         return 0;
                     case GeoLine _:
                         return 5;
@@ -563,6 +622,7 @@ public partial class GeometryPad : Addon
                         return 20;
                 }
             }
+
             if (needplen == plen && needclen == clen && needllen == llen && needpolen == polen)
             {
                 SAll.Sort((s1, s2) =>
@@ -575,10 +635,12 @@ public partial class GeometryPad : Addon
                         return 0;
                     return 1;
                 });
-                var shape=GeometryActions.CreateShape(GeoPadAction.Self,(Getter)GeoPadAction.GetterConstructor.Invoke(SAll?.Select(o => (object?)o)?.ToArray() ?? []));
+                var shape = GeometryActions.CreateShape(GeoPadAction.Self,
+                    (Getter)GeoPadAction.GetterConstructor.Invoke(SAll?.Select(o => (object?)o)?.ToArray() ?? []));
                 AddShape(shape);
                 Shapes.ClearSelected();
             }
+
             return Intercept;
         }
     }
@@ -593,7 +655,6 @@ public partial class GeometryPad : Addon
         //rect.Intersect(Owner.ValidRect.ToSKRect());
         dc.Save();
         dc.ClipRect(rect);
-        //RenderFunction(dc, new SKRectI((int)rect.Left, (int)rect.Top, (int)rect.Right, (int)rect.Bottom),Shapes.GetShapes<ImplicitFunction>());
         RenderShapes(dc, rect, Shapes.GetShapes<GeometryShape>());
         if (GeoPadAction.Name.English == "Select" && PointerProperties.IsLeftButtonPressed)
         {
@@ -662,7 +723,8 @@ public partial class GeometryPad : Addon
                         else
                             dc.DrawLine(MathToPixelSK(vs.Item1), MathToPixelSK(vs.Item2), StrokePaintMain);
 
-                        dc.DrawBubble($"{Properties.Resources.StraightText}:{s.Name}", MathToPixelSK((s.Current.Point1 + s.Current.Point2) / 2),
+                        dc.DrawBubble($"{Properties.Resources.StraightText}:{s.Name}",
+                            MathToPixelSK((s.Current.Point1 + s.Current.Point2) / 2),
                             BubbleBack, PaintMain);
                     }
                         break;
@@ -675,7 +737,8 @@ public partial class GeometryPad : Addon
                         else
                             dc.DrawLine(MathToPixelSK(v1), MathToPixelSK(v2), StrokePaintMain);
 
-                        dc.DrawBubble($"{MultiLanguageResources.Instance.SegmentText}:{s.Name}", MathToPixelSK((s.Current.Point1 + s.Current.Point2) / 2),
+                        dc.DrawBubble($"{MultiLanguageResources.Instance.SegmentText}:{s.Name}",
+                            MathToPixelSK((s.Current.Point1 + s.Current.Point2) / 2),
                             BubbleBack, PaintMain);
                     }
                         break;
@@ -710,7 +773,8 @@ public partial class GeometryPad : Addon
                         else
                             dc.DrawLine(MathToPixelSK(v1), MathToPixelSK(p), StrokePaintMain);
 
-                        dc.DrawBubble($"{MultiLanguageResources.Instance.HalfLineText}:{h.Name}", MathToPixelSK((h.Current.Point1 + h.Current.Point2) / 2),
+                        dc.DrawBubble($"{MultiLanguageResources.Instance.HalfLineText}:{h.Name}",
+                            MathToPixelSK((h.Current.Point1 + h.Current.Point2) / 2),
                             BubbleBack, PaintMain);
                     }
                         break;
@@ -804,13 +868,14 @@ public partial class GeometryPad : Addon
                 StrokePaint.Color = new SKColor(p.Color).WithAlpha(255);
                 var index = 0;
                 var loc = MathToPixelSK(p.Location);
-                dc.DrawBubble($"{MultiLanguageResources.Instance.PointText}:" + p.Name, loc.OffSetBy(2, 2 + 20 * index++), BubbleBack, PaintMain);
+                dc.DrawBubble($"{MultiLanguageResources.Instance.PointText}:" + p.Name,
+                    loc.OffSetBy(2, 2 + 20 * index++), BubbleBack, PaintMain);
                 if (p == MovingPoint)
                 {
                     dc.DrawOval(loc, new SKSize(4, 4), FilledMedian);
                     dc.DrawOval(loc, new SKSize(7, 7), StrokeMedian);
                     dc.DrawBubble(
-                        $"({System.Math.Round(MovingPoint.Location.X,8)},{System.Math.Round(MovingPoint.Location.Y,8)}) {(MovingPoint.PointGetter is PointGetter_Movable ? "" : MultiLanguageResources.Instance.CantBeMovedText)}",
+                        $"({Round(MovingPoint.Location.X, 8)},{Round(MovingPoint.Location.Y, 8)}) {(MovingPoint.PointGetter is PointGetter_Movable ? "" : MultiLanguageResources.Instance.CantBeMovedText)}",
                         loc.OffSetBy(2, 2 + 20 * index++), BubbleBack, PaintMain);
                 }
                 else if (p.Selected)
@@ -833,8 +898,8 @@ public partial class GeometryPad : Addon
             }
         }
     }
-    private int cnt = 0;
-    private void RenderFunction(SKCanvas dc, SKRectI rect,ImplicitFunction impFunc)
+
+    private void RenderFunction(SKCanvas dc, SKRectI rect, ImplicitFunction impFunc)
     {
         if (!impFunc.IsCorrect)
             return;
@@ -846,17 +911,15 @@ public partial class GeometryPad : Addon
         var paint = new SKPaint { Color = new SKColor(impFunc.Color) };
         do
         {
-            var paint1 = new SKPaint { Color = ColorExtension.GetRandomColor() };
             var rs = RectToCalc.ToArray();
             RectToCalc.Clear();
             Action<int> atn = idx => RenderRectIntervalSet(dc, rs[idx], RectToCalc, RectToRenderRect,
-                RectToRenderPoint, paint1, impFunc.Function, false);
+                RectToRenderPoint, paint, impFunc.Function, false);
             for (var i = 0; i < rs.Length; i += 100)
             {
                 Parallel.For(i, Min(i + 100, rs.Length), atn);
                 foreach (var r in RectToRenderRect) dc.DrawRect(r, paint);
                 foreach (var point in RectToRenderPoint) dc.DrawPoint(point.X, point.Y, paint);
-                //dc.DrawPoint(point, paint);
                 RectToRenderRect.Clear();
                 RectToRenderPoint.Clear();
             }
@@ -867,7 +930,6 @@ public partial class GeometryPad : Addon
         ConcurrentBag<SKRectI> RectToRender, ConcurrentBag<SKPoint> RectToRenderPoint, SKPaint paint,
         HasReferenceIntervalSetFunc<IntervalSet> func, bool checkpixel)
     {
-        //dc.DrawRect(r,paint);
         if (r.Height == 0 || r.Width == 0)
             return;
         int xtimes = 2, ytimes = 2;
@@ -890,7 +952,7 @@ public partial class GeometryPad : Addon
                 var ymin = Owner.PixelToMathY(j);
                 var ymax = Owner.PixelToMathY(j + dy);
                 var yi = IntervalSet.Create(ymin, ymax, Def.TT);
-                Def result = func.Function.Invoke(xi, yi);
+                var result = func.Function.Invoke(xi, yi);
                 if (result == Def.TT)
                 {
                     if (isPixel)
@@ -953,10 +1015,7 @@ public partial class GeometryPad : Addon
         var s2 = ss[1].Item2;
         if (s1 is Line && s2 is Line) return new PointGetter_FromTwoLine(s1 as Line, s2 as Line);
 
-        if (s1 is Line l1 && s2 is Circle c1)
-        {
-            (s1, s2) = (s2, s1);
-        }
+        if (s1 is Line l1 && s2 is Circle c1) (s1, s2) = (s2, s1);
 
         if (s1 is Circle c2 && s2 is Line l2)
         {
@@ -965,12 +1024,15 @@ public partial class GeometryPad : Addon
             return new PointGetter_FromLineAndCircle(l2, c2,
                 (MathToPixel(v1) - Location).GetLength() < (MathToPixel(v2) - Location).GetLength());
         }
-        else if(s1 is Circle c3 && s2 is Circle c4)
+
+        if (s1 is Circle c3 && s2 is Circle c4)
         {
             Vec v1, v2;
-            (v1, v2) = IntersectionMath.FromTwoCircle(c3.InnerCircle,c4.InnerCircle);
-            return new PointGetter_FromTwoCircle((Circle)s1, (Circle)s2, (MathToPixel(v1) - Location).GetLength() < (MathToPixel(v2) - Location).GetLength());
+            (v1, v2) = IntersectionMath.FromTwoCircle(c3.InnerCircle, c4.InnerCircle);
+            return new PointGetter_FromTwoCircle((Circle)s1, (Circle)s2,
+                (MathToPixel(v1) - Location).GetLength() < (MathToPixel(v2) - Location).GetLength());
         }
+
         return null;
     }
 
@@ -1083,6 +1145,10 @@ public partial class GeometryPad : Addon
 
     #region Do
 
+    /// <summary>
+    ///     添加“添加图形”操作到CmdManager
+    /// </summary>
+    /// <param name="shape"></param>
     private void DoShapeAdd(Shape shape)
     {
         CmdManager.Do(
@@ -1101,14 +1167,15 @@ public partial class GeometryPad : Addon
         );
     }
 
+    /// <summary>
+    ///     添加“删除图形”操作到CmdManager
+    /// </summary>
+    /// <param name="shape"></param>
     private void DoShapeDelete(Shape shape)
     {
         if (shape is GeometryShape geo)
-        {
             DoGeoShapesDelete([geo]);
-        }
         else
-        {
             CmdManager.Do(
                 shape,
                 o =>
@@ -1121,16 +1188,20 @@ public partial class GeometryPad : Addon
                     shape.IsDeleted = true;
                     ShapeItemsControl.InvalidateArrange();
                 },
-                o => { Shapes.Remove(shape);
-                    if (shape is ImplicitFunction impf)
-                    {
-                        Layers.Remove(impf.RenderTarget);
-                    }
+                o =>
+                {
+                    Shapes.Remove(shape);
+                    if (shape is ImplicitFunction impf) Layers.Remove(impf.RenderTarget);
                     shape.Dispose();
                 }, true
             );
-        }
     }
+
+    private void DoFuncTextChange(TextBox tb, string newtext, string oldtext)
+    {
+        CmdManager.Do<object?>(null, o => { tb.Text = newtext; }, o => { tb.Text = oldtext; }, o => { });
+    }
+
     private void DoGeoShapesDelete(IEnumerable<GeometryShape> shapes)
     {
         var ss = shapes.Select(s => ShapeList.GetAllChildren(s)).JoinToOne().Distinct().ToArray();
@@ -1202,10 +1273,11 @@ public partial class GeometryPad : Addon
 
     #region ControlAction
 
-    private void TextBox_OnKeyUp(object? sender, KeyEventArgs e)
-    {
-    }
-
+    /// <summary>
+    ///     监听数字输入框的变化 设置是否出错 并将操作添加入CmdManager
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void Number_OnPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
     {
         if (sender is TextBox tb)
@@ -1230,48 +1302,46 @@ public partial class GeometryPad : Addon
             }
     }
 
-    private void TextBoxGetFocus(object? sender, GotFocusEventArgs e)
-    {
-        if (sender is TextBox tb)
-        {
-        }
-    }
-
+    /// <summary>
+    ///     拦截操作的通用方法
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void EventHandledTrue(object? sender, RoutedEventArgs e)
     {
         e.Handled = true;
     }
 
+    /// <summary>
+    ///     删除按钮
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void DeleteButtonClicked(object? sender, RoutedEventArgs e)
     {
         if (sender is Button btn)
             if (btn.Tag is GeometryShape shape)
-            {
                 DoGeoShapesDelete([shape]);
-            }
-            else if(btn.Tag is Shape s)
-            {
-                DoShapeDelete(s);
-            }
+            else if (btn.Tag is Shape s) DoShapeDelete(s);
+
+        e.Handled = true;
     }
 
+    /// <summary>
+    ///     绑定拦截操作
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void NumberTextBox_OnLoaded(object? sender, RoutedEventArgs e)
     {
         if (sender is TextBox tb) tb.AddHandler(KeyDownEvent, TunnelTextBoxKeyDown, RoutingStrategies.Tunnel);
     }
 
-    public void TextBoxPixelXLostFocus(object? sender, RoutedEventArgs e)
-    {
-    }
-
-    public void TextBoxPixelYLostFocus(object? sender, RoutedEventArgs e)
-    {
-    }
-
-    public void NumberLostFocus(object? sender, RoutedEventArgs e)
-    {
-    }
-
+    /// <summary>
+    ///     使在TextBox中可以通过左右键来移动到同级TextBox
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     public void TextBoxKeyDown(object? sender, KeyEventArgs e)
     {
         if (sender is TextBox box)
@@ -1329,6 +1399,11 @@ public partial class GeometryPad : Addon
         }
     }
 
+    /// <summary>
+    ///     拦截除了Ctrl+A以外的键盘输入
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     public void TunnelTextBoxKeyDown(object? sender, KeyEventArgs e)
     {
         if (e.KeyModifiers == KeyModifiers.Control)
@@ -1343,10 +1418,15 @@ public partial class GeometryPad : Addon
         }
     }
 
+    /// <summary>
+    ///     几何操作RadioButton被选择
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     public void RadioButtonChecked(object? sender, RoutedEventArgs e)
     {
         if (sender is RadioButton rb)
-            if (rb.IsChecked == true&& rb.Tag is ActionData ad)
+            if (rb.IsChecked == true && rb.Tag is ActionData ad)
             {
                 SetAction(ad);
                 Static.Info(new TextBlock { Text = GeoPadAction.Description.Data });
@@ -1354,27 +1434,4 @@ public partial class GeometryPad : Addon
     }
 
     #endregion
-
-    private void NewFuncOnClick(object? sender, KeyEventArgs e)
-    {
-        if (e.Key == Key.Enter && e.KeyModifiers == KeyModifiers.None &&!string.IsNullOrWhiteSpace(NewFuncTextBox.Text))
-        {
-            AddShape(CreateImpFunc(NewFuncTextBox.Text));
-            NewFuncTextBox.Text = "";
-        }
-    }
-
-    private void ImpFuncOnTapped(object? sender, TappedEventArgs e)
-    {
-        if (sender is Border border)
-        {
-            FlyoutBase.ShowAttachedFlyout(border);
-        }
-    }
-    private ImplicitFunction CreateImpFunc(string expression)
-    {
-        var ins= new ImplicitFunction(expression);
-        ins.RenderTarget.OnRender += (dc,s)=>RenderFunction(dc,new SKRectI((int)s.Left,(int)s.Top,(int)s.Right,(int)s.Bottom),ins);
-        return ins;
-    }
 }

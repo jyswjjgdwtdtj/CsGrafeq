@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reflection;
-using CsGrafeq.Collections;
 
 namespace CsGrafeqApplication.Addons.GeometryPad;
 
@@ -25,6 +24,7 @@ internal enum ShapeArg
     Circle = 0b0100,
     Polygon = 0b1000
 }
+
 [Flags]
 internal enum ShownShapeArg
 {
@@ -33,16 +33,17 @@ internal enum ShownShapeArg
     Straight = 0b0010,
     Half = 0b0100,
     Segment = 0b1000,
-    Circle=0b10000,
+    Circle = 0b10000,
     Polygon = 0b100000,
-    Angle= 0b1000000
+    Angle = 0b1000000
 }
 
 internal class HasNameActionList : ObservableCollection<ActionData>
 {
-    public MultiLanguageData Name { get; init; }
     public HasNameActionList(MultiLanguageData multiLanguageData)
     {
-        Name=multiLanguageData;
+        Name = multiLanguageData;
     }
+
+    public MultiLanguageData Name { get; init; }
 }

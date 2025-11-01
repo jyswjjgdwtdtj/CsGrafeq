@@ -4,9 +4,11 @@ namespace CsGrafeq.Interval;
 
 public struct Range : IRange
 {
-    public double Inf { get; set; }
+    public readonly double Inf => _Inf;
+    public double _Inf;
 
-    public double Sup { get; set; }
+    public readonly double Sup => _Sup;
+    public double _Sup;
 
     public Range(double num) : this(num, num)
     {
@@ -15,35 +17,35 @@ public struct Range : IRange
     public Range(double min, double max)
     {
         Math.SwapIfNotLess(ref min, ref max);
-        Inf = min;
-        Sup = max;
+        _Inf = min;
+        _Sup = max;
     }
 
-    public bool IsInValid => double.IsNaN(Inf) || double.IsNaN(Sup);
+    public bool IsInValid => double.IsNaN(_Inf) || double.IsNaN(_Sup);
 
-    public double Width => Sup - Inf;
+    public double Width => _Sup - _Inf;
 
     public bool Contains(double num)
     {
-        return Inf < num && num < Sup;
+        return _Inf < num && num < _Sup;
     }
 
     public bool ContainsEqual(double num)
     {
-        return Inf <= num && num <= Sup;
+        return _Inf <= num && num <= _Sup;
     }
 
     public override string ToString()
     {
-        return "[" + Inf + "," + Sup + "]";
+        return "[" + _Inf + "," + _Sup + "]";
     }
 
     public bool IsEmpty => false;
 
     public bool TryGetNumber(out double number)
     {
-        number = Inf;
-        return Inf == Sup;
+        number = _Inf;
+        return _Inf == _Sup;
     }
 
     public bool TryGetInteger(out int integer)

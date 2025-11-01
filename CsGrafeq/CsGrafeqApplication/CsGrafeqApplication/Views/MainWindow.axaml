@@ -4,7 +4,6 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:views="clr-namespace:CsGrafeqApplication.Views"
         xmlns:vm="clr-namespace:CsGrafeqApplication.ViewModels"
-		xmlns:prop="clr-namespace:CsGrafeqApplication.Properties;assembly=CsGrafeqApplication"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="CsGrafeqApplication.Views.MainWindow"
         x:DataType="vm:ViewModelBase"

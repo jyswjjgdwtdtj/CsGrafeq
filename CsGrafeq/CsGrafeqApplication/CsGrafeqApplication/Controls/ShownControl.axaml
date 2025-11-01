@@ -9,7 +9,7 @@
         <!-- Set Defaults -->
         <Setter Property="Template">
             <ControlTemplate>
-                <ContentPresenter Content="{TemplateBinding Child}"></ContentPresenter>
+                <ContentPresenter Content="{TemplateBinding Child}" />
             </ControlTemplate>
         </Setter>
     </Style>

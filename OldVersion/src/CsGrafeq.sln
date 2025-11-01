@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.12.35527.113
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11123.170 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsGrafeq", "CsGrafeq\CsGrafeq.csproj", "{FBC5524A-E48D-46BB-8DA4-7A444B0A60EB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsGrafeqPlayGround", "..\PlayGround\CsGrafeqPlayGround\CsGrafeqPlayGround.csproj", "{D20D4BA0-DDB1-4394-B07B-1871CC57264D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsGrafeq.Test", "CsGrafeq.Test\CsGrafeq.Test.csproj", "{10A8B5E6-4AFC-4D99-9424-F46FFC86333A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,8 +23,15 @@ Global
 		{D20D4BA0-DDB1-4394-B07B-1871CC57264D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D20D4BA0-DDB1-4394-B07B-1871CC57264D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D20D4BA0-DDB1-4394-B07B-1871CC57264D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10A8B5E6-4AFC-4D99-9424-F46FFC86333A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10A8B5E6-4AFC-4D99-9424-F46FFC86333A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10A8B5E6-4AFC-4D99-9424-F46FFC86333A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10A8B5E6-4AFC-4D99-9424-F46FFC86333A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0FAA3B8F-0714-4CDD-8E7F-5CA9BB1B9129}
 	EndGlobalSection
 EndGlobal

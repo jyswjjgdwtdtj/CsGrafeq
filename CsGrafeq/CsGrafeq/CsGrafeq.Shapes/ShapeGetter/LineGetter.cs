@@ -1,5 +1,4 @@
-﻿using System.Text;
-using static System.Math;
+﻿using static System.Math;
 
 namespace CsGrafeq.Shapes.ShapeGetter;
 
@@ -8,8 +7,6 @@ public abstract class LineGetter : GeometryGetter
     public override string ActionName => "Line";
     public override GeometryShape[] Parameters => [];
     public abstract LineStruct GetLine();
-
-    
 }
 
 public abstract class LineGetter_TwoPoint : LineGetter
@@ -187,7 +184,7 @@ public abstract class LineGetter_PointAndLine : LineGetter
 
 public class LineGetter_Vertical : LineGetter_PointAndLine
 {
-    public LineGetter_Vertical( Point point, Line line) : base(point,line)
+    public LineGetter_Vertical(Point point, Line line) : base(point, line)
     {
     }
 
@@ -210,7 +207,7 @@ public class LineGetter_Vertical : LineGetter_PointAndLine
 
 public class LineGetter_Parallel : LineGetter_PointAndLine
 {
-    public LineGetter_Parallel(Point point,Line line) : base( point,line)
+    public LineGetter_Parallel(Point point, Line line) : base(point, line)
     {
     }
 
