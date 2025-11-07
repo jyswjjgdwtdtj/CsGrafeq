@@ -8,6 +8,10 @@
         x:Class="CsGrafeqApplication.Views.MainWindow"
         x:DataType="vm:ViewModelBase"
         Icon="/Assets/favicon.ico"
-        Title="{CompiledBinding MultiLanguageResources.CsGrafeqText.Data}">
+        Title="{CompiledBinding MultiLanguageResources.CsGrafeqText.Data}"
+        ExtendClientAreaToDecorationsHint="True"
+        TransparencyLevelHint="Transparent"
+        Width="300"
+        >
     <views:MainView />
 </Window>

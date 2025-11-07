@@ -8,7 +8,10 @@ public class DisplayerContainerViewModel : ViewModelBase
     public Displayer? Displayer
     {
         get;
-        set => this.RaiseAndSetIfChanged(ref field, value);
+        set
+        {
+            this.RaiseAndSetIfChanged(ref field, value);
+        }
     }
 
     public bool IsOperationVisible

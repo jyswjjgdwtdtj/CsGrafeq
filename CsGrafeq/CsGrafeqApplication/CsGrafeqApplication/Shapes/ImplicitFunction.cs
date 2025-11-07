@@ -16,12 +16,19 @@ public class ImplicitFunction : Shape
         Expression = expression;
         EnglishChar.Instance.CharValueChanged += CharValueChanged;
         RenderTarget.OnRender += RenderTarget_OnRender;
+        this.PropertyChanged+=(s,e)=>
+        {
+        };
+        ;
     }
 
     public bool IsCorrect
     {
         get => field;
-        private set => this.RaiseAndSetIfChanged(ref field, value);
+        private set
+        {
+            this.RaiseAndSetIfChanged(ref field, value);
+        }
     } = false;
 
     public HasReferenceIntervalSetFunc<IntervalSet> Function

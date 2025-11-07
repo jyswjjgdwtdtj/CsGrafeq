@@ -21,6 +21,7 @@
 
     <ItemGroup>
         <PackageReference Remove="Packaging.Targets"/>
+        <PackageReference Include="DialogHost.Avalonia" />
     </ItemGroup>
 
     <ItemGroup>

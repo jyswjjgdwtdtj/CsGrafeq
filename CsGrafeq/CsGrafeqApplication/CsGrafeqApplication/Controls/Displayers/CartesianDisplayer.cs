@@ -367,7 +367,7 @@ public class CartesianDisplayer : Displayer
 
     public override void CompoundBuffers()
     {
-        lock (TotalBuffer)
+        lock (TotalBufferLock)
         {
             using (var dc = new SKCanvas(TotalBuffer))
             {
@@ -376,7 +376,6 @@ public class CartesianDisplayer : Displayer
                 foreach (var i in Addons)
                 foreach (var layer in i.Layers)
                     layer.DrawBitmap(dc, 0, 0);
-
                 RenderAxisNumber(dc);
             }
         }
@@ -418,8 +417,11 @@ public class CartesianDisplayer : Displayer
             if (ZoomingOptimization)
                 lock (LockTargetForPreviousBuffer)
                 {
-                    PreviousBuffer.Dispose();
-                    PreviousBuffer = TotalBuffer.Copy();
+                    lock (TotalBufferLock)
+                    {
+                        PreviousBuffer.Dispose();
+                        PreviousBuffer = TotalBuffer.Copy();
+                    }
                 }
         }
 
@@ -449,7 +451,7 @@ public class CartesianDisplayer : Displayer
             return;
         }
 
-        lock (TotalBuffer)
+        lock (TotalBufferLock)
         {
             using (var dc = new SKCanvas(TotalBuffer))
             {

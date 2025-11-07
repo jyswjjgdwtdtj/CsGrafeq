@@ -5,6 +5,12 @@ namespace CsGrafeqApplication;
 
 public static class Static
 {
-    public static Action<Control> MsgBox;
-    public static Action<Control> Info;
+    public static Action<Control,InfoType> Info;
+
+    public enum InfoType
+    {
+        Information,
+        Warning,
+        Error
+    }
 }

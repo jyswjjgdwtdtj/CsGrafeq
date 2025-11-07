@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:CsGrafeqApplication.ViewModels"
              xmlns:ctls="clr-namespace:CsGrafeqApplication.Controls"
+             xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CsGrafeqApplication.Views.MainView"
              x:DataType="vm:MainViewModel">
@@ -20,5 +21,9 @@
     </Design.DataContext>
     <Design.Width>600</Design.Width>
     <Design.Height>400</Design.Height>
-    <ctls:DisplayerContainer Name="MainContainer" />
+    <dialogHostAvalonia:DialogHost CloseOnClickAway="True" CornerRadius="5">
+        <dialogHostAvalonia:DialogHost.DialogContent>
+        </dialogHostAvalonia:DialogHost.DialogContent>
+        <ctls:DisplayerContainer Name="MainContainer" />
+    </dialogHostAvalonia:DialogHost>
 </UserControl>

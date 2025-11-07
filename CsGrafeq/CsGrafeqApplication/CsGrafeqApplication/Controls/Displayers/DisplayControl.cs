@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Input;
+using CsGrafeq.Debug;
 using SkiaSharp;
 using static CsGrafeq.Extension;
 
@@ -19,9 +20,9 @@ public class DisplayControl : CartesianDisplayer
         AddHandler(TappedEvent, (_, e) => OnPointerTapped(e));
         AddHandler(DoubleTappedEvent, (_, e) => OnPointerDoubleTapped(e));
     }
-
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
+        Debug.LogPointer("PointerPressed");
         if (!e.Pointer.IsPrimary) return;
         StopWheeling();
         if (CallAddonPointerPressed(e) == DoNext)
@@ -44,6 +45,7 @@ public class DisplayControl : CartesianDisplayer
 
     protected override void OnPointerMoved(PointerEventArgs e)
     {
+        Debug.LogPointer("PointerMoved");
         if (!e.Pointer.IsPrimary) return;
         StopWheeling();
         if (CallAddonPointerMoved(e) == DoNext)
@@ -63,7 +65,7 @@ public class DisplayControl : CartesianDisplayer
                 if (newZero != Zero)
                 {
                     Zero = newZero;
-                    lock (TotalBuffer)
+                    lock (TotalBufferLock)
                     {
                         using (var dc = new SKCanvas(TotalBuffer))
                         {
@@ -116,9 +118,10 @@ public class DisplayControl : CartesianDisplayer
             AskForRender();
         }
     }
-
+    
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
+        Debug.LogPointer("PointerReleased");
         if (!e.Pointer.IsPrimary) return;
         Focus();
         StopWheeling();

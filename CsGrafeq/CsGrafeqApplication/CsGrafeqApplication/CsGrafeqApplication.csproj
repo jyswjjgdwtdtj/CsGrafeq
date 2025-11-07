@@ -25,85 +25,89 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
     <ItemGroup>
-        <None Remove="Assets\camera.svg"/>
-        <None Remove="Assets\delete.svg"/>
-        <None Remove="Assets\Github.svg"/>
-        <None Remove="Assets\input.svg"/>
-        <None Remove="Assets\shape.svg"/>
-        <None Remove="Assets\slider.svg"/>
-        <None Remove="Fonts\MapleMono-CN-Regular.ttf"/>
+        <None Remove="Assets\camera.svg" />
+        <None Remove="Assets\delete.svg" />
+        <None Remove="Assets\Github.svg" />
+        <None Remove="Assets\input.svg" />
+        <None Remove="Assets\shape.svg" />
+        <None Remove="Assets\slider.svg" />
+        <None Remove="Fonts\MapleMono-CN-Regular.ttf" />
     </ItemGroup>
     <ItemGroup>
-        <AvaloniaResource Include="Assets\avalonia-logo.ico"/>
-        <AvaloniaResource Include="Assets\calc.svg"/>
-        <AvaloniaResource Include="Assets\camera.svg"/>
-        <AvaloniaResource Include="Assets\delete.svg"/>
-        <AvaloniaResource Include="Assets\favicon.ico"/>
-        <AvaloniaResource Include="Assets\Github.svg"/>
-        <AvaloniaResource Include="Assets\input.svg"/>
-        <AvaloniaResource Include="Assets\shape.svg"/>
-        <AvaloniaResource Include="Assets\slider.svg"/>
-        <None Remove="Assets\csharp.svg"/>
-        <AvaloniaResource Include="Assets\csharp.svg"/>
-        <None Remove="Assets\error.svg"/>
-        <AvaloniaResource Include="Assets\error.svg"/>
-        <None Remove="Assets\folder.svg"/>
-        <AvaloniaResource Include="Assets\folder.svg"/>
-        <None Remove="Assets\keyboard.svg"/>
-        <AvaloniaResource Include="Assets\keyboard.svg"/>
-        <None Remove="Assets\language.svg"/>
-        <AvaloniaResource Include="Assets\language.svg"/>
-        <None Remove="Assets\linedown.svg"/>
-        <AvaloniaResource Include="Assets\linedown.svg"/>
-        <None Remove="Assets\setting.svg"/>
-        <AvaloniaResource Include="Assets\setting.svg"/>
-        <None Remove="Assets\stepback.svg"/>
-        <AvaloniaResource Include="Assets\stepback.svg"/>
-        <None Remove="Assets\stepover.svg"/>
-        <AvaloniaResource Include="Assets\stepover.svg"/>
-        <None Remove="Assets\lineup.svg"/>
-        <AvaloniaResource Include="Assets\lineup.svg"/>
-        <None Remove="Assets\zoomin.svg"/>
-        <AvaloniaResource Include="Assets\zoomin.svg"/>
-        <None Remove="Assets\zoomout.svg"/>
-        <AvaloniaResource Include="Assets\zoomout.svg"/>
-        <None Remove="Assets\trash.svg"/>
-        <AvaloniaResource Include="Assets\trash.svg"/>
-        <None Remove="Assets\selectall.svg"/>
-        <AvaloniaResource Include="Assets\selectall.svg"/>
-        <None Remove="Assets\deselectall.svg"/>
-        <AvaloniaResource Include="Assets\deselectall.svg"/>
+        <AvaloniaResource Include="Assets\avalonia-logo.ico" />
+        <AvaloniaResource Include="Assets\calc.svg" />
+        <AvaloniaResource Include="Assets\camera.svg" />
+        <AvaloniaResource Include="Assets\delete.svg" />
+        <AvaloniaResource Include="Assets\favicon.ico" />
+        <AvaloniaResource Include="Assets\Github.svg" />
+        <AvaloniaResource Include="Assets\input.svg" />
+        <AvaloniaResource Include="Assets\shape.svg" />
+        <AvaloniaResource Include="Assets\slider.svg" />
+        <None Remove="Assets\csharp.svg" />
+        <AvaloniaResource Include="Assets\csharp.svg" />
+        <None Remove="Assets\error.svg" />
+        <AvaloniaResource Include="Assets\error.svg" />
+        <None Remove="Assets\folder.svg" />
+        <AvaloniaResource Include="Assets\folder.svg" />
+        <None Remove="Assets\keyboard.svg" />
+        <AvaloniaResource Include="Assets\keyboard.svg" />
+        <None Remove="Assets\language.svg" />
+        <AvaloniaResource Include="Assets\language.svg" />
+        <None Remove="Assets\linedown.svg" />
+        <AvaloniaResource Include="Assets\linedown.svg" />
+        <None Remove="Assets\setting.svg" />
+        <AvaloniaResource Include="Assets\setting.svg" />
+        <None Remove="Assets\stepback.svg" />
+        <AvaloniaResource Include="Assets\stepback.svg" />
+        <None Remove="Assets\stepover.svg" />
+        <AvaloniaResource Include="Assets\stepover.svg" />
+        <None Remove="Assets\lineup.svg" />
+        <AvaloniaResource Include="Assets\lineup.svg" />
+        <None Remove="Assets\zoomin.svg" />
+        <AvaloniaResource Include="Assets\zoomin.svg" />
+        <None Remove="Assets\zoomout.svg" />
+        <AvaloniaResource Include="Assets\zoomout.svg" />
+        <None Remove="Assets\trash.svg" />
+        <AvaloniaResource Include="Assets\trash.svg" />
+        <None Remove="Assets\selectall.svg" />
+        <AvaloniaResource Include="Assets\selectall.svg" />
+        <None Remove="Assets\deselectall.svg" />
+        <AvaloniaResource Include="Assets\deselectall.svg" />
         <AvaloniaResource Include="Fonts\MapleMono-CN-Regular.ttf">
             <CopyToOutputDirectory>Never</CopyToOutputDirectory>
         </AvaloniaResource>
-        <None Remove="Assets\add.svg"/>
-        <AvaloniaResource Include="Assets\add.svg"/>
+        <None Remove="Assets\add.svg" />
+        <AvaloniaResource Include="Assets\add.svg" />
+        <None Remove="Assets\theme.svg" />
+        <AvaloniaResource Include="Assets\theme.svg" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia"/>
-        <PackageReference Include="Avalonia.Controls.ColorPicker"/>
-        <PackageReference Include="Avalonia.Controls.DataGrid"/>
-        <PackageReference Include="Avalonia.Controls.TreeDataGrid"/>
-        <PackageReference Include="Avalonia.Skia"/>
-        <PackageReference Include="Avalonia.Themes.Fluent"/>
-        <PackageReference Include="Avalonia.Fonts.Inter"/>
+        <PackageReference Include="Avalonia" />
+        <PackageReference Include="Avalonia.Controls.ColorPicker" />
+        <PackageReference Include="Avalonia.Controls.DataGrid" />
+        <PackageReference Include="Avalonia.Controls.TreeDataGrid" />
+        <PackageReference Include="Avalonia.Skia" />
+        <PackageReference Include="Avalonia.Themes.Fluent" />
+        <PackageReference Include="Avalonia.Fonts.Inter" />
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
         <PackageReference Include="Avalonia.Diagnostics">
             <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="HarfBuzzSharp"/>
-        <PackageReference Include="SkiaSharp"/>
-        <PackageReference Include="SkiaSharp.HarfBuzz"/>
-        <PackageReference Include="Svg.Controls.Skia.Avalonia"/>
+        <PackageReference Include="DialogHost.Avalonia" />
+        <PackageReference Include="HarfBuzzSharp" />
+        <PackageReference Include="SkiaSharp" />
+        <PackageReference Include="SkiaSharp.HarfBuzz" />
+        <PackageReference Include="Svg.Controls.Skia.Avalonia" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Base\CsGrafeq.Base.csproj"/>
-        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Compiler\CsGrafeq.Compiler.csproj"/>
-        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Interval\CsGrafeq.Interval.csproj"/>
-        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Shapes\CsGrafeq.Shapes.csproj"/>
+        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Base\CsGrafeq.Base.csproj" />
+        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Compiler\CsGrafeq.Compiler.csproj" />
+        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Debug\CsGrafeq.Debug.csproj" />
+        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Interval\CsGrafeq.Interval.csproj" />
+        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Shapes\CsGrafeq.Shapes.csproj" />
     </ItemGroup>
 
     <ItemGroup>

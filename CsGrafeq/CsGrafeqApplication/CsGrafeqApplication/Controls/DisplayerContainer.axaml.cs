@@ -3,15 +3,19 @@ using System.Threading;
 using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
+using Avalonia.LogicalTree;
 using Avalonia.Media;
 using Avalonia.Styling;
 using CsGrafeqApplication.Addons.GeometryPad;
 using CsGrafeqApplication.Controls.Displayers;
 using CsGrafeqApplication.ViewModels;
 using CsGrafeqApplication.Views;
+using DialogHostAvalonia;
+using Microsoft.Win32;
 
 namespace CsGrafeqApplication.Controls;
 
@@ -69,39 +73,30 @@ public partial class DisplayerContainer : UserControl
                 Splitter.IsVisible = true;
             }
         };
-        Static.MsgBox = MsgBox;
         Static.Info = Info;
     }
-
     protected override void OnSizeChanged(SizeChangedEventArgs e)
     {
         base.OnSizeChanged(e);
     }
 
-    private void MsgBox(Control content)
-    {
-        content.VerticalAlignment = VerticalAlignment.Stretch;
-        content.HorizontalAlignment = HorizontalAlignment.Stretch;
-        ContentContainer.Child = content;
-        MsgBoxContainer.IsVisible = true;
-        PopupBack.Background = Brushes.Transparent;
-    }
 
-    private async void Info(Control content)
+    
+    private async void Info(Control content,Static.InfoType infotype)
     {
+        var color = infotype switch
+        {
+            Static.InfoType.Warning=>Colors.Yellow,
+            Static.InfoType.Error=>Colors.Red,
+            _ => Color.FromRgb(0x77,0xcc,0xbb)
+        };
+        InfoOuterContainer.Background=new SolidColorBrush(Color.FromArgb(128,color.R,color.G,color.B));
         InfoCancellation.Cancel();
         InfoCancellation = new CancellationTokenSource();
         InfoPresenter.Content = content;
         ((Control)InfoPresenter.Parent).Opacity = 1;
         await anim.RunAsync(InfoPresenter.Parent, InfoCancellation.Token);
     }
-
-    private void Button_OnClick(object? sender, RoutedEventArgs e)
-    {
-        MsgBoxContainer.IsVisible = false;
-        PopupBack.Background = null;
-    }
-
     private void GlobalKeyDown(object? sender, KeyEventArgs e)
     {
         switch (e.Key)
@@ -200,7 +195,7 @@ public partial class DisplayerContainer : UserControl
 
     private void Setting_Clicked(object? sender, RoutedEventArgs e)
     {
-        MsgBox(new SettingView(VM.Displayer as DisplayControl));
+        DialogHost.Show(new SettingView(VM.Displayer as DisplayControl));
     }
 
     private void StepBack_Clicked(object? sender, RoutedEventArgs e)
@@ -227,7 +222,6 @@ public partial class DisplayerContainer : UserControl
     {
         VM.Displayer.Addons[0].Delete();
     }
-
     private void SelectAll_Clicked(object? sender, RoutedEventArgs e)
     {
         VM.Displayer.Addons[0].SelectAll();
@@ -242,4 +236,80 @@ public partial class DisplayerContainer : UserControl
     {
         Languages.SetLanguage(Languages.AllowedLanguages[(sender as ComboBox)?.SelectedIndex ?? 0]);
     }
+
+    private void Github_Clicked(object? sender, RoutedEventArgs e)
+    {
+        RegistryKey key = Registry.ClassesRoot.OpenSubKey(@"http\shell\open\command\");
+        string s = key.GetValue("").ToString();
+        Console.WriteLine(s);
+        System.Diagnostics.Process.Start(s, "https://github.com/jyswjjgdwtdtj/CsGrafeq");
+    
+    }
+
+    private void ThemeSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        (TopLevel.GetTopLevel(this) as Window)?.SystemDecorations = SystemDecorations.Full;
+        if (sender is ComboBox comboBox)
+        {
+            switch (comboBox.SelectedIndex)
+            {
+                case 0:
+                    Application.Current.RequestedThemeVariant = ThemeVariant.Light;
+                    break;
+                case 1:
+                    Application.Current.RequestedThemeVariant = ThemeVariant.Dark;
+                    break;
+                case 2:
+                    Application.Current.RequestedThemeVariant = ThemeVariant.Default;
+                    break;
+            }
+        }
+    }
+/*
+    private static bool IsWindow = (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime)!;
+    private Window CurrentWindow;
+    private double PressedXPosRatio = 0;
+    private int PressedYPos;
+    private PixelPoint PressedWidnowPos;
+    private void TitlePointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (IsWindow&&e.Properties.IsLeftButtonPressed)
+        {
+            CurrentWindow=TopLevel.GetTopLevel(this) as Window;
+            var PressedPoint = CurrentWindow.PointToScreen(e.GetCurrentPoint(CurrentWindow).Position);
+            PressedYPos=PressedPoint.Y;
+            PressedXPosRatio=PressedPoint.X/CurrentWindow.Width;
+            PressedWidnowPos = CurrentWindow.Position;
+        }
+    }
+
+    private void TitlePointerReleased(object? sender, PointerReleasedEventArgs e)
+    {
+        Console.WriteLine(CurrentWindow.PointToScreen(e.GetCurrentPoint(CurrentWindow).Position));
+        preventMove=false;
+    }
+
+    private void TitlePointerMoved(object? sender, PointerEventArgs e)
+    {
+        if (IsWindow&&e.Properties.IsLeftButtonPressed&&(!preventMove))
+        {
+            if (CurrentWindow.WindowState == WindowState.Maximized)
+                CurrentWindow.WindowState = WindowState.Normal;
+            var currentPos =CurrentWindow.PointToScreen(e.GetCurrentPoint(CurrentWindow).Position);
+            CurrentWindow.Position = new(PressedWidnowPos.X+currentPos.X-(int)(CurrentWindow.Width*PressedXPosRatio), PressedWidnowPos.Y+currentPos.Y-PressedYPos);
+        }
+    }
+    private bool preventMove = false;
+    private void TitleDoubleTapped(object? sender, TappedEventArgs e)
+    {
+        if (IsWindow)
+        {
+            if (CurrentWindow.WindowState == WindowState.Maximized)
+                CurrentWindow.WindowState = WindowState.Normal;
+            else if (CurrentWindow.WindowState == WindowState.Normal)
+                CurrentWindow.WindowState = WindowState.Maximized;
+            e.Handled = true;
+            preventMove=true;
+        }
+    }*/
 }

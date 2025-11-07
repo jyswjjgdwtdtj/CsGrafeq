@@ -143,14 +143,14 @@
                     <DockPanel LastChildFill="True" HorizontalAlignment="Stretch" Margin="5">
                         <Border Width="30" Height="30" DockPanel.Dock="Left">
                             <Svg Path="/Assets/add.svg" Width="25" Height="25" Margin="0" VerticalAlignment="Center"
-                                 HorizontalAlignment="Center" />
+                                 HorizontalAlignment="Center" Css="{DynamicResource OppositeCssPathFillString}"/>
                         </Border>
                         <Border Background="{DynamicResource CgBackgroundBrush}"
                                 BorderBrush="{DynamicResource CgHTCtPureBackgroundBrush}" BorderThickness="1"
                                 CornerRadius="5">
                             <TextBox BorderThickness="0" Classes="NoDataValidation" AcceptsReturn="False"
                                      AcceptsTab="False" KeyUp="NewFuncOnClick" Name="NewFuncTextBox"
-                                     PropertyChanged="NewFuncPropertyChanged" />
+                                     PropertyChanged="NewFuncPropertyChanged"/>
                         </Border>
                     </DockPanel>
                 </Border>

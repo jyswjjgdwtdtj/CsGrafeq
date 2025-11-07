@@ -2,7 +2,11 @@
 using TTimer = System.Timers.Timer;
 
 namespace CsGrafeq;
-
+/// <summary>
+/// 其实不应该叫Clock
+/// 当距离上一次更新达到一定时间 则调用指定事件
+/// 用于鼠标滚轮操作的绘制
+/// </summary>
 public class Clock
 {
     private readonly TTimer Timer = new();
@@ -29,7 +33,7 @@ public class Clock
         Do();
     }
 
-    public void Do()
+    private void Do()
     {
         if (Running && (DateTime.Now - LastTime).TotalMilliseconds > Timer.Interval)
         {

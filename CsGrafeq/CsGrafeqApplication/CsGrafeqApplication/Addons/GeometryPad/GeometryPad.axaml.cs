@@ -21,6 +21,9 @@ using AvaPoint = Avalonia.Point;
 using AvaRect = Avalonia.Rect;
 using AvaSize = Avalonia.Size;
 using GeoHalf = CsGrafeq.Shapes.Half;
+using DialogHostAvalonia;
+using DialogHostAvalonia.Utilities;
+using static CsGrafeqApplication.Extension;
 
 namespace CsGrafeqApplication.Addons.GeometryPad;
 
@@ -89,6 +92,7 @@ public partial class GeometryPad : Addon
         Layers.Add(MainRenderTarget);
         MainRenderTarget.OnRender += Renderable_OnRender;
 #if DEBUG
+      
         var p1 = AddShape(new GeoPoint(new PointGetter_FromLocation((0.5, 0.5))));
         var p2 = AddShape(new GeoPoint(new PointGetter_FromLocation((1.5, 1.5))));
         var s1 = AddShape(new Straight(new LineGetter_Connected(p1, p2)));
@@ -100,9 +104,13 @@ public partial class GeometryPad : Addon
     }
 
     internal ActionData GeoPadAction { get; private set; }
-
+    /// <summary>
+    /// 图形的集合
+    /// </summary>
     public ShapeList Shapes { get; init; }
-
+    /// <summary>
+    /// 所有者
+    /// </summary>
     public override Displayer? Owner
     {
         get => base.Owner;
@@ -131,11 +139,11 @@ public partial class GeometryPad : Addon
 
     public override string AddonName => "GeometryPad";
 
-    private static TOutput VoidFunc<TInput, TOutput>(TInput d) where TOutput : struct
-    {
-        return default;
-    }
-
+    
+    /// <summary>
+    /// 设置action
+    /// </summary>
+    /// <param name="ad"></param>
     internal void SetAction(ActionData ad)
     {
         if (GeoPadAction == ad)
@@ -143,7 +151,12 @@ public partial class GeometryPad : Addon
         GeoPadAction = ad;
         Shapes.ClearSelected();
     }
-
+    /// <summary>
+    /// 添加图形
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="shape"></param>
+    /// <returns></returns>
     public T? AddShape<T>(T shape) where T : Shape
     {
         if (shape.IsDeleted)
@@ -652,7 +665,6 @@ public partial class GeometryPad : Addon
     protected void Renderable_OnRender(SKCanvas dc, SKRect rect)
     {
         if (Owner is null) return;
-        //rect.Intersect(Owner.ValidRect.ToSKRect());
         dc.Save();
         dc.ClipRect(rect);
         RenderShapes(dc, rect, Shapes.GetShapes<GeometryShape>());
@@ -906,29 +918,30 @@ public partial class GeometryPad : Addon
         if (impFunc.IsDeleted)
             return;
         var RectToCalc = new ConcurrentBag<SKRectI> { rect };
-        var RectToRenderRect = new ConcurrentBag<SKRectI>();
-        var RectToRenderPoint = new ConcurrentBag<SKPoint>();
+        var Points = new ConcurrentBag<SKPoint> {  };
+        var Rects = new ConcurrentBag<SKRectI> { };
         var paint = new SKPaint { Color = new SKColor(impFunc.Color) };
+        IntervalHandler<IntervalSet> func = impFunc.Function.Function;
         do
         {
             var rs = RectToCalc.ToArray();
             RectToCalc.Clear();
-            Action<int> atn = idx => RenderRectIntervalSet(dc, rs[idx], RectToCalc, RectToRenderRect,
-                RectToRenderPoint, paint, impFunc.Function, false);
+            Action<int> atn = idx => RenderRectIntervalSet( rs[idx], RectToCalc,  func, false,Points,Rects);
             for (var i = 0; i < rs.Length; i += 100)
             {
                 Parallel.For(i, Min(i + 100, rs.Length), atn);
-                foreach (var r in RectToRenderRect) dc.DrawRect(r, paint);
-                foreach (var point in RectToRenderPoint) dc.DrawPoint(point.X, point.Y, paint);
-                RectToRenderRect.Clear();
-                RectToRenderPoint.Clear();
+                //for(var j=i; j< Min(i + 100, rs.Length); j++) atn(j);
+                foreach (var rectToDraw in Rects) {
+                    dc.DrawRect(rectToDraw,paint);
+                }
+                Rects.Clear();
+                dc.DrawPoints(SKPointMode.Points,Points.ToArray(), paint);
+                Points.Clear();
             }
         } while (RectToCalc.Count != 0);
     }
 
-    private void RenderRectIntervalSet(SKCanvas dc, SKRectI r, ConcurrentBag<SKRectI> RectToCalc,
-        ConcurrentBag<SKRectI> RectToRender, ConcurrentBag<SKPoint> RectToRenderPoint, SKPaint paint,
-        HasReferenceIntervalSetFunc<IntervalSet> func, bool checkpixel)
+    private void RenderRectIntervalSet(SKRectI r, ConcurrentBag<SKRectI> RectToCalc,IntervalHandler<IntervalSet> func, bool checkpixel, ConcurrentBag<SKPoint> Points, ConcurrentBag<SKRectI> Rects)
     {
         if (r.Height == 0 || r.Width == 0)
             return;
@@ -943,27 +956,27 @@ public partial class GeometryPad : Addon
         for (var i = r.Left; i < r.Right; i += dx)
         {
             var di = i;
-            var xmin = Owner.PixelToMathX(i);
-            var xmax = Owner.PixelToMathX(i + dx);
+            var xmin = PixelToMathX(i);
+            var xmax = PixelToMathX(i + dx);
             var xi = IntervalSet.Create(xmin, xmax, Def.TT);
             for (var j = r.Top; j < r.Bottom; j += dy)
             {
                 var dj = j;
-                var ymin = Owner.PixelToMathY(j);
-                var ymax = Owner.PixelToMathY(j + dy);
+                var ymin = PixelToMathY(j);
+                var ymax = PixelToMathY(j + dy);
                 var yi = IntervalSet.Create(ymin, ymax, Def.TT);
-                var result = func.Function.Invoke(xi, yi);
+                var result = func(xi, yi);
                 if (result == Def.TT)
                 {
                     if (isPixel)
-                        RectToRenderPoint.Add(new SKPoint(di, dj));
+                        Points.Add(new SKPoint(di, dj));
                     else
-                        RectToRender.Add(new SKRectI(di, dj, di + dx, dj + dy));
+                        Rects.Add(new SKRectI(di, dj, di + dx, dj + dy));
                 }
                 else if (result == Def.FT)
                 {
                     if (isPixel)
-                        RectToRenderPoint.Add(new SKPoint(di, dj));
+                        Points.Add(new SKPoint(di, dj));
                     else
                         RectToCalc.Add(new SKRectI(i, j, Min(i + dx, r.Right),
                             Min(j + dy, r.Bottom)));
@@ -1429,9 +1442,13 @@ public partial class GeometryPad : Addon
             if (rb.IsChecked == true && rb.Tag is ActionData ad)
             {
                 SetAction(ad);
-                Static.Info(new TextBlock { Text = GeoPadAction.Description.Data });
+                Static.Info(new TextBlock { Text = GeoPadAction.Description.Data },Static.InfoType.Information);
             }
     }
 
     #endregion
+
+    private void AddFuncTapped(object? sender, TappedEventArgs e)
+    {
+    }
 }

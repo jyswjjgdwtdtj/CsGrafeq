@@ -18,6 +18,28 @@
             <Setter Property="Css" Value="{DynamicResource OppositeCssPathStrokeString}" />
         </Style>
     </UserControl.Styles>
+    <DockPanel LastChildFill="True">
+        <DockPanel.Resources>
+            
+            <ResourceDictionary>
+                <Color x:Key="Cyan">#aa77ccbb</Color>
+                <LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%" x:Key="MedianLinearGradientBrush">
+                    <GradientStop Color="{StaticResource Cyan}" Offset="0.0"/>
+                    <GradientStop Color="{StaticResource Cyan}" Offset="0.2"/>
+                    <GradientStop Color="Transparent" Offset="1.0"/>
+                </LinearGradientBrush>
+            </ResourceDictionary>
+        </DockPanel.Resources>
+        <Border DockPanel.Dock="Top" Background="{StaticResource MedianLinearGradientBrush}" IsHitTestVisible="False">
+            <DockPanel LastChildFill="True">
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                    <Image Width="16" Height="16" Source="avares://CsGrafeqApplication/Assets/favicon.ico" VerticalAlignment="Center" Margin="8,5,5,5"/>
+                    <TextBlock VerticalAlignment="Center" FontFamily="{StaticResource MapleMono}">CsGrafeq</TextBlock>
+                </StackPanel>
+                <TabStrip Height="30">
+                </TabStrip>
+            </DockPanel>
+        </Border>
     <Panel Name="PART_Container" IsTabStop="False">
         <Panel.Styles>
             <Style Selector="Control">
@@ -45,12 +67,14 @@
             <ContentPresenter Content="{CompiledBinding Displayer}" />
         </Border>
         <Grid ZIndex="1" Name="PART_Grid">
+            <Grid.Resources>
+            </Grid.Resources>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="300" />
                 <ColumnDefinition Width="6" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <Border Grid.Column="0" BorderThickness="0" BorderBrush="Gray" Name="OperationContainer"
+            <Border Grid.Column="0" Grid.Row="1" BorderThickness="0" BorderBrush="Gray" Name="OperationContainer"
                     DataContext="{CompiledBinding Displayer}"
                     Background="{DynamicResource CgBackgroundBrush}">
                 <ItemsControl ItemsSource="{CompiledBinding Addons}">
@@ -61,31 +85,13 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="addons:Addon">
-                            <Expander Width="{CompiledBinding $parent[ItemsControl].Bounds.Width}"
-                                      Height="{CompiledBinding $parent[ScrollViewer].Bounds.Height}"
-                                      Padding="0" Margin="0" Classes="NoBorderExpander"
-                                      BorderThickness="0">
-                                <Expander.Styles>
-                                    <Style Selector="Expander.NoBorderExpander">
-                                        <Style Selector="^ /template/ ToggleButton#ExpanderHeader">
-                                            <Setter Property="BorderThickness" Value="0" />
-                                        </Style>
-                                        <Style Selector="^  /template/ Border#ExpanderContent">
-                                            <Setter Property="BorderThickness" Value="0" />
-                                        </Style>
-                                    </Style>
-                                </Expander.Styles>
-                                <Expander.Header>
-                                    <TextBlock Text="{CompiledBinding Name}" />
-                                </Expander.Header>
-                                <ContentPresenter Content="{CompiledBinding .}" />
-                            </Expander>
+                            <ContentPresenter Content="{CompiledBinding .}" />
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </Border>
-            <GridSplitter Grid.Column="1" ResizeDirection="Columns" Name="Splitter" Width="1" />
-            <Border BorderThickness="0" Grid.Column="2" Name="PART_CoverDisplayer">
+            <GridSplitter Grid.Column="1" Grid.Row="1" ResizeDirection="Columns" Name="Splitter" Width="1" />
+            <Border BorderThickness="0" Grid.Column="2" Grid.Row="1" Name="PART_CoverDisplayer">
                 <CheckBox Width="15" Height="40" VerticalAlignment="Center" HorizontalAlignment="Left"
                           Name="Toggle">
                     <CheckBox.Template>
@@ -244,6 +250,33 @@
                                 <Setter Property="Margin" Value="0" />
                             </Style>
                         </StackPanel.Styles>
+                        <Button Click="Github_Clicked">
+                            <ToolTip.Tip>
+                                <TextBlock Text="Open Github Site" />
+                            </ToolTip.Tip>
+                            <Svg Path="/Assets/Github.svg" Width="32" Height="32" Margin="0" Classes="F" />
+                        </Button>
+                        <Button>
+                            <Button.Flyout>
+                                <Flyout Placement="Left">
+                                    <ComboBox SelectionChanged="ThemeSelectionChanged" SelectedIndex="2">
+                                        <ComboBoxItem>
+                                            <TextBlock Text="{CompiledBinding MultiLanguageResources.LightText.Data}" />
+                                        </ComboBoxItem>
+                                        <ComboBoxItem>
+                                            <TextBlock Text="{CompiledBinding MultiLanguageResources.DarkText.Data}" />
+                                        </ComboBoxItem>
+                                        <ComboBoxItem>
+                                            <TextBlock Text="{CompiledBinding MultiLanguageResources.FollowSystemText.Data}" />
+                                        </ComboBoxItem>
+                                    </ComboBox>
+                                </Flyout>
+                            </Button.Flyout>
+                            <ToolTip.Tip>
+                                <TextBlock Text="{CompiledBinding MultiLanguageResources.ThemeText.Data}" />
+                            </ToolTip.Tip>
+                            <Svg Path="/Assets/theme.svg" Width="32" Height="32" Margin="0" Classes="F" />
+                        </Button>
                         <Button Click="Setting_Clicked">
                             <ToolTip.Tip>
                                 <TextBlock Text="{CompiledBinding MultiLanguageResources.SettingText.Data}" />
@@ -285,22 +318,12 @@
                     <RowDefinition Height="60*" MaxHeight="400" />
                     <RowDefinition Height="20*" />
                 </Grid.RowDefinitions>
-                <Border Name="MsgBoxContainer" Grid.Row="1" Grid.Column="1" CornerRadius="10"
-                        Background="{DynamicResource HTMedianBrush}" VerticalAlignment="Stretch"
-                        HorizontalAlignment="Stretch" IsVisible="False">
-                    <DockPanel LastChildFill="True">
-                        <Button Click="Button_OnClick" HorizontalAlignment="Right" Width="60" Height="30"
-                                HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="40,10"
-                                DockPanel.Dock="Bottom" Content="OK" Background="{DynamicResource CgBackgroundBrush}" />
-                        <Border Name="ContentContainer" Padding="40" Background="{DynamicResource CgBackgroundBrush}"
-                                Margin="15" CornerRadius="5" />
-                    </DockPanel>
-                </Border>
-                <Border Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center"
-                        Background="{DynamicResource HTMedianBrush}" Padding="15" Opacity="0" CornerRadius="4">
+                <Border Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center" Focusable="False" IsEnabled="False"
+                        Background="{DynamicResource HTMedianBrush}" Padding="15" Opacity="0" CornerRadius="4" Name="InfoOuterContainer">
                     <ContentPresenter Name="InfoPresenter" Foreground="{DynamicResource CgForegroundBrush}" />
                 </Border>
             </Grid>
         </Border>
     </Panel>
+    </DockPanel>
 </UserControl>

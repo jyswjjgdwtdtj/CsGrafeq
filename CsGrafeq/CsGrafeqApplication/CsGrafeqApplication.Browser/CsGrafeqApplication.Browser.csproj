@@ -12,6 +12,7 @@
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Avalonia.Browser"/>
+        <PackageReference Include="DialogHost.Avalonia" />
         <PackageReference Include="HarfBuzzSharp.NativeAssets.WebAssembly"/>
         <PackageReference Include="SkiaSharp.NativeAssets.WebAssembly"/>
     </ItemGroup>

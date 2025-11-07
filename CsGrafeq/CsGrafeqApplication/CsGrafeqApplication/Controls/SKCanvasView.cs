@@ -28,7 +28,7 @@ public class SKCanvasView : UserControl
     public SKCanvasView()
     {
         Background = new SolidColorBrush(Colors.Transparent);
-        customDrawOper = new CustomDrawOperation(ValidRect);
+        customDrawOper = new CustomDrawOperation(ValidRect,this);
         customDrawOper.SKDraw += (s, e) => { OnSkiaRender(e); };
         OnValidRectRefresh();
         SizeChanged += (s, e) => { OnValidRectRefresh(); };
@@ -64,7 +64,7 @@ public class SKCanvasView : UserControl
         context.Custom(customDrawOper);
     }
 
-    public virtual void OnValidRectRefresh()
+    protected virtual void OnValidRectRefresh()
     {
         ValidRect = Bounds;
     }
@@ -73,13 +73,15 @@ public class SKCanvasView : UserControl
     {
         private readonly object BufferLock = new();
         private WriteableBitmap Buffer;
+        private SKCanvasView Canvas;
 
-        public CustomDrawOperation(Rect bounds, uint clearColor = 0x00FFFFFF)
+        public CustomDrawOperation(Rect bounds,SKCanvasView canvas, uint clearColor = 0x00FFFFFF)
         {
             Bounds = bounds;
             SKDraw += (s, e) => { e.Canvas.Clear(clearColor); };
             Buffer = new WriteableBitmap(new PixelSize(Max((int)bounds.Width, 100), Max((int)bounds.Height, 100)),
                 Dpi);
+            Canvas = canvas;
         }
 
         public Vector Dpi { get; } = new(300, 300);
@@ -110,7 +112,7 @@ public class SKCanvasView : UserControl
 
         public bool HitTest(Point p)
         {
-            return true;
+            return false;
         }
 
         public bool Equals(ICustomDrawOperation? other)
@@ -132,7 +134,6 @@ public class SKCanvasView : UserControl
                         SKDraw?.Invoke(null, new SKRenderEventArgs(canvas));
                     }
                 }
-
                 context.DrawBitmap(Buffer, Bounds, Bounds);
             }
         }
@@ -148,10 +149,5 @@ public class SKCanvasView : UserControl
         }
 
         public SKCanvas Canvas { get; init; }
-    }
-
-    protected class PropertyResetEventArgs<T>(T FormerValue)
-    {
-        public readonly T Value = FormerValue;
     }
 }

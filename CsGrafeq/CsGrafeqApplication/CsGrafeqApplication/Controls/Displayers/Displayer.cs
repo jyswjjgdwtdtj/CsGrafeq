@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Input.GestureRecognizers;
+using Avalonia.Media;
 using Avalonia.Metadata;
+using Avalonia.Rendering;
 using Avalonia.Threading;
 using CsGrafeqApplication.Addons;
 using SkiaSharp;
@@ -14,7 +17,7 @@ using AvaPoint = Avalonia.Point;
 
 namespace CsGrafeqApplication.Controls.Displayers;
 
-public abstract class Displayer : SKCanvasView
+public abstract class Displayer : SKCanvasView,ICustomHitTest
 {
     public const bool DoNext = true;
     public const bool Intercept = false;
@@ -25,6 +28,7 @@ public abstract class Displayer : SKCanvasView
     public bool NeedRenderingAll = false;
     public List<Renderable> NeedRenderingLayers = new();
     protected SKBitmap TotalBuffer = new(1, 1);
+    protected object TotalBufferLock = new();
 
     public Displayer()
     {
@@ -36,8 +40,12 @@ public abstract class Displayer : SKCanvasView
         AddHandler(Gestures.PinchEvent, (s, e) => { Zoom(e.Scale, e.ScaleOrigin); });
         Languages.LanguageChanged += ForceToRender;
         RenderClock.OnElapsed += Render;
+        IsHitTestVisible = true;
+        
     }
-
+    /// <summary>
+    /// 
+    /// </summary>
     public bool ZoomingOptimization { get; set; } = false;
     public bool MovingOptimization { get; set; } = false;
     public bool ZOPEnable { get; set; } = true;
@@ -50,10 +58,19 @@ public abstract class Displayer : SKCanvasView
     protected sealed override void OnSkiaRender(SKRenderEventArgs e)
     {
         var dc = e.Canvas;
-        lock (TotalBuffer)
+        lock (TotalBufferLock)
         {
             dc.DrawBitmap(TotalBuffer, SKPoint.Empty);
         }
+    }
+    public bool HitTest(AvaPoint point)
+    {
+        if (point.Y < 30)
+        {
+            Console.WriteLine(point.ToString());
+            return false;
+        }
+        return true;
     }
 
     public abstract double MathToPixelX(double x);
@@ -167,22 +184,25 @@ public abstract class Displayer : SKCanvasView
                 return Intercept;
         return DoNext;
     }
-
     protected override void OnSizeChanged(SizeChangedEventArgs e)
     {
         base.OnSizeChanged(e);
         if (e.NewSize.Width > e.PreviousSize.Width || e.NewSize.Height > e.PreviousSize.Height)
-            if ((int)e.NewSize.Width != (int)e.PreviousSize.Width || (int)e.NewSize.Height != e.PreviousSize.Height)
-                lock (TotalBuffer)
+        {
+            if (e.NewSize.Width > TotalBuffer.Width || e.NewSize.Height > TotalBuffer.Height)
+            {
+                lock (TotalBufferLock)
                 {
                     TotalBuffer.Dispose();
                     TotalBuffer = new SKBitmap((int)e.NewSize.Width, (int)e.NewSize.Height);
                     foreach (var adn in Addons)
                     foreach (var layer in adn.Layers)
                         layer.SetBitmapSize(new SKSizeI((int)e.NewSize.Width, (int)e.NewSize.Height));
-
-                    ForceToRender();
                 }
+                ForceToRender();
+                
+            }
+        }
     }
 
     protected void Invalidate()
@@ -194,10 +214,9 @@ public abstract class Displayer : SKCanvasView
     {
         using (var dc = layer.GetBitmapCanvas())
         {
-            dc.Clear();
+            dc?.Clear();
             layer.Render(dc, Bounds.ToSKRect());
         }
-
         layer.Changed = false;
     }
 

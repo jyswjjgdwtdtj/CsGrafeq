@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsGrafeqApplication.Android
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsGrafeq.Compiler", "CsGrafeq\CsGrafeq.Compiler\CsGrafeq.Compiler.csproj", "{23EB97D9-FB60-4346-A4BB-B0CF592F6C63}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsGrafeq.Debug", "CsGrafeq\CsGrafeq.Debug\CsGrafeq.Debug.csproj", "{F4EB3AF3-1C65-46F7-AF1A-E4BB44245664}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,10 @@ Global
 		{23EB97D9-FB60-4346-A4BB-B0CF592F6C63}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{23EB97D9-FB60-4346-A4BB-B0CF592F6C63}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{23EB97D9-FB60-4346-A4BB-B0CF592F6C63}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4EB3AF3-1C65-46F7-AF1A-E4BB44245664}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4EB3AF3-1C65-46F7-AF1A-E4BB44245664}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4EB3AF3-1C65-46F7-AF1A-E4BB44245664}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4EB3AF3-1C65-46F7-AF1A-E4BB44245664}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -85,6 +91,7 @@ Global
 		{6A58291E-804A-6971-5173-203E456545E1} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{57E4B1E2-F612-93AC-C973-E0231C778939} = {EAD93855-B844-4115-BD34-A091C454A542}
 		{23EB97D9-FB60-4346-A4BB-B0CF592F6C63} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{F4EB3AF3-1C65-46F7-AF1A-E4BB44245664} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5A59E9EE-CB1C-46E4-84FF-9F8B019627AD}

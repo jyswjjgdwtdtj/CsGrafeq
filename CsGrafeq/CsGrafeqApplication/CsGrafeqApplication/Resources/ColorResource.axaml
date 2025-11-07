@@ -6,6 +6,7 @@
     <system:UInt32 x:Key="LightUint">8978380</system:UInt32>
     <system:UInt32 x:Key="DarkUint">32896</system:UInt32>
     <Color x:Key="Median">#00b89f</Color>
+    <Color x:Key="HTMedian">#7700b89f</Color>
     <Color x:Key="Light">#88ffcc</Color>
     <Color x:Key="Dark">Teal</Color>
     <SolidColorBrush x:Key="HTMedianBrush" Color="{DynamicResource Median}" Opacity="0.3" />

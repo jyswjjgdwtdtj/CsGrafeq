@@ -32,11 +32,17 @@ public class MultiLanguageResources
             ["ControlledText"] = ControlledText,
             ["MovingOpText"] = MovingOpText,
             ["ZoomingOpText"] = ZoomingOpText,
-            ["OnText"] = OnText
+            ["OnText"] = OnText,
+            ["LightText"] = LightText,
+            ["DarkText"] = DarkText,
+            ["FollowSystemText"] = FollowSystemText,
         };
     }
 
     public static MultiLanguageResources Instance { get; private set; } = new();
+    public MultiLanguageData LightText { get; } = new() { English = "Light", Chinese = "亮色" };
+    public MultiLanguageData DarkText { get; } = new() { English = "Dark", Chinese = "暗色" };
+    public MultiLanguageData FollowSystemText { get; } = new() { English = "Follow System", Chinese = "跟随系统" };
     public MultiLanguageData AngleText { get; } = new() { English = "Angle", Chinese = "角" };
     public MultiLanguageData CantBeMovedText { get; } = new() { English = "Unmovable", Chinese = "无法移动" };
     public MultiLanguageData CircleText { get; } = new() { English = "Circle", Chinese = "圆" };

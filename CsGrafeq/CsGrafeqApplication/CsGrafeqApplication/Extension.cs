@@ -18,7 +18,7 @@ using Avalonia.Threading;
 
 namespace CsGrafeqApplication;
 
-public static class Extension
+internal static class Extension
 {
     internal static void GetFocus(this Control control)
     {
@@ -45,5 +45,9 @@ public static class Extension
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static void Void()
     {
+    }
+    public static TOutput VoidFunc<TInput, TOutput>(TInput d) where TOutput : struct
+    {
+        return default;
     }
 }
