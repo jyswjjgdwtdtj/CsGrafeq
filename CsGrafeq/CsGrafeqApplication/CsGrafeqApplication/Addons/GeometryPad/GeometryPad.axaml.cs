@@ -9,6 +9,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
+using Avalonia.Media;
 using CsGrafeq.Interval;
 using CsGrafeq.Shapes;
 using CsGrafeq.Shapes.ShapeGetter;
@@ -24,6 +25,9 @@ using GeoHalf = CsGrafeq.Shapes.Half;
 using DialogHostAvalonia;
 using DialogHostAvalonia.Utilities;
 using static CsGrafeqApplication.Extension;
+using static CsGrafeq.Utilities.ThrowHelper;
+using Avalonia.Threading;
+using CsGrafeqApplication.Controls;
 
 namespace CsGrafeqApplication.Addons.GeometryPad;
 
@@ -57,7 +61,7 @@ public partial class GeometryPad : Addon
         Setting = new GeometryPadSetting(this);
         InputMethod.SetIsInputMethodEnabled(this, false);
         DataContext = VM = new GeometryPadViewModel();
-        Shapes = VM!.Shapes;
+        Shapes = VM.Shapes;
         foreach (var i in VM!.Actions)
         foreach (var j in i)
             Actions!.Add(j);
@@ -98,11 +102,13 @@ public partial class GeometryPad : Addon
         var s1 = AddShape(new Straight(new LineGetter_Connected(p1, p2)));
         var p3 = AddShape(new GeoPoint(new PointGetter_OnLine(s1, (0, 0))));
         var c1 = AddShape(new Circle(new CircleGetter_FromCenterAndRadius(p1)));
-        var ip1 = AddShape(CreateImpFunc("y=x+1"));
+        for(var i = 0; i < 1; i++)
+        {
+            var ip1 = AddShape(CreateImpFunc("y=x+1"));
+        }
 #endif
         InitializeComponent();
     }
-
     internal ActionData GeoPadAction { get; private set; }
     /// <summary>
     /// 图形的集合
@@ -396,7 +402,7 @@ public partial class GeometryPad : Addon
                     }
                 }
             }*/
-            if (MovingPoint.PointGetter is PointGetter_Movable pg)
+            if (MovingPoint.PointGetter is PointGetter_Movable pg&&MovingPoint.IsUserEnabled)
             {
                 pg.SetPoint(Owner.PixelToMath(PointerMovedPos));
                 if (MovingPoint.PointGetter is PointGetter_FromLocation)
@@ -631,7 +637,7 @@ public partial class GeometryPad : Addon
                     case GeoPolygon _:
                         return 15;
                     default:
-                        CsGrafeq.Extension.Throw("");
+                        Throw("");
                         return 20;
                 }
             }
@@ -688,7 +694,8 @@ public partial class GeometryPad : Addon
         var cd = (CartesianDisplayer)Owner;
         using (SKPaint TPFilledPaint = new() { IsAntialias = true },
                FilledPaint = new() { IsAntialias = true },
-               StrokePaint = new() { IsStroke = true, IsAntialias = true },
+               StrokePaint = new() { IsStroke = true, IsAntialias = true,StrokeWidth = 2},
+               StrokePaint1 = new() { IsStroke = true, IsAntialias = true,StrokeWidth = 1},
                StrokeMain = new() { Color = cd.AxisPaintMain.Color, IsStroke = true, IsAntialias = true },
                PaintMain = new() { Color = cd.AxisPaintMain.Color, IsAntialias = true },
                StrokePaintMain = new() { Color = cd.AxisPaintMain.Color, IsAntialias = true, IsStroke = true },
@@ -877,7 +884,7 @@ public partial class GeometryPad : Addon
                     continue;
                 FilledPaint.Color = new SKColor(p.Color).WithAlpha(255);
                 TPFilledPaint.Color = new SKColor(p.Color).WithAlpha(90);
-                StrokePaint.Color = new SKColor(p.Color).WithAlpha(255);
+                StrokePaint1.Color = new SKColor(p.Color).WithAlpha(255);
                 var index = 0;
                 var loc = MathToPixelSK(p.Location);
                 dc.DrawBubble($"{MultiLanguageResources.Instance.PointText}:" + p.Name,
@@ -887,13 +894,13 @@ public partial class GeometryPad : Addon
                     dc.DrawOval(loc, new SKSize(4, 4), FilledMedian);
                     dc.DrawOval(loc, new SKSize(7, 7), StrokeMedian);
                     dc.DrawBubble(
-                        $"({Round(MovingPoint.Location.X, 8)},{Round(MovingPoint.Location.Y, 8)}) {(MovingPoint.PointGetter is PointGetter_Movable ? "" : MultiLanguageResources.Instance.CantBeMovedText)}",
+                        $"({Round(MovingPoint.Location.X, 8)},{Round(MovingPoint.Location.Y, 8)}) {((MovingPoint.PointGetter is PointGetter_Movable&&MovingPoint.IsUserEnabled) ? "" : MultiLanguageResources.Instance.CantBeMovedText)}",
                         loc.OffSetBy(2, 2 + 20 * index++), BubbleBack, PaintMain);
                 }
                 else if (p.Selected)
                 {
                     dc.DrawOval(loc, new SKSize(4, 4), FilledPaint);
-                    dc.DrawOval(loc, new SKSize(7, 7), StrokePaint);
+                    dc.DrawOval(loc, new SKSize(7, 7), StrokePaint1);
                 }
                 else if (p.PointerOver)
                 {
@@ -1176,7 +1183,13 @@ public partial class GeometryPad : Addon
                 shape.IsDeleted = true;
                 ShapeItemsControl?.InvalidateArrange();
             },
-            o => { Shapes.Remove(shape); }, true
+            o => { 
+                Shapes.Remove(shape); 
+                if(o is ImplicitFunction im)
+                {
+                    Layers.Remove(im.RenderTarget);
+                }
+            }, true
         );
     }
 
@@ -1198,7 +1211,7 @@ public partial class GeometryPad : Addon
                 },
                 o =>
                 {
-                    shape.IsDeleted = true;
+                    shape.IsDeleted = false;
                     ShapeItemsControl.InvalidateArrange();
                 },
                 o =>
@@ -1269,15 +1282,15 @@ public partial class GeometryPad : Addon
     {
         CmdManager.Do<object?>(null, o =>
         {
-            previous.UnAttach(point.RefreshValues, point);
+            previous.UnAttach(point);
             point.PointGetter = next;
-            next.Attach(point.RefreshValues, point);
+            next.Attach( point);
             point.RefreshValues();
         }, o =>
         {
-            next.UnAttach(point.RefreshValues, point);
+            next.UnAttach(point);
             point.PointGetter = previous;
-            previous.Attach(point.RefreshValues, point);
+            previous.Attach(point);
             point.RefreshValues();
         }, o => { }, true);
     }
@@ -1450,5 +1463,58 @@ public partial class GeometryPad : Addon
 
     private void AddFuncTapped(object? sender, TappedEventArgs e)
     {
+    }
+
+    private void NewFuncTextBoxTemplateApplied(object? s, TemplateAppliedEventArgs e)
+    {
+        var tb=s as TextBox;
+        var borderelement=e.NameScope.Find<Border>("PART_BorderElement");
+        borderelement.CornerRadius = new CornerRadius(0);
+        borderelement.BorderThickness = new Thickness(0,0,0,2);
+        borderelement.Background=Brushes.Transparent;
+        tb.LostFocus+=(s,e)=>
+        {
+            borderelement.Background=Brushes.Transparent;
+        };
+        tb.GotFocus += (s, e) =>
+        {
+            borderelement.Background=Brushes.Transparent;
+        };
+    }
+
+    private void Expander_TemplateApplied(object? sender, TemplateAppliedEventArgs e)
+    {
+        var tgb = e.NameScope.Find<ToggleButton>("ExpanderHeader");
+        tgb.TemplateApplied += (_, te) =>
+        {
+            var border=te.NameScope.Find<Border>("ToggleButtonBackground");
+            border.Background = Brushes.Transparent;
+            border.PointerEntered += (_,_) => { border.Background=Brushes.Transparent;};
+        };
+    }
+
+    private void AddFuncQuestionsClicked(object? sender, RoutedEventArgs e)
+    {
+        TopLevel tp=TopLevel.GetTopLevel(this);
+        if (tp != null)
+        {
+            ListBox lb=new ListBox(){MaxHeight = tp.Height*2/3,MaxWidth = tp.Width*2/3,};
+            var examples =new List<string>(ImplicitFunctionExamples.Examples);
+            for (var i = 0; i < examples.Count; i++)
+            {
+                examples[i] = examples[i].Split(";")[0];
+            }
+            lb.ItemsSource = examples;
+            lb.SelectionMode = SelectionMode.Single;
+            lb.SelectionChanged += (s, se) =>
+            {
+                NewFuncTextBox.Text=lb?.SelectedItem?.ToString()??NewFuncTextBox.Text;
+                DialogHost.Close("dialog");
+                NewFuncTextBox.Focus();
+            };
+            ScrollViewer sv=new ScrollViewer(){MaxHeight = tp.Height*2/3,MaxWidth = tp.Width*2/3,HorizontalScrollBarVisibility = ScrollBarVisibility.Hidden};
+            sv.Content = lb;
+            DialogHost.Show(sv,"dialog");
+        }
     }
 }

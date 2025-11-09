@@ -1,4 +1,5 @@
 ﻿using CsGrafeq.Interval.Interface;
+using CsGrafeq.Utilities;
 
 namespace CsGrafeq.Interval;
 
@@ -16,7 +17,7 @@ public struct Range : IRange
 
     public Range(double min, double max)
     {
-        Math.SwapIfNotLess(ref min, ref max);
+        CsGrafeqMath.SwapIfNotLess(ref min, ref max);
         _Inf = min;
         _Sup = max;
     }

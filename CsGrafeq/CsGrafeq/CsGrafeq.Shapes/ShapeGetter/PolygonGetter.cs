@@ -13,21 +13,20 @@ public class PolygonGetter : GeometryGetter
     public override string ActionName => "Polygon";
     public override GeometryShape[] Parameters => Points;
 
-    public override void Attach(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void Attach(GeometryShape subShape)
     {
         foreach (var i in Points)
         {
-            i.ShapeChanged += handler;
-            i.SubShapes.Add(subShape);
+            i.AddSubShape(subShape);
+;
         }
     }
 
-    public override void UnAttach(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void UnAttach(GeometryShape subShape)
     {
         foreach (var i in Points)
         {
-            i.ShapeChanged -= handler;
-            i.SubShapes.Remove(subShape);
+            i.RemoveSubShape(subShape);
         }
     }
 

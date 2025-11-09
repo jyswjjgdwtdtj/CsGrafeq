@@ -260,7 +260,7 @@ public static class Compiler
                     else if (name.Length == 1 && 'a' <= name[0] && name[0] <= 'z')
                     {
                         expStack.Push(Expression.Call(GetInfo(T.CreateFromDouble),
-                            Expression.Call(variables, GetInfo(EnglishChar.Instance.GetValue),
+                            Expression.Call(GetInfo(EnglishChar.StaticGetValue),
                                 Expression.Constant(name[0]))));
                         usedVars |= (EnglishCharEnum)sysMath.Pow(2, name[0] - 'a');
                     }
@@ -272,7 +272,7 @@ public static class Compiler
                     break;
                 case ElementType.Function:
                 {
-                    if (IComputableNumber<T>.MethodDictionary.TryGetValue(element.NameOrValue.ToLower(),
+                    if (IComputableNumber<T>.ComputableNumberMethodDictionary.TryGetValue(element.NameOrValue.ToLower(),
                             out var method) && method.Method.GetParameters().Length == element.ArgCount)
                         switch (element.ArgCount)
                         {

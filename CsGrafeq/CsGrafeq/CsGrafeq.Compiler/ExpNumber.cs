@@ -1,6 +1,7 @@
 ﻿using CsGrafeq.Compiler;
 using CsGrafeq.Numeric;
 using ReactiveUI;
+using static CsGrafeq.Utilities.DoubleCompareHelper;
 
 namespace CsGrafeq;
 
@@ -122,7 +123,7 @@ public class ExpNumber : ReactiveObject
 
     private void SetValue(double value)
     {
-        if (!Extension.CompareDoubleIfBothNaNThenEqual(value, Value) || IsExpression)
+        if (!CompareDoubleIfBothNaNThenEqual(value, Value) || IsExpression)
         {
             Value = value;
             this.RaisePropertyChanged(nameof(Value));

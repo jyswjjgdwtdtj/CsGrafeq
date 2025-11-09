@@ -11,7 +11,7 @@ public class Point : GeometryShape
     public Point(PointGetter pointgetter)
     {
         PointGetter = pointgetter;
-        PointGetter.Attach(RefreshValues, this);
+        PointGetter.Attach(this);
         RefreshValues();
     }
 
@@ -31,7 +31,7 @@ public class Point : GeometryShape
     {
         var loc = PointGetter.GetPoint();
         Location.SetValue(loc.X, loc.Y);
-        InvokeEvent();
+        InvokeShapeChanged();
     }
 
     public override Vec NearestOf(Vec vec)

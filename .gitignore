@@ -4,4 +4,4 @@ Debug/
 Release/
 obj/
 *.pdb
-
+*.Test/

@@ -1,4 +1,5 @@
 ﻿using static System.Math;
+using static CsGrafeq.Utilities.ThrowHelper;
 
 namespace CsGrafeq.Shapes;
 
@@ -113,7 +114,7 @@ public static class IntersectionMath
             case Polygon _:
                 return 15;
             default:
-                Extension.Throw("");
+                Throw("");
                 return 20;
         }
     }

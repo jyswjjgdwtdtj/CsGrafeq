@@ -1,8 +1,47 @@
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Transactions;
+
 namespace CsGrafeq.Numeric;
 
 public interface IComputableNumber<T> : IHasOperatorNumber<T> where T : IComputableNumber<T>
 {
-    static IDictionary<string, Delegate> MethodDictionary { get; } = new Dictionary<string, Delegate>
+    static unsafe IComputableNumber()
+    {
+        MethodPtrDictionary = new Dictionary<string, nint>
+    {
+        { "sqrt", GetUnManagedPtr(T.Sqrt) },
+        { "cbrt", GetUnManagedPtr(T.Cbrt) },
+        { "pow", GetUnManagedPtr(T.Pow) },
+        { "exp", GetUnManagedPtr(T.Exp) },
+        { "log", GetUnManagedPtr(T.Log) },
+        { "lg", GetUnManagedPtr(T.Lg) },
+        { "ln", GetUnManagedPtr(T.Ln) },
+        { "sin", GetUnManagedPtr(T.Sin) },
+        { "cos", GetUnManagedPtr(T.Cos) },
+        { "tan", GetUnManagedPtr(T.Tan) },
+        { "cot", GetUnManagedPtr(T.Cot) },
+        { "arcsin", GetUnManagedPtr(T.ArcSin) },
+        { "arccos", GetUnManagedPtr(T.ArcCos) },
+        { "arctan", GetUnManagedPtr(T.ArcTan) },
+        { "tanh", GetUnManagedPtr(T.Tanh) },
+        { "cosh", GetUnManagedPtr(T.Cosh) },
+        { "sinh", GetUnManagedPtr(T.Sinh) },
+        { "arccosh", GetUnManagedPtr(T.ArcCosh) },
+        { "arctanh", GetUnManagedPtr(T.ArcTanh) },
+        { "arcsinh", GetUnManagedPtr(T.ArcSinh) },
+        { "floor", GetUnManagedPtr(T.Floor) },
+        { "ceil", GetUnManagedPtr(T.Ceil) },
+        { "gcd", GetUnManagedPtr(T.GCD) },
+        { "lcm", GetUnManagedPtr(T.LCM) },
+        { "sgn", GetUnManagedPtr(T.Sgn) },
+        { "abs", GetUnManagedPtr(T.Abs) },
+        { "median", GetUnManagedPtr(T.Median) },
+        { "min", GetUnManagedPtr(T.Min) },
+        { "max", GetUnManagedPtr(T.Max) }
+    };
+    }
+    static IDictionary<string, Delegate> ComputableNumberMethodDictionary { get; } = new Dictionary<string, Delegate>
     {
         { "sqrt", T.Sqrt },
         { "cbrt", T.Cbrt },
@@ -34,7 +73,17 @@ public interface IComputableNumber<T> : IHasOperatorNumber<T> where T : IComputa
         { "min", T.Min },
         { "max", T.Max }
     };
-
+    private unsafe static MethodInfo GetInfo(Delegate d)
+    {
+        return d.Method;
+    }
+    private static IntPtr GetUnManagedPtr(Delegate d)
+    {
+        var mi = d.Method;
+        RuntimeHelpers.PrepareMethod(mi.MethodHandle);
+        return mi.MethodHandle.GetFunctionPointer();
+    }
+    static unsafe IDictionary<string, nint> MethodPtrDictionary { get; }
     static abstract T Sqrt(T num);
     static abstract T Cbrt(T num);
     static abstract T Pow(T num, T exp);

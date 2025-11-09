@@ -2,7 +2,7 @@
 using Avalonia.Input;
 using CsGrafeq.Debug;
 using SkiaSharp;
-using static CsGrafeq.Extension;
+using static CsGrafeq.Utilities.ThrowHelper;
 
 namespace CsGrafeqApplication.Controls.Displayers;
 
@@ -71,18 +71,19 @@ public class DisplayControl : CartesianDisplayer
                         {
                             dc.Clear(AxisBackground);
                             RenderAxisLine(dc);
-                            if (false) //&&(!MovingOptimization || (LastZeroPos - Zero).Length > 30))
+                            if ((!MovingOptimization || (LastZeroPos - Zero).Length > 100))
                             {
                                 foreach (var adn in Addons)
                                 foreach (var rt in adn.Layers)
                                 {
+                                    if (!rt.IsActive)
+                                        continue;
                                     var size = rt.GetSize();
                                     if (size.Width != TotalBuffer.Width || size.Height != TotalBuffer.Height)
                                     {
                                         Throw("Bitmap size mismatch");
                                         return;
                                     }
-
                                     var newbmp = rt.GetCopy();
                                     using (var canvas = rt.GetBitmapCanvas())
                                     {
@@ -98,11 +99,17 @@ public class DisplayControl : CartesianDisplayer
 
                                 LastZeroPos = Zero;
                             }
-
-                            foreach (var adn in Addons)
-                            foreach (var layer in adn.Layers)
-                                layer.DrawBitmap(dc, (int)(Zero.X - LastZeroPos.X), (int)(Zero.Y - LastZeroPos.Y));
-                            //RenderMovedPlace(dc,layer.Render);
+                            else
+                            {
+                                foreach (var adn in Addons)
+                                    foreach (var layer in adn.Layers)
+                                    {
+                                        if (!layer.IsActive)
+                                            continue;
+                                        layer.DrawBitmap(dc, (int)(Zero.X - LastZeroPos.X), (int)(Zero.Y - LastZeroPos.Y));
+                                        RenderMovedPlace(dc, layer.Render);
+                                    }
+                            }
                             RenderAxisNumber(dc);
                         }
                     }

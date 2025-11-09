@@ -1,4 +1,7 @@
-﻿using static CsGrafeq.Interval.Def;
+﻿using CsGrafeq.Utilities;
+using static CsGrafeq.Interval.Def;
+using static CsGrafeq.Interval.Extensions.IntervalSetExtension;
+using CGMath = CsGrafeq.Utilities.CsGrafeqMath;
 
 namespace CsGrafeq.Interval;
 
@@ -17,7 +20,7 @@ public readonly struct Interval //: _Interval
 
     public static Interval Create(double Inf, double Sup, Def def)
     {
-        Math.SwapIfNotLess(ref Inf, ref Sup);
+        CsGrafeqMath.SwapIfNotLess(ref Inf, ref Sup);
         return new Interval { Inf = Inf, Sup = Sup, Def = def };
     }
 
@@ -100,7 +103,7 @@ public readonly struct Interval //: _Interval
             return new Interval { Inf = left.Inf * right.Inf, Sup = left.Sup * right.Sup, Def = def };
         if (left.Sup < 0 && right.Sup < 0)
             return new Interval { Inf = left.Sup * right.Sup, Sup = left.Inf * right.Inf, Def = def };
-        var res = Math.GetMinMax4(left.Inf * right.Inf, left.Inf * right.Sup, left.Sup * right.Inf,
+        var res = CGMath.GetMinMax4(left.Inf * right.Inf, left.Inf * right.Sup, left.Sup * right.Inf,
             left.Sup * right.Sup);
         return new Interval { Inf = res.Item1, Sup = res.Item2, Def = def };
     }

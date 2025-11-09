@@ -9,6 +9,8 @@ using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.LogicalTree;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using CsGrafeqApplication.Addons.GeometryPad;
 using CsGrafeqApplication.Controls.Displayers;
@@ -111,13 +113,22 @@ public partial class DisplayerContainer : UserControl
             }
                 break;
             case Key.A:
-            {
-                if (e.KeyModifiers == KeyModifiers.Control)
                 {
-                    SelectAll_Clicked(sender, e);
-                    e.Handled = true;
+                    if (e.KeyModifiers == KeyModifiers.Control)
+                    {
+                        SelectAll_Clicked(sender, e);
+                        e.Handled = true;
+                    }
                 }
-            }
+                break;
+            case Key.S:
+                {
+                    if (e.KeyModifiers == KeyModifiers.Control)
+                    {
+                        SaveClicked(sender, e);
+                        e.Handled = true;
+                    }
+                }
                 break;
             case Key.OemComma: // Ctrl + ,
             {
@@ -312,4 +323,35 @@ public partial class DisplayerContainer : UserControl
             preventMove=true;
         }
     }*/
+private async void SaveClicked(object? sender, RoutedEventArgs e)
+{
+    var topLevel = TopLevel.GetTopLevel(this);
+    if (topLevel != null)
+    {
+        var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions()
+        {
+            Title = "Open Text File",
+            FileTypeChoices = [FilePickerFileTypes.ImageAll],
+            DefaultExtension = ".jpg",
+            ShowOverwritePrompt = true
+        });
+        if (file != null)
+        {
+                var size = new PixelSize((int)VM.Displayer.Bounds.Width, (int)VM.Displayer.Bounds.Height);
+                var rr = new RenderTargetBitmap(size);
+                using (var dc = rr.CreateDrawingContext())
+                {
+                    RenderTargetBitmap rt = new RenderTargetBitmap(size);
+                    rt.Render(VM.Displayer);
+                    dc.DrawImage(rt, VM.Displayer.Bounds);
+                    rt = new RenderTargetBitmap(new((int)InfoCanvas.Bounds.Width, (int)InfoCanvas.Bounds.Height));
+                    rt.Render(InfoCanvas);
+                    dc.DrawImage(rt, InfoCanvas.Bounds);
+                }
+                rr.Save(file.Path.AbsolutePath);
+                
+
+            }
+    }
+}
 }

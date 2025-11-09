@@ -11,6 +11,9 @@
             <SolidColorBrush x:Key="CgCtPureBackgroundBrush" Color="Black" />
             <SolidColorBrush x:Key="CgHTCtPureBackgroundBrush" Color="Black" Opacity="0.3" />
             <SolidColorBrush x:Key="CgTransparentBrush" Opacity="0" Color="White" />
+            <SolidColorBrush x:Key="AxisBackgroundBrush" Opacity="0" Color="#ffffff" />
+            <Color x:Key="CgTransparentColor">#00ffffff</Color>
+            <Color x:Key="AxisBackgroundColor">#ffffff</Color>
             <system:String x:Key="CurrentColorString">path {fill:#ffffff}</system:String>
             <system:String x:Key="OppositeCssPathFillString">path { fill: #000000 }</system:String>
             <system:String x:Key="OppositeCssPathStrokeString">path { stroke: #000000 }</system:String>
@@ -24,6 +27,9 @@
             <SolidColorBrush x:Key="CgCtPureBackgroundBrush" Color="White" />
             <SolidColorBrush x:Key="CgHTCtPureBackgroundBrush" Color="White" Opacity="0.3" />
             <SolidColorBrush x:Key="CgTransparentBrush" Opacity="0" Color="Black" />
+            <Color x:Key="CgTransparentColor">#00000000</Color>
+            <SolidColorBrush x:Key="AxisBackground" Opacity="0" Color="#1e1e1e" />
+            <Color x:Key="AxisBackgroundColor">#1e1e1e</Color>
             <system:String x:Key="CurrentColorString">path {fill:#000000}</system:String>
             <system:String x:Key="OppositeCssPathFillString">path {fill:#ffffff}</system:String>
             <system:String x:Key="OppositeCssPathStrokeString">path { stroke: #ffffff }</system:String>

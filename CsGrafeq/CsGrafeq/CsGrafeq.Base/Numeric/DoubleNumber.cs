@@ -1,5 +1,6 @@
+using CsGrafeq.Utilities;
 using System.Runtime.CompilerServices;
-using sysMath = System.Math;
+using CGMath = CsGrafeq.Utilities.CsGrafeqMath;
 
 namespace CsGrafeq.Numeric;
 
@@ -15,163 +16,163 @@ public struct DoubleNumber : IComputableNumber<DoubleNumber>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static DoubleNumber Sqrt(DoubleNumber num)
     {
-        return new DoubleNumber(sysMath.Sqrt(num.Value));
+        return new DoubleNumber(Math.Sqrt(num.Value));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static DoubleNumber Cbrt(DoubleNumber num)
     {
-        return new DoubleNumber(sysMath.Cbrt(num.Value));
+        return new DoubleNumber(Math.Cbrt(num.Value));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static DoubleNumber Pow(DoubleNumber num, DoubleNumber exp)
     {
-        return new DoubleNumber(sysMath.Pow(num.Value, exp.Value));
+        return new DoubleNumber(Math.Pow(num.Value, exp.Value));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static DoubleNumber Exp(DoubleNumber num)
     {
-        return new DoubleNumber(sysMath.Exp(num.Value));
+        return new DoubleNumber(Math.Exp(num.Value));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static DoubleNumber Log(DoubleNumber num1, DoubleNumber num2)
     {
-        return new DoubleNumber(sysMath.Log(num1.Value, num2.Value));
+        return new DoubleNumber(Math.Log(num1.Value, num2.Value));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static DoubleNumber Lg(DoubleNumber num)
     {
-        return new DoubleNumber(sysMath.Log10(num.Value));
+        return new DoubleNumber(Math.Log10(num.Value));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static DoubleNumber Ln(DoubleNumber num)
     {
-        return new DoubleNumber(sysMath.Log(num.Value));
+        return new DoubleNumber(Math.Log(num.Value));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static DoubleNumber Sin(DoubleNumber num)
     {
-        return new DoubleNumber(sysMath.Sin(num.Value));
+        return new DoubleNumber(Math.Sin(num.Value));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static DoubleNumber Cos(DoubleNumber num)
     {
-        return new DoubleNumber(sysMath.Cos(num.Value));
+        return new DoubleNumber(Math.Cos(num.Value));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static DoubleNumber Tan(DoubleNumber num)
     {
-        return new DoubleNumber(sysMath.Tan(num.Value));
+        return new DoubleNumber(Math.Tan(num.Value));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static DoubleNumber Cot(DoubleNumber num)
     {
-        return new DoubleNumber(1.0 / sysMath.Tan(num.Value));
+        return new DoubleNumber(1.0 / Math.Tan(num.Value));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static DoubleNumber ArcSin(DoubleNumber num)
     {
-        return new DoubleNumber(sysMath.Asin(num.Value));
+        return new DoubleNumber(Math.Asin(num.Value));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static DoubleNumber ArcCos(DoubleNumber num)
     {
-        return new DoubleNumber(sysMath.Acos(num.Value));
+        return new DoubleNumber(Math.Acos(num.Value));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static DoubleNumber ArcTan(DoubleNumber num)
     {
-        return new DoubleNumber(sysMath.Atan(num.Value));
+        return new DoubleNumber(Math.Atan(num.Value));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static DoubleNumber Tanh(DoubleNumber num)
     {
-        return new DoubleNumber(sysMath.Tanh(num.Value));
+        return new DoubleNumber(Math.Tanh(num.Value));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static DoubleNumber Cosh(DoubleNumber num)
     {
-        return new DoubleNumber(sysMath.Cosh(num.Value));
+        return new DoubleNumber(Math.Cosh(num.Value));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static DoubleNumber Sinh(DoubleNumber num)
     {
-        return new DoubleNumber(sysMath.Sinh(num.Value));
+        return new DoubleNumber(Math.Sinh(num.Value));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static DoubleNumber ArcCosh(DoubleNumber num)
     {
-        return new DoubleNumber(sysMath.Acosh(num.Value));
+        return new DoubleNumber(Math.Acosh(num.Value));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static DoubleNumber ArcTanh(DoubleNumber num)
     {
-        return new DoubleNumber(sysMath.Atanh(num.Value));
+        return new DoubleNumber(Math.Atanh(num.Value));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static DoubleNumber ArcSinh(DoubleNumber num)
     {
-        return new DoubleNumber(sysMath.Asinh(num.Value));
+        return new DoubleNumber(Math.Asinh(num.Value));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static DoubleNumber Floor(DoubleNumber num)
     {
-        return new DoubleNumber(sysMath.Floor(num.Value));
+        return new DoubleNumber(Math.Floor(num.Value));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static DoubleNumber Ceil(DoubleNumber num)
     {
-        return new DoubleNumber(sysMath.Ceiling(num.Value));
+        return new DoubleNumber(Math.Ceiling(num.Value));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static DoubleNumber GCD(DoubleNumber num1, DoubleNumber num2)
     {
-        return new DoubleNumber(Math.GCD((long)num1.Value, (long)num2.Value));
+        return new DoubleNumber(CGMath.GCD((long)num1.Value, (long)num2.Value));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static DoubleNumber LCM(DoubleNumber num1, DoubleNumber num2)
     {
-        return new DoubleNumber(Math.LCM((long)num1.Value, (long)num2.Value));
+        return new DoubleNumber(CGMath.LCM((long)num1.Value, (long)num2.Value));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static DoubleNumber Sgn(DoubleNumber num)
     {
-        return new DoubleNumber(sysMath.Sign(num.Value));
+        return new DoubleNumber(Math.Sign(num.Value));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static DoubleNumber Abs(DoubleNumber num)
     {
-        return new DoubleNumber(sysMath.Abs(num.Value));
+        return new DoubleNumber(Math.Abs(num.Value));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static DoubleNumber Median(DoubleNumber num1, DoubleNumber num2, DoubleNumber num3)
     {
-        return new DoubleNumber(Math.DoubleMedian(num1.Value, num2.Value, num3.Value));
+        return new DoubleNumber(CGMath.DoubleMedian(num1.Value, num2.Value, num3.Value));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

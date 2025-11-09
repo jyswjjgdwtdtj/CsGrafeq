@@ -21,7 +21,7 @@
     </Design.DataContext>
     <Design.Width>600</Design.Width>
     <Design.Height>400</Design.Height>
-    <dialogHostAvalonia:DialogHost CloseOnClickAway="True" CornerRadius="5">
+    <dialogHostAvalonia:DialogHost CloseOnClickAway="True" CornerRadius="5" Identifier="dialog">
         <dialogHostAvalonia:DialogHost.DialogContent>
         </dialogHostAvalonia:DialogHost.DialogContent>
         <ctls:DisplayerContainer Name="MainContainer" />

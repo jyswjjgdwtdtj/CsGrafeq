@@ -1,7 +1,7 @@
 ﻿using ReactiveUI;
-using static CsGrafeq.Math;
 using static CsGrafeq.Shapes.GeometryMath;
 using static System.Math;
+using CsGrafeq.Utilities;
 
 
 namespace CsGrafeq.Shapes.ShapeGetter;
@@ -49,20 +49,18 @@ public class PointGetter_AxialSymmetryPoint : PointGetter
         return new Vec(v1.X + t * dx, v1.Y + t * dy) * 2 - ControlPoint;
     }
 
-    public override void Attach(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void Attach(GeometryShape subShape)
     {
-        Point.ShapeChanged += handler;
-        Line.ShapeChanged += handler;
-        Point.SubShapes.Add(subShape);
-        Line.SubShapes.Add(subShape);
+        Point.AddSubShape(subShape);
+        Line.AddSubShape(subShape);
+;
+;
     }
 
-    public override void UnAttach(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void UnAttach(GeometryShape subShape)
     {
-        Point.ShapeChanged -= handler;
-        Line.ShapeChanged -= handler;
-        Point.SubShapes.Remove(subShape);
-        Line.SubShapes.Remove(subShape);
+        Point.RemoveSubShape(subShape);
+        Line.RemoveSubShape(subShape);
     }
 }
 
@@ -90,16 +88,16 @@ public abstract class PointGetter_Movable : PointGetter
     public abstract void SetPoint(Vec controlPoint);
     public abstract void SetStringPoint(Vector2<string> point);
 
-    public override void Attach(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void Attach(GeometryShape subShape)
     {
-        PointX.NumberChanged += handler;
-        PointY.NumberChanged += handler;
+        PointX.NumberChanged += subShape.RefreshValues;
+        PointY.NumberChanged += subShape.RefreshValues;
     }
 
-    public override void UnAttach(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void UnAttach(GeometryShape subShape)
     {
-        PointX.NumberChanged -= handler;
-        PointY.NumberChanged -= handler;
+        PointX.NumberChanged -= subShape.RefreshValues;
+        PointY.NumberChanged -= subShape.RefreshValues;
     }
 }
 
@@ -197,18 +195,16 @@ public abstract class PointGetter_OnShape<T> : PointGetter_Movable where T : Geo
     protected abstract double YFromX(double x);
     protected abstract Vec GetPointWithoutExpression();
 
-    public override void Attach(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void Attach(GeometryShape subShape)
     {
-        base.Attach(handler, subShape);
-        OnShape.ShapeChanged += handler;
-        OnShape.SubShapes.Add(subShape);
+        base.Attach(subShape);
+        OnShape.AddSubShape(subShape);
     }
 
-    public override void UnAttach(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void UnAttach(GeometryShape subShape)
     {
-        base.UnAttach(handler, subShape);
-        OnShape.ShapeChanged -= handler;
-        OnShape.SubShapes.Remove(subShape);
+        base.UnAttach(subShape);
+        OnShape.RemoveSubShape(subShape);
     }
 
     protected void CheckExp()
@@ -281,9 +277,9 @@ public sealed class PointGetter_OnLine(Line line, Vec InitialPoint) : PointGette
         else
             ratio = 0.5;
         if (Line is Half)
-            ratio = RangeTo(0, double.PositiveInfinity, ratio);
+            ratio = CsGrafeqMath.RangeTo(0, double.PositiveInfinity, ratio);
         else if (Line is Segment)
-            ratio = RangeTo(0, 1, ratio);
+            ratio =CsGrafeqMath.RangeTo(0, 1, ratio);
         return ratio;
     }
 
@@ -460,26 +456,24 @@ public class PointGetter_NearestPointOnLine : PointGetter
         var dy = v2.Y - v1.Y;
         var t = ((ControlPoint.X - v1.X) * dx + (ControlPoint.Y - v1.Y) * dy) / (dx * dx + dy * dy);
         if (Line is Half)
-            t = RangeTo(0, double.PositiveInfinity, t);
+            t =CsGrafeqMath.RangeTo(0, double.PositiveInfinity, t);
         else if (Line is Segment)
-            t = RangeTo(0, 1, t);
+            t =CsGrafeqMath.RangeTo(0, 1, t);
         return new Vec(v1.X + t * dx, v1.Y + t * dy);
     }
 
-    public override void Attach(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void Attach(GeometryShape subShape)
     {
-        Line.ShapeChanged += handler;
-        Point.ShapeChanged += handler;
-        Line.SubShapes.Add(subShape);
-        Point.SubShapes.Add(subShape);
+        Line.AddSubShape(subShape);
+        Point.AddSubShape(subShape);
+;
+;
     }
 
-    public override void UnAttach(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void UnAttach(GeometryShape subShape)
     {
-        Line.ShapeChanged -= handler;
-        Point.ShapeChanged -= handler;
-        Line.SubShapes.Remove(subShape);
-        Point.SubShapes.Remove(subShape);
+        Line.RemoveSubShape(subShape);
+        Point.RemoveSubShape(subShape);
     }
 }
 
@@ -499,22 +493,19 @@ public abstract class PointGetter_FromTwoPoint : PointGetter
 
     public override GeometryShape[] Parameters => [Point1, Point2];
 
-    public override void Attach(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void Attach(GeometryShape subShape)
     {
-        Point1.ShapeChanged += handler;
-        Point2.ShapeChanged += handler;
+        Point1.AddSubShape(subShape);
+        Point2.AddSubShape(subShape);
 
-        Point1.SubShapes.Add(subShape);
-        Point2.SubShapes.Add(subShape);
+;
+;
     }
 
-    public override void UnAttach(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void UnAttach(GeometryShape subShape)
     {
-        Point1.ShapeChanged -= handler;
-        Point2.ShapeChanged -= handler;
-
-        Point1.SubShapes.Remove(subShape);
-        Point2.SubShapes.Remove(subShape);
+        Point1.RemoveSubShape(subShape);
+        Point2.RemoveSubShape(subShape);
     }
 }
 
@@ -539,16 +530,15 @@ public class PointGetter_EndOfLine : PointGetter
         return line.Current.Point2;
     }
 
-    public override void Attach(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void Attach(GeometryShape subShape)
     {
-        line.ShapeChanged += handler;
-        line.SubShapes.Add(subShape);
+        line.AddSubShape(subShape);
+;
     }
 
-    public override void UnAttach(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void UnAttach(GeometryShape subShape)
     {
-        line.ShapeChanged -= handler;
-        line.SubShapes.Remove(subShape);
+        line.RemoveSubShape(subShape);
     }
 }
 
@@ -575,7 +565,7 @@ public class PointGetter_MiddlePoint : PointGetter_FromTwoPoint
      {
          AngleGetter = ag;
      }
-     public override void Attach(ShapeChangedHandler handler, GeometryShape subShape)
+     public override void Attach(GeometryShape subShape)
      {
          base.Attach(handler,subShape);
          AngleGetter.Attach(handler, subShape);
@@ -605,26 +595,22 @@ public abstract class PointGetter_FromThreePoint : PointGetter
     public override GeometryShape[] Parameters => [Point1, Point2, Point3];
     public abstract override Vec GetPoint();
 
-    public override void Attach(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void Attach(GeometryShape subShape)
     {
-        Point1.ShapeChanged += handler;
-        Point2.ShapeChanged += handler;
-        Point3.ShapeChanged += handler;
+        Point1.AddSubShape(subShape);
+        Point2.AddSubShape(subShape);
+        Point3.AddSubShape(subShape);
 
-        Point1.SubShapes.Add(subShape);
-        Point2.SubShapes.Add(subShape);
-        Point3.SubShapes.Add(subShape);
+;
+;
+;
     }
 
-    public override void UnAttach(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void UnAttach(GeometryShape subShape)
     {
-        Point1.ShapeChanged -= handler;
-        Point2.ShapeChanged -= handler;
-        Point3.ShapeChanged -= handler;
-
-        Point1.SubShapes.Remove(subShape);
-        Point2.SubShapes.Remove(subShape);
-        Point3.SubShapes.Remove(subShape);
+        Point1.RemoveSubShape(subShape);
+        Point2.RemoveSubShape(subShape);
+        Point3.RemoveSubShape(subShape);
     }
 }
 
@@ -725,20 +711,20 @@ public abstract class PointGetter_Intersection<TShape1, TShape2>(TShape1 shape1,
     protected readonly TShape2 Shape2 = shape2;
     public override GeometryShape[] Parameters => [Shape1, Shape2];
 
-    public override void Attach(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void Attach(GeometryShape subShape)
     {
-        Shape1.ShapeChanged += handler;
-        Shape1.ShapeChanged += handler;
-        Shape2.ShapeChanged += handler;
-        Shape2.ShapeChanged += handler;
+        Shape1.AddSubShape(subShape);
+        Shape1.AddSubShape(subShape);
+        Shape2.AddSubShape(subShape);
+        Shape2.AddSubShape(subShape);
     }
 
-    public override void UnAttach(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void UnAttach(GeometryShape subShape)
     {
-        Shape1.ShapeChanged -= handler;
-        Shape1.ShapeChanged -= handler;
-        Shape2.ShapeChanged -= handler;
-        Shape2.ShapeChanged -= handler;
+        Shape1.RemoveSubShape(subShape);
+        Shape1.RemoveSubShape(subShape);
+        Shape2.RemoveSubShape(subShape);
+        Shape2.RemoveSubShape(subShape);
     }
 }
 

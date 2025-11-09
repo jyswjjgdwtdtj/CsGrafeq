@@ -1,9 +1,9 @@
 using System.Numerics;
 using sysMath = System.Math;
 
-namespace CsGrafeq;
+namespace CsGrafeq.Utilities;
 
-public static class Math
+public static class CsGrafeqMath
 {
     public static double PosMod(double a, double b)
     {
@@ -28,22 +28,22 @@ public static class Math
 
     public static double RoundTen(double num, int fix)
     {
-        num /= Pow(10d, -fix);
+        num /= SpecialPow(10d, -fix);
         num = sysMath.Round(num, 0);
-        num *= Pow(10d, -fix);
+        num *= SpecialPow(10d, -fix);
         return num;
     }
 
     public static decimal RoundTen(decimal num, int fix)
     {
-        var m = Pow(10M, -fix);
+        var m = SpecialPow(10M, -fix);
         num /= m;
         num = sysMath.Round(num, 0);
         num *= m;
         return num;
     }
 
-    public static T Pow<T>(T num, int times) where T : INumber<T>
+    public static T SpecialPow<T>(T num, int times) where T : INumber<T>
     {
         var result = T.One;
         if (times > 0)

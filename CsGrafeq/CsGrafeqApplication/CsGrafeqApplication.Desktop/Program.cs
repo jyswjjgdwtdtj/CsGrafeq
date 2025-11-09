@@ -20,7 +20,7 @@ internal sealed class Program
     {
         return AppBuilder.Configure<App>()
             .UsePlatformDetect()
-            .WithInterFont()
+            .WithInterFont().UseSkia()
             .LogToTrace();
     }
 }

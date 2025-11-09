@@ -14,7 +14,7 @@ using AddonPointerEventArgs = CsGrafeqApplication.Addons.Addon.AddonPointerEvent
 using AddonPointerEventArgsBase = CsGrafeqApplication.Addons.Addon.AddonPointerEventArgsBase;
 using AddonPointerWheelEventArgs = CsGrafeqApplication.Addons.Addon.AddonPointerWheelEventArgs;
 using AvaPoint = Avalonia.Point;
-
+using Avalonia.Skia;
 namespace CsGrafeqApplication.Controls.Displayers;
 
 public abstract class Displayer : SKCanvasView,ICustomHitTest
@@ -44,9 +44,12 @@ public abstract class Displayer : SKCanvasView,ICustomHitTest
         
     }
     /// <summary>
-    /// 
+    /// 缩放优化
     /// </summary>
     public bool ZoomingOptimization { get; set; } = false;
+    /// <summary>
+    /// 移动优化
+    /// </summary>
     public bool MovingOptimization { get; set; } = false;
     public bool ZOPEnable { get; set; } = true;
     public bool MOPEnable { get; set; } = true;
@@ -63,11 +66,15 @@ public abstract class Displayer : SKCanvasView,ICustomHitTest
             dc.DrawBitmap(TotalBuffer, SKPoint.Empty);
         }
     }
+    /// <summary>
+    /// 并无卵用
+    /// </summary>
+    /// <param name="point"></param>
+    /// <returns></returns>
     public bool HitTest(AvaPoint point)
     {
         if (point.Y < 30)
         {
-            Console.WriteLine(point.ToString());
             return false;
         }
         return true;
@@ -204,12 +211,17 @@ public abstract class Displayer : SKCanvasView,ICustomHitTest
             }
         }
     }
-
+    /// <summary>
+    /// 使所有层无效
+    /// </summary>
     protected void Invalidate()
     {
         foreach (var i in Addons) Invalidate(i);
     }
-
+    /// <summary>
+    /// 使Renderable层无效
+    /// </summary>
+    /// <param name="layer"></param>
     protected void Invalidate(Renderable layer)
     {
         using (var dc = layer.GetBitmapCanvas())
@@ -219,14 +231,19 @@ public abstract class Displayer : SKCanvasView,ICustomHitTest
         }
         layer.Changed = false;
     }
-
+    /// <summary>
+    /// 使Addon中的所有层无效
+    /// </summary>
+    /// <param name="adn"></param>
     protected void Invalidate(Addon adn)
     {
         foreach (var layer in adn.Layers)
             Invalidate(layer);
         adn.Changed = false;
     }
-
+    /// <summary>
+    /// 强制重绘
+    /// </summary>
     protected void ForceToRender()
     {
         RenderClock.Cancel();
@@ -262,7 +279,9 @@ public abstract class Displayer : SKCanvasView,ICustomHitTest
             Dispatcher.UIThread.InvokeAsync(InvalidateVisual);
         }
     }
-
+    /// <summary>
+    /// 要求重绘
+    /// </summary>
     internal void AskForRender()
     {
         RenderClock.Touch();

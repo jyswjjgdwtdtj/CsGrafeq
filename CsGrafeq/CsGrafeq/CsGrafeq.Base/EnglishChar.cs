@@ -2,8 +2,9 @@
 using System.Runtime.CompilerServices;
 using CsGrafeq.Collections;
 using ReactiveUI;
-using static CsGrafeq.Extension;
-using sysMath = System.Math;
+using static CsGrafeq.Utilities.ThrowHelper;
+using static CsGrafeq.Utilities.CsGrafeqMath;
+using static System.Math;
 
 namespace CsGrafeq;
 
@@ -16,9 +17,10 @@ public class EnglishChar : ReactiveObject
             if (e.PropertyName.Length == 1)
             {
                 var c = e.PropertyName[0];
-                if ('A' <= c && c <= 'Z') CharValueChanged?.Invoke((EnglishCharEnum)sysMath.Pow(2, c - 'A'));
+                if ('A' <= c && c <= 'Z') CharValueChanged?.Invoke((EnglishCharEnum)Math.Pow(2, c - 'A'));
             }
         };
+        A = 10;
     }
 
     public static EnglishChar Instance { get; } = new();
@@ -44,7 +46,11 @@ public class EnglishChar : ReactiveObject
     public double A
     {
         get => CharsValue[0];
-        set => this.RaiseAndSetIfChanged(ref CharsValue[0], value);
+        set
+        {
+            Console.WriteLine("a changed value");
+            this.RaiseAndSetIfChanged(ref CharsValue[0], value);
+        }
     }
 
     public double B
@@ -203,6 +209,12 @@ public class EnglishChar : ReactiveObject
     public double GetValue(char c)
     {
         return this[c];
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double StaticGetValue(char c)
+    {
+        return Instance[c];
     }
 
     public void AddReference(EnglishCharEnum c)
