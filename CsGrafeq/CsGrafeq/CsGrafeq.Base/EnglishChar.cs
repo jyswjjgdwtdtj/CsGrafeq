@@ -46,11 +46,7 @@ public class EnglishChar : ReactiveObject
     public double A
     {
         get => CharsValue[0];
-        set
-        {
-            Console.WriteLine("a changed value");
-            this.RaiseAndSetIfChanged(ref CharsValue[0], value);
-        }
+        set=> this.RaiseAndSetIfChanged(ref CharsValue[0], value);
     }
 
     public double B

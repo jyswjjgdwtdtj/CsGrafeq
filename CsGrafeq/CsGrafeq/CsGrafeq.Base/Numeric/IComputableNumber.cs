@@ -4,7 +4,7 @@ using System.Transactions;
 
 namespace CsGrafeq.Numeric;
 
-public interface IComputableNumber<T> : IHasOperatorNumber<T> where T : IComputableNumber<T>
+public interface IComputableNumber<T> : IHasOperatorNumber<T>, INeedClone<T> where T : IComputableNumber<T>, INeedClone<T>
 {
     static unsafe IComputableNumber()
     {
@@ -38,7 +38,8 @@ public interface IComputableNumber<T> : IHasOperatorNumber<T> where T : IComputa
         { "abs", GetUnManagedPtr(T.Abs) },
         { "median", GetUnManagedPtr(T.Median) },
         { "min", GetUnManagedPtr(T.Min) },
-        { "max", GetUnManagedPtr(T.Max) }
+        { "max", GetUnManagedPtr(T.Max) },
+            {"clone",GetUnManagedPtr(T.Clone)  }
     };
     }
     static IDictionary<string, Delegate> ComputableNumberMethodDictionary { get; } = new Dictionary<string, Delegate>
@@ -71,7 +72,8 @@ public interface IComputableNumber<T> : IHasOperatorNumber<T> where T : IComputa
         { "abs", T.Abs },
         { "median", T.Median },
         { "min", T.Min },
-        { "max", T.Max }
+        { "max", T.Max },
+        {"clone",T.Clone }
     };
     private unsafe static MethodInfo GetInfo(Delegate d)
     {

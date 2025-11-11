@@ -927,7 +927,7 @@ public partial class GeometryPad : Addon
         var RectToCalc = new ConcurrentBag<SKRectI> { rect };
         var Points = new ConcurrentBag<SKPoint> {  };
         var Rects = new ConcurrentBag<SKRectI> { };
-        var paint = new SKPaint { Color = new SKColor(impFunc.Color) };
+        var paint = new SKPaint { Color = new SKColor(impFunc.Color).WithAlpha(impFunc.Opacity) };
         IntervalHandler<IntervalSet> func = impFunc.Function.Function;
         do
         {
@@ -936,8 +936,8 @@ public partial class GeometryPad : Addon
             Action<int> atn = idx => RenderRectIntervalSet( rs[idx], RectToCalc,  func, false,Points,Rects);
             for (var i = 0; i < rs.Length; i += 100)
             {
-                Parallel.For(i, Min(i + 100, rs.Length), atn);
-                //for(var j=i; j< Min(i + 100, rs.Length); j++) atn(j);
+                //Parallel.For(i, Min(i + 100, rs.Length), atn);
+                for(var j=i; j< Min(i + 100, rs.Length); j++) atn(j);
                 foreach (var rectToDraw in Rects) {
                     dc.DrawRect(rectToDraw,paint);
                 }
@@ -946,6 +946,7 @@ public partial class GeometryPad : Addon
                 Points.Clear();
             }
         } while (RectToCalc.Count != 0);
+        dc.Flush();
     }
 
     private void RenderRectIntervalSet(SKRectI r, ConcurrentBag<SKRectI> RectToCalc,IntervalHandler<IntervalSet> func, bool checkpixel, ConcurrentBag<SKPoint> Points, ConcurrentBag<SKRectI> Rects)
@@ -1426,7 +1427,7 @@ public partial class GeometryPad : Addon
     }
 
     /// <summary>
-    ///     拦截除了Ctrl+A以外的键盘输入
+    ///     拦截除了部分操作以外的键盘快捷键输入
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
@@ -1436,11 +1437,18 @@ public partial class GeometryPad : Addon
         {
             if (e.Key == Key.A)
             {
+            }else if (e.Key == Key.C)
+            {
+            }else if (e.Key == Key.V)
+            {
             }
             else
             {
                 e.Handled = true;
             }
+        }else if (e.KeyModifiers!=KeyModifiers.None)
+        {
+            e.Handled = true;
         }
     }
 

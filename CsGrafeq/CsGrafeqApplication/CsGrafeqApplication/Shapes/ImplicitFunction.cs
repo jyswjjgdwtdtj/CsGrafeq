@@ -1,5 +1,7 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 using CsGrafeq.Interval;
+using CsGrafeqApplication;
 using CsGrafeqApplication.Addons;
 using ReactiveUI;
 using SkiaSharp;
@@ -9,7 +11,15 @@ namespace CsGrafeq.Shapes;
 public class ImplicitFunction : Shape
 {
     public readonly Renderable RenderTarget = new();
-
+    public byte Opacity
+    {
+        get => field;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref field, value);
+            InvokeShapeChanged();
+        }
+    }
     public bool ShowFormula
     {
         get;
@@ -25,6 +35,7 @@ public class ImplicitFunction : Shape
         {
             RefreshIsActive();
         };
+        Opacity = Static.Instance.DefaultOpacity;
     }
 
     public bool IsCorrect

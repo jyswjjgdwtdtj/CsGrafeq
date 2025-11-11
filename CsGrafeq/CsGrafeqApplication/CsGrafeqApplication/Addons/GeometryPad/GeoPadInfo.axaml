@@ -6,27 +6,29 @@
              xmlns:geopad="clr-namespace:CsGrafeqApplication.Addons.GeometryPad;assembly=CsGrafeqApplication"
              xmlns:shapes="clr-namespace:CsGrafeq.Shapes" 
              x:Class="CsGrafeqApplication.Addons.GeometryPad.GeoPadInfo" x:DataType="geopad:GeometryPadViewModel">
-    <ItemsControl ItemsSource="{CompiledBinding Shapes}">
-        <ItemsControl.ItemTemplate>
-            <geopad:ImpFuncShowDataTemplate>
-                <geopad:ImpFuncShowDataTemplate.ImpFuncDataTemplate>
-                    <DataTemplate DataType="shapes:ImplicitFunction">
-                        <Border IsVisible="{CompiledBinding ShowFormula}">
-                        <Border IsVisible="{CompiledBinding IsDeleted,Converter={StaticResource Not}}">
-                        <Border IsVisible="{CompiledBinding IsCorrect}">
-                            <DockPanel LastChildFill="True" Height="40">
-                                <Border Width="40" Height="40" DockPanel.Dock="Left">
-                                    <Rectangle Fill="{CompiledBinding Color,Converter={StaticResource UIntColorToBrush},ConverterParameter='255',Mode=OneWay}"  Stroke="Black" Width="15" Height="15" StrokeThickness="1"></Rectangle>
+    <Border  CornerRadius="5" Background="{DynamicResource CgBackgroundBrush}">
+        <ItemsControl ItemsSource="{CompiledBinding Shapes}">
+            <ItemsControl.ItemTemplate>
+                <geopad:ImpFuncShowDataTemplate>
+                    <geopad:ImpFuncShowDataTemplate.ImpFuncDataTemplate>
+                        <DataTemplate DataType="shapes:ImplicitFunction">
+                            <Border IsVisible="{CompiledBinding ShowFormula}">
+                                <Border IsVisible="{CompiledBinding IsDeleted,Converter={StaticResource Not}}">
+                                    <Border IsVisible="{CompiledBinding IsCorrect}">
+                                        <DockPanel LastChildFill="True" Height="40">
+                                            <Border Width="40" Height="40" DockPanel.Dock="Left">
+                                                <Rectangle Fill="{CompiledBinding Color,Converter={StaticResource UIntColorToBrush},ConverterParameter='255',Mode=OneWay}"  Stroke="Black" Width="15" Height="15" StrokeThickness="1"></Rectangle>
+                                            </Border>
+                                            <TextBlock Text="{CompiledBinding Expression}" VerticalAlignment="Center"></TextBlock>
+                                        </DockPanel>
+                                    </Border>
                                 </Border>
-                                <TextBlock Text="{CompiledBinding Expression}" VerticalAlignment="Center"></TextBlock>
-                            </DockPanel>
-                        </Border>
-                        </Border>
-                        </Border>
-                    </DataTemplate>
-                </geopad:ImpFuncShowDataTemplate.ImpFuncDataTemplate>
-            </geopad:ImpFuncShowDataTemplate>
+                            </Border>
+                        </DataTemplate>
+                    </geopad:ImpFuncShowDataTemplate.ImpFuncDataTemplate>
+                </geopad:ImpFuncShowDataTemplate>
             
-        </ItemsControl.ItemTemplate>
-    </ItemsControl>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Border>
 </UserControl>

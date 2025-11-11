@@ -16,9 +16,10 @@ public static class IntervalCompiler
             throw new ArgumentNullException("expression");
         var exptree =
             Compiler.Compiler.ConstructExpTree<IntervalSet>(expression, 2, out var xVar, out var yVar, out _,
-                out var reference);
+                out var reference).Reduce();
+        Console.WriteLine(exptree.ToString());
         return new HasReferenceIntervalSetFunc<IntervalSet>(
-            CompileByDynamicMethod(Expression.Lambda<IntervalHandler<IntervalSet>>(exptree.Reduce(), xVar, yVar)), reference);
+            CompileByDynamicMethod(Expression.Lambda<IntervalHandler<IntervalSet>>(exptree, xVar, yVar)), reference);
         //return new HasReferenceIntervalSetFunc<IntervalSet>(Expression.Lambda<IntervalHandler<IntervalSet>>(exptree.Reduce(), xVar, yVar).Compile(), reference);
     }
 

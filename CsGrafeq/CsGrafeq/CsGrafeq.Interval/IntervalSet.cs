@@ -10,22 +10,37 @@ namespace CsGrafeq.Interval;
 public readonly struct IntervalSet : IInterval<IntervalSet>
 {
     #region 定义
+    public static bool NeedClone => true;
 
     public static readonly IntervalSet Empty = new(new Range[0], FF, false, double.NaN, double.NaN, double.NaN);
     public static readonly Range EmptyRange = new(double.NaN);
     internal readonly Range[] Intervals;
     public readonly Def Def => _Def;
+    /// <summary>
+    /// 最大值
+    /// </summary>
     public readonly double Sup => _Sup;
+    /// <summary>
+    /// 最小值
+    /// </summary>
     public readonly double Inf => _Inf;
 
     public readonly Def _Def;
-
+/// <summary>
+/// 最大值字段
+/// </summary>
     public readonly double _Sup;
-
+/// <summary>
+/// 最小值字段
+/// </summary>
     public readonly double _Inf;
-
+/// <summary>
+/// 是否是单个数
+/// </summary>
     internal readonly bool IsNumber;
-
+/// <summary>
+/// 数
+/// </summary>
     internal readonly double Number;
 
     public IntervalSet() : this([],TT,false,double.NaN,double.NaN,double.NaN) { 
@@ -378,20 +393,15 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
         if (i.IsEmpty) return Empty;
 
         if (i.IsNumber) return Create(Math.Sign(i.Number));
-
         var tmp = new Range[3];
-        var loc = 0;
+        int loc = 0;
         if (i._Inf < 0)
-            tmp[loc++] = new Range(-1);
-        foreach (var j in i.Intervals)
-            if (j.ContainsEqual(0))
-                tmp[loc++] = new Range(0);
-
-        if (i._Sup < 0)
-            tmp[loc++] = new Range(1);
-        var res = new Range[loc];
-        for (var j = 0; j < loc; j++) res[j] = tmp[j];
-        return Create(res, FT);
+            tmp[loc++] = new(-1);
+        if(i.Contains(0))
+            tmp[loc++] = new(0);
+        if (i._Sup > 0)
+            tmp[loc++] = new(1);
+        return Create(tmp.Slice(0,loc), FT);
     }
 
     public static unsafe IntervalSet Abs(IntervalSet i1)
@@ -404,16 +414,13 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
 
     private static Range RangeAbs(Range i)
     {
-        double inf = 0, sup = 0;
         if (i.ContainsEqual(0))
         {
-            sup = Math.Max(-i._Inf, i._Sup);
-            inf = 0;
-            return new Range(inf, sup);
+            return new Range(0, Math.Max(-i._Inf, i._Sup));
         }
 
-        if (i._Sup < 0) (inf, sup) = (-i._Sup, -i._Inf);
-        return new Range(inf, sup);
+        if (i._Sup < 0) return new(-i._Sup,-i.Inf);
+        return new Range(i._Inf, i._Sup);
     }
 
     public static unsafe IntervalSet Min(IntervalSet i1, IntervalSet i2)

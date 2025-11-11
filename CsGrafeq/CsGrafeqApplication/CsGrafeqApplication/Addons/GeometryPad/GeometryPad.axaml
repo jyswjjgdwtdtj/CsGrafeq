@@ -527,7 +527,7 @@
                                             CornerRadius="5" BorderThickness="0" Tapped="ImpFuncOnTapped">
                                             <FlyoutBase.AttachedFlyout>
                                                 <Flyout ShowMode="Standard" Placement="BottomEdgeAlignedLeft">
-                                                    <Grid ColumnDefinitions="80,120" RowDefinitions="Auto,Auto"
+                                                    <Grid ColumnDefinitions="80,120" RowDefinitions="Auto,Auto,Auto"
                                                           RowSpacing="3">
                                                         <TextBlock Grid.Row="0" Grid.Column="0"
                                                                    VerticalAlignment="Center">
@@ -537,8 +537,10 @@
                                                                      Color="{CompiledBinding Color,Converter={StaticResource UIntToColor}}"
                                                                      IsAlphaVisible="False"
                                                                      IsAccentColorsVisible="False" />
-                                                        <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">Show Formula</TextBlock>
+                                                        <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">Show Formula:</TextBlock>
                                                         <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{CompiledBinding ShowFormula}" VerticalAlignment="Center" HorizontalAlignment="Center"></CheckBox>
+                                                        <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Opacity:</TextBlock>
+                                                        <Slider Grid.Row="2" Grid.Column="1" Value="{CompiledBinding Opacity}" Minimum="0" Maximum="255" VerticalAlignment="Center" HorizontalAlignment="Stretch"></Slider>
                                                     </Grid>
                                                 </Flyout>
                                             </FlyoutBase.AttachedFlyout>

@@ -227,6 +227,7 @@ public abstract class Displayer : SKCanvasView,ICustomHitTest
         using (var dc = layer.GetBitmapCanvas())
         {
             dc?.Clear();
+            dc?.Flush();
             layer.Render(dc, Bounds.ToSKRect());
         }
         layer.Changed = false;
