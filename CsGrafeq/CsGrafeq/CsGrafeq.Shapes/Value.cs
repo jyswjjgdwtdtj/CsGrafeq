@@ -17,11 +17,6 @@ public sealed class Value<T> : Shape
     {
     }
 
-    public override void InvokeEvent()
-    {
-        throw new NotImplementedException();
-    }
-
 
     private string IsNullRetEmpty(string str)
     {

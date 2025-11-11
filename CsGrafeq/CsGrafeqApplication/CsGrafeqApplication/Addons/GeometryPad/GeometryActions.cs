@@ -3,6 +3,7 @@ using System.Reflection;
 using Avalonia.Collections;
 using CsGrafeq.Shapes;
 using CsGrafeq.Shapes.ShapeGetter;
+using static CsGrafeq.Utilities.ThrowHelper;
 
 namespace CsGrafeqApplication.Addons.GeometryPad;
 
@@ -49,7 +50,7 @@ internal static class GeometryActions
                 Description = new MultiLanguageData { English = "Put the middle of two points", Chinese = "放置两点的中点" },
                 GetterConstructor =
                     ConstructorInvoker.Create(typeof(PointGetter_MiddlePoint).GetConstructors()
-                        .FirstOrDefault()), // ctor(Point, Point)
+                        .FirstOrDefault()!), // ctor(Point, Point)
                 Args = [ShapeArg.Point, ShapeArg.Point],
                 Self = ShownShapeArg.Point
             },
@@ -60,7 +61,7 @@ internal static class GeometryActions
                     { English = "Put the median center of three points", Chinese = "放置三点的重心（质心）" },
                 GetterConstructor =
                     ConstructorInvoker.Create(typeof(PointGetter_MedianCenter).GetConstructors()
-                        .FirstOrDefault()), // ctor(Point, Point, Point)
+                        .FirstOrDefault()!), // ctor(Point, Point, Point)
                 Args = [ShapeArg.Point, ShapeArg.Point, ShapeArg.Point],
                 Self = ShownShapeArg.Point
             },
@@ -71,7 +72,7 @@ internal static class GeometryActions
                     { English = "Put the median center of three points", Chinese = "放置三点的外心（外接圆心）" },
                 GetterConstructor =
                     ConstructorInvoker.Create(typeof(PointGetter_OutCenter).GetConstructors()
-                        .FirstOrDefault()), // ctor(Point, Point, Point)
+                        .FirstOrDefault()!), // ctor(Point, Point, Point)
                 Args = [ShapeArg.Point, ShapeArg.Point, ShapeArg.Point],
                 Self = ShownShapeArg.Point
             },
@@ -82,7 +83,7 @@ internal static class GeometryActions
                     { English = "Put the in center of three points", Chinese = "放置三点的内心（内切圆心）" },
                 GetterConstructor =
                     ConstructorInvoker.Create(typeof(PointGetter_InCenter).GetConstructors()
-                        .FirstOrDefault()), // ctor(Point, Point, Point)
+                        .FirstOrDefault()!), // ctor(Point, Point, Point)
                 Args = [ShapeArg.Point, ShapeArg.Point, ShapeArg.Point],
                 Self = ShownShapeArg.Point
             },
@@ -93,7 +94,7 @@ internal static class GeometryActions
                     { English = "Put the ortho center of three points", Chinese = "放置三点的垂心" },
                 GetterConstructor =
                     ConstructorInvoker.Create(typeof(PointGetter_OrthoCenter).GetConstructors()
-                        .FirstOrDefault()), // ctor(Point, Point, Point)
+                        .FirstOrDefault()!), // ctor(Point, Point, Point)
                 Args = [ShapeArg.Point, ShapeArg.Point, ShapeArg.Point],
                 Self = ShownShapeArg.Point
             },
@@ -104,7 +105,7 @@ internal static class GeometryActions
                     { English = "Put the axial symmetry of a point from a line", Chinese = "根据直线放置点的轴对称点" },
                 GetterConstructor =
                     ConstructorInvoker.Create(typeof(PointGetter_AxialSymmetryPoint).GetConstructors()
-                        .FirstOrDefault()), // ctor(Point, Line)
+                        .FirstOrDefault()!), // ctor(Point, Line)
                 Args = [ShapeArg.Point, ShapeArg.Line],
                 Self = ShownShapeArg.Point
             },
@@ -115,7 +116,7 @@ internal static class GeometryActions
                     { English = "Put the nearest point of a shape from a points", Chinese = "放置点到图形上的最近点" },
                 GetterConstructor =
                     ConstructorInvoker.Create(typeof(PointGetter_NearestPointOnLine).GetConstructors()
-                        .FirstOrDefault()), // ctor(Line, Point)
+                        .FirstOrDefault()!), // ctor(Line, Point)
                 Args = [ShapeArg.Point, ShapeArg.Line],
                 Self = ShownShapeArg.Point
             }
@@ -130,7 +131,7 @@ internal static class GeometryActions
                     { English = "Create a straight line from two points", Chinese = "由两点创建直线" },
                 GetterConstructor =
                     ConstructorInvoker.Create(typeof(LineGetter_Connected).GetConstructors()
-                        .FirstOrDefault()), // ctor(Point, Point)
+                        .FirstOrDefault()!), // ctor(Point, Point)
                 Args = [ShapeArg.Point, ShapeArg.Point],
                 Self = ShownShapeArg.Straight
             },
@@ -141,7 +142,7 @@ internal static class GeometryActions
                     { English = "Create a half line from two points", Chinese = "由两点创建半直线" },
                 GetterConstructor =
                     ConstructorInvoker.Create(typeof(LineGetter_Half).GetConstructors()
-                        .FirstOrDefault()), // ctor(Point, Point)
+                        .FirstOrDefault()!), // ctor(Point, Point)
                 Args = [ShapeArg.Point, ShapeArg.Point],
                 Self = ShownShapeArg.Half
             },
@@ -152,7 +153,7 @@ internal static class GeometryActions
                     { English = "Create a line segment from two points", Chinese = "由两点创建线段" },
                 GetterConstructor =
                     ConstructorInvoker.Create(typeof(LineGetter_Segment).GetConstructors()
-                        .FirstOrDefault()), // ctor(Point, Point)
+                        .FirstOrDefault()!), // ctor(Point, Point)
                 Args = [ShapeArg.Point, ShapeArg.Point],
                 Self = ShownShapeArg.Segment
             },
@@ -163,7 +164,7 @@ internal static class GeometryActions
                     { English = "Create a vertical line of a line from a point", Chinese = "根据一条直线和一点创建垂线" },
                 GetterConstructor =
                     ConstructorInvoker.Create(typeof(LineGetter_Vertical).GetConstructors()
-                        .FirstOrDefault()), // ctor(Line, Point)
+                        .FirstOrDefault()!), // ctor(Line, Point)
                 Args = [ShapeArg.Point, ShapeArg.Line],
                 Self = ShownShapeArg.Straight
             },
@@ -174,7 +175,7 @@ internal static class GeometryActions
                     { English = "Create a parallel line of a line from a point", Chinese = "根据一条直线和一点创建平行线" },
                 GetterConstructor =
                     ConstructorInvoker.Create(typeof(LineGetter_Parallel).GetConstructors()
-                        .FirstOrDefault()), // ctor(Line, Point)
+                        .FirstOrDefault()!), // ctor(Line, Point)
                 Args = [ShapeArg.Point, ShapeArg.Line],
                 Self = ShownShapeArg.Straight
             },
@@ -189,7 +190,7 @@ internal static class GeometryActions
                 },
                 GetterConstructor =
                     ConstructorInvoker.Create(typeof(LineGetter_Fitted).GetConstructors()
-                        .FirstOrDefault()), // ctor(Point[])
+                        .FirstOrDefault()!), // ctor(Point[])
                 Args = [ShapeArg.Point],
                 IsMultiPoint = true,
                 Self = ShownShapeArg.Straight
@@ -201,7 +202,7 @@ internal static class GeometryActions
                     { English = "Create a perpendicular bisector from two points", Chinese = "由两点创建垂直平分线" },
                 GetterConstructor =
                     ConstructorInvoker.Create(typeof(LineGetter_PerpendicularBisector).GetConstructors()
-                        .FirstOrDefault()), // ctor(Point, Point)
+                        .FirstOrDefault()!), // ctor(Point, Point)
                 Args = [ShapeArg.Point, ShapeArg.Point],
                 Self = ShownShapeArg.Straight
             }
@@ -219,7 +220,7 @@ internal static class GeometryActions
                 },
                 GetterConstructor =
                     ConstructorInvoker.Create(typeof(PolygonGetter).GetConstructors()
-                        .FirstOrDefault()), // ctor(Point[])
+                        .FirstOrDefault()!), // ctor(Point[])
                 Args = [ShapeArg.Point],
                 IsMultiPoint = true,
                 Self = ShownShapeArg.Polygon
@@ -235,7 +236,7 @@ internal static class GeometryActions
                     { English = "Create a circle from three points", Chinese = "由三点创建圆" },
                 GetterConstructor =
                     ConstructorInvoker.Create(typeof(CircleGetter_FromThreePoint).GetConstructors()
-                        .FirstOrDefault()), // ctor(Point, Point, Point)
+                        .FirstOrDefault()!), // ctor(Point, Point, Point)
                 Args = [ShapeArg.Point, ShapeArg.Point, ShapeArg.Point],
                 Self = ShownShapeArg.Circle
             },
@@ -247,7 +248,7 @@ internal static class GeometryActions
                 GetterConstructor =
                     ConstructorInvoker.Create(
                         typeof(CircleGetter_FromCenterAndPoint).GetConstructors()
-                            .FirstOrDefault()), // ctor(Point, Point)
+                            .FirstOrDefault()!), // ctor(Point, Point)
                 Args = [ShapeArg.Point, ShapeArg.Point],
                 Self = ShownShapeArg.Circle
             },
@@ -258,7 +259,7 @@ internal static class GeometryActions
                     { English = "Create a circle from center and radius", Chinese = "由圆心和半径创建圆" },
                 GetterConstructor =
                     ConstructorInvoker.Create(typeof(CircleGetter_FromCenterAndRadius).GetConstructors()
-                        .FirstOrDefault()), // ctor(Point)
+                        .FirstOrDefault()!), // ctor(Point)
                 Args = [ShapeArg.Point],
                 Self = ShownShapeArg.Circle
             }
@@ -272,7 +273,7 @@ internal static class GeometryActions
                 Description = new MultiLanguageData { English = "Create an angle", Chinese = "创建一个角" },
                 GetterConstructor =
                     ConstructorInvoker.Create(typeof(AngleGetter_FromThreePoint).GetConstructors()
-                        .FirstOrDefault()), // ctor(Point anglePoint, Point point1, Point point2)
+                        .FirstOrDefault()!), // ctor(Point anglePoint, Point point1, Point point2)
                 Args = [ShapeArg.Point, ShapeArg.Point, ShapeArg.Point],
                 Self = ShownShapeArg.Angle
             }
@@ -296,7 +297,7 @@ internal static class GeometryActions
             case ShownShapeArg.Polygon:
                 return new Polygon((PolygonGetter)getter);
             default:
-                return CsGrafeq.Extension.Throw<GeometryShape>("");
+                return Throw<GeometryShape>("");
         }
     }
 }

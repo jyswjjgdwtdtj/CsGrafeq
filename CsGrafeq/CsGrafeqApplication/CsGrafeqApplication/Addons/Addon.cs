@@ -16,7 +16,6 @@ public abstract class Addon : UserControl
     private readonly OnceLock IsAddonLoaded = new();
     internal readonly List<Renderable> Layers = new();
     public bool Changed { get; set; } = false;
-
     //Addon内部勿动
     public bool IsAddonEnabled { get; set; } = true;
 

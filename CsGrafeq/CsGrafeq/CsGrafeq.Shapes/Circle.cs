@@ -10,7 +10,7 @@ public class Circle : FilledShape
     public Circle(CircleGetter cg)
     {
         CircleGetter = cg;
-        cg.Attach(RefreshValues, this);
+        cg.Attach(this);
         RefreshValues();
     }
 
@@ -24,7 +24,7 @@ public class Circle : FilledShape
     {
         InnerCircle = CircleGetter.GetCircle();
         Description = $"Center:({LocX},{LocY}),Radius:{Radius}";
-        InvokeEvent();
+        InvokeShapeChanged();
     }
 
     public override Vec NearestOf(Vec vec)

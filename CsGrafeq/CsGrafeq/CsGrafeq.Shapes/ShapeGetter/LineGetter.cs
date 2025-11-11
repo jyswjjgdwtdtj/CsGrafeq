@@ -21,20 +21,18 @@ public abstract class LineGetter_TwoPoint : LineGetter
 
     public override GeometryShape[] Parameters => [Point1, Point2];
 
-    public override void Attach(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void Attach(GeometryShape subShape)
     {
-        Point1.ShapeChanged += handler;
-        Point2.ShapeChanged += handler;
-        Point1.SubShapes.Add(subShape);
-        Point2.SubShapes.Add(subShape);
+        Point1.AddSubShape(subShape);
+        Point2.AddSubShape(subShape);
+;
+;
     }
 
-    public override void UnAttach(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void UnAttach(GeometryShape subShape)
     {
-        Point1.ShapeChanged -= handler;
-        Point2.ShapeChanged -= handler;
-        Point1.SubShapes.Remove(subShape);
-        Point2.SubShapes.Remove(subShape);
+        Point1.RemoveSubShape(subShape);
+        Point2.RemoveSubShape(subShape);
     }
 }
 
@@ -112,24 +110,21 @@ public class LineGetter_AngleBisector : LineGetter
     public override GeometryShape[] Parameters => [Point1, Point2, AnglePoint];
     public override string ActionName => "AngleBisector";
 
-    public override void Attach(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void Attach(GeometryShape subShape)
     {
-        Point1.ShapeChanged += handler;
-        Point2.ShapeChanged += handler;
-        AnglePoint.ShapeChanged += handler;
-        Point1.SubShapes.Add(subShape);
-        Point2.SubShapes.Add(subShape);
-        AnglePoint.SubShapes.Add(subShape);
+        Point1.AddSubShape(subShape);
+        Point2.AddSubShape(subShape);
+        AnglePoint.AddSubShape(subShape);
+;
+;
+;
     }
 
-    public override void UnAttach(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void UnAttach(GeometryShape subShape)
     {
-        Point1.ShapeChanged -= handler;
-        Point2.ShapeChanged -= handler;
-        AnglePoint.ShapeChanged -= handler;
-        Point1.SubShapes.Remove(subShape);
-        Point2.SubShapes.Remove(subShape);
-        AnglePoint.SubShapes.Remove(subShape);
+        Point1.RemoveSubShape(subShape);
+        Point2.RemoveSubShape(subShape);
+        AnglePoint.RemoveSubShape(subShape);
     }
 
     public override LineStruct GetLine()
@@ -165,20 +160,18 @@ public abstract class LineGetter_PointAndLine : LineGetter
 
     public override GeometryShape[] Parameters => [Line, Point];
 
-    public override void Attach(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void Attach(GeometryShape subShape)
     {
-        Line.ShapeChanged += handler;
-        Point.ShapeChanged += handler;
-        Line.SubShapes.Add(subShape);
-        Point.SubShapes.Add(subShape);
+        Line.AddSubShape(subShape);
+        Point.AddSubShape(subShape);
+;
+;
     }
 
-    public override void UnAttach(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void UnAttach(GeometryShape subShape)
     {
-        Line.ShapeChanged -= handler;
-        Point.ShapeChanged -= handler;
-        Line.SubShapes.Remove(subShape);
-        Point.SubShapes.Remove(subShape);
+        Line.RemoveSubShape(subShape);
+        Point.RemoveSubShape(subShape);
     }
 }
 
@@ -281,21 +274,19 @@ public class LineGetter_Fitted : LineGetter
         return new LineStruct(Point1, Point2);
     }
 
-    public override void Attach(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void Attach(GeometryShape subShape)
     {
         foreach (var i in Points)
         {
-            i.SubShapes.Add(subShape);
-            i.ShapeChanged += handler;
+            i.AddSubShape(subShape);
         }
     }
 
-    public override void UnAttach(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void UnAttach(GeometryShape subShape)
     {
         foreach (var i in Points)
         {
-            i.ShapeChanged -= handler;
-            i.SubShapes.Remove(subShape);
+            i.RemoveSubShape(subShape);
         }
     }
 }

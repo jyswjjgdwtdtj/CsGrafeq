@@ -1,5 +1,7 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 using CsGrafeq.Interval;
+using CsGrafeqApplication;
 using CsGrafeqApplication.Addons;
 using ReactiveUI;
 using SkiaSharp;
@@ -9,7 +11,20 @@ namespace CsGrafeq.Shapes;
 public class ImplicitFunction : Shape
 {
     public readonly Renderable RenderTarget = new();
-
+    public byte Opacity
+    {
+        get => field;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref field, value);
+            InvokeShapeChanged();
+        }
+    }
+    public bool ShowFormula
+    {
+        get;
+        set => this.RaiseAndSetIfChanged(ref field, value);
+    } = true;
     public ImplicitFunction(string expression = "y=x+1")
     {
         Description = "ImplicitFunction";
@@ -18,8 +33,9 @@ public class ImplicitFunction : Shape
         RenderTarget.OnRender += RenderTarget_OnRender;
         this.PropertyChanged+=(s,e)=>
         {
+            RefreshIsActive();
         };
-        ;
+        Opacity = Static.Instance.DefaultOpacity;
     }
 
     public bool IsCorrect
@@ -30,6 +46,10 @@ public class ImplicitFunction : Shape
             this.RaiseAndSetIfChanged(ref field, value);
         }
     } = false;
+    public void RefreshIsActive()
+    {
+        RenderTarget.IsActive = IsCorrect && !IsDeleted;
+    }
 
     public HasReferenceIntervalSetFunc<IntervalSet> Function
     {
@@ -55,7 +75,7 @@ public class ImplicitFunction : Shape
                 IsCorrect = false;
             }
 
-            InvokeEvent();
+            InvokeShapeChanged();
             Description = Expression;
         }
     }
@@ -77,6 +97,6 @@ public class ImplicitFunction : Shape
     {
         if (IsCorrect && !IsDeleted)
             if (Function.Reference.HasFlag(englishCharEnum))
-                InvokeEvent();
+                InvokeShapeChanged();
     }
 }

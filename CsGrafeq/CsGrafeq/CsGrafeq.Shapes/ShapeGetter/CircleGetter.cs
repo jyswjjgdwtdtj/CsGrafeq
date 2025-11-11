@@ -41,24 +41,18 @@ public class CircleGetter_FromThreePoint : CircleGetter
         return new CircleStruct { Center = c, Radius = (c - Point1.Location).GetLength() };
     }
 
-    public override void Attach(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void Attach(GeometryShape subShape)
     {
-        Point1.ShapeChanged += handler;
-        Point2.ShapeChanged += handler;
-        Point3.ShapeChanged += handler;
-        Point1.SubShapes.Add(subShape);
-        Point2.SubShapes.Add(subShape);
-        Point3.SubShapes.Add(subShape);
+        Point1.AddSubShape(subShape);
+        Point2.AddSubShape(subShape);
+        Point3.AddSubShape(subShape);
     }
 
-    public override void UnAttach(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void UnAttach(GeometryShape subShape)
     {
-        Point1.ShapeChanged -= handler;
-        Point2.ShapeChanged -= handler;
-        Point3.ShapeChanged -= handler;
-        Point1.SubShapes.Remove(subShape);
-        Point2.SubShapes.Remove(subShape);
-        Point3.SubShapes.Remove(subShape);
+        Point1.RemoveSubShape(subShape);
+        Point2.RemoveSubShape(subShape);
+        Point3.RemoveSubShape(subShape);
     }
 }
 
@@ -82,18 +76,17 @@ public class CircleGetter_FromCenterAndRadius : CircleGetter
         return new CircleStruct { Center = Center.Location, Radius = Radius.Value };
     }
 
-    public override void Attach(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void Attach(GeometryShape subShape)
     {
-        Center.ShapeChanged += handler;
-        Center.SubShapes.Add(subShape);
-        Radius.NumberChanged += handler;
+        Center.AddSubShape(subShape);
+;
+        Radius.NumberChanged += subShape.RefreshValues;
     }
 
-    public override void UnAttach(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void UnAttach(GeometryShape subShape)
     {
-        Center.ShapeChanged -= handler;
-        Center.SubShapes.Remove(subShape);
-        Radius.NumberChanged -= handler;
+        Center.RemoveSubShape(subShape);
+        Radius.NumberChanged -= subShape.RefreshValues;
     }
 }
 
@@ -117,20 +110,18 @@ public class CircleGetter_FromCenterAndPoint : CircleGetter
             { Center = Center.Location, Radius = ((Vec)Center.Location - Point.Location).GetLength() };
     }
 
-    public override void Attach(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void Attach(GeometryShape subShape)
     {
-        Center.ShapeChanged += handler;
-        Point.ShapeChanged += handler;
-        Point.SubShapes.Add(subShape);
-        Center.SubShapes.Add(subShape);
+        Center.AddSubShape(subShape);
+        Point.AddSubShape(subShape);
+;
+;
     }
 
-    public override void UnAttach(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void UnAttach(GeometryShape subShape)
     {
-        Center.ShapeChanged -= handler;
-        Point.ShapeChanged -= handler;
-        Point.SubShapes.Remove(subShape);
-        Center.SubShapes.Remove(subShape);
+        Center.RemoveSubShape(subShape);
+        Point.RemoveSubShape(subShape);
     }
 }
 /*public class CircleGetter_FromCenterAndDistance : CircleGetter
@@ -146,8 +137,8 @@ public class CircleGetter_FromCenterAndPoint : CircleGetter
     {
         return new CircleStruct { Center = Center.Location, Radius = Distance.GetNumber() };
     }
-    public override void Attach(ShapeChangedHandler handler, GeometryShape subShape)
+    public override void Attach(GeometryShape subShape)
     {
-        Center.ShapeChanged += handler;
+        Center.AddSubShape(subShape);
         //Distance.Attach(handler);
     }*/

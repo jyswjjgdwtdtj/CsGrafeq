@@ -26,9 +26,13 @@ public class Renderable : IDisposable
         get => field;
         set
         {
+            bool flag = value && !field;
             field = value;
             Changed = true;
-            SetBitmapSize(Size);
+            if (flag)
+            {
+                SetBitmapSize(Size);
+            }
         }
     } = true;
     /// <summary>
@@ -67,8 +71,10 @@ public class Renderable : IDisposable
     /// 获取缓冲区Canvas
     /// </summary>
     /// <returns>缓冲区Canvas</returns>
-    public SKCanvas GetBitmapCanvas()
+    public SKCanvas? GetBitmapCanvas()
     {
+        if (!IsActive)
+            return null;
         lock (BitmapLock)
         {
             return new SKCanvas(Bitmap);
@@ -86,8 +92,10 @@ public class Renderable : IDisposable
     /// 获取缓冲区的拷贝
     /// </summary>
     /// <returns></returns>
-    public SKBitmap GetCopy()
+    public SKBitmap? GetCopy()
     {
+        if (!IsActive)
+            return null;
         lock (BitmapLock)
         {
             return Bitmap.Copy();
@@ -101,6 +109,8 @@ public class Renderable : IDisposable
     /// <param name="y"></param>
     public void DrawBitmap(SKCanvas canvas, int x, int y)
     {
+        if (!IsActive)
+            return;
         lock (BitmapLock)
         {
             canvas.DrawBitmap(Bitmap, x, y);
@@ -117,6 +127,8 @@ public class Renderable : IDisposable
     /// <param name="rect"></param>
     public void Render(SKCanvas? dc, SKRect rect)
     {
+        if (!IsActive)
+            return;
         OnRender?.Invoke(dc, rect);
     }
 

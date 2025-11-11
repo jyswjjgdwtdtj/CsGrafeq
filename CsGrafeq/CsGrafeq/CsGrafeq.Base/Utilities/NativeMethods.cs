@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace CsGrafeq;
+namespace CsGrafeq.Utilities;
 
 public static class NativeMethods
 {

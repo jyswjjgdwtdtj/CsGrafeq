@@ -80,6 +80,8 @@
         <AvaloniaResource Include="Assets\add.svg" />
         <None Remove="Assets\theme.svg" />
         <AvaloniaResource Include="Assets\theme.svg" />
+        <None Remove="Assets\save.svg" />
+        <AvaloniaResource Include="Assets\save.svg" />
     </ItemGroup>
 
     <ItemGroup>

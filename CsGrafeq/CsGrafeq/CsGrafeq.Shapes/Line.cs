@@ -12,7 +12,7 @@ public abstract class Line : GeometryShape
     public Line(LineGetter lineGetter)
     {
         LineGetter = lineGetter;
-        LineGetter.Attach(RefreshValues, this);
+        LineGetter.Attach(this);
         RefreshValues();
     }
 
@@ -26,7 +26,7 @@ public abstract class Line : GeometryShape
     {
         Current = LineGetter.GetLine();
         Description = Current.ExpStr.Replace("x", "𝑥").Replace("y", "𝑦");
-        InvokeEvent();
+        InvokeShapeChanged();
     }
 
     public abstract bool CheckIsValid(Vec vec);
@@ -50,7 +50,7 @@ public class Segment : Line
     {
         Current = LineGetter.GetLine();
         Description = Current.ExpStr + " " + Current.Distance;
-        InvokeEvent();
+        InvokeShapeChanged();
     }
 
     public override bool CheckIsValid(Vec vec)

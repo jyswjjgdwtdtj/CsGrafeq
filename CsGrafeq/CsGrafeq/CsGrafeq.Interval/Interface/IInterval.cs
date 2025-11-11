@@ -1,5 +1,6 @@
-﻿using CsGrafeq.Numeric;
-using static CsGrafeq.Interval.Def;
+﻿using static CsGrafeq.Interval.Def;
+using CsGrafeq.Interval.Interface;
+using CsGrafeq.Numeric;
 
 namespace CsGrafeq.Interval.Interface;
 

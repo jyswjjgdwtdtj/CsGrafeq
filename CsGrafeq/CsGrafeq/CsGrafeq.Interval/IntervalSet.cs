@@ -1,32 +1,50 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using CsGrafeq.Interval.Interface;
+using CsGrafeq.Utilities;
 using static CsGrafeq.Interval.Def;
 using static CsGrafeq.Interval.Extensions.IntervalSetExtension;
-using sysMath = System.Math;
+using CGMath=CsGrafeq.Utilities.CsGrafeqMath;
 
 namespace CsGrafeq.Interval;
 
 public readonly struct IntervalSet : IInterval<IntervalSet>
 {
     #region 定义
+    public static bool NeedClone => true;
 
     public static readonly IntervalSet Empty = new(new Range[0], FF, false, double.NaN, double.NaN, double.NaN);
     public static readonly Range EmptyRange = new(double.NaN);
     internal readonly Range[] Intervals;
     public readonly Def Def => _Def;
+    /// <summary>
+    /// 最大值
+    /// </summary>
     public readonly double Sup => _Sup;
+    /// <summary>
+    /// 最小值
+    /// </summary>
     public readonly double Inf => _Inf;
 
     public readonly Def _Def;
-
+/// <summary>
+/// 最大值字段
+/// </summary>
     public readonly double _Sup;
-
+/// <summary>
+/// 最小值字段
+/// </summary>
     public readonly double _Inf;
-
+/// <summary>
+/// 是否是单个数
+/// </summary>
     internal readonly bool IsNumber;
-
+/// <summary>
+/// 数
+/// </summary>
     internal readonly double Number;
 
+    public IntervalSet() : this([],TT,false,double.NaN,double.NaN,double.NaN) { 
+    }
     public IntervalSet(Range[] ranges, Def def, bool isNumber, double inf, double sup, double number)
     {
         Intervals = ranges;
@@ -49,7 +67,7 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
 
     public static IntervalSet Create(double min, double max, Def def)
     {
-        Math.SwapIfNotLess(ref min, ref max);
+        CsGrafeqMath.SwapIfNotLess(ref min, ref max);
         return new IntervalSet(new Range[1] { new(min, max) }, TT, false, min, max, double.NaN);
     }
 
@@ -197,7 +215,7 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
             return EmptyRange;
         if (i1._Inf > 0 && i2._Inf > 0) return new Range { _Inf = i1._Inf * i2._Inf, _Sup = i1._Sup * i2._Sup };
         if (i1._Sup < 0 && i2._Sup < 0) return new Range { _Inf = i1._Sup * i2._Sup, _Sup = i1._Inf * i2._Inf };
-        var res = Math.GetMinMax4(i1._Inf * i2._Inf, i1._Inf * i2._Sup, i1._Sup * i2._Inf, i1._Sup * i2._Sup);
+        var res = CGMath.GetMinMax4(i1._Inf * i2._Inf, i1._Inf * i2._Sup, i1._Sup * i2._Inf, i1._Sup * i2._Sup);
         return new Range(res.Item1, res.Item2);
     }
 
@@ -276,8 +294,8 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
             var loc = 0;
             foreach (var i in i1.Intervals)
             {
-                var min = sysMath.Floor(i._Inf / num);
-                var max = sysMath.Floor(i._Sup / num);
+                var min = Math.Floor(i._Inf / num);
+                var max = Math.Floor(i._Sup / num);
                 if (min == max)
                 {
                     ranges[loc++] = new Range(i._Inf - min * num, i._Sup - max * num);
@@ -374,48 +392,40 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
     {
         if (i.IsEmpty) return Empty;
 
-        if (i.IsNumber) return Create(sysMath.Sign(i.Number));
-
+        if (i.IsNumber) return Create(Math.Sign(i.Number));
         var tmp = new Range[3];
-        var loc = 0;
+        int loc = 0;
         if (i._Inf < 0)
-            tmp[loc++] = new Range(-1);
-        foreach (var j in i.Intervals)
-            if (j.ContainsEqual(0))
-                tmp[loc++] = new Range(0);
-
-        if (i._Sup < 0)
-            tmp[loc++] = new Range(1);
-        var res = new Range[loc];
-        for (var j = 0; j < loc; j++) res[j] = tmp[j];
-        return Create(res, FT);
+            tmp[loc++] = new(-1);
+        if(i.Contains(0))
+            tmp[loc++] = new(0);
+        if (i._Sup > 0)
+            tmp[loc++] = new(1);
+        return Create(tmp.Slice(0,loc), FT);
     }
 
     public static unsafe IntervalSet Abs(IntervalSet i1)
     {
         if (i1.IsEmpty)
             return Empty;
-        if (i1.IsNumber) return Create(sysMath.Abs(i1._Inf));
+        if (i1.IsNumber) return Create(Math.Abs(i1._Inf));
         return IntervalSetMethod(i1, &RangeAbs);
     }
 
     private static Range RangeAbs(Range i)
     {
-        double inf = 0, sup = 0;
         if (i.ContainsEqual(0))
         {
-            sup = sysMath.Max(-i._Inf, i._Sup);
-            inf = 0;
-            return new Range(inf, sup);
+            return new Range(0, Math.Max(-i._Inf, i._Sup));
         }
 
-        if (i._Sup < 0) (inf, sup) = (-i._Sup, -i._Inf);
-        return new Range(inf, sup);
+        if (i._Sup < 0) return new(-i._Sup,-i.Inf);
+        return new Range(i._Inf, i._Sup);
     }
 
     public static unsafe IntervalSet Min(IntervalSet i1, IntervalSet i2)
     {
-        if (i1.IsNumber && i2.IsNumber) return Create(sysMath.Min(i1.Number, i2.Number));
+        if (i1.IsNumber && i2.IsNumber) return Create(Math.Min(i1.Number, i2.Number));
         if (i1.IsEmpty || i2.IsEmpty)
             return Empty;
         return IntervalSetMethod(i1, i2, &RangeMin);
@@ -423,12 +433,12 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
 
     private static Range RangeMin(Range i1, Range i2)
     {
-        return new Range { _Inf = sysMath.Min(i1._Inf, i2._Inf), _Sup = sysMath.Min(i1._Sup, i2._Sup) };
+        return new Range { _Inf = Math.Min(i1._Inf, i2._Inf), _Sup = Math.Min(i1._Sup, i2._Sup) };
     }
 
     public static unsafe IntervalSet Max(IntervalSet i1, IntervalSet i2)
     {
-        if (i1.IsNumber && i2.IsNumber) return Create(sysMath.Max(i1.Number, i2.Number));
+        if (i1.IsNumber && i2.IsNumber) return Create(Math.Max(i1.Number, i2.Number));
         if (i1.IsEmpty || i2.IsEmpty)
             return Empty;
         return IntervalSetMethod(i1, i2, &RangeMax);
@@ -436,7 +446,7 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
 
     private static Range RangeMax(Range i1, Range i2)
     {
-        return new Range { _Inf = sysMath.Max(i1._Inf, i2._Inf), _Sup = sysMath.Max(i1._Sup, i2._Sup) };
+        return new Range { _Inf = Math.Max(i1._Inf, i2._Inf), _Sup = Math.Max(i1._Sup, i2._Sup) };
     }
 
     public static IntervalSet Median(IntervalSet c1, IntervalSet c2, IntervalSet c3)
@@ -457,16 +467,16 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
 
     public static unsafe IntervalSet Exp(IntervalSet i1)
     {
-        if (i1.IsNumber) return Create(sysMath.Exp(i1.Number));
+        if (i1.IsNumber) return Create(Math.Exp(i1.Number));
         if (i1.IsEmpty)
             return Empty;
-        i1.Intervals.MonotoneTransform(&sysMath.Exp);
+        i1.Intervals.MonotoneTransform(&Math.Exp);
         return i1;
     }
 
     public static IntervalSet Ln(IntervalSet i1)
     {
-        if (i1.IsNumber) return Create(sysMath.Log(i1.Number));
+        if (i1.IsNumber) return Create(Math.Log(i1.Number));
         //e为底
         if (i1.IsEmpty) return Empty;
 
@@ -480,9 +490,9 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
             if (range._Sup < 0)
                 continue;
             if (range._Inf < 0)
-                i1.Intervals[current++] = new Range(double.NegativeInfinity, sysMath.Log(range._Sup));
+                i1.Intervals[current++] = new Range(double.NegativeInfinity, Math.Log(range._Sup));
             else
-                i1.Intervals[current++] = new Range(sysMath.Log(range._Inf), sysMath.Log(range._Sup));
+                i1.Intervals[current++] = new Range(Math.Log(range._Inf), Math.Log(range._Sup));
         }
 
         var res = i1.Intervals.Slice(0, current);
@@ -491,7 +501,7 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
 
     public static IntervalSet Lg(IntervalSet i1)
     {
-        if (i1.IsNumber) return Create(sysMath.Log(i1.Number));
+        if (i1.IsNumber) return Create(Math.Log(i1.Number));
 
         //e为底
         if (i1.IsEmpty) return Empty;
@@ -506,9 +516,9 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
             if (range._Sup < 0)
                 continue;
             if (range._Inf < 0)
-                i1.Intervals[current++] = new Range(double.NegativeInfinity, sysMath.Log10(range._Sup));
+                i1.Intervals[current++] = new Range(double.NegativeInfinity, Math.Log10(range._Sup));
             else
-                i1.Intervals[current++] = new Range(sysMath.Log10(range._Inf), sysMath.Log10(range._Sup));
+                i1.Intervals[current++] = new Range(Math.Log10(range._Inf), Math.Log10(range._Sup));
         }
 
         var res = i1.Intervals.Slice(0, current);
@@ -517,13 +527,13 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
 
     public static IntervalSet Log(IntervalSet i1, IntervalSet i2)
     {
-        if (i1.IsNumber && i2.IsNumber) return Create(sysMath.Log(i1.Number, i2.Number));
+        if (i1.IsNumber && i2.IsNumber) return Create(Math.Log(i1.Number, i2.Number));
         return Ln(i1) / Ln(i2);
     }
 
     public static IntervalSet Pow(IntervalSet i1, IntervalSet i2)
     {
-        if (i1.IsNumber && i2.IsNumber) return Create(sysMath.Pow(i1.Number, i2.Number));
+        if (i1.IsNumber && i2.IsNumber) return Create(Math.Pow(i1.Number, i2.Number));
         if (i2.IsNumber)
         {
             var num = i2.Number;
@@ -539,18 +549,18 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
                         {
                             if (inum < 0)
                             {
-                                ranges[loc++] = new Range(sysMath.Pow(r._Inf, num), double.NegativeInfinity);
-                                ranges[loc++] = new Range(sysMath.Pow(r._Sup, num), double.PositiveInfinity);
+                                ranges[loc++] = new Range(Math.Pow(r._Inf, num), double.NegativeInfinity);
+                                ranges[loc++] = new Range(Math.Pow(r._Sup, num), double.PositiveInfinity);
                             }
                             else
                             {
                                 ranges[loc++] = new Range(0,
-                                    sysMath.Max(sysMath.Pow(r._Sup, num), sysMath.Pow(r._Inf, num)));
+                                    Math.Max(Math.Pow(r._Sup, num), Math.Pow(r._Inf, num)));
                             }
                         }
                         else
                         {
-                            ranges[loc++] = new Range(sysMath.Pow(r._Inf, num), sysMath.Pow(r._Sup, num));
+                            ranges[loc++] = new Range(Math.Pow(r._Inf, num), Math.Pow(r._Sup, num));
                         }
 
                     if (loc == i1.Intervals.Length)
@@ -561,7 +571,7 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
                 for (var i = 0; i < i1.Intervals.Length; i++)
                 {
                     var r = i1.Intervals[i];
-                    i1.Intervals[i] = new Range(sysMath.Pow(r._Inf, num), sysMath.Pow(r._Sup, num));
+                    i1.Intervals[i] = new Range(Math.Pow(r._Inf, num), Math.Pow(r._Sup, num));
                 }
 
                 return i1;
@@ -573,7 +583,7 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
 
     public static IntervalSet Sqrt(IntervalSet i1)
     {
-        if (i1.IsNumber) return Create(sysMath.Sqrt(i1.Number));
+        if (i1.IsNumber) return Create(Math.Sqrt(i1.Number));
         //e为底
         if (i1.IsEmpty) return Empty;
 
@@ -587,9 +597,9 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
             if (range._Sup < 0)
                 continue;
             if (range._Inf < 0)
-                i1.Intervals[current++] = new Range(0, sysMath.Sqrt(range._Sup));
+                i1.Intervals[current++] = new Range(0, Math.Sqrt(range._Sup));
             else
-                i1.Intervals[current++] = new Range(sysMath.Sqrt(range._Inf), sysMath.Sqrt(range._Sup));
+                i1.Intervals[current++] = new Range(Math.Sqrt(range._Inf), Math.Sqrt(range._Sup));
         }
 
         var res = i1.Intervals.Slice(0, current);
@@ -599,16 +609,16 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
     public static unsafe IntervalSet Cbrt(IntervalSet num)
     {
         if (num.IsNumber)
-            return Create(sysMath.Cbrt(num.Number));
+            return Create(Math.Cbrt(num.Number));
         if (num.IsEmpty)
             return Empty;
-        num.Intervals.MonotoneTransform(&sysMath.Cbrt);
+        num.Intervals.MonotoneTransform(&Math.Cbrt);
         return num;
     }
 
     private static Range RangeCbrt(Range num)
     {
-        return new Range(sysMath.Cbrt(num._Inf), sysMath.Cbrt(num._Sup));
+        return new Range(Math.Cbrt(num._Inf), Math.Cbrt(num._Sup));
     }
 
     private static Range RangeMedian(Range i1, Range i2, Range i3)
@@ -626,7 +636,7 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
 
     public static IntervalSet Floor(IntervalSet i1)
     {
-        if (i1.IsNumber) return Create(sysMath.Floor(i1.Number));
+        if (i1.IsNumber) return Create(Math.Floor(i1.Number));
         if (i1.IsEmpty)
             return Empty;
         var len = i1.Intervals.Length;
@@ -637,8 +647,8 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
             var range = i1.Intervals[i];
             if (loc < 2)
             {
-                var min = sysMath.Floor(range._Inf);
-                var max = sysMath.Floor(range._Sup);
+                var min = Math.Floor(range._Inf);
+                var max = Math.Floor(range._Sup);
                 if (min == max)
                 {
                     ranges[loc++] = new Range(min);
@@ -657,18 +667,18 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
             break;
         }
 
-        var res = i1.Intervals.Slice(0, loc);
+        var res = ranges.Slice(0, loc);
         return Create(res, FT);
     }
 
     private static Range rfloor(Range r)
     {
-        return new Range(sysMath.Floor(r._Inf), sysMath.Floor(r._Sup));
+        return new Range(Math.Floor(r._Inf), Math.Floor(r._Sup));
     }
 
     public static IntervalSet Ceil(IntervalSet i1)
     {
-        if (i1.IsNumber) return Create(sysMath.Ceiling(i1.Number));
+        if (i1.IsNumber) return Create(Math.Ceiling(i1.Number));
         if (i1.IsEmpty)
             return Empty;
         var len = i1.Intervals.Length;
@@ -679,8 +689,8 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
             var range = i1.Intervals[i];
             if (loc < 2)
             {
-                var min = sysMath.Ceiling(range._Inf);
-                var max = sysMath.Ceiling(range._Sup);
+                var min = Math.Ceiling(range._Inf);
+                var max = Math.Ceiling(range._Sup);
                 if (min == max)
                 {
                     ranges[loc++] = new Range(min);
@@ -699,13 +709,13 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
             break;
         }
 
-        var res = i1.Intervals.Slice(0, loc);
+        var res =ranges.Slice(0, loc);
         return Create(res, FT);
     }
 
     private static Range rceil(Range r)
     {
-        return new Range(sysMath.Ceiling(r._Inf), sysMath.Ceiling(r._Sup));
+        return new Range(Math.Ceiling(r._Inf), Math.Ceiling(r._Sup));
     }
 
     public static IntervalSet GCD(IntervalSet i1, IntervalSet i2)
@@ -713,7 +723,7 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
         if (i1.IsNumber && i2.IsNumber)
         {
             if (i1.Number == (int)i1.Number && i2._Inf == (int)i2._Inf)
-                return Create(Math.GCD((int)i1.Number, (int)i2._Inf));
+                return Create(CGMath.GCD((int)i1.Number, (int)i2._Inf));
             return ThrowWithMessage<ArgumentException, IntervalSet>(new ArgumentException("参数需经过Floor,Ceil函数处理"));
         }
 
@@ -722,26 +732,26 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
         if (!(i1.Intervals[0].TryGetInteger(out _) && i2.Intervals[0].TryGetInteger(out _)))
             return ThrowWithMessage<ArgumentException, IntervalSet>(new ArgumentException("参数需经过Floor,Ceil函数处理"));
         if (i1.Intervals.Length == 1 && i2.Intervals.Length == 1)
-            return Create(Math.GCD((int)i1.Intervals[0]._Inf, (int)i2.Intervals[0]._Inf));
+            return Create(CGMath.GCD((int)i1.Intervals[0]._Inf, (int)i2.Intervals[0]._Inf));
         if (i1.Intervals.Length == 2 && i2.Intervals.Length == 1)
             return Create(new double[]
             {
-                Math.GCD((int)i1.Intervals[0]._Inf, (int)i2.Intervals[0]._Inf),
-                Math.GCD((int)i1.Intervals[1]._Inf, (int)i2.Intervals[0]._Inf)
+                CGMath.GCD((int)i1.Intervals[0]._Inf, (int)i2.Intervals[0]._Inf),
+                CGMath.GCD((int)i1.Intervals[1]._Inf, (int)i2.Intervals[0]._Inf)
             }, FT);
         if (i1.Intervals.Length == 1 && i2.Intervals.Length == 2)
             return Create(new double[]
             {
-                Math.GCD((int)i1.Intervals[0]._Inf, (int)i2.Intervals[0]._Inf),
-                Math.GCD((int)i1.Intervals[0]._Inf, (int)i2.Intervals[1]._Inf)
+                CGMath.GCD((int)i1.Intervals[0]._Inf, (int)i2.Intervals[0]._Inf),
+                CGMath.GCD((int)i1.Intervals[0]._Inf, (int)i2.Intervals[1]._Inf)
             }, FT);
         if (i1.Intervals.Length == 2 && i2.Intervals.Length == 2)
             return Create(new double[]
             {
-                Math.GCD((int)i1.Intervals[0]._Inf, (int)i2.Intervals[0]._Inf),
-                Math.GCD((int)i1.Intervals[0]._Inf, (int)i2.Intervals[1]._Inf),
-                Math.GCD((int)i1.Intervals[1]._Inf, (int)i2.Intervals[0]._Inf),
-                Math.GCD((int)i1.Intervals[1]._Inf, (int)i2.Intervals[1]._Inf)
+                CGMath.GCD((int)i1.Intervals[0]._Inf, (int)i2.Intervals[0]._Inf),
+                CGMath.GCD((int)i1.Intervals[0]._Inf, (int)i2.Intervals[1]._Inf),
+                CGMath.GCD((int)i1.Intervals[1]._Inf, (int)i2.Intervals[0]._Inf),
+                CGMath.GCD((int)i1.Intervals[1]._Inf, (int)i2.Intervals[1]._Inf)
             }, FT);
         return Create(1, double.PositiveInfinity, FT);
     }
@@ -751,7 +761,7 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
         if (i1.IsNumber && i2.IsNumber)
         {
             if (i1.Number == (int)i1.Number && i2._Inf == (int)i2._Inf)
-                return Create(Math.LCM((int)i1.Number, (int)i2._Inf));
+                return Create(CGMath.LCM((int)i1.Number, (int)i2._Inf));
             return ThrowWithMessage<ArgumentException, IntervalSet>(new ArgumentException("参数需经过Floor,Ceil函数处理"));
         }
 
@@ -760,26 +770,26 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
         if (!(i1.Intervals[0].TryGetInteger(out _) && i2.Intervals[0].TryGetInteger(out _)))
             return ThrowWithMessage<ArgumentException, IntervalSet>(new ArgumentException("参数需经过Floor,Ceil函数处理"));
         if (i1.Intervals.Length == 1 && i2.Intervals.Length == 1)
-            return Create(Math.LCM((int)i1.Intervals[0]._Inf, (int)i2.Intervals[0]._Inf));
+            return Create(CGMath.LCM((int)i1.Intervals[0]._Inf, (int)i2.Intervals[0]._Inf));
         if (i1.Intervals.Length == 2 && i2.Intervals.Length == 1)
             return Create(new double[]
             {
-                Math.LCM((int)i1.Intervals[0]._Inf, (int)i2.Intervals[0]._Inf),
-                Math.LCM((int)i1.Intervals[1]._Inf, (int)i2.Intervals[0]._Inf)
+                CGMath.LCM((int)i1.Intervals[0]._Inf, (int)i2.Intervals[0]._Inf),
+                CGMath.LCM((int)i1.Intervals[1]._Inf, (int)i2.Intervals[0]._Inf)
             }, FT);
         if (i1.Intervals.Length == 1 && i2.Intervals.Length == 2)
             return Create(new double[]
             {
-                Math.LCM((int)i1.Intervals[0]._Inf, (int)i2.Intervals[0]._Inf),
-                Math.LCM((int)i1.Intervals[0]._Inf, (int)i2.Intervals[1]._Inf)
+                CGMath.LCM((int)i1.Intervals[0]._Inf, (int)i2.Intervals[0]._Inf),
+                CGMath.LCM((int)i1.Intervals[0]._Inf, (int)i2.Intervals[1]._Inf)
             }, FT);
         if (i1.Intervals.Length == 2 && i2.Intervals.Length == 2)
             return Create(new double[]
             {
-                Math.LCM((int)i1.Intervals[0]._Inf, (int)i2.Intervals[0]._Inf),
-                Math.LCM((int)i1.Intervals[0]._Inf, (int)i2.Intervals[1]._Inf),
-                Math.LCM((int)i1.Intervals[1]._Inf, (int)i2.Intervals[0]._Inf),
-                Math.LCM((int)i1.Intervals[1]._Inf, (int)i2.Intervals[1]._Inf)
+                CGMath.LCM((int)i1.Intervals[0]._Inf, (int)i2.Intervals[0]._Inf),
+                CGMath.LCM((int)i1.Intervals[0]._Inf, (int)i2.Intervals[1]._Inf),
+                CGMath.LCM((int)i1.Intervals[1]._Inf, (int)i2.Intervals[0]._Inf),
+                CGMath.LCM((int)i1.Intervals[1]._Inf, (int)i2.Intervals[1]._Inf)
             }, FT);
         return Create(1, double.PositiveInfinity, FT);
     }
@@ -790,7 +800,7 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
 
     public static unsafe IntervalSet Sin(IntervalSet i1)
     {
-        if (i1.IsNumber) return Create(sysMath.Sin(i1.Number));
+        if (i1.IsNumber) return Create(Math.Sin(i1.Number));
         if (i1.IsEmpty)
             return Empty;
         return IntervalSetMethod(i1, &RangeSin);
@@ -798,8 +808,8 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
 
     public static IntervalSet Cos(IntervalSet i1)
     {
-        if (i1.IsNumber) return Create(sysMath.Cos(i1.Number));
-        return Sin(i1 + sysMath.PI / 2);
+        if (i1.IsNumber) return Create(Math.Cos(i1.Number));
+        return Sin(i1 + Math.PI / 2);
     }
 
     private static Range RangeSin(Range i)
@@ -808,26 +818,26 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
         var b = i._Sup;
         (double _Inf, double _Sup) minmax = (0, 0);
         (double _Inf, double _Sup) j = (0, 0);
-        if (sysMath.Floor((a / sysMath.PI - 0.5) / 2) < sysMath.Floor((b / sysMath.PI - 0.5) / 2))
+        if (Math.Floor((a / Math.PI - 0.5) / 2) < Math.Floor((b / Math.PI - 0.5) / 2))
         {
             minmax._Sup = 1;
             j._Sup = 1;
         }
 
-        if (sysMath.Floor((a / sysMath.PI + 0.5) / 2) < sysMath.Floor((b / sysMath.PI + 0.5) / 2))
+        if (Math.Floor((a / Math.PI + 0.5) / 2) < Math.Floor((b / Math.PI + 0.5) / 2))
         {
             minmax._Inf = 1;
             j._Inf = -1;
         }
 
-        if (minmax._Inf == 0) j._Inf = sysMath.Min(sysMath.Sin(a), sysMath.Sin(b));
-        if (minmax._Sup == 0) j._Sup = sysMath.Max(sysMath.Sin(a), sysMath.Sin(b));
+        if (minmax._Inf == 0) j._Inf = Math.Min(Math.Sin(a), Math.Sin(b));
+        if (minmax._Sup == 0) j._Sup = Math.Max(Math.Sin(a), Math.Sin(b));
         return new Range(j._Inf, j._Sup);
     }
 
     public static IntervalSet Tan(IntervalSet i1)
     {
-        if (i1.IsNumber) return Create(sysMath.Tan(i1.Number));
+        if (i1.IsNumber) return Create(Math.Tan(i1.Number));
 
         if (i1.IsEmpty)
             return Empty;
@@ -835,16 +845,16 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
         var loc = 0;
         foreach (var i in i1.Intervals)
         {
-            var r = (int)sysMath.Floor((i._Sup + sysMath.PI / 2) / sysMath.PI);
-            var l = (int)sysMath.Floor((i._Inf + sysMath.PI / 2) / sysMath.PI);
+            var r = (int)Math.Floor((i._Sup + Math.PI / 2) / Math.PI);
+            var l = (int)Math.Floor((i._Inf + Math.PI / 2) / Math.PI);
             if (r - l == 1)
             {
-                ranges[loc++] = new Range { _Sup = sysMath.Tan(i._Sup), _Inf = double.NegativeInfinity };
-                ranges[loc++] = new Range { _Inf = sysMath.Tan(i._Inf), _Sup = double.PositiveInfinity };
+                ranges[loc++] = new Range { _Sup = Math.Tan(i._Sup), _Inf = double.NegativeInfinity };
+                ranges[loc++] = new Range { _Inf = Math.Tan(i._Inf), _Sup = double.PositiveInfinity };
             }
             else if (l == r)
             {
-                ranges[loc++] = new Range { _Inf = sysMath.Tan(i._Inf), _Sup = sysMath.Tan(i._Sup) };
+                ranges[loc++] = new Range { _Inf = Math.Tan(i._Inf), _Sup = Math.Tan(i._Sup) };
             }
             else
             {
@@ -858,62 +868,62 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
 
     public static IntervalSet Cot(IntervalSet i1)
     {
-        return -Tan(i1 + sysMath.PI / 2);
+        return -Tan(i1 + Math.PI / 2);
     }
 
     public static unsafe IntervalSet ArcTan(IntervalSet i1)
     {
-        if (i1.IsNumber) return Create(sysMath.Atan(i1.Number));
+        if (i1.IsNumber) return Create(Math.Atan(i1.Number));
         if (i1.IsEmpty)
             return Empty;
-        i1.Intervals.MonotoneTransform(&sysMath.Atan);
+        i1.Intervals.MonotoneTransform(&Math.Atan);
         return i1;
     }
 
     public static unsafe IntervalSet ArcCos(IntervalSet i1)
     {
-        if (i1.IsNumber) return Create(sysMath.Acos(i1.Number));
+        if (i1.IsNumber) return Create(Math.Acos(i1.Number));
         if (i1.IsEmpty)
             return Empty;
         if (i1._Sup < -1 || i1.Number > 1)
             return Empty;
         var res = i1.Intervals.SetBounds(new Range { _Inf = -1, _Sup = 1 });
-        res.MonotoneTransformOp(&sysMath.Acos);
+        res.MonotoneTransformOp(&Math.Acos);
         return Create(res, i1._Sup > 1 || i1.Number < -1 ? FT : i1._Def);
     }
 
     public static unsafe IntervalSet ArcSin(IntervalSet i1)
     {
-        if (i1.IsNumber) return Create(sysMath.Asin(i1.Number));
+        if (i1.IsNumber) return Create(Math.Asin(i1.Number));
         if (i1.IsEmpty)
             return Empty;
         if (i1._Sup < -1 || i1._Inf > 1)
             return Empty;
         var res = i1.Intervals.SetBounds(new Range { _Inf = -1, _Sup = 1 });
-        res.MonotoneTransform(&sysMath.Asin);
+        res.MonotoneTransform(&Math.Asin);
         return Create(res, i1._Sup > 1 || i1._Inf < -1 ? FT : i1._Def);
     }
 
     public static unsafe IntervalSet Sinh(IntervalSet i1)
     {
-        if (i1.IsNumber) return Create(sysMath.Sinh(i1.Number));
+        if (i1.IsNumber) return Create(Math.Sinh(i1.Number));
         if (i1.IsEmpty)
             return Empty;
-        i1.Intervals.MonotoneTransform(&sysMath.Sinh);
+        i1.Intervals.MonotoneTransform(&Math.Sinh);
         return i1;
     }
 
     public static IntervalSet Cosh(IntervalSet i1)
     {
-        if (i1.IsNumber) return Create(sysMath.Cosh(i1.Number));
+        if (i1.IsNumber) return Create(Math.Cosh(i1.Number));
         if (i1.IsEmpty)
             return Empty;
         for (var i = 0; i < i1.Intervals.Length; i++)
         {
             ref var r = ref i1.Intervals[i];
             r = r.Contains(0)
-                ? new Range { _Sup = sysMath.Cosh(sysMath.Max(r._Sup, -r._Inf)), _Inf = 1 }
-                : new Range(sysMath.Cosh(r._Inf), sysMath.Cosh(r._Sup));
+                ? new Range { _Sup = Math.Cosh(Math.Max(r._Sup, -r._Inf)), _Inf = 1 }
+                : new Range(Math.Cosh(r._Inf), Math.Cosh(r._Sup));
         }
 
         return Create(i1.Intervals.FormatRanges(), i1._Def);
@@ -921,35 +931,35 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
 
     public static unsafe IntervalSet Tanh(IntervalSet i1)
     {
-        if (i1.IsNumber) return Create(sysMath.Tanh(i1.Number));
+        if (i1.IsNumber) return Create(Math.Tanh(i1.Number));
         if (i1.IsEmpty)
             return Empty;
-        i1.Intervals.MonotoneTransform(&sysMath.Tanh);
+        i1.Intervals.MonotoneTransform(&Math.Tanh);
         return i1;
     }
 
     public static unsafe IntervalSet ArcCosh(IntervalSet num)
     {
-        if (num.IsNumber) return Create(sysMath.Acosh(num.Number));
+        if (num.IsNumber) return Create(Math.Acosh(num.Number));
         var min = num._Inf;
         var res = num.Intervals.SetBounds(new Range(1, double.PositiveInfinity));
         var min1 = double.NaN;
         if (res.Length > 0)
             min1 = res[0]._Inf;
-        res.MonotoneTransformOp(&sysMath.Acosh);
+        res.MonotoneTransformOp(&Math.Acosh);
         return Create(res, min == min1 ? num._Def : FT);
     }
 
     public static unsafe IntervalSet ArcSinh(IntervalSet num)
     {
-        if (num.IsNumber) return Create(sysMath.Asinh(num.Number));
-        num.Intervals.MonotoneTransform(&sysMath.Asinh);
+        if (num.IsNumber) return Create(Math.Asinh(num.Number));
+        num.Intervals.MonotoneTransform(&Math.Asinh);
         return num;
     }
 
     public static IntervalSet ArcTanh(IntervalSet num)
     {
-        if (num.IsNumber) return Create(sysMath.Atanh(num.Number));
+        if (num.IsNumber) return Create(Math.Atanh(num.Number));
         //e为底
         if (num.IsEmpty) return Empty;
 
@@ -962,9 +972,9 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
             var range = num.Intervals[i];
             if (range._Sup < -1 || range._Inf > 1)
                 continue;
-            var inf = sysMath.Max(-1, range._Inf);
-            var sup = sysMath.Min(1, range._Sup);
-            num.Intervals[current++] = new Range(sysMath.Atanh(inf), sysMath.Atanh(sup));
+            var inf = Math.Max(-1, range._Inf);
+            var sup = Math.Min(1, range._Sup);
+            num.Intervals[current++] = new Range(Math.Atanh(inf), Math.Atanh(sup));
         }
 
         var res = num.Intervals.Slice(0, current);

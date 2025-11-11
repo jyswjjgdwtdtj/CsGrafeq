@@ -1,14 +1,18 @@
+﻿using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using ReactiveUI;
 
 namespace CsGrafeqApplication.Controls;
 
-[PseudoClasses(":modifying")]
-public class VariableBox : TemplatedControl
+/// <summary>
+/// 逻辑上来说这应该是一个UserControl 但是UserControl属性绑定不上去 不知道为什么
+/// </summary>
+public class VariableBox : UserControl
 {
     public static readonly DirectProperty<VariableBox, string> ValueNameProperty =
         AvaloniaProperty.RegisterDirect<VariableBox, string>(
@@ -17,10 +21,6 @@ public class VariableBox : TemplatedControl
     public static readonly DirectProperty<VariableBox, double> ValueProperty =
         AvaloniaProperty.RegisterDirect<VariableBox, double>(
             nameof(Value), o => o.Value, (o, v) => o.Value = v);
-
-    public static readonly DirectProperty<VariableBox, bool> IsModifyStatusProperty =
-        AvaloniaProperty.RegisterDirect<VariableBox, bool>(
-            nameof(IsModifyStatus), o => o.IsModifyStatus, (o, v) => o.IsModifyStatus = v);
 
     public static readonly DirectProperty<VariableBox, SliderData> MySliderDataProperty =
         AvaloniaProperty.RegisterDirect<VariableBox, SliderData>(
@@ -32,18 +32,50 @@ public class VariableBox : TemplatedControl
         MySliderData.Max = 10;
         PropertyChanged += (s, e) =>
         {
-            if (e.Property == IsModifyStatusProperty) PseudoClasses.Set(":modifying", IsModifyStatus);
+        };
+        MySliderData.PropertyChanged += (s, e) =>
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(MySliderData.Value):
+                    Value = MySliderData.Value;
+                    break;
+            }
         };
     }
 
-    public SliderData MySliderData { get; } = new();
-
-    public bool IsModifyStatus
+    protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
-        get => field;
-        set => SetAndRaise(IsModifyStatusProperty, ref field, value);
+        base.OnApplyTemplate(e);
+        var min=e.NameScope.Find<TextBox>("RangeMinimum");
+        var max=e.NameScope.Find<TextBox>("RangeMaximum");
+        var value=e.NameScope.Find<TextBox>("ValueTextBlock");
+        EventHandler<TemplateAppliedEventArgs> tbt=(object? s, TemplateAppliedEventArgs te) =>
+        {
+            var tb=s as TextBox;
+            var borderelement=te.NameScope.Find<Border>("PART_BorderElement");
+            borderelement.CornerRadius = new CornerRadius(0);
+            borderelement.BorderThickness = new Thickness(0,0,0,2);
+            borderelement.IsVisible=false;
+            borderelement.Background=Brushes.Transparent;
+            tb.LostFocus+=(s,e)=>
+            {
+                borderelement.IsVisible=false;
+                borderelement.Background=Brushes.Transparent;
+            };
+            tb.GotFocus += (s, e) =>
+            {
+                borderelement.IsVisible = true;
+                borderelement.Background=Brushes.Transparent;
+            };
+        };
+        min.TemplateApplied += tbt;
+        max.TemplateApplied += tbt;
+        value.TemplateApplied += tbt;
+        
     }
 
+    public SliderData MySliderData { get; } = new();
     public double Value
     {
         get => MySliderData.Value;
@@ -59,29 +91,6 @@ public class VariableBox : TemplatedControl
     {
         get => field;
         set => SetAndRaise(ValueNameProperty, ref field, value);
-    }
-
-    protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
-    {
-        base.OnApplyTemplate(e);
-        //偷懒了.....^_^
-        if (e.NameScope.Find<TextBlock>("ValueTextBlock") != null)
-        {
-            e.NameScope.Find<TextBlock>("ValueTextBlock")!.Tapped += GoModifying;
-            e.NameScope.Find<TextBlock>("RangeMinimum")!.Tapped += GoModifying;
-            e.NameScope.Find<TextBlock>("RangeMaximum")!.Tapped += GoModifying;
-        }
-    }
-
-    private void GoModifying(object? sender, RoutedEventArgs e)
-    {
-        IsModifyStatus = true;
-    }
-
-    protected override void OnLostFocus(RoutedEventArgs e)
-    {
-        base.OnLostFocus(e);
-        IsModifyStatus = false;
     }
 }
 

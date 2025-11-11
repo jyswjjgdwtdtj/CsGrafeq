@@ -3,10 +3,21 @@ using ReactiveUI;
 
 namespace CsGrafeq.Shapes;
 
-public abstract class GeometryShape : Shape
+public abstract class GeometryShape : RefreshableShape
 {
     public static readonly GeometryShape Null = new NullGeometryShape();
     public List<GeometryShape> SubShapes = new();
+
+    public void AddSubShape(GeometryShape subShape)
+    {
+        SubShapes.Add(subShape);
+        ShapeChanged += subShape.RefreshValues;
+    }
+    public void RemoveSubShape(GeometryShape subShape)
+    {
+        SubShapes.Remove(subShape);
+        ShapeChanged -= subShape.RefreshValues;
+    }
     public abstract GeometryGetter Getter { get; }
 
     public bool PointerOver
@@ -30,12 +41,11 @@ public abstract class GeometryShape : Shape
             var v = field;
             this.RaiseAndSetIfChanged(ref field, value);
             if (v != value) SelectedChanged?.Invoke(this, value);
-            InvokeEvent();
+            InvokeShapeChanged();
         }
     } = false;
 
     public abstract Vec NearestOf(Vec vec);
-    public abstract void RefreshValues();
     public event ShapeChangedHandler<bool>? SelectedChanged;
 
     public override void Dispose()

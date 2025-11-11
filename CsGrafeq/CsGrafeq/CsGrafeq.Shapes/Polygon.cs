@@ -11,7 +11,7 @@ public class Polygon : FilledShape
     public Polygon(PolygonGetter getter)
     {
         PolygonGetter = getter;
-        PolygonGetter.Attach(RefreshValues, this);
+        PolygonGetter.Attach(this);
         RefreshValues();
     }
 
@@ -21,7 +21,7 @@ public class Polygon : FilledShape
     public override void RefreshValues()
     {
         Locations = PolygonGetter.GetPolygon();
-        InvokeEvent();
+        InvokeShapeChanged();
     }
 
     public override Vec NearestOf(Vec vec)

@@ -12,6 +12,7 @@
         <ProjectReference Include="..\CsGrafeq.Compiler\CsGrafeq.Compiler.csproj"/>
         <ProjectReference Include="..\CsGrafeq.Base\CsGrafeq.Base.csproj"/>
         <ProjectReference Include="..\CsGrafeq.Compiler\CsGrafeq.Compiler.csproj"/>
+        <ProjectReference Include="..\CsGrafeq.Debug\CsGrafeq.Debug.csproj" />
     </ItemGroup>
 
     <ItemGroup>

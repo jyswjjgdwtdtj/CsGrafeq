@@ -16,7 +16,7 @@ public static class Compiler
     private static readonly Regex numberOrpoint = new("[0-9.]");
     private static readonly Regex spaceOrtab = new(@"([ ]|\t)");
 
-    public static HasReferenceFunction0<T> Compile0<T>(string expression) where T : IComputableNumber<T>
+    public static HasReferenceFunction0<T> Compile0<T>(string expression) where T : IComputableNumber<T>, INeedClone<T>
     {
         var exp = ConstructExpTree<T>(expression, 0, out _, out _, out _, out var usedVars);
         var expres = Expression.Lambda<Function0<T>>(exp);
@@ -24,7 +24,7 @@ public static class Compiler
     }
 
     public static bool TryCompile0<T>(string expression, out HasReferenceFunction0<T> expFunc, out Exception? ex)
-        where T : IComputableNumber<T>
+        where T : IComputableNumber<T>, INeedClone<T>
     {
         try
         {
@@ -40,7 +40,7 @@ public static class Compiler
         }
     }
 
-    public static HasReferenceFunction1<T> Compile1<T>(string expression) where T : IComputableNumber<T>
+    public static HasReferenceFunction1<T> Compile1<T>(string expression) where T : IComputableNumber<T>, INeedClone<T>
     {
         var exp = ConstructExpTree<T>(expression, 1, out var xVar, out _, out _, out var usedVars);
         var expres = Expression.Lambda<Function1<T>>(exp, xVar);
@@ -48,7 +48,7 @@ public static class Compiler
     }
 
     public static bool TryCompile1<T>(string expression, out HasReferenceFunction1<T> expFunc, out Exception? ex)
-        where T : IComputableNumber<T>
+        where T : IComputableNumber<T>, INeedClone<T>
     {
         try
         {
@@ -72,7 +72,7 @@ public static class Compiler
     }
 
     public static bool TryCompile2<T>(string expression, out HasReferenceFunction2<T> expFunc, out Exception? ex)
-        where T : IComputableNumber<T>
+        where T : IComputableNumber<T>, INeedClone<T>
     {
         try
         {
@@ -88,7 +88,7 @@ public static class Compiler
         }
     }
 
-    public static HasReferenceFunction3<T> Compile3<T>(string expression) where T : IComputableNumber<T>
+    public static HasReferenceFunction3<T> Compile3<T>(string expression) where T : IComputableNumber<T>, INeedClone<T>
     {
         var exp = ConstructExpTree<T>(expression, 3, out var xVar, out var yVar, out var zVar, out var usedVars);
         var expres = Expression.Lambda<Function3<T>>(exp, xVar, yVar, zVar);
@@ -96,7 +96,7 @@ public static class Compiler
     }
 
     public static bool TryCompile3<T>(string expression, out HasReferenceFunction3<T> expFunc, out Exception? ex)
-        where T : IComputableNumber<T>
+        where T : IComputableNumber<T>, INeedClone<T>
     {
         try
         {
@@ -121,8 +121,8 @@ public static class Compiler
         usedVars = EnglishCharEnum.None;
         var elements = expression.GetTokens().ParseTokens();
         var expStack = new Stack<Expression>();
-        var cloneMethod = typeof(T).GetMethod("Clone", BindingFlags.Static | BindingFlags.Public);
-        var needClone = cloneMethod != null;
+        var cloneMethod =GetInfo(T.Clone);
+        var needClone = true;
         xVar = Expression.Parameter(typeof(T), "x");
         yVar = Expression.Parameter(typeof(T), "y");
         zVar = Expression.Parameter(typeof(T), "z");
@@ -260,7 +260,7 @@ public static class Compiler
                     else if (name.Length == 1 && 'a' <= name[0] && name[0] <= 'z')
                     {
                         expStack.Push(Expression.Call(GetInfo(T.CreateFromDouble),
-                            Expression.Call(variables, GetInfo(EnglishChar.Instance.GetValue),
+                            Expression.Call(GetInfo(EnglishChar.StaticGetValue),
                                 Expression.Constant(name[0]))));
                         usedVars |= (EnglishCharEnum)sysMath.Pow(2, name[0] - 'a');
                     }
@@ -272,7 +272,7 @@ public static class Compiler
                     break;
                 case ElementType.Function:
                 {
-                    if (IComputableNumber<T>.MethodDictionary.TryGetValue(element.NameOrValue.ToLower(),
+                    if (IComputableNumber<T>.ComputableNumberMethodDictionary.TryGetValue(element.NameOrValue.ToLower(),
                             out var method) && method.Method.GetParameters().Length == element.ArgCount)
                         switch (element.ArgCount)
                         {

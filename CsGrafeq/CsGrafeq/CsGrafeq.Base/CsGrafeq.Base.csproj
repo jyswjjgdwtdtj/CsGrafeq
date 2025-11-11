@@ -13,7 +13,7 @@
 
     <ItemGroup>
         <PackageReference Include="DialogHost.Avalonia" Version="0.9.3" />
-        <PackageReference Include="ReactiveUI" Version="20.4.1"/>
+        <PackageReference Include="ReactiveUI" Version="20.4.1" />
     </ItemGroup>
 
 </Project>

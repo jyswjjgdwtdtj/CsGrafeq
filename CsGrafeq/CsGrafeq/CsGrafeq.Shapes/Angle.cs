@@ -11,7 +11,7 @@ public class Angle : GeometryShape
     public Angle(AngleGetter getter)
     {
         AngleGetter = getter;
-        AngleGetter.Attach(RefreshValues, this);
+        AngleGetter.Attach(this);
         RefreshValues();
     }
 

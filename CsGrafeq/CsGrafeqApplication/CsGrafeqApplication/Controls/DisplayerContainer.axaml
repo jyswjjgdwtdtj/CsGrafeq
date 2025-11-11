@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:CsGrafeqApplication.ViewModels"
              xmlns:addons="clr-namespace:CsGrafeqApplication.Addons"
+             xmlns:geopad="clr-namespace:CsGrafeqApplication.Addons.GeometryPad"
              xmlns:controls="clr-namespace:CsGrafeqApplication.Controls"
              xmlns:csgrafeqapp="clr-namespace:CsGrafeqApplication"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
@@ -23,16 +24,17 @@
             
             <ResourceDictionary>
                 <Color x:Key="Cyan">#aa77ccbb</Color>
-                <LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%" x:Key="MedianLinearGradientBrush">
+               
+                <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%" x:Key="MedianLinearGradientBrush">
                     <GradientStop Color="{StaticResource Cyan}" Offset="0.0"/>
                     <GradientStop Color="{StaticResource Cyan}" Offset="0.2"/>
-                    <GradientStop Color="Transparent" Offset="1.0"/>
+                    <GradientStop Color="{DynamicResource CgTransparentColor}" Offset="1.0"/>
                 </LinearGradientBrush>
             </ResourceDictionary>
         </DockPanel.Resources>
-        <Border DockPanel.Dock="Top" Background="{StaticResource MedianLinearGradientBrush}" IsHitTestVisible="False">
+        <Border DockPanel.Dock="Top" Background="{DynamicResource AxisBackgroundColor}" IsHitTestVisible="False">
             <DockPanel LastChildFill="True">
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" Background="{StaticResource MedianLinearGradientBrush}">
                     <Image Width="16" Height="16" Source="avares://CsGrafeqApplication/Assets/favicon.ico" VerticalAlignment="Center" Margin="8,5,5,5"/>
                     <TextBlock VerticalAlignment="Center" FontFamily="{StaticResource MapleMono}">CsGrafeq</TextBlock>
                 </StackPanel>
@@ -66,7 +68,10 @@
         <Border Name="DisplayerCon" ZIndex="0" BorderThickness="0">
             <ContentPresenter Content="{CompiledBinding Displayer}" />
         </Border>
-        <Grid ZIndex="1" Name="PART_Grid">
+        <Canvas ZIndex="5" Name="InfoCanvas">
+            <geopad:GeoPadInfo DataContext="{CompiledBinding  Displayer.Addons[0].DataContext}"></geopad:GeoPadInfo>
+        </Canvas>
+        <Grid ZIndex="10" Name="PART_Grid">
             <Grid.Resources>
             </Grid.Resources>
             <Grid.ColumnDefinitions>
@@ -133,7 +138,7 @@
                 </CheckBox>
             </Border>
         </Grid>
-        <Grid ColumnDefinitions="*,52" RowDefinitions="*,52" ZIndex="2" Name="SettingDockPanel"
+        <Grid ColumnDefinitions="*,52" RowDefinitions="*,52" ZIndex="15" Name="SettingDockPanel"
               VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
             <Border Grid.Column="1" Grid.Row="1">
                 <ToggleButton Name="SettingToggle">
@@ -250,6 +255,12 @@
                                 <Setter Property="Margin" Value="0" />
                             </Style>
                         </StackPanel.Styles>
+                        <Button Click="SaveClicked">
+                            <ToolTip.Tip>
+                                <TextBlock Text="Save" />
+                            </ToolTip.Tip>
+                            <Svg Path="/Assets/save.svg" Width="32" Height="32" Margin="0" Classes="F" />
+                        </Button>
                         <Button Click="Github_Clicked">
                             <ToolTip.Tip>
                                 <TextBlock Text="Open Github Site" />
@@ -306,7 +317,7 @@
                 </controls:ShownControl>
             </Border>
         </Grid>
-        <Border ZIndex="3" Name="PopupBack">
+        <Border ZIndex="20" Name="PopupBack">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="20*" />
