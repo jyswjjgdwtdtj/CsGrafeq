@@ -28,46 +28,81 @@ using static CsGrafeqApplication.Extension;
 using static CsGrafeq.Utilities.ThrowHelper;
 using Avalonia.Threading;
 using CsGrafeqApplication.Controls;
+using static CsGrafeqApplication.GlobalSetting;
 
 namespace CsGrafeqApplication.Addons.GeometryPad;
 
 public partial class GeometryPad : Addon
 {
-    private static readonly double PointerTouchRange = OS.GetOSType() == OSType.Android ? 15 : 5;
-    private readonly List<ActionData> Actions = new();
+    /// <summary>
+    /// 所有几何图形的渲染目标
+    /// </summary>
     private readonly Renderable MainRenderTarget = new();
+    /// <summary>
+    /// ViewModel
+    /// </summary>
     private readonly GeometryPadViewModel VM;
+    #region CoordinateTransformFuncs
+    /// <summary>
+    /// 将数学坐标转换为像素坐标（Avalonia.Point） 来自Owner
+    /// </summary>
     private Func<Vec, AvaPoint> MathToPixel = VoidFunc<Vec, AvaPoint>;
+    /// <summary>
+    /// 将数学坐标转换为像素坐标（SKPoint） 来自Owner
+    /// </summary>
     protected Func<Vec, SKPoint> MathToPixelSK = VoidFunc<Vec, SKPoint>;
-    private GeoPoint? MovingPoint;
-    private Vector2<string> MovingPointEndPos = new("0", "0");
-    private Vector2<string> MovingPointStartPos = new("0", "0");
+    /// <summary>
+    /// 将像素坐标转换为数学坐标（Avalonia.Point） 来自Owner
+    /// </summary>
     protected Func<AvaPoint, Vec> PixelToMath = VoidFunc<AvaPoint, Vec>;
+    /// <summary>
+    /// 将像素坐标转换为数学坐标（SKPoint） 来自Owner
+    /// </summary>
     protected Func<SKPoint, Vec> PixelToMathSK = VoidFunc<SKPoint, Vec>;
 
     protected Func<double, double> PixelToMathX = VoidFunc<double, double>,
-        PixelToMathY = VoidFunc<double, double>,
-        MathToPixelX = VoidFunc<double, double>,
-        MathToPixelY = VoidFunc<double, double>;
-
-    private AvaPoint PointerMovedPos;
-    private Vec PointerPressedMovingPointPos;
-    private AvaPoint PointerPressedPos;
-    private PointerPointProperties PointerProperties;
-    private AvaPoint PointerReleasedPos;
+    PixelToMathY = VoidFunc<double, double>,
+    MathToPixelX = VoidFunc<double, double>,
+    MathToPixelY = VoidFunc<double, double>;
+    #endregion
+    /// <summary>
+    /// 正在被移动的点
+    /// </summary>
+    private GeoPoint? MovingPoint { get; set; }
+    /// <summary>
+    /// 点拖动操作的起始点位置 字符串形式
+    /// </summary>
+    private Vector2<string> PointMovementEndPositionStr { get; set; } = new("0", "0");
+    /// <summary>
+    /// 点拖动操作的结束点位置 字符串形式
+    /// </summary>
+    private Vector2<string> PointMovementStartPositionStr { get; set; } = new("0", "0");
+    /// <summary>
+    /// 移动操作正在进行时的指针位置
+    /// </summary>
+    private AvaPoint PointerMovedPosition { get; set; }
+    /// <summary>
+    /// 移动操作开始时的指针位置
+    /// </summary>
+    private AvaPoint PointerPressedPosition { get; set; }
+    /// <summary>
+    /// 上一次指针操作的属性
+    /// </summary>
+    private PointerPointProperties LastPointerProperties { get; set; }
+    /// <summary>
+    /// 移动结束时的指针位置
+    /// </summary>
+    private AvaPoint PointerReleasedPosition { get; set; }
 
     public GeometryPad()
     {
         Setting = new GeometryPadSetting(this);
-        InputMethod.SetIsInputMethodEnabled(this, false);
         DataContext = VM = new GeometryPadViewModel();
         Shapes = VM.Shapes;
-        foreach (var i in VM!.Actions)
-        foreach (var j in i)
-            Actions!.Add(j);
-        GeoPadAction = Actions.First();
+        CurrentAction = GeometryActions.Actions.FirstOrDefault()?.FirstOrDefault()!;
         Shapes.CollectionChanged += (s, e) =>
         {
+            // 添加隐函数时启用移动缩放优化
             if (Shapes.GetShapes<ImplicitFunction>().Count() > 0)
             {
                 Owner?.MovingOptimization = true;
@@ -76,12 +111,13 @@ public partial class GeometryPad : Addon
 
             var newshapes = e.NewItems?.OfType<Shape>() ?? [];
             var newfuncs = newshapes.OfType<ImplicitFunction>();
+            // 设置隐函数渲染目标大小
             foreach (var fn in newfuncs)
             {
                 fn.RenderTarget.Changed = true;
                 fn.RenderTarget.SetBitmapSize(MainRenderTarget.GetSize());
             }
-
+            // 主渲染目标标记为已更改
             if (newshapes.Any(o => o is GeometryShape)) MainRenderTarget.Changed = true;
             Owner?.AskForRender();
         };
@@ -109,7 +145,10 @@ public partial class GeometryPad : Addon
 #endif
         InitializeComponent();
     }
-    internal ActionData GeoPadAction { get; private set; }
+    /// <summary>
+    /// 当前几何操作
+    /// </summary>
+    internal ActionData CurrentAction { get; private set; }
     /// <summary>
     /// 图形的集合
     /// </summary>
@@ -147,14 +186,14 @@ public partial class GeometryPad : Addon
 
     
     /// <summary>
-    /// 设置action
+    /// 设置Action
     /// </summary>
     /// <param name="ad"></param>
     internal void SetAction(ActionData ad)
     {
-        if (GeoPadAction == ad)
+        if (CurrentAction == ad)
             return;
-        GeoPadAction = ad;
+        CurrentAction = ad;
         Shapes.ClearSelected();
     }
     /// <summary>
@@ -187,7 +226,11 @@ public partial class GeometryPad : Addon
     {
         if (sender is Border border) FlyoutBase.ShowAttachedFlyout(border);
     }
-
+    /// <summary>
+    /// 创建新的隐函数图形
+    /// </summary>
+    /// <param name="expression"></param>
+    /// <returns></returns>
     private ImplicitFunction CreateImpFunc(string expression)
     {
         var ins = new ImplicitFunction(expression);
@@ -237,40 +280,6 @@ public partial class GeometryPad : Addon
                 }
     }
 
-    private class TextChangedCommand : CommandManager.Command
-    {
-        public readonly string PreviousText;
-
-        public TextChangedCommand(string previous, string current, ExpNumber target, TextBox tb)
-            : base(new object(), _ => { }, _ => { }, _ => { })
-        {
-            PreviousText = previous;
-            CurrentText = current;
-            Number = target;
-            Do = _ =>
-            {
-                target.ValueStr = current;
-                (tb.Tag as GeoPoint)?.RefreshValues();
-                if (target.IsError)
-                    DataValidationErrors.SetError(tb, new Exception());
-                else
-                    DataValidationErrors.ClearErrors(tb);
-            };
-            UnDo = _ =>
-            {
-                target.ValueStr = previous;
-                (tb.Tag as GeoPoint)?.RefreshValues();
-                if (target.IsError)
-                    DataValidationErrors.SetError(tb, new Exception());
-                else
-                    DataValidationErrors.ClearErrors(tb);
-            };
-            Clear = _ => { };
-        }
-
-        public string CurrentText { get; init; }
-        public ExpNumber Number { get; init; }
-    }
 
     #region KeyAction
 
@@ -323,28 +332,30 @@ public partial class GeometryPad : Addon
 
 
     #region PointerAction
-
-    private bool IsMovingPointMovable;
+    /// <summary>
+    /// 指示试图被移动的点是否可移动
+    /// </summary>
+    private bool IsMovingPointMovable { get; set; }
 
     protected override bool AddonPointerPressed(AddonPointerEventArgs e)
     {
         if (Owner == null) return DoNext;
-        PointerProperties = e.Properties;
-        PointerPressedPos = e.Location;
-        if (GeoPadAction.Name.English == "Select")
+        LastPointerProperties = e.Properties;
+        PointerPressedPosition = e.Location;
+        if (CurrentAction.Name.English == "Select")
         {
             Shapes.ClearSelected();
         }
         else
         {
-            MovingPoint = GetShape<GeoPoint>(e.Location);
+            TryGetShape<GeoPoint>(e.Location,out var mp);
+            MovingPoint = mp;
             if (MovingPoint != null)
             {
-                PointerPressedMovingPointPos = MovingPoint.Location;
                 if (MovingPoint.PointGetter is PointGetter_Movable pgm && MovingPoint.IsUserEnabled)
                 {
                     IsMovingPointMovable = true;
-                    MovingPointStartPos = new Vector2<string>(pgm.PointX.ValueStr, pgm.PointY.ValueStr);
+                    PointMovementStartPositionStr = new Vector2<string>(pgm.PointX.ValueStr, pgm.PointY.ValueStr);
                 }
                 else
                 {
@@ -362,9 +373,9 @@ public partial class GeometryPad : Addon
     protected override bool AddonPointerMoved(AddonPointerEventArgs e)
     {
         if (Owner == null) return DoNext;
-        PointerProperties = e.Properties;
-        PointerMovedPos = e.Location;
-        if (GeoPadAction.Name.English == "Select" && e.Properties.IsLeftButtonPressed)
+        LastPointerProperties = e.Properties;
+        PointerMovedPosition = e.Location;
+        if (CurrentAction.Name.English == "Select" && e.Properties.IsLeftButtonPressed)
         {
             MainRenderTarget.Changed = true;
             return Intercept;
@@ -374,10 +385,10 @@ public partial class GeometryPad : Addon
 
         if (e.Properties.IsLeftButtonPressed)
         {
-            if (OS.GetOSType() == OSType.Android && (PointerMovedPos - PointerPressedPos).GetLength() < 10)
+            if (OS.GetOSType() == OSType.Android && (PointerMovedPosition - PointerPressedPosition).GetLength() < 10)
             {
             }
-            else if (PointerMovedPos == PointerPressedPos)
+            else if (PointerMovedPosition == PointerPressedPosition)
             {
             }
             else
@@ -397,25 +408,24 @@ public partial class GeometryPad : Addon
                     if (getter.GetType() != previous.GetType() ||
                         !Extension.ArrayEqual(getter.Parameters, previous.Parameters))
                     {
-                        Console.WriteLine(123);
                         DoPointGetterChange(MovingPoint, previous, getter);
                     }
                 }
             }*/
             if (MovingPoint.PointGetter is PointGetter_Movable pg&&MovingPoint.IsUserEnabled)
             {
-                pg.SetPoint(Owner.PixelToMath(PointerMovedPos));
+                pg.SetPoint(Owner.PixelToMath(PointerMovedPosition));
                 if (MovingPoint.PointGetter is PointGetter_FromLocation)
                 {
                     pg.SetPoint(
-                        Owner.PixelToMath(FindNearestPointOnTwoAxisLine(PointerMovedPos)));
+                        Owner.PixelToMath(FindNearestPointOnTwoAxisLine(PointerMovedPosition)));
                 }
                 else if (MovingPoint.PointGetter is PointGetter_OnLine)
                 {
                     var newp = FindNearestPointOnTwoAxisLine(MathToPixel(pg.GetPoint()));
-                    if (newp.X != PointerMovedPos.X)
+                    if (newp.X != PointerMovedPosition.X)
                         pg.PointX.SetNumber(PixelToMathX(newp.X));
-                    else if (newp.Y != PointerMovedPos.Y)
+                    else if (newp.Y != PointerMovedPosition.Y)
                         pg.PointY.SetNumber(PixelToMathY(newp.Y));
                     else
                         pg?.SetPoint(Owner.PixelToMath(newp));
@@ -434,96 +444,29 @@ public partial class GeometryPad : Addon
     protected override bool AddonPointerReleased(AddonPointerEventArgs e)
     {
         if (Owner == null) return DoNext;
-        PointerProperties = e.Properties;
-        PointerReleasedPos = e.Location;
+        LastPointerProperties = e.Properties;
+        PointerReleasedPosition = e.Location;
         var disp = (Owner as DisplayControl)!;
-        if (GeoPadAction.Name.English == "Select")
+        if (CurrentAction.Name.English == "Select")
         {
-            var rect = RegulateRectangle(new AvaRect(PointerPressedPos,
-                new AvaSize(PointerReleasedPos.X - PointerPressedPos.X, PointerReleasedPos.Y - PointerPressedPos.Y)));
-            var mathrectloc = Owner.PixelToMath(new AvaPoint(rect.Left, rect.Top + rect.Height));
-            var mathrectsize = new Vec(rect.Width, rect.Height) / disp.UnitLength;
-            foreach (var s in Shapes)
-                switch (s)
-                {
-                    case GeoPoint p:
-                    {
-                        var v = p.Location - mathrectloc;
-                        if (RangeIn(0, mathrectsize.X, v.X) && RangeIn(0, mathrectsize.Y, v.Y))
-                            p.Selected = true;
-                    }
-                        break;
-                    case Line l:
-                    {
-                        var v1 = l.Current.Point1;
-                        var v2 = l.Current.Point2;
-                        var LT = new Vec(Owner.PixelToMathX(rect.Left), Owner.PixelToMathY(rect.Bottom));
-                        var RT = new Vec(Owner.PixelToMathX(rect.Right), Owner.PixelToMathY(rect.Bottom));
-                        var RB = new Vec(Owner.PixelToMathX(rect.Right), Owner.PixelToMathY(rect.Top));
-                        var LB = new Vec(Owner.PixelToMathX(rect.Left), Owner.PixelToMathY(rect.Top));
-                        var vs = GetValidVec(
-                            GetIntersectionOfSegmentAndLine(LT, RT, v1, v2),
-                            GetIntersectionOfSegmentAndLine(RT, RB, v1, v2),
-                            GetIntersectionOfSegmentAndLine(RB, LB, v1, v2),
-                            GetIntersectionOfSegmentAndLine(LB, LT, v1, v2)
-                        );
-                        vs.Item1 = l.CheckIsValid(vs.Item1) ? vs.Item1 : Vec.Invalid;
-                        vs.Item2 = l.CheckIsValid(vs.Item2) ? vs.Item2 : Vec.Invalid;
-
-                        if (!(vs.Item1.IsInvalid() && vs.Item2.IsInvalid()))
-                            l.Selected = true;
-                        else if (RangeIn(mathrectloc.X, mathrectloc.X + mathrectsize.X,
-                                     ((l.Current.Point1 + l.Current.Point2) / 2).X) && RangeIn(mathrectloc.Y,
-                                     mathrectloc.Y + mathrectsize.Y, ((l.Current.Point1 + l.Current.Point2) / 2).Y))
-                            l.Selected = true;
-                    }
-                        break;
-                    case Circle c:
-                    {
-                        var o = mathrectloc + mathrectsize / 2;
-                        var cc = c.InnerCircle.Center - o;
-                        o = mathrectsize / 2;
-                        cc.X = Abs(cc.X);
-                        cc.Y = Abs(cc.Y);
-                        var bc = cc - o;
-                        bc.X = Max(bc.X, 0);
-                        bc.Y = Max(bc.Y, 0);
-                        if (bc.GetLength() <= c.InnerCircle.Radius)
-                            c.Selected = true;
-                    }
-                        break;
-                    case Polygon p:
-                    {
-                        foreach (var point in p.Locations)
-                        {
-                            var v = point - mathrectloc;
-                            if (RangeIn(0, mathrectsize.X, v.X) && RangeIn(0, mathrectsize.Y, v.Y)) p.Selected = true;
-
-                            break;
-                        }
-                    }
-                        break;
-                    case Angle a:
-                    {
-                        var v = a.AngleData.AnglePoint - mathrectloc;
-                        if (RangeIn(0, mathrectsize.X, v.X) && RangeIn(0, mathrectsize.Y, v.Y)) a.Selected = true;
-                    }
-                        break;
-                }
-
+            var rect = RegulateRectangle(new AvaRect(PointerPressedPosition,
+                new AvaSize(PointerReleasedPosition.X - PointerPressedPosition.X, PointerReleasedPosition.Y - PointerPressedPosition.Y)));
+            var mathrect = new CgRectangle(Owner.PixelToMath(new AvaPoint(rect.Left, rect.Top + rect.Height)), new Vec(rect.Width, rect.Height) / disp.UnitLength);
+            foreach (var s in Shapes.GetShapes<GeometryShape>())
+                s.Selected=s.IsIntersectedWithRect(mathrect);
             MainRenderTarget.Changed = true;
-            PointerPressedPos = new AvaPoint(double.NaN, double.NaN);
+            PointerPressedPosition = new AvaPoint(double.NaN, double.NaN);
             return Intercept;
         }
 
         if (MovingPoint == null) return DoNext;
 
-        if (PointerReleasedPos != PointerPressedPos)
+        if (PointerReleasedPosition != PointerPressedPosition)
             Shapes.ClearSelected();
         if (IsMovingPointMovable)
         {
             var pgm = (PointGetter_Movable)MovingPoint.PointGetter;
-            DoPointMove(MovingPoint, MovingPointStartPos,
+            DoPointMove(MovingPoint, PointMovementStartPositionStr,
                 new Vector2<string>(pgm.PointX.ValueStr, pgm.PointY.ValueStr));
         }
 
@@ -535,7 +478,8 @@ public partial class GeometryPad : Addon
     {
         if (Owner == null) return DoNext;
         {
-            if (GeoPadAction.Name.English == "Put")
+            // 放置点
+            if (CurrentAction.Name.English == "Put")
             {
                 Shapes.ClearSelected();
                 PutPoint(e.Location)?.Selected = true;
@@ -544,7 +488,7 @@ public partial class GeometryPad : Addon
 
             var first = Shapes.GetSelectedShapes<GeoPoint>().FirstOrDefault();
             var selectfirst = false;
-            if (GeoPadAction.Args.Contains(ShapeArg.Point) &&
+            if (CurrentAction.Args.Contains(ShapeArg.Point) &&
                 TryGetShape<GeoPoint>(e.Location, out var point))
             {
                 if (first == point)
@@ -552,36 +496,36 @@ public partial class GeometryPad : Addon
                 else
                     point.Selected = !point.Selected;
             }
-            else if (GeoPadAction.Args.Contains(ShapeArg.Line) &&
+            else if (CurrentAction.Args.Contains(ShapeArg.Line) &&
                      TryGetShape<GeoLine>(e.Location, out var line))
             {
                 line.Selected = !line.Selected;
             }
-            else if (GeoPadAction.Args.Contains(ShapeArg.Circle) &&
+            else if (CurrentAction.Args.Contains(ShapeArg.Circle) &&
                      TryGetShape<GeoCircle>(e.Location, out var circle))
             {
                 circle.Selected = !circle.Selected;
             }
-            else if (GeoPadAction.Args.Contains(ShapeArg.Polygon) &&
+            else if (CurrentAction.Args.Contains(ShapeArg.Polygon) &&
                      TryGetShape<GeoPolygon>(e.Location, out var polygon))
             {
                 polygon.Selected = !polygon.Selected;
             }
-            else if (GeoPadAction.Args.Contains(ShapeArg.Point) && GeoPadAction.Name.English != "Move" &&
-                     GeoPadAction.Name.English != "Select")
+            else if (CurrentAction.Args.Contains(ShapeArg.Point) && CurrentAction.Name.English != "Move" &&
+                     CurrentAction.Name.English != "Select")
             {
                 PutPoint(e.Location)?.Selected = true;
             }
 
-            if (GeoPadAction.Name.English != "Move" && GeoPadAction.Name.English != "Select")
+            if (CurrentAction.Name.English != "Move" && CurrentAction.Name.English != "Select")
             {
-                if (!GeoPadAction.Args.Contains(ShapeArg.Point))
+                if (!CurrentAction.Args.Contains(ShapeArg.Point))
                     Shapes.ClearSelected<GeoPoint>();
-                if (!GeoPadAction.Args.Contains(ShapeArg.Line))
+                if (!CurrentAction.Args.Contains(ShapeArg.Line))
                     Shapes.ClearSelected<GeoLine>();
-                if (!GeoPadAction.Args.Contains(ShapeArg.Circle))
+                if (!CurrentAction.Args.Contains(ShapeArg.Circle))
                     Shapes.ClearSelected<GeoCircle>();
-                if (!GeoPadAction.Args.Contains(ShapeArg.Polygon))
+                if (!CurrentAction.Args.Contains(ShapeArg.Polygon))
                     Shapes.ClearSelected<GeoPolygon>();
             }
 
@@ -594,17 +538,17 @@ public partial class GeometryPad : Addon
             var llen = SLines.Length;
             var clen = SCircles.Length;
             var polen = SPolygons.Length;
-            var needplen = GeoPadAction.Args.Count(i => i == ShapeArg.Point);
-            var needllen = GeoPadAction.Args.Count(i => i == ShapeArg.Line);
-            var needclen = GeoPadAction.Args.Count(i => i == ShapeArg.Circle);
-            var needpolen = GeoPadAction.Args.Count(i => i == ShapeArg.Circle);
-            if (GeoPadAction.IsMultiPoint)
+            var needplen = CurrentAction.Args.Count(i => i == ShapeArg.Point);
+            var needllen = CurrentAction.Args.Count(i => i == ShapeArg.Line);
+            var needclen = CurrentAction.Args.Count(i => i == ShapeArg.Circle);
+            var needpolen = CurrentAction.Args.Count(i => i == ShapeArg.Circle);
+            if (CurrentAction.IsMultiPoint)
             {
                 if (plen > 2)
                     if (selectfirst)
                     {
-                        var shape = GeometryActions.CreateShape(GeoPadAction.Self,
-                            (Getter)GeoPadAction.GetterConstructor.Invoke(SPoints.ToArray()));
+                        var shape = GeometryActions.CreateShape(CurrentAction.Self,
+                            (Getter)CurrentAction.GetterConstructor.Invoke(SPoints.ToArray()));
                         AddShape(shape);
                         Shapes.ClearSelected();
                     }
@@ -616,7 +560,7 @@ public partial class GeometryPad : Addon
                 return Intercept;
             }
 
-            if (GeoPadAction.Name.English == "Select" || GeoPadAction.Name.English == "Move") return Intercept;
+            if (CurrentAction.Name.English == "Select" || CurrentAction.Name.English == "Move") return Intercept;
             //==========================
             if (needplen < plen || needclen < clen || needllen < llen || needpolen < polen)
             {
@@ -654,8 +598,8 @@ public partial class GeometryPad : Addon
                         return 0;
                     return 1;
                 });
-                var shape = GeometryActions.CreateShape(GeoPadAction.Self,
-                    (Getter)GeoPadAction.GetterConstructor.Invoke(SAll?.Select(o => (object?)o)?.ToArray() ?? []));
+                var shape = GeometryActions.CreateShape(CurrentAction.Self,
+                    (Getter)CurrentAction.GetterConstructor.Invoke(SAll?.Select(o => (object?)o)?.ToArray() ?? []));
                 AddShape(shape);
                 Shapes.ClearSelected();
             }
@@ -674,10 +618,10 @@ public partial class GeometryPad : Addon
         dc.Save();
         dc.ClipRect(rect);
         RenderShapes(dc, rect, Shapes.GetShapes<GeometryShape>());
-        if (GeoPadAction.Name.English == "Select" && PointerProperties.IsLeftButtonPressed)
+        if (CurrentAction.Name.English == "Select" && LastPointerProperties.IsLeftButtonPressed)
         {
-            var selrect = RegulateRectangle(new AvaRect(PointerPressedPos,
-                new AvaSize(PointerMovedPos.X - PointerPressedPos.X, PointerMovedPos.Y - PointerPressedPos.Y)));
+            var selrect = RegulateRectangle(new AvaRect(PointerPressedPosition,
+                new AvaSize(PointerMovedPosition.X - PointerPressedPosition.X, PointerMovedPosition.Y - PointerPressedPosition.Y)));
             dc.DrawRect(selrect.ToSKRect(), StrokeMedian);
         }
 
@@ -701,16 +645,6 @@ public partial class GeometryPad : Addon
                StrokePaintMain = new() { Color = cd.AxisPaintMain.Color, IsAntialias = true, IsStroke = true },
                BubbleBack = new() { Color = cd.AxisPaint1.Color.WithAlpha(90), IsAntialias = true })
         {
-            /*switch (OS.GetOSType())
-            {
-                case OSType.Android:
-                {
-                    StrokePaint.StrokeWidth = 2;
-                    StrokeMain.StrokeWidth = 2;
-                    StrokePaintMain.StrokeWidth = 2;
-                }
-                    break;
-            }*/
 
             foreach (var shape in shapes)
             {
@@ -851,14 +785,14 @@ public partial class GeometryPad : Addon
                         var angle = ang.AngleData;
                         var pf = MathToPixelSK(angle.AnglePoint);
                         var arg1 =
-                            PosMod(MathToPixel(angle.Point1).Sub(MathToPixel(angle.AnglePoint)).Arg() / PI * 180,
+                            CustomMod(MathToPixel(angle.Point1).Sub(MathToPixel(angle.AnglePoint)).Arg() / PI * 180,
                                 360);
                         var arg2 =
-                            PosMod(MathToPixel(angle.Point2).Sub(MathToPixel(angle.AnglePoint)).Arg() / PI * 180,
+                            CustomMod(MathToPixel(angle.Point2).Sub(MathToPixel(angle.AnglePoint)).Arg() / PI * 180,
                                 360);
                         var aa = angle.Angle;
                         var a = arg2 - arg1;
-                        a = PosMod(a, 360);
+                        a = CustomMod(a, 360);
                         if (a > 180)
                             a -= 360;
                         if (ang.Selected)
@@ -936,6 +870,7 @@ public partial class GeometryPad : Addon
             Action<int> atn = idx => RenderRectIntervalSet( rs[idx], RectToCalc,  func, false,Points,Rects);
             for (var i = 0; i < rs.Length; i += 100)
             {
+                //总会有莫名的问题 
                 //Parallel.For(i, Min(i + 100, rs.Length), atn);
                 for(var j=i; j< Min(i + 100, rs.Length); j++) atn(j);
                 foreach (var rectToDraw in Rects) {
@@ -996,7 +931,11 @@ public partial class GeometryPad : Addon
     #endregion
 
     #region ShapeAction
-
+    /// <summary>
+    /// 在指定位置放置点
+    /// </summary>
+    /// <param name="Location"></param>
+    /// <returns></returns>
     public GeoPoint? PutPoint(AvaPoint Location)
     {
         var getter = GetNewPointGetterFromLocation(Location);
@@ -1006,7 +945,11 @@ public partial class GeometryPad : Addon
         AddShape(p);
         return p;
     }
-
+    /// <summary>
+    /// 获取指定位置的点获取器
+    /// </summary>
+    /// <param name="Location"></param>
+    /// <returns></returns>
     protected PointGetter? GetNewPointGetterFromLocation(AvaPoint Location)
     {
         var disp = (Owner as DisplayControl)!;
@@ -1056,7 +999,9 @@ public partial class GeometryPad : Addon
 
         return null;
     }
-
+    /// <summary>
+    /// 点获取器的类型
+    /// </summary>
     protected enum PGType
     {
         None,
@@ -1131,19 +1076,19 @@ public partial class GeometryPad : Addon
 
         return nearest;
     }
-
+    /// <summary>
+    /// 试着从指定位置获取图形
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="Location"></param>
+    /// <param name="shape"></param>
+    /// <returns></returns>
     public bool TryGetShape<T>(AvaPoint Location, out T shape) where T : GeometryShape
-    {
-        shape = GetShape<T>(Location)!;
-        return shape != null;
-    }
-
-    public T? GetShape<T>(AvaPoint Location) where T : GeometryShape
     {
         var disp = (Owner as DisplayControl)!;
         var v = Owner!.PixelToMath(Location);
         var distance = double.PositiveInfinity;
-        T? target = null;
+        shape = null;
         foreach (var s in Shapes)
         {
             if (!s.Visible)
@@ -1154,14 +1099,12 @@ public partial class GeometryPad : Addon
                 if (dis < PointerTouchRange && dis < distance)
                 {
                     distance = dis;
-                    target = tar;
+                    shape = tar;
                 }
             }
         }
-
-        return target;
+        return shape != null;
     }
-
     #endregion
 
     #region Do
@@ -1231,7 +1174,7 @@ public partial class GeometryPad : Addon
 
     private void DoGeoShapesDelete(IEnumerable<GeometryShape> shapes)
     {
-        var ss = shapes.Select(s => ShapeList.GetAllChildren(s)).JoinToOne().Distinct().ToArray();
+        var ss = shapes.Select(s => ShapeList.GetAllChildren(s)).SelectMany(o=>o).Distinct().ToArray();
         CmdManager.Do(
             ss,
             o =>
@@ -1463,7 +1406,7 @@ public partial class GeometryPad : Addon
             if (rb.IsChecked == true && rb.Tag is ActionData ad)
             {
                 SetAction(ad);
-                Static.Info(new TextBlock { Text = GeoPadAction.Description.Data },Static.InfoType.Information);
+                Static.Info(new TextBlock { Text = CurrentAction.Description.Data },Static.InfoType.Information);
             }
     }
 

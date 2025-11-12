@@ -1,4 +1,7 @@
-﻿using CsGrafeq.Shapes.ShapeGetter;
+﻿using Avalonia;
+using CsGrafeq.Shapes.ShapeGetter;
+using CsGrafeq.Utilities;
+using static CsGrafeq.Utilities.CsGrafeqMath;
 using static CsGrafeq.Shapes.ShapeGetter.AngleGetter;
 
 namespace CsGrafeq.Shapes;
@@ -27,5 +30,10 @@ public class Angle : GeometryShape
     public override Vec NearestOf(Vec vec)
     {
         return Vec.Infinity;
+    }
+    public override bool IsIntersectedWithRect(CgRectangle rect)
+    {
+        var v = AngleData.AnglePoint - rect.Location;
+        return RangeIn(0, rect.Size.X, v.X) && RangeIn(0, rect.Size.Y, v.Y);
     }
 }

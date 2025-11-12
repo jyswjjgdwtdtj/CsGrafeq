@@ -215,7 +215,7 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
             return EmptyRange;
         if (i1._Inf > 0 && i2._Inf > 0) return new Range { _Inf = i1._Inf * i2._Inf, _Sup = i1._Sup * i2._Sup };
         if (i1._Sup < 0 && i2._Sup < 0) return new Range { _Inf = i1._Sup * i2._Sup, _Sup = i1._Inf * i2._Inf };
-        var res = CGMath.GetMinMax4(i1._Inf * i2._Inf, i1._Inf * i2._Sup, i1._Sup * i2._Inf, i1._Sup * i2._Sup);
+        var res = CGMath.GetMinMax(i1._Inf * i2._Inf, i1._Inf * i2._Sup, i1._Sup * i2._Inf, i1._Sup * i2._Sup);
         return new Range(res.Item1, res.Item2);
     }
 

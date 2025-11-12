@@ -20,7 +20,7 @@
                     <StackPanel Orientation="Horizontal" DataContext="{TemplateBinding MySliderData}">
                         <TextBlock Text="{TemplateBinding ValueName}" VerticalAlignment="Center" />
                         <TextBlock Text=" = " VerticalAlignment="Center" />
-                        <TextBox VerticalAlignment="Center" Text="{CompiledBinding Value}" Name="ValueTextBlock"  x:DataType="controls:SliderData"/>
+                        <TextBox VerticalAlignment="Center" Text="{CompiledBinding Value}" Name="ValueTextBlock" HorizontalContentAlignment="Center"  x:DataType="controls:SliderData" Width="NaN"/>
                     </StackPanel>
                     <DockPanel LastChildFill="True" DataContext="{TemplateBinding MySliderData}">
                         <TextBox Text="{CompiledBinding Min}" Width="NaN" DockPanel.Dock="Left" AcceptsReturn="False" AcceptsTab="False" MinWidth="0"

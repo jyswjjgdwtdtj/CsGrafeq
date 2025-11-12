@@ -1,4 +1,5 @@
 ﻿using CsGrafeq.Shapes.ShapeGetter;
+using CsGrafeq.Utilities;
 using static CsGrafeq.Shapes.GeometryMath;
 
 namespace CsGrafeq.Shapes;
@@ -53,5 +54,16 @@ public class Polygon : FilledShape
             }
 
         return tar;
+    }
+
+    public override bool IsIntersectedWithRect(CgRectangle rect)
+    {
+        foreach (var point in Locations)
+        {
+            var v = point - rect.Location;
+            if (CsGrafeqMath.RangeIn(0, rect.Size.X, v.X) && CsGrafeqMath.RangeIn(0, rect.Size.Y, v.Y)) return true;
+        }
+
+        return false;
     }
 }

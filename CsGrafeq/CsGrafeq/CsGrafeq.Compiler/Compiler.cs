@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using CsGrafeq.Numeric;
 using sysMath = System.Math;
+using System.Linq;
 
 namespace CsGrafeq.Compiler;
 
@@ -16,19 +17,20 @@ public static class Compiler
     private static readonly Regex numberOrpoint = new("[0-9.]");
     private static readonly Regex spaceOrtab = new(@"([ ]|\t)");
 
-    public static HasReferenceFunction0<T> Compile0<T>(string expression) where T : IComputableNumber<T>, INeedClone<T>
+    public static Delegate Compile<T>(string expression,uint paraCount,out EnglishCharEnum usedVars) where T : IComputableNumber<T>, INeedClone<T>
     {
-        var exp = ConstructExpTree<T>(expression, 0, out _, out _, out _, out var usedVars);
-        var expres = Expression.Lambda<Function0<T>>(exp);
-        return new HasReferenceFunction0<T>(expres.Compile(), usedVars);
+        var exp = ConstructExpTree<T>(expression, paraCount, out var x, out var y, out var z, out usedVars);
+        var expResult=Expression.Lambda(exp,((IEnumerable<ParameterExpression>)[x,y,z]).Take((int)paraCount));
+        return expResult.Compile();
     }
 
-    public static bool TryCompile0<T>(string expression, out HasReferenceFunction0<T> expFunc, out Exception? ex)
-        where T : IComputableNumber<T>, INeedClone<T>
+    public static bool TryCompile<T>(string expression,uint paraCount, out Delegate expFunc,out EnglishCharEnum usedVars, out Exception? ex)
+        where T : IComputableNumber<T>
     {
+        //expFunc = Compile<T>(expression,paraCount,out usedVars);
         try
         {
-            expFunc = Compile0<T>(expression);
+            expFunc = Compile<T>(expression,paraCount,out usedVars);
             ex = null;
             return true;
         }
@@ -36,82 +38,10 @@ public static class Compiler
         {
             ex = e;
             expFunc = null;
+            usedVars = EnglishCharEnum.None;
             return false;
         }
     }
-
-    public static HasReferenceFunction1<T> Compile1<T>(string expression) where T : IComputableNumber<T>, INeedClone<T>
-    {
-        var exp = ConstructExpTree<T>(expression, 1, out var xVar, out _, out _, out var usedVars);
-        var expres = Expression.Lambda<Function1<T>>(exp, xVar);
-        return new HasReferenceFunction1<T>(expres.Compile(), usedVars);
-    }
-
-    public static bool TryCompile1<T>(string expression, out HasReferenceFunction1<T> expFunc, out Exception? ex)
-        where T : IComputableNumber<T>, INeedClone<T>
-    {
-        try
-        {
-            expFunc = Compile1<T>(expression);
-            ex = null;
-            return true;
-        }
-        catch (Exception e)
-        {
-            ex = e;
-            expFunc = null;
-            return false;
-        }
-    }
-
-    public static HasReferenceFunction2<T> Compile2<T>(string expression) where T : IComputableNumber<T>
-    {
-        var exp = ConstructExpTree<T>(expression, 2, out var xVar, out var yVar, out _, out var usedVars);
-        var expres = Expression.Lambda<Function2<T>>(exp, xVar, yVar);
-        return new HasReferenceFunction2<T>(expres.Compile(), usedVars);
-    }
-
-    public static bool TryCompile2<T>(string expression, out HasReferenceFunction2<T> expFunc, out Exception? ex)
-        where T : IComputableNumber<T>, INeedClone<T>
-    {
-        try
-        {
-            expFunc = Compile2<T>(expression);
-            ex = null;
-            return true;
-        }
-        catch (Exception e)
-        {
-            ex = e;
-            expFunc = null;
-            return false;
-        }
-    }
-
-    public static HasReferenceFunction3<T> Compile3<T>(string expression) where T : IComputableNumber<T>, INeedClone<T>
-    {
-        var exp = ConstructExpTree<T>(expression, 3, out var xVar, out var yVar, out var zVar, out var usedVars);
-        var expres = Expression.Lambda<Function3<T>>(exp, xVar, yVar, zVar);
-        return new HasReferenceFunction3<T>(expres.Compile(), usedVars);
-    }
-
-    public static bool TryCompile3<T>(string expression, out HasReferenceFunction3<T> expFunc, out Exception? ex)
-        where T : IComputableNumber<T>, INeedClone<T>
-    {
-        try
-        {
-            expFunc = Compile3<T>(expression);
-            ex = null;
-            return true;
-        }
-        catch (Exception e)
-        {
-            ex = e;
-            expFunc = null;
-            return false;
-        }
-    }
-
     public static Expression ConstructExpTree<T>(string expression, [Range(0, 3)] uint argsLength,
         out ParameterExpression xVar, out ParameterExpression yVar, out ParameterExpression zVar,
         out EnglishCharEnum usedVars) where T : IComputableNumber<T>

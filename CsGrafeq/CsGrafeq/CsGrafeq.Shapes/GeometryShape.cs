@@ -1,11 +1,11 @@
 using CsGrafeq.Shapes.ShapeGetter;
 using ReactiveUI;
+using Avalonia;
 
 namespace CsGrafeq.Shapes;
 
 public abstract class GeometryShape : RefreshableShape
 {
-    public static readonly GeometryShape Null = new NullGeometryShape();
     public List<GeometryShape> SubShapes = new();
 
     public void AddSubShape(GeometryShape subShape)
@@ -51,4 +51,5 @@ public abstract class GeometryShape : RefreshableShape
     public override void Dispose()
     {
     }
+    public abstract bool IsIntersectedWithRect(CgRectangle rect);
 }

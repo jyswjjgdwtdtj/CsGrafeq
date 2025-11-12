@@ -252,7 +252,6 @@ public partial class DisplayerContainer : UserControl
     {
         RegistryKey key = Registry.ClassesRoot.OpenSubKey(@"http\shell\open\command\");
         string s = key.GetValue("").ToString();
-        Console.WriteLine(s);
         System.Diagnostics.Process.Start(s, "https://github.com/jyswjjgdwtdtj/CsGrafeq");
     
     }

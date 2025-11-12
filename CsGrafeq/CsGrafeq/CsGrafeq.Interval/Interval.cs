@@ -103,7 +103,7 @@ public readonly struct Interval //: _Interval
             return new Interval { Inf = left.Inf * right.Inf, Sup = left.Sup * right.Sup, Def = def };
         if (left.Sup < 0 && right.Sup < 0)
             return new Interval { Inf = left.Sup * right.Sup, Sup = left.Inf * right.Inf, Def = def };
-        var res = CGMath.GetMinMax4(left.Inf * right.Inf, left.Inf * right.Sup, left.Sup * right.Inf,
+        var res = CGMath.GetMinMax(left.Inf * right.Inf, left.Inf * right.Sup, left.Sup * right.Inf,
             left.Sup * right.Sup);
         return new Interval { Inf = res.Item1, Sup = res.Item2, Def = def };
     }
@@ -218,8 +218,8 @@ public readonly struct Interval //: _Interval
         return new Interval
         {
             Def = i1.Def & i2.Def & i3.Def,
-            Inf = Math.DoubleMedian(i1.Inf, i2.Inf, i3.Inf),
-            Sup = Math.DoubleMedian(i1.Sup, i2.Sup, i3.Sup)
+            Inf = Math.Median(i1.Inf, i2.Inf, i3.Inf),
+            Sup = Math.Median(i1.Sup, i2.Sup, i3.Sup)
         };
     }
 

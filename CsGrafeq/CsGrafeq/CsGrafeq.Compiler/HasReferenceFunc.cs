@@ -2,14 +2,6 @@ using CsGrafeq.Numeric;
 
 namespace CsGrafeq.Compiler;
 
-public delegate T Function0<T>() where T : IComputableNumber<T>;
-
-public delegate T Function1<T>(T arg1) where T : IComputableNumber<T>;
-
-public delegate T Function2<T>(T arg1, T arg2) where T : IComputableNumber<T>;
-
-public delegate T Function3<T>(T arg1, T arg2, T arg3) where T : IComputableNumber<T>;
-
 public class HasReferenceFunction<T> : IDisposable where T : Delegate
 {
     private readonly bool Disposed = false;
@@ -39,23 +31,32 @@ public class HasReferenceFunction<T> : IDisposable where T : Delegate
         Dispose();
     }
 }
-
-public class HasReferenceFunction0<T>(Function0<T> function, EnglishCharEnum reference)
-    : HasReferenceFunction<Function0<T>>(function, reference) where T : IComputableNumber<T>
+public class HasReferenceFunction : IDisposable
 {
-}
+    private readonly bool Disposed = false;
+    public readonly nint Function;
+    public readonly EnglishCharEnum Reference;
 
-public class HasReferenceFunction1<T>(Function1<T> function, EnglishCharEnum reference)
-    : HasReferenceFunction<Function1<T>>(function, reference) where T : IComputableNumber<T>
-{
-}
+    public HasReferenceFunction(nint function, EnglishCharEnum reference)
+    {
+        Function = function;
+        if (function==nint.Zero)
+            throw new ArgumentNullException(nameof(function));
+        Reference = reference;
+        EnglishChar.Instance.AddReference(reference);
+    }
 
-public class HasReferenceFunction2<T>(Function2<T> function, EnglishCharEnum reference)
-    : HasReferenceFunction<Function2<T>>(function, reference) where T : IComputableNumber<T>
-{
-}
+    public void Dispose()
+    {
+        if (!Disposed)
+        {
+            EnglishChar.Instance.RemoveReference(Reference);
+            GC.SuppressFinalize(this);
+        }
+    }
 
-public class HasReferenceFunction3<T>(Function3<T> function, EnglishCharEnum reference)
-    : HasReferenceFunction<Function3<T>>(function, reference) where T : IComputableNumber<T>
-{
+    ~HasReferenceFunction()
+    {
+        Dispose();
+    }
 }
