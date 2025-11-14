@@ -3,6 +3,7 @@ using CsGrafeq.Numeric;
 using CsGrafeq.Utilities;
 using ReactiveUI;
 using static CsGrafeq.Utilities.DoubleCompareHelper;
+
 namespace CsGrafeq;
 
 /// <summary>
@@ -106,9 +107,9 @@ public class ExpNumber : ReactiveObject
 
         Func.Dispose();
         IsExpression = true;
-        if (Compiler.Compiler.TryCompile<DoubleNumber>(expression,0,out var expFunc, out var usedVars,out _))
+        if (Compiler.Compiler.TryCompile<DoubleNumber>(expression, 0, out var expFunc, out var usedVars, out _))
         {
-            Func = new((Func<DoubleNumber>)expFunc, usedVars);
+            Func = new HasReferenceFunction<Func<DoubleNumber>>((Func<DoubleNumber>)expFunc, usedVars);
             IsError = false;
             SetValue(Func.Function().Value);
             UserSetValueStr?.Invoke();
@@ -132,7 +133,7 @@ public class ExpNumber : ReactiveObject
 
         if (!IsExpression)
         {
-            ShownText = double.IsNaN(value) ? "" : value.CustomToString(8,1e-8);
+            ShownText = double.IsNaN(value) ? "" : value.CustomToString(8, 1e-8);
             this.RaisePropertyChanged(nameof(ValueStr));
         }
     }

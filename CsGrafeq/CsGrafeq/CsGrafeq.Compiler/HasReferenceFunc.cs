@@ -1,5 +1,3 @@
-using CsGrafeq.Numeric;
-
 namespace CsGrafeq.Compiler;
 
 public class HasReferenceFunction<T> : IDisposable where T : Delegate
@@ -31,6 +29,7 @@ public class HasReferenceFunction<T> : IDisposable where T : Delegate
         Dispose();
     }
 }
+
 public class HasReferenceFunction : IDisposable
 {
     private readonly bool Disposed = false;
@@ -40,7 +39,7 @@ public class HasReferenceFunction : IDisposable
     public HasReferenceFunction(nint function, EnglishCharEnum reference)
     {
         Function = function;
-        if (function==nint.Zero)
+        if (function == nint.Zero)
             throw new ArgumentNullException(nameof(function));
         Reference = reference;
         EnglishChar.Instance.AddReference(reference);

@@ -12,11 +12,11 @@
         <ProjectReference Include="..\CsGrafeq.Compiler\CsGrafeq.Compiler.csproj"/>
         <ProjectReference Include="..\CsGrafeq.Base\CsGrafeq.Base.csproj"/>
         <ProjectReference Include="..\CsGrafeq.Compiler\CsGrafeq.Compiler.csproj"/>
-        <ProjectReference Include="..\CsGrafeq.Debug\CsGrafeq.Debug.csproj" />
+        <ProjectReference Include="..\CsGrafeq.Debug\CsGrafeq.Debug.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="DialogHost.Avalonia" Version="0.9.3" />
+        <PackageReference Include="DialogHost.Avalonia" Version="0.9.3"/>
         <PackageReference Include="FastExpressionCompiler" Version="5.3.0"/>
     </ItemGroup>
 

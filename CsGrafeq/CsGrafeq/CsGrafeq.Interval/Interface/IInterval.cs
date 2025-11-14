@@ -1,11 +1,13 @@
-﻿using static CsGrafeq.Interval.Def;
-using CsGrafeq.Interval.Interface;
-using CsGrafeq.Numeric;
+﻿using CsGrafeq.Numeric;
+using static CsGrafeq.Interval.Def;
 
 namespace CsGrafeq.Interval.Interface;
 
 public interface IInterval
 {
+    /// <summary>
+    ///     定义
+    /// </summary>
     Def Def { get; }
 }
 

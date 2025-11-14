@@ -79,7 +79,7 @@ public class CircleGetter_FromCenterAndRadius : CircleGetter
     public override void Attach(GeometryShape subShape)
     {
         Center.AddSubShape(subShape);
-;
+        ;
         Radius.NumberChanged += subShape.RefreshValues;
     }
 
@@ -114,8 +114,8 @@ public class CircleGetter_FromCenterAndPoint : CircleGetter
     {
         Center.AddSubShape(subShape);
         Point.AddSubShape(subShape);
-;
-;
+        ;
+        ;
     }
 
     public override void UnAttach(GeometryShape subShape)

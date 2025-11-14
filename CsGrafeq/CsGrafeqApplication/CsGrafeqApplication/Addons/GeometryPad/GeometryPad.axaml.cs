@@ -958,7 +958,7 @@ public partial class GeometryPad : Addon
         foreach (var geoshape in Shapes.GetShapes<GeometryShape>())
             if (geoshape is Line || geoshape is Circle)
             {
-                var dist = ((geoshape.NearestOf(mathcursor) - mathcursor) * disp.UnitLength).GetLength();
+                var dist = ((geoshape.DistanceTo(mathcursor) - mathcursor) * disp.UnitLength).GetLength();
                 if (dist < 5) shapes.Add((dist, geoshape));
             }
 
@@ -1095,7 +1095,7 @@ public partial class GeometryPad : Addon
                 continue;
             if (s is T tar)
             {
-                var dis = ((tar.NearestOf(v) - v) * disp.UnitLength).GetLength();
+                var dis = ((tar.DistanceTo(v) - v) * disp.UnitLength).GetLength();
                 if (dis < PointerTouchRange && dis < distance)
                 {
                     distance = dis;

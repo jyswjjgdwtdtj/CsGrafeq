@@ -4,14 +4,15 @@ public interface IHasOperatorNumber<T> where T : IHasOperatorNumber<T>
 {
     static IDictionary<string, Delegate> HasOperatorNumberMethodDictionary { get; } = new Dictionary<string, Delegate>
     {
-        { "add",IHasOperatorNumber<T>.Add},
-        { "subtract", IHasOperatorNumber<T>.Subtract },
-        { "multiply", IHasOperatorNumber<T>.Multiply },
-        { "divide", IHasOperatorNumber<T>.Divide },
-        { "modulo", IHasOperatorNumber<T>.Modulo },
-        { "neg", IHasOperatorNumber<T>.Neg }
+        { "add", Add },
+        { "subtract", Subtract },
+        { "multiply", Multiply },
+        { "divide", Divide },
+        { "modulo", Modulo },
+        { "neg", Neg }
     };
-    static unsafe IDictionary<string, nint> HasOperatorNumberPtrMethodDictionary { get; } = new Dictionary<string, nint>
+
+    static IDictionary<string, nint> HasOperatorNumberPtrMethodDictionary { get; } = new Dictionary<string, nint>
     {
         /*{ "add", new IntPtr((delegate*<T,T,T>)(&IHasOperatorNumber<T>.Add)) },
         { "subtract", new IntPtr((delegate*<T,T,T>)(&IHasOperatorNumber<T>.Subtract)) },
@@ -20,6 +21,7 @@ public interface IHasOperatorNumber<T> where T : IHasOperatorNumber<T>
         { "modulo", new IntPtr((delegate*<T, T, T>)(&IHasOperatorNumber<T>.Modulo)) },
         { "neg", new IntPtr((delegate*<T,T>)(&IHasOperatorNumber<T>.Neg)) },*/
     };
+
     static T Add(T left, T right)
     {
         return left + right;

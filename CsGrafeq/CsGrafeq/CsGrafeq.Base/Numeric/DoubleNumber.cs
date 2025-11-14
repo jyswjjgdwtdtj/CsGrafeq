@@ -1,4 +1,3 @@
-using CsGrafeq.Utilities;
 using System.Runtime.CompilerServices;
 using CGMath = CsGrafeq.Utilities.CsGrafeqMath;
 
@@ -228,9 +227,11 @@ public struct DoubleNumber : IComputableNumber<DoubleNumber>
     {
         return new DoubleNumber(num);
     }
+
     public static DoubleNumber Clone(DoubleNumber Value)
     {
         throw new NotImplementedException();
     }
+
     public static bool NeedClone => false;
 }

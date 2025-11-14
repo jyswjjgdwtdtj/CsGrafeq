@@ -42,11 +42,11 @@ public class AngleGetter_FromThreePoint : AngleGetter
     public override void Attach(GeometryShape subShape)
     {
         AnglePoint.AddSubShape(subShape);
-;
+        ;
         Point1.AddSubShape(subShape);
-;
+        ;
         Point2.AddSubShape(subShape);
-;
+        ;
     }
 
     public override void UnAttach(GeometryShape subShape)

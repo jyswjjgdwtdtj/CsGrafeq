@@ -11,7 +11,9 @@ public class TextGetter_Static : TextGetter
     {
         Text = text;
     }
+
     protected string Text { get; init; }
+
     public override string GetText()
     {
         return Text;

@@ -18,16 +18,13 @@ public class PolygonGetter : GeometryGetter
         foreach (var i in Points)
         {
             i.AddSubShape(subShape);
-;
+            ;
         }
     }
 
     public override void UnAttach(GeometryShape subShape)
     {
-        foreach (var i in Points)
-        {
-            i.RemoveSubShape(subShape);
-        }
+        foreach (var i in Points) i.RemoveSubShape(subShape);
     }
 
     public virtual Vec[] GetPolygon()

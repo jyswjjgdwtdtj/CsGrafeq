@@ -28,10 +28,11 @@ public class Circle : FilledShape
         InvokeShapeChanged();
     }
 
-    public override Vec NearestOf(Vec vec)
+    public override Vec DistanceTo(Vec vec)
     {
         return InnerCircle.Center + (vec - InnerCircle.Center).Unit() * InnerCircle.Radius;
     }
+
     public override bool IsIntersectedWithRect(CgRectangle rect)
     {
         var o = rect.Location + rect.Size / 2;

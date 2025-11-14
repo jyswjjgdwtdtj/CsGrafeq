@@ -14,7 +14,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="DialogHost.Avalonia" Version="0.9.3" />
+        <PackageReference Include="DialogHost.Avalonia" Version="0.9.3"/>
     </ItemGroup>
 
 </Project>

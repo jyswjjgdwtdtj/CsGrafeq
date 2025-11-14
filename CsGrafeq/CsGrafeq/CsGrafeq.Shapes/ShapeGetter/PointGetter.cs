@@ -1,7 +1,7 @@
-﻿using ReactiveUI;
+﻿using CsGrafeq.Utilities;
+using ReactiveUI;
 using static CsGrafeq.Shapes.GeometryMath;
 using static System.Math;
-using CsGrafeq.Utilities;
 
 
 namespace CsGrafeq.Shapes.ShapeGetter;
@@ -53,8 +53,8 @@ public class PointGetter_AxialSymmetryPoint : PointGetter
     {
         Point.AddSubShape(subShape);
         Line.AddSubShape(subShape);
-;
-;
+        ;
+        ;
     }
 
     public override void UnAttach(GeometryShape subShape)
@@ -279,7 +279,7 @@ public sealed class PointGetter_OnLine(Line line, Vec InitialPoint) : PointGette
         if (Line is Half)
             ratio = CsGrafeqMath.RangeTo(0, double.PositiveInfinity, ratio);
         else if (Line is Segment)
-            ratio =CsGrafeqMath.RangeTo(0, 1, ratio);
+            ratio = CsGrafeqMath.RangeTo(0, 1, ratio);
         return ratio;
     }
 
@@ -456,9 +456,9 @@ public class PointGetter_NearestPointOnLine : PointGetter
         var dy = v2.Y - v1.Y;
         var t = ((ControlPoint.X - v1.X) * dx + (ControlPoint.Y - v1.Y) * dy) / (dx * dx + dy * dy);
         if (Line is Half)
-            t =CsGrafeqMath.RangeTo(0, double.PositiveInfinity, t);
+            t = CsGrafeqMath.RangeTo(0, double.PositiveInfinity, t);
         else if (Line is Segment)
-            t =CsGrafeqMath.RangeTo(0, 1, t);
+            t = CsGrafeqMath.RangeTo(0, 1, t);
         return new Vec(v1.X + t * dx, v1.Y + t * dy);
     }
 
@@ -466,8 +466,8 @@ public class PointGetter_NearestPointOnLine : PointGetter
     {
         Line.AddSubShape(subShape);
         Point.AddSubShape(subShape);
-;
-;
+        ;
+        ;
     }
 
     public override void UnAttach(GeometryShape subShape)
@@ -498,8 +498,8 @@ public abstract class PointGetter_FromTwoPoint : PointGetter
         Point1.AddSubShape(subShape);
         Point2.AddSubShape(subShape);
 
-;
-;
+        ;
+        ;
     }
 
     public override void UnAttach(GeometryShape subShape)
@@ -533,7 +533,7 @@ public class PointGetter_EndOfLine : PointGetter
     public override void Attach(GeometryShape subShape)
     {
         line.AddSubShape(subShape);
-;
+        ;
     }
 
     public override void UnAttach(GeometryShape subShape)
@@ -601,9 +601,9 @@ public abstract class PointGetter_FromThreePoint : PointGetter
         Point2.AddSubShape(subShape);
         Point3.AddSubShape(subShape);
 
-;
-;
-;
+        ;
+        ;
+        ;
     }
 
     public override void UnAttach(GeometryShape subShape)

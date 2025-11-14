@@ -21,10 +21,8 @@
     </UserControl.Styles>
     <DockPanel LastChildFill="True">
         <DockPanel.Resources>
-            
             <ResourceDictionary>
                 <Color x:Key="Cyan">#aa77ccbb</Color>
-               
                 <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%" x:Key="MedianLinearGradientBrush">
                     <GradientStop Color="{StaticResource Cyan}" Offset="0.0"/>
                     <GradientStop Color="{StaticResource Cyan}" Offset="0.2"/>
@@ -42,7 +40,8 @@
                 </TabStrip>
             </DockPanel>
         </Border>
-    <Panel Name="PART_Container" IsTabStop="False">
+        <controls:GlobalMathKeyBoard>
+            <Panel Name="PART_Container" IsTabStop="False">
         <Panel.Styles>
             <Style Selector="Control">
                 <Setter Property="IsTabStop" Value="False" />
@@ -81,7 +80,7 @@
             </Grid.ColumnDefinitions>
             <Border Grid.Column="0" Grid.Row="1" BorderThickness="0" BorderBrush="Gray" Name="OperationContainer"
                     DataContext="{CompiledBinding Displayer}"
-                    Background="{DynamicResource CgBackgroundBrush}">
+                    Background="{DynamicResource CgTranslucentBackgroundBrush}">
                 <ItemsControl ItemsSource="{CompiledBinding Addons}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -112,17 +111,17 @@
                         </ControlTemplate>
                     </CheckBox.Template>
                     <CheckBox.Styles>
-                        <Style Selector="CheckBox TextBlock#TextBlock">
+                        <Style Selector="CheckBox#Toggle TextBlock#TextBlock">
                             <Setter Property="Text" Value="&lt;" />
                         </Style>
-                        <Style Selector="CheckBox:checked TextBlock#TextBlock">
+                        <Style Selector="CheckBox#Toggle:checked TextBlock#TextBlock">
                             <Setter Property="Text" Value="&gt;" />
                         </Style>
-                        <Style Selector="CheckBox Border#Border">
+                        <Style Selector="CheckBox#Toggle Border#Border">
                             <Setter Property="Width" Value="15" />
                             <Setter Property="Height" Value="40" />
                         </Style>
-                        <Style Selector="CheckBox:pressed Border#Border">
+                        <Style Selector="CheckBox#Toggle:pressed Border#Border">
                             <Setter Property="Width"
                                     Value="13" />
                             <Setter Property="Height"
@@ -336,5 +335,6 @@
             </Grid>
         </Border>
     </Panel>
+        </controls:GlobalMathKeyBoard>
     </DockPanel>
 </UserControl>

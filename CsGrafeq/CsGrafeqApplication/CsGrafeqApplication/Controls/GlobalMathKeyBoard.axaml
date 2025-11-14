@@ -1,0 +1,163 @@
+﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                     xmlns:controls="clr-namespace:CsGrafeqApplication.Controls"
+                     xmlns:system="clr-namespace:System;assembly=System.Runtime">
+    <Design.PreviewWith>
+        <controls:GlobalMathKeyBoard Width="600" Height="400">
+            <Panel></Panel>
+        </controls:GlobalMathKeyBoard>
+    </Design.PreviewWith>
+    <ControlTheme x:Key="{x:Type controls:GlobalMathKeyBoard}"
+                  TargetType="controls:GlobalMathKeyBoard">
+        <Setter Property="VerticalAlignment" Value="Stretch"></Setter>
+        <Setter Property="HorizontalAlignment" Value="Stretch"></Setter>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <DockPanel LastChildFill="True">
+                    <Border DockPanel.Dock="Bottom" BorderThickness="1" BorderBrush="{DynamicResource CgOppositeBackgroundBrush}" Name="PART_KeyBoardContainer" Focusable="False">
+                        <Border.Styles>
+                            <Style Selector="Border">
+                                <Setter Property="Transitions">
+                                    <Transitions>
+                                        <DoubleTransition Property="Height" Duration="0:0:0.1"></DoubleTransition>
+                                    </Transitions>
+                                </Setter>
+                            </Style>
+                            <Style Selector="Border:not(:keyboardopened)">
+                                <Setter Property="Height" Value="0"></Setter>
+                            </Style>
+                            <Style Selector="Border:keyboardopened">
+                                <Setter Property="Height" Value="200"></Setter>
+                            </Style>
+                        </Border.Styles>
+                            <Grid RowDefinitions="50,50,50,50" RowSpacing="1">
+                                <Grid.Styles>
+                                    <Style Selector="controls|KeyButton.Char">
+                                        <Setter Property="Height" Value="48"></Setter>
+                                        <Setter Property="Width" Value="48"></Setter>
+                                    </Style>
+                                </Grid.Styles>
+                                <StackPanel  Orientation="Horizontal" Spacing="3" HorizontalAlignment="Center">
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="1" SecondButton="!" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="2" SecondButton="+" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="3" SecondButton="-" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="4" SecondButton="(" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="5" SecondButton=")" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="6" SecondButton="*" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="7" SecondButton="/" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="8" SecondButton="=" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="9" SecondButton="|" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="0" SecondButton="&amp;" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="&lt;" SecondButton="%" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="&gt;" SecondButton="^" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                </StackPanel>
+                                <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="3" HorizontalAlignment="Center">
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="q"  SecondButton="Q" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="w"  SecondButton="W" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="e"  SecondButton="E" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="r"  SecondButton="R" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="t"  SecondButton="T" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="y"  SecondButton="Y" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="u"  SecondButton="U" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="i"  SecondButton="I" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="o"  SecondButton="O" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="p"  SecondButton="P" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                </StackPanel>
+                                <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="3" HorizontalAlignment="Center">
+                                    <CheckBox Name="ShiftCheckBox" FontSize="20" Width="80" VerticalAlignment="Stretch">
+                                        <CheckBox.Styles>
+                                            <Style Selector="CheckBox">
+                                                <Setter Property="Template">
+                                                    <ControlTemplate>
+                                                        <Border CornerRadius="4" BorderBrush="{DynamicResource CgForegroundBrush}" BorderThickness="1" HorizontalAlignment="Stretch" Height="{CompiledBinding $parent[CheckBox].Height}" Name="PART_Container" Background="{TemplateBinding Background}">
+                                                            <Border.Styles>
+                                                                <Style Selector="Border">
+                                                                    <Setter Property="Background" Value="{DynamicResource CgOppositeTranslucentBackgroundBrush0}"></Setter>
+                                                                    <Style Selector="^:pressed">
+                                                                        <Setter Property="Background" Value="{DynamicResource CgOppositeTranslucentBackgroundBrush1}"></Setter>
+                                                                    </Style>
+                                                                </Style>
+                                                            </Border.Styles>
+                                                            <AccessText VerticalAlignment="Center" HorizontalAlignment="Center" Text="{TemplateBinding Content}" FontFamily="{StaticResource MapleMono}" FontSize="25"></AccessText>
+                                                        </Border>
+                                                    </ControlTemplate>
+                                                </Setter>
+                                            </Style>
+                                            <Style Selector="CheckBox:checked">
+                                                <Setter Property="Background" Value="{DynamicResource CgOppositeTranslucentBackgroundBrush0}"></Setter>
+                                            </Style>
+                                            <Style Selector="CheckBox:not(:checked)">
+                                                <Setter Property="Background" Value="{DynamicResource CgBackgroundBrush}"></Setter>
+                                            </Style>
+                                        </CheckBox.Styles>
+                                        Shift
+                                    </CheckBox>
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="a"  SecondButton="A" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="s"  SecondButton="S" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="d"  SecondButton="D" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="f"  SecondButton="F" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="g"  SecondButton="G" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="h"  SecondButton="H" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="j"  SecondButton="J" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="k"  SecondButton="K" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="l"  SecondButton="L" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                    <Border CornerRadius="4" BorderBrush="{DynamicResource CgForegroundBrush}" BorderThickness="1" Width="55" Height="{CompiledBinding $parent[StackPanel].Height}">
+                                        <Border.Styles>
+                                            <Style Selector="Border">
+                                                <Setter Property="Background" Value="{DynamicResource CgBackgroundBrush}"></Setter>
+                                            </Style>
+                                        </Border.Styles>
+                                        <AccessText VerticalAlignment="Center" HorizontalAlignment="Center" Text="⇦" FontFamily="{StaticResource MapleMono}" FontSize="25"></AccessText>
+                                    </Border>
+                                </StackPanel>
+                                <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="3" HorizontalAlignment="Center">
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="z"  SecondButton="Z" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="x"  SecondButton="X" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="c"  SecondButton="C" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="v"  SecondButton="V" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="b"  SecondButton="B" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="n"  SecondButton="N" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                    <controls:KeyButton Classes="KeyButton Char" FirstButton="m"  SecondButton="M" IsFirst="{CompiledBinding #ShiftCheckBox.IsChecked}" ></controls:KeyButton>
+                                </StackPanel>
+                            </Grid>
+                    </Border>
+                    <Panel>
+                        <ContentPresenter ZIndex="0" Content="{TemplateBinding Content}"
+                                          HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                        <Border Background="{DynamicResource CgBackgroundBrush}" CornerRadius="4,4,0,0" BorderBrush="{DynamicResource CgOppositeBackgroundBrush}" BorderThickness="1,1,1,0" Width="50" Height="30"
+                                VerticalAlignment="Bottom" HorizontalAlignment="Left">
+                            <CheckBox VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Name="VisibilityCheckBox">
+                                <CheckBox.Styles>
+                                    <Style Selector="CheckBox#VisibilityCheckBox:checked">
+                                        <Setter Property="Template">
+                                            <ControlTemplate>
+                                                <PathIcon>
+                                                    <PathIcon.Data>
+                                                        <StreamGeometry>M5.161 10.073C4.454 9.265 5.028 8 6.102 8h11.796c1.074 0 1.648 1.265.941 2.073l-5.522 6.31a1.75 1.75 0 0 1-2.634 0zM6.653 9.5l5.159 5.896a.25.25 0 0 0 .376 0l5.16-5.896z</StreamGeometry>
+                                                    </PathIcon.Data>
+                                                </PathIcon>
+                                            </ControlTemplate>
+                                        </Setter>
+                                    </Style>
+                                    <Style Selector="CheckBox#VisibilityCheckBox:not(:checked)">
+                                        <Setter Property="Template">
+                                            <ControlTemplate>
+                                                <PathIcon>
+                                                    <PathIcon.Data>
+                                                        <StreamGeometry>M5.161 14.907c-.707.809-.133 2.073.941 2.073h11.796c1.074 0 1.648-1.264.941-2.073l-5.522-6.31a1.75 1.75 0 0 0-2.634 0zm1.492.573l5.159-5.896a.25.25 0 0 1 .376 0l5.16 5.897z</StreamGeometry>
+                                                    </PathIcon.Data>
+                                                </PathIcon>
+                                            </ControlTemplate>
+                                        </Setter>
+                                    </Style>
+                                </CheckBox.Styles>
+                            </CheckBox>
+                        </Border>
+                    </Panel>
+                </DockPanel>
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+</ResourceDictionary>

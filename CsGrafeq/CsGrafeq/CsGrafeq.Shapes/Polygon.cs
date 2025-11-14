@@ -25,7 +25,7 @@ public class Polygon : FilledShape
         InvokeShapeChanged();
     }
 
-    public override Vec NearestOf(Vec vec)
+    public override Vec DistanceTo(Vec vec)
     {
         var len = Locations.Length;
         return FindMin(GetEnumDistance(Locations, vec));

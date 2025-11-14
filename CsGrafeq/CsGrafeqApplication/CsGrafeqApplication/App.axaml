@@ -12,12 +12,15 @@
                 <ResourceInclude Source="/Themes/BackgroundTheme.axaml" />
                 <ResourceInclude Source="/Resources/Resource.axaml" />
                 <ResourceInclude Source="/Controls/VariableBox.axaml" />
+                <ResourceInclude Source="/Controls/GlobalMathKeyBoard.axaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
         <FontFamily x:Key="MapleMono">avares://CsGrafeqApplication/Fonts/MapleMono-CN-Regular.ttf#Maple Mono CN</FontFamily>
     </Application.Resources>
     <Application.Styles>
         <StyleInclude Source="/Controls/ShownControl.axaml" />
+        <StyleInclude Source="/Controls/KeyButton.axaml"/>
+        <StyleInclude Source="/Controls/MathBox.axaml"/>
     </Application.Styles>
     <Application.Styles>
         <FluentTheme />

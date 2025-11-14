@@ -7,7 +7,7 @@ namespace CsGrafeq.Utilities;
 public static class CsGrafeqMath
 {
     /// <summary>
-    /// 取模操作
+    ///     取模操作
     /// </summary>
     /// <param name="a"></param>
     /// <param name="b"></param>
@@ -16,8 +16,9 @@ public static class CsGrafeqMath
     {
         return a - b * sysMath.Floor(a / b);
     }
+
     /// <summary>
-    /// Sgn函数
+    ///     Sgn函数
     /// </summary>
     /// <param name="num"></param>
     /// <typeparam name="T"></typeparam>
@@ -27,8 +28,9 @@ public static class CsGrafeqMath
     {
         return T.Sign(num);
     }
+
     /// <summary>
-    /// 是否在范围之中
+    ///     是否在范围之中
     /// </summary>
     /// <param name="num1"></param>
     /// <param name="num2"></param>
@@ -40,8 +42,9 @@ public static class CsGrafeqMath
         SwapIfNotLess(ref num1, ref num2);
         return num1 <= numtest && numtest <= num2;
     }
+
     /// <summary>
-    /// 使num1&lt;=num2
+    ///     使num1&lt;=num2
     /// </summary>
     /// <param name="num1"></param>
     /// <param name="num2"></param>
@@ -50,30 +53,49 @@ public static class CsGrafeqMath
     {
         if (num1 > num2) (num1, num2) = (num2, num1);
     }
+
     /// <summary>
-    /// 四舍五入至小数点
-    /// 此函数为从.NET Framework迁移的遗留函数
+    ///     四舍五入至小数点
+    ///     此函数为从.NET Framework迁移的遗留函数
     /// </summary>
     /// <param name="num"></param>
     /// <param name="fix"></param>
     /// <returns></returns>
     public static double RoundTen(double num, int fix)
     {
+        if (fix == 0)
+            return num;
+        if (fix < 0)
+        {
+            double n = SpecialPow(10, -fix);
+            return Math.Round(num / n) * n;
+        }
+
         return Math.Round(num, fix);
     }
+
     /// <summary>
-    /// 四舍五入至小数点
-    /// 此函数为从.NET Framework迁移的遗留函数
+    ///     四舍五入至小数点
+    ///     此函数为从.NET Framework迁移的遗留函数
     /// </summary>
     /// <param name="num"></param>
     /// <param name="fix"></param>
     /// <returns></returns>
     public static decimal RoundTen(decimal num, int fix)
     {
+        if (fix == 0)
+            return num;
+        if (fix < 0)
+        {
+            var n = SpecialPow(10m, -fix);
+            return Math.Round(num / n) * n;
+        }
+
         return Math.Round(num, fix);
     }
+
     /// <summary>
-    /// 无优化的乘方运算
+    ///     无优化的乘方运算
     /// </summary>
     /// <param name="num"></param>
     /// <param name="times"></param>
@@ -91,8 +113,9 @@ public static class CsGrafeqMath
 
         return result;
     }
+
     /// <summary>
-    /// 限定至范围
+    ///     限定至范围
     /// </summary>
     /// <param name="min"></param>
     /// <param name="max"></param>
@@ -107,8 +130,9 @@ public static class CsGrafeqMath
             return max;
         return target;
     }
+
     /// <summary>
-    /// 获取四个数的最大值和最小值
+    ///     获取四个数的最大值和最小值
     /// </summary>
     /// <param name="n1"></param>
     /// <param name="n2"></param>
@@ -127,8 +151,9 @@ public static class CsGrafeqMath
         maxnum = maxnum > n4 ? maxnum : n4;
         return (minnum, maxnum);
     }
+
     /// <summary>
-    /// 获取三数中间的数
+    ///     获取三数中间的数
     /// </summary>
     /// <param name="t1"></param>
     /// <param name="t2"></param>
@@ -140,40 +165,44 @@ public static class CsGrafeqMath
         if ((t2 - t1) * (t1 - t3) > 0) return t1;
         return t3;
     }
-/// <summary>
-/// 最大公约数
-/// </summary>
-/// <param name="a"></param>
-/// <param name="b"></param>
-/// <returns></returns>
+
+    /// <summary>
+    ///     最大公约数
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
     public static long GCD(long a, long b)
     {
         return a == 0 || b == 0 ? 0 : GCDForLong(a, b);
     }
+
     private static long GCDForLong(long a, long b)
     {
         return b == 0 ? sysMath.Abs(a) : GCDForLong(b, a % b);
     }
-/// <summary>
-/// 最小公倍数
-/// </summary>
-/// <param name="a"></param>
-/// <param name="b"></param>
-/// <returns></returns>
+
+    /// <summary>
+    ///     最小公倍数
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
     public static long LCM(long a, long b)
     {
         return a == 0 || b == 0 ? 0 : a * b / GCDForLong(a, b);
     }
-/// <summary>
-/// 约至小数点后指定位数
-/// </summary>
-/// <param name="d"></param>
-/// <param name="dots"></param>
-/// <param name="precision"></param>
-/// <returns></returns>
-    public static string CustomToString(this double d,int dots,double precision)
+
+    /// <summary>
+    ///     约至小数点后指定位数
+    /// </summary>
+    /// <param name="d"></param>
+    /// <param name="dots"></param>
+    /// <param name="precision"></param>
+    /// <returns></returns>
+    public static string CustomToString(this double d, int dots, double precision)
     {
-        var tar = double.Round(d,dots);
+        var tar = double.Round(d, dots);
         return double.Abs(tar - d) < precision ? tar.ToString() : d.ToString();
     }
 }

@@ -97,6 +97,10 @@
             <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
+        <PackageReference Include="CSharpMath" />
+        <PackageReference Include="CSharpMath.Avalonia" />
+        <PackageReference Include="CSharpMath.Rendering" />
+        <PackageReference Include="CSharpMath.SkiaSharp" />
         <PackageReference Include="DialogHost.Avalonia" />
         <PackageReference Include="HarfBuzzSharp" />
         <PackageReference Include="SkiaSharp" />

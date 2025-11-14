@@ -6,7 +6,7 @@
              xmlns:geopad="clr-namespace:CsGrafeqApplication.Addons.GeometryPad;assembly=CsGrafeqApplication"
              xmlns:shapes="clr-namespace:CsGrafeq.Shapes" 
              x:Class="CsGrafeqApplication.Addons.GeometryPad.GeoPadInfo" x:DataType="geopad:GeometryPadViewModel">
-    <Border  CornerRadius="5" Background="{DynamicResource CgBackgroundBrush}">
+    <Border  CornerRadius="5" Background="{DynamicResource CgTranslucentBackgroundBrush}">
         <ItemsControl ItemsSource="{CompiledBinding Shapes}">
             <ItemsControl.ItemTemplate>
                 <geopad:ImpFuncShowDataTemplate>

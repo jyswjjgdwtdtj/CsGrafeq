@@ -1,6 +1,4 @@
-﻿using Avalonia;
-using CsGrafeq.Shapes.ShapeGetter;
-using CsGrafeq.Utilities;
+﻿using CsGrafeq.Shapes.ShapeGetter;
 using static CsGrafeq.Utilities.CsGrafeqMath;
 using static CsGrafeq.Shapes.ShapeGetter.AngleGetter;
 
@@ -27,10 +25,11 @@ public class Angle : GeometryShape
         Description = "Degree:" + AngleData.Angle;
     }
 
-    public override Vec NearestOf(Vec vec)
+    public override Vec DistanceTo(Vec vec)
     {
         return Vec.Infinity;
     }
+
     public override bool IsIntersectedWithRect(CgRectangle rect)
     {
         var v = AngleData.AnglePoint - rect.Location;

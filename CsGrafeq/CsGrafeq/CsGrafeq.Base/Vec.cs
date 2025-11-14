@@ -1,10 +1,11 @@
 ﻿using static System.Math;
 
 namespace CsGrafeq;
+
 /// <summary>
-/// 总是代表数学空间的向量或点 区别于Avalonia.Point，其总为像素坐标
+///     总是代表数学空间的向量或点 区别于Avalonia.Point，其总为像素坐标
 /// </summary>
-public struct Vec: IEquatable<Vec>
+public struct Vec : IEquatable<Vec>
 {
     public double X;
     public double Y;
@@ -44,8 +45,9 @@ public struct Vec: IEquatable<Vec>
     {
         return new Vec(left.X / ratio, left.Y / ratio);
     }
+
     /// <summary>
-    /// 点乘
+    ///     点乘
     /// </summary>
     /// <param name="left"></param>
     /// <param name="right"></param>
@@ -54,8 +56,9 @@ public struct Vec: IEquatable<Vec>
     {
         return left.X * right.X + left.Y * right.Y;
     }
+
     /// <summary>
-    /// 叉乘
+    ///     叉乘
     /// </summary>
     /// <param name="left"></param>
     /// <param name="right"></param>
@@ -84,33 +87,38 @@ public struct Vec: IEquatable<Vec>
     {
         return double.IsNaN(X) || double.IsNaN(Y);
     }
+
     /// <summary>
-    /// 无效向量（XY均为NaN）
+    ///     无效向量（XY均为NaN）
     /// </summary>
     public static readonly Vec Invalid = new(double.NaN, double.NaN);
+
     /// <summary>
-    /// 正无穷向量（XY均为正无穷）
+    ///     正无穷向量（XY均为正无穷）
     /// </summary>
     public static readonly Vec Infinity = new(double.PositiveInfinity, double.PositiveInfinity);
+
     /// <summary>
-    /// 负无穷向量（XY均为负无穷）
+    ///     负无穷向量（XY均为负无穷）
     /// </summary>
     public static readonly Vec NegInfinity = new(double.NegativeInfinity, double.NegativeInfinity);
+
     /// <summary>
-    /// 空向量（XY均为0）
+    ///     空向量（XY均为0）
     /// </summary>
     public static readonly Vec Empty = new(0, 0);
 
     /// <summary>
-    /// 极坐标角度，范围[0,2π)
+    ///     极坐标角度，范围[0,2π)
     /// </summary>
     /// <returns></returns>
     public double Arg2()
     {
         return Atan2(Y, X) % (2 * PI);
     }
+
     /// <summary>
-    /// 单位向量
+    ///     单位向量
     /// </summary>
     /// <returns></returns>
     public Vec Unit()
@@ -118,10 +126,12 @@ public struct Vec: IEquatable<Vec>
         var len = GetLength();
         return new Vec(X / len, Y / len);
     }
+
     public override bool Equals(object? obj)
     {
         return obj is Vec vec && Equals(vec);
     }
+
     public bool Equals(Vec other)
     {
         return X.Equals(other.X) && Y.Equals(other.Y);

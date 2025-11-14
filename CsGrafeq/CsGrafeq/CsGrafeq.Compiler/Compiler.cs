@@ -4,7 +4,6 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using CsGrafeq.Numeric;
 using sysMath = System.Math;
-using System.Linq;
 
 namespace CsGrafeq.Compiler;
 
@@ -17,20 +16,22 @@ public static class Compiler
     private static readonly Regex numberOrpoint = new("[0-9.]");
     private static readonly Regex spaceOrtab = new(@"([ ]|\t)");
 
-    public static Delegate Compile<T>(string expression,uint paraCount,out EnglishCharEnum usedVars) where T : IComputableNumber<T>, INeedClone<T>
+    public static Delegate Compile<T>(string expression, uint paraCount, out EnglishCharEnum usedVars)
+        where T : IComputableNumber<T>, INeedClone<T>
     {
         var exp = ConstructExpTree<T>(expression, paraCount, out var x, out var y, out var z, out usedVars);
-        var expResult=Expression.Lambda(exp,((IEnumerable<ParameterExpression>)[x,y,z]).Take((int)paraCount));
+        var expResult = Expression.Lambda(exp, ((IEnumerable<ParameterExpression>)[x, y, z]).Take((int)paraCount));
         return expResult.Compile();
     }
 
-    public static bool TryCompile<T>(string expression,uint paraCount, out Delegate expFunc,out EnglishCharEnum usedVars, out Exception? ex)
+    public static bool TryCompile<T>(string expression, uint paraCount, out Delegate expFunc,
+        out EnglishCharEnum usedVars, out Exception? ex)
         where T : IComputableNumber<T>
     {
         //expFunc = Compile<T>(expression,paraCount,out usedVars);
         try
         {
-            expFunc = Compile<T>(expression,paraCount,out usedVars);
+            expFunc = Compile<T>(expression, paraCount, out usedVars);
             ex = null;
             return true;
         }
@@ -42,6 +43,7 @@ public static class Compiler
             return false;
         }
     }
+
     public static Expression ConstructExpTree<T>(string expression, [Range(0, 3)] uint argsLength,
         out ParameterExpression xVar, out ParameterExpression yVar, out ParameterExpression zVar,
         out EnglishCharEnum usedVars) where T : IComputableNumber<T>
@@ -51,7 +53,7 @@ public static class Compiler
         usedVars = EnglishCharEnum.None;
         var elements = expression.GetTokens().ParseTokens();
         var expStack = new Stack<Expression>();
-        var cloneMethod =GetInfo(T.Clone);
+        var cloneMethod = GetInfo(T.Clone);
         var needClone = true;
         xVar = Expression.Parameter(typeof(T), "x");
         yVar = Expression.Parameter(typeof(T), "y");

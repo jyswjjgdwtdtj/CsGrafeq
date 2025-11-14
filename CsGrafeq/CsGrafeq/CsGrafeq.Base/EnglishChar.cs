@@ -3,7 +3,6 @@ using System.Runtime.CompilerServices;
 using CsGrafeq.Collections;
 using ReactiveUI;
 using static CsGrafeq.Utilities.ThrowHelper;
-using static CsGrafeq.Utilities.CsGrafeqMath;
 using static System.Math;
 
 namespace CsGrafeq;
@@ -17,7 +16,7 @@ public class EnglishChar : ReactiveObject
             if (e.PropertyName.Length == 1)
             {
                 var c = e.PropertyName[0];
-                if ('A' <= c && c <= 'Z') CharValueChanged?.Invoke((EnglishCharEnum)Math.Pow(2, c - 'A'));
+                if ('A' <= c && c <= 'Z') CharValueChanged?.Invoke((EnglishCharEnum)Pow(2, c - 'A'));
             }
         };
         A = 10;
@@ -46,7 +45,7 @@ public class EnglishChar : ReactiveObject
     public double A
     {
         get => CharsValue[0];
-        set=> this.RaiseAndSetIfChanged(ref CharsValue[0], value);
+        set => this.RaiseAndSetIfChanged(ref CharsValue[0], value);
     }
 
     public double B
