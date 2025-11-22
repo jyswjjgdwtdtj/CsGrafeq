@@ -11,11 +11,7 @@ global using GeoSegment = CsGrafeq.Shapes.Segment;
 global using CsGrafeq;
 global using static CsGrafeq.Utilities.CsGrafeqMath;
 global using static System.Math;
-using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using Avalonia.Controls;
-using Avalonia.Threading;
 
 namespace CsGrafeqApplication;
 
@@ -25,6 +21,7 @@ internal static class Extension
     internal static void Void()
     {
     }
+
     public static TOutput VoidFunc<TInput, TOutput>(TInput d) where TOutput : struct
     {
         return default;

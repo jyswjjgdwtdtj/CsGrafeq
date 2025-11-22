@@ -2,18 +2,20 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Templates;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using Avalonia.Media;
+using Avalonia.Themes.Fluent;
 using CsGrafeq.Interval;
 using CsGrafeq.Shapes;
 using CsGrafeq.Shapes.ShapeGetter;
 using CsGrafeqApplication.Controls.Displayers;
+using DialogHostAvalonia;
 using SkiaSharp;
 using static CsGrafeq.Shapes.GeometryMath;
 using static CsGrafeqApplication.AvaloniaMath;
@@ -22,12 +24,8 @@ using AvaPoint = Avalonia.Point;
 using AvaRect = Avalonia.Rect;
 using AvaSize = Avalonia.Size;
 using GeoHalf = CsGrafeq.Shapes.Half;
-using DialogHostAvalonia;
-using DialogHostAvalonia.Utilities;
 using static CsGrafeqApplication.Extension;
 using static CsGrafeq.Utilities.ThrowHelper;
-using Avalonia.Threading;
-using CsGrafeqApplication.Controls;
 using static CsGrafeqApplication.GlobalSetting;
 
 namespace CsGrafeqApplication.Addons.GeometryPad;
@@ -35,64 +33,14 @@ namespace CsGrafeqApplication.Addons.GeometryPad;
 public partial class GeometryPad : Addon
 {
     /// <summary>
-    /// 所有几何图形的渲染目标
+    ///     所有几何图形的渲染目标
     /// </summary>
     private readonly Renderable MainRenderTarget = new();
+
     /// <summary>
-    /// ViewModel
+    ///     ViewModel
     /// </summary>
     private readonly GeometryPadViewModel VM;
-    #region CoordinateTransformFuncs
-    /// <summary>
-    /// 将数学坐标转换为像素坐标（Avalonia.Point） 来自Owner
-    /// </summary>
-    private Func<Vec, AvaPoint> MathToPixel = VoidFunc<Vec, AvaPoint>;
-    /// <summary>
-    /// 将数学坐标转换为像素坐标（SKPoint） 来自Owner
-    /// </summary>
-    protected Func<Vec, SKPoint> MathToPixelSK = VoidFunc<Vec, SKPoint>;
-    /// <summary>
-    /// 将像素坐标转换为数学坐标（Avalonia.Point） 来自Owner
-    /// </summary>
-    protected Func<AvaPoint, Vec> PixelToMath = VoidFunc<AvaPoint, Vec>;
-    /// <summary>
-    /// 将像素坐标转换为数学坐标（SKPoint） 来自Owner
-    /// </summary>
-    protected Func<SKPoint, Vec> PixelToMathSK = VoidFunc<SKPoint, Vec>;
-
-    protected Func<double, double> PixelToMathX = VoidFunc<double, double>,
-    PixelToMathY = VoidFunc<double, double>,
-    MathToPixelX = VoidFunc<double, double>,
-    MathToPixelY = VoidFunc<double, double>;
-    #endregion
-    /// <summary>
-    /// 正在被移动的点
-    /// </summary>
-    private GeoPoint? MovingPoint { get; set; }
-    /// <summary>
-    /// 点拖动操作的起始点位置 字符串形式
-    /// </summary>
-    private Vector2<string> PointMovementEndPositionStr { get; set; } = new("0", "0");
-    /// <summary>
-    /// 点拖动操作的结束点位置 字符串形式
-    /// </summary>
-    private Vector2<string> PointMovementStartPositionStr { get; set; } = new("0", "0");
-    /// <summary>
-    /// 移动操作正在进行时的指针位置
-    /// </summary>
-    private AvaPoint PointerMovedPosition { get; set; }
-    /// <summary>
-    /// 移动操作开始时的指针位置
-    /// </summary>
-    private AvaPoint PointerPressedPosition { get; set; }
-    /// <summary>
-    /// 上一次指针操作的属性
-    /// </summary>
-    private PointerPointProperties LastPointerProperties { get; set; }
-    /// <summary>
-    /// 移动结束时的指针位置
-    /// </summary>
-    private AvaPoint PointerReleasedPosition { get; set; }
 
     public GeometryPad()
     {
@@ -117,6 +65,7 @@ public partial class GeometryPad : Addon
                 fn.RenderTarget.Changed = true;
                 fn.RenderTarget.SetBitmapSize(MainRenderTarget.GetSize());
             }
+
             // 主渲染目标标记为已更改
             if (newshapes.Any(o => o is GeometryShape)) MainRenderTarget.Changed = true;
             Owner?.AskForRender();
@@ -132,29 +81,67 @@ public partial class GeometryPad : Addon
         Layers.Add(MainRenderTarget);
         MainRenderTarget.OnRender += Renderable_OnRender;
 #if DEBUG
-      
+
         var p1 = AddShape(new GeoPoint(new PointGetter_FromLocation((0.5, 0.5))));
         var p2 = AddShape(new GeoPoint(new PointGetter_FromLocation((1.5, 1.5))));
         var s1 = AddShape(new Straight(new LineGetter_Connected(p1, p2)));
         var p3 = AddShape(new GeoPoint(new PointGetter_OnLine(s1, (0, 0))));
         var c1 = AddShape(new Circle(new CircleGetter_FromCenterAndRadius(p1)));
-        for(var i = 0; i < 1; i++)
+        for (var i = 0; i < 1; i++)
         {
             var ip1 = AddShape(CreateImpFunc("y=x+1"));
         }
 #endif
         InitializeComponent();
     }
+
     /// <summary>
-    /// 当前几何操作
+    ///     正在被移动的点
+    /// </summary>
+    private GeoPoint? MovingPoint { get; set; }
+
+    /// <summary>
+    ///     点拖动操作的起始点位置 字符串形式
+    /// </summary>
+    private Vector2<string> PointMovementEndPositionStr { get; set; } = new("0", "0");
+
+    /// <summary>
+    ///     点拖动操作的结束点位置 字符串形式
+    /// </summary>
+    private Vector2<string> PointMovementStartPositionStr { get; set; } = new("0", "0");
+
+    /// <summary>
+    ///     移动操作正在进行时的指针位置
+    /// </summary>
+    private AvaPoint PointerMovedPosition { get; set; }
+
+    /// <summary>
+    ///     移动操作开始时的指针位置
+    /// </summary>
+    private AvaPoint PointerPressedPosition { get; set; }
+
+    /// <summary>
+    ///     上一次指针操作的属性
+    /// </summary>
+    private PointerPointProperties LastPointerProperties { get; set; }
+
+    /// <summary>
+    ///     移动结束时的指针位置
+    /// </summary>
+    private AvaPoint PointerReleasedPosition { get; set; }
+
+    /// <summary>
+    ///     当前几何操作
     /// </summary>
     internal ActionData CurrentAction { get; private set; }
+
     /// <summary>
-    /// 图形的集合
+    ///     图形的集合
     /// </summary>
     public ShapeList Shapes { get; init; }
+
     /// <summary>
-    /// 所有者
+    ///     所有者
     /// </summary>
     public override Displayer? Owner
     {
@@ -184,9 +171,9 @@ public partial class GeometryPad : Addon
 
     public override string AddonName => "GeometryPad";
 
-    
+
     /// <summary>
-    /// 设置Action
+    ///     设置Action
     /// </summary>
     /// <param name="ad"></param>
     internal void SetAction(ActionData ad)
@@ -196,8 +183,9 @@ public partial class GeometryPad : Addon
         CurrentAction = ad;
         Shapes.ClearSelected();
     }
+
     /// <summary>
-    /// 添加图形
+    ///     添加图形
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="shape"></param>
@@ -214,20 +202,21 @@ public partial class GeometryPad : Addon
 
     private void NewFuncOnClick(object? sender, KeyEventArgs e)
     {
-        if (e.Key == Key.Enter && e.KeyModifiers == KeyModifiers.None &&
+        /*if (e.Key == Key.Enter && e.KeyModifiers == KeyModifiers.None &&
             !string.IsNullOrWhiteSpace(NewFuncTextBox.Text) && IntervalCompiler.TryCompile(NewFuncTextBox.Text))
         {
             AddShape(CreateImpFunc(NewFuncTextBox.Text));
             NewFuncTextBox.Text = "";
-        }
+        }*/
     }
 
     private void ImpFuncOnTapped(object? sender, TappedEventArgs e)
     {
         if (sender is Border border) FlyoutBase.ShowAttachedFlyout(border);
     }
+
     /// <summary>
-    /// 创建新的隐函数图形
+    ///     创建新的隐函数图形
     /// </summary>
     /// <param name="expression"></param>
     /// <returns></returns>
@@ -279,6 +268,81 @@ public partial class GeometryPad : Addon
                     DoFuncTextChange(tb, (string)e.NewValue, (string)e.OldValue);
                 }
     }
+
+    private void AddFuncTapped(object? sender, TappedEventArgs e)
+    {
+    }
+
+    private void NewFuncTextBoxTemplateApplied(object? s, TemplateAppliedEventArgs e)
+    {
+        var tb = s as TextBox;
+        var borderelement = e.NameScope.Find<Border>("PART_BorderElement");
+        borderelement.CornerRadius = new CornerRadius(0);
+        borderelement.BorderThickness = new Thickness(0, 0, 0, 2);
+        borderelement.Background = Brushes.Transparent;
+        tb.LostFocus += (s, e) => { borderelement.Background = Brushes.Transparent; };
+        tb.GotFocus += (s, e) => { borderelement.Background = Brushes.Transparent; };
+    }
+
+    private void Expander_TemplateApplied(object? sender, TemplateAppliedEventArgs e)
+    {
+    }
+
+    private void AddFuncQuestionsClicked(object? sender, RoutedEventArgs e)
+    {
+        return;
+        var tp = TopLevel.GetTopLevel(this);
+        if (tp != null)
+        {
+            var lb = new ListBox { MaxHeight = tp.Height * 2 / 3, MaxWidth = tp.Width * 2 / 3 };
+            var examples = new List<string>(ImplicitFunctionExamples.Examples);
+            for (var i = 0; i < examples.Count; i++) examples[i] = examples[i].Split(";")[0];
+            lb.ItemsSource = examples;
+            lb.SelectionMode = SelectionMode.Single;
+            lb.SelectionChanged += (s, se) =>
+            {
+                /*NewFuncTextBox.Text = lb?.SelectedItem?.ToString() ?? NewFuncTextBox.Text;
+                DialogHost.Close("dialog");
+                NewFuncTextBox.Focus();*/
+            };
+            var sv = new ScrollViewer
+            {
+                MaxHeight = tp.Height * 2 / 3, MaxWidth = tp.Width * 2 / 3,
+                HorizontalScrollBarVisibility = ScrollBarVisibility.Hidden
+            };
+            sv.Content = lb;
+            DialogHost.Show(sv, "dialog");
+        }
+    }
+
+    #region CoordinateTransformFuncs
+
+    /// <summary>
+    ///     将数学坐标转换为像素坐标（Avalonia.Point） 来自Owner
+    /// </summary>
+    private Func<Vec, AvaPoint> MathToPixel = VoidFunc<Vec, AvaPoint>;
+
+    /// <summary>
+    ///     将数学坐标转换为像素坐标（SKPoint） 来自Owner
+    /// </summary>
+    protected Func<Vec, SKPoint> MathToPixelSK = VoidFunc<Vec, SKPoint>;
+
+    /// <summary>
+    ///     将像素坐标转换为数学坐标（Avalonia.Point） 来自Owner
+    /// </summary>
+    protected Func<AvaPoint, Vec> PixelToMath = VoidFunc<AvaPoint, Vec>;
+
+    /// <summary>
+    ///     将像素坐标转换为数学坐标（SKPoint） 来自Owner
+    /// </summary>
+    protected Func<SKPoint, Vec> PixelToMathSK = VoidFunc<SKPoint, Vec>;
+
+    protected Func<double, double> PixelToMathX = VoidFunc<double, double>,
+        PixelToMathY = VoidFunc<double, double>,
+        MathToPixelX = VoidFunc<double, double>,
+        MathToPixelY = VoidFunc<double, double>;
+
+    #endregion
 
 
     #region KeyAction
@@ -332,8 +396,9 @@ public partial class GeometryPad : Addon
 
 
     #region PointerAction
+
     /// <summary>
-    /// 指示试图被移动的点是否可移动
+    ///     指示试图被移动的点是否可移动
     /// </summary>
     private bool IsMovingPointMovable { get; set; }
 
@@ -348,7 +413,7 @@ public partial class GeometryPad : Addon
         }
         else
         {
-            TryGetShape<GeoPoint>(e.Location,out var mp);
+            TryGetShape<GeoPoint>(e.Location, out var mp);
             MovingPoint = mp;
             if (MovingPoint != null)
             {
@@ -412,7 +477,7 @@ public partial class GeometryPad : Addon
                     }
                 }
             }*/
-            if (MovingPoint.PointGetter is PointGetter_Movable pg&&MovingPoint.IsUserEnabled)
+            if (MovingPoint.PointGetter is PointGetter_Movable pg && MovingPoint.IsUserEnabled)
             {
                 pg.SetPoint(Owner.PixelToMath(PointerMovedPosition));
                 if (MovingPoint.PointGetter is PointGetter_FromLocation)
@@ -450,10 +515,12 @@ public partial class GeometryPad : Addon
         if (CurrentAction.Name.English == "Select")
         {
             var rect = RegulateRectangle(new AvaRect(PointerPressedPosition,
-                new AvaSize(PointerReleasedPosition.X - PointerPressedPosition.X, PointerReleasedPosition.Y - PointerPressedPosition.Y)));
-            var mathrect = new CgRectangle(Owner.PixelToMath(new AvaPoint(rect.Left, rect.Top + rect.Height)), new Vec(rect.Width, rect.Height) / disp.UnitLength);
+                new AvaSize(PointerReleasedPosition.X - PointerPressedPosition.X,
+                    PointerReleasedPosition.Y - PointerPressedPosition.Y)));
+            var mathrect = new CgRectangle(Owner.PixelToMath(new AvaPoint(rect.Left, rect.Top + rect.Height)),
+                new Vec(rect.Width, rect.Height) / disp.UnitLength);
             foreach (var s in Shapes.GetShapes<GeometryShape>())
-                s.Selected=s.IsIntersectedWithRect(mathrect);
+                s.Selected = s.IsIntersectedWithRect(mathrect);
             MainRenderTarget.Changed = true;
             PointerPressedPosition = new AvaPoint(double.NaN, double.NaN);
             return Intercept;
@@ -621,7 +688,8 @@ public partial class GeometryPad : Addon
         if (CurrentAction.Name.English == "Select" && LastPointerProperties.IsLeftButtonPressed)
         {
             var selrect = RegulateRectangle(new AvaRect(PointerPressedPosition,
-                new AvaSize(PointerMovedPosition.X - PointerPressedPosition.X, PointerMovedPosition.Y - PointerPressedPosition.Y)));
+                new AvaSize(PointerMovedPosition.X - PointerPressedPosition.X,
+                    PointerMovedPosition.Y - PointerPressedPosition.Y)));
             dc.DrawRect(selrect.ToSKRect(), StrokeMedian);
         }
 
@@ -638,14 +706,13 @@ public partial class GeometryPad : Addon
         var cd = (CartesianDisplayer)Owner;
         using (SKPaint TPFilledPaint = new() { IsAntialias = true },
                FilledPaint = new() { IsAntialias = true },
-               StrokePaint = new() { IsStroke = true, IsAntialias = true,StrokeWidth = 2},
-               StrokePaint1 = new() { IsStroke = true, IsAntialias = true,StrokeWidth = 1},
+               StrokePaint = new() { IsStroke = true, IsAntialias = true, StrokeWidth = 2 },
+               StrokePaint1 = new() { IsStroke = true, IsAntialias = true, StrokeWidth = 1 },
                StrokeMain = new() { Color = cd.AxisPaintMain.Color, IsStroke = true, IsAntialias = true },
                PaintMain = new() { Color = cd.AxisPaintMain.Color, IsAntialias = true },
                StrokePaintMain = new() { Color = cd.AxisPaintMain.Color, IsAntialias = true, IsStroke = true },
                BubbleBack = new() { Color = cd.AxisPaint1.Color.WithAlpha(90), IsAntialias = true })
         {
-
             foreach (var shape in shapes)
             {
                 if (shape is null)
@@ -828,7 +895,7 @@ public partial class GeometryPad : Addon
                     dc.DrawOval(loc, new SKSize(4, 4), FilledMedian);
                     dc.DrawOval(loc, new SKSize(7, 7), StrokeMedian);
                     dc.DrawBubble(
-                        $"({Round(MovingPoint.Location.X, 8)},{Round(MovingPoint.Location.Y, 8)}) {((MovingPoint.PointGetter is PointGetter_Movable&&MovingPoint.IsUserEnabled) ? "" : MultiLanguageResources.Instance.CantBeMovedText)}",
+                        $"({Round(MovingPoint.Location.X, 8)},{Round(MovingPoint.Location.Y, 8)}) {(MovingPoint.PointGetter is PointGetter_Movable && MovingPoint.IsUserEnabled ? "" : MultiLanguageResources.Instance.CantBeMovedText)}",
                         loc.OffSetBy(2, 2 + 20 * index++), BubbleBack, PaintMain);
                 }
                 else if (p.Selected)
@@ -859,32 +926,32 @@ public partial class GeometryPad : Addon
         if (impFunc.IsDeleted)
             return;
         var RectToCalc = new ConcurrentBag<SKRectI> { rect };
-        var Points = new ConcurrentBag<SKPoint> {  };
-        var Rects = new ConcurrentBag<SKRectI> { };
+        var Points = new ConcurrentBag<SKPoint>();
+        var Rects = new ConcurrentBag<SKRectI>();
         var paint = new SKPaint { Color = new SKColor(impFunc.Color).WithAlpha(impFunc.Opacity) };
-        IntervalHandler<IntervalSet> func = impFunc.Function.Function;
+        var func = impFunc.Function.Function;
         do
         {
             var rs = RectToCalc.ToArray();
             RectToCalc.Clear();
-            Action<int> atn = idx => RenderRectIntervalSet( rs[idx], RectToCalc,  func, false,Points,Rects);
+            Action<int> atn = idx => RenderRectIntervalSet(rs[idx], RectToCalc, func, false, Points, Rects);
             for (var i = 0; i < rs.Length; i += 100)
             {
                 //总会有莫名的问题 
                 //Parallel.For(i, Min(i + 100, rs.Length), atn);
-                for(var j=i; j< Min(i + 100, rs.Length); j++) atn(j);
-                foreach (var rectToDraw in Rects) {
-                    dc.DrawRect(rectToDraw,paint);
-                }
+                for (var j = i; j < Min(i + 100, rs.Length); j++) atn(j);
+                foreach (var rectToDraw in Rects) dc.DrawRect(rectToDraw, paint);
                 Rects.Clear();
-                dc.DrawPoints(SKPointMode.Points,Points.ToArray(), paint);
+                dc.DrawPoints(SKPointMode.Points, Points.ToArray(), paint);
                 Points.Clear();
             }
         } while (RectToCalc.Count != 0);
+
         dc.Flush();
     }
 
-    private void RenderRectIntervalSet(SKRectI r, ConcurrentBag<SKRectI> RectToCalc,IntervalHandler<IntervalSet> func, bool checkpixel, ConcurrentBag<SKPoint> Points, ConcurrentBag<SKRectI> Rects)
+    private void RenderRectIntervalSet(SKRectI r, ConcurrentBag<SKRectI> RectToCalc, IntervalHandler<IntervalSet> func,
+        bool checkpixel, ConcurrentBag<SKPoint> Points, ConcurrentBag<SKRectI> Rects)
     {
         if (r.Height == 0 || r.Width == 0)
             return;
@@ -931,8 +998,9 @@ public partial class GeometryPad : Addon
     #endregion
 
     #region ShapeAction
+
     /// <summary>
-    /// 在指定位置放置点
+    ///     在指定位置放置点
     /// </summary>
     /// <param name="Location"></param>
     /// <returns></returns>
@@ -945,8 +1013,9 @@ public partial class GeometryPad : Addon
         AddShape(p);
         return p;
     }
+
     /// <summary>
-    /// 获取指定位置的点获取器
+    ///     获取指定位置的点获取器
     /// </summary>
     /// <param name="Location"></param>
     /// <returns></returns>
@@ -999,8 +1068,9 @@ public partial class GeometryPad : Addon
 
         return null;
     }
+
     /// <summary>
-    /// 点获取器的类型
+    ///     点获取器的类型
     /// </summary>
     protected enum PGType
     {
@@ -1076,8 +1146,9 @@ public partial class GeometryPad : Addon
 
         return nearest;
     }
+
     /// <summary>
-    /// 试着从指定位置获取图形
+    ///     试着从指定位置获取图形
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="Location"></param>
@@ -1103,8 +1174,10 @@ public partial class GeometryPad : Addon
                 }
             }
         }
+
         return shape != null;
     }
+
     #endregion
 
     #region Do
@@ -1127,12 +1200,10 @@ public partial class GeometryPad : Addon
                 shape.IsDeleted = true;
                 ShapeItemsControl?.InvalidateArrange();
             },
-            o => { 
-                Shapes.Remove(shape); 
-                if(o is ImplicitFunction im)
-                {
-                    Layers.Remove(im.RenderTarget);
-                }
+            o =>
+            {
+                Shapes.Remove(shape);
+                if (o is ImplicitFunction im) Layers.Remove(im.RenderTarget);
             }, true
         );
     }
@@ -1174,7 +1245,7 @@ public partial class GeometryPad : Addon
 
     private void DoGeoShapesDelete(IEnumerable<GeometryShape> shapes)
     {
-        var ss = shapes.Select(s => ShapeList.GetAllChildren(s)).SelectMany(o=>o).Distinct().ToArray();
+        var ss = shapes.Select(s => ShapeList.GetAllChildren(s)).SelectMany(o => o).Distinct().ToArray();
         CmdManager.Do(
             ss,
             o =>
@@ -1228,7 +1299,7 @@ public partial class GeometryPad : Addon
         {
             previous.UnAttach(point);
             point.PointGetter = next;
-            next.Attach( point);
+            next.Attach(point);
             point.RefreshValues();
         }, o =>
         {
@@ -1380,16 +1451,19 @@ public partial class GeometryPad : Addon
         {
             if (e.Key == Key.A)
             {
-            }else if (e.Key == Key.C)
+            }
+            else if (e.Key == Key.C)
             {
-            }else if (e.Key == Key.V)
+            }
+            else if (e.Key == Key.V)
             {
             }
             else
             {
                 e.Handled = true;
             }
-        }else if (e.KeyModifiers!=KeyModifiers.None)
+        }
+        else if (e.KeyModifiers != KeyModifiers.None)
         {
             e.Handled = true;
         }
@@ -1406,66 +1480,18 @@ public partial class GeometryPad : Addon
             if (rb.IsChecked == true && rb.Tag is ActionData ad)
             {
                 SetAction(ad);
-                Static.Info(new TextBlock { Text = CurrentAction.Description.Data },Static.InfoType.Information);
+                Static.Info(new TextBlock { Text = CurrentAction.Description.Data }, Static.InfoType.Information);
             }
     }
 
     #endregion
 
-    private void AddFuncTapped(object? sender, TappedEventArgs e)
+    protected override void OnLoaded(RoutedEventArgs e)
     {
-    }
-
-    private void NewFuncTextBoxTemplateApplied(object? s, TemplateAppliedEventArgs e)
-    {
-        var tb=s as TextBox;
-        var borderelement=e.NameScope.Find<Border>("PART_BorderElement");
-        borderelement.CornerRadius = new CornerRadius(0);
-        borderelement.BorderThickness = new Thickness(0,0,0,2);
-        borderelement.Background=Brushes.Transparent;
-        tb.LostFocus+=(s,e)=>
+        base.OnLoaded(e);
+        foreach (var control in this.GetTemplateChildren().OfType<TextBox>())
         {
-            borderelement.Background=Brushes.Transparent;
-        };
-        tb.GotFocus += (s, e) =>
-        {
-            borderelement.Background=Brushes.Transparent;
-        };
-    }
-
-    private void Expander_TemplateApplied(object? sender, TemplateAppliedEventArgs e)
-    {
-        var tgb = e.NameScope.Find<ToggleButton>("ExpanderHeader");
-        tgb.TemplateApplied += (_, te) =>
-        {
-            var border=te.NameScope.Find<Border>("ToggleButtonBackground");
-            border.Background = Brushes.Transparent;
-            border.PointerEntered += (_,_) => { border.Background=Brushes.Transparent;};
-        };
-    }
-
-    private void AddFuncQuestionsClicked(object? sender, RoutedEventArgs e)
-    {
-        TopLevel tp=TopLevel.GetTopLevel(this);
-        if (tp != null)
-        {
-            ListBox lb=new ListBox(){MaxHeight = tp.Height*2/3,MaxWidth = tp.Width*2/3,};
-            var examples =new List<string>(ImplicitFunctionExamples.Examples);
-            for (var i = 0; i < examples.Count; i++)
-            {
-                examples[i] = examples[i].Split(";")[0];
-            }
-            lb.ItemsSource = examples;
-            lb.SelectionMode = SelectionMode.Single;
-            lb.SelectionChanged += (s, se) =>
-            {
-                NewFuncTextBox.Text=lb?.SelectedItem?.ToString()??NewFuncTextBox.Text;
-                DialogHost.Close("dialog");
-                NewFuncTextBox.Focus();
-            };
-            ScrollViewer sv=new ScrollViewer(){MaxHeight = tp.Height*2/3,MaxWidth = tp.Width*2/3,HorizontalScrollBarVisibility = ScrollBarVisibility.Hidden};
-            sv.Content = lb;
-            DialogHost.Show(sv,"dialog");
+            control.Styles.Add(Static.FluentTheme);
         }
     }
 }

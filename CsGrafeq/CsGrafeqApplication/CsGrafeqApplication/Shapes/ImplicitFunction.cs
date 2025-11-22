@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel.DataAnnotations;
 using CsGrafeq.Interval;
 using CsGrafeqApplication;
 using CsGrafeqApplication.Addons;
@@ -11,6 +10,17 @@ namespace CsGrafeq.Shapes;
 public class ImplicitFunction : Shape
 {
     public readonly Renderable RenderTarget = new();
+
+    public ImplicitFunction(string expression = "y=x+1")
+    {
+        Description = "ImplicitFunction";
+        Expression = expression;
+        EnglishChar.Instance.CharValueChanged += CharValueChanged;
+        RenderTarget.OnRender += RenderTarget_OnRender;
+        PropertyChanged += (s, e) => { RefreshIsActive(); };
+        Opacity = Static.Instance.DefaultOpacity;
+    }
+
     public byte Opacity
     {
         get => field;
@@ -20,36 +30,18 @@ public class ImplicitFunction : Shape
             InvokeShapeChanged();
         }
     }
+
     public bool ShowFormula
     {
         get;
         set => this.RaiseAndSetIfChanged(ref field, value);
     } = true;
-    public ImplicitFunction(string expression = "y=x+1")
-    {
-        Description = "ImplicitFunction";
-        Expression = expression;
-        EnglishChar.Instance.CharValueChanged += CharValueChanged;
-        RenderTarget.OnRender += RenderTarget_OnRender;
-        this.PropertyChanged+=(s,e)=>
-        {
-            RefreshIsActive();
-        };
-        Opacity = Static.Instance.DefaultOpacity;
-    }
 
     public bool IsCorrect
     {
         get => field;
-        private set
-        {
-            this.RaiseAndSetIfChanged(ref field, value);
-        }
+        private set => this.RaiseAndSetIfChanged(ref field, value);
     } = false;
-    public void RefreshIsActive()
-    {
-        RenderTarget.IsActive = IsCorrect && !IsDeleted;
-    }
 
     public HasReferenceIntervalSetFunc<IntervalSet> Function
     {
@@ -81,6 +73,11 @@ public class ImplicitFunction : Shape
     }
 
     public override string TypeName => "ImplicitFunction";
+
+    public void RefreshIsActive()
+    {
+        RenderTarget.IsActive = IsCorrect && !IsDeleted;
+    }
 
     private void RenderTarget_OnRender(SKCanvas dc, SKRect rect)
     {

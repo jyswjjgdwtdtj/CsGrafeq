@@ -1,32 +1,35 @@
-﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:controls="using:CsGrafeqApplication.Controls">
-
-    <!--
-    Additional resources 
-    Using Control Themes:
-         https://docs.avaloniaui.net/docs/basics/user-interface/styling/control-themes
-    Using Theme Variants:
-         https://docs.avaloniaui.net/docs/guides/styles-and-resources/how-to-use-theme-variants
-  -->
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:CsGrafeqApplication.Controls">
     <Design.PreviewWith>
-        
+        <controls:VariableBox Width="200" ValueName="a"></controls:VariableBox>
     </Design.PreviewWith>
-    <ControlTheme x:Key="{x:Type controls:VariableBox}" TargetType="controls:VariableBox">
+    <Style Selector="controls|VariableBox">
         <Setter Property="Margin" Value="5" />
+        <Setter Property="ClipToBounds" Value="False"></Setter>
+        <Setter Property="Height" Value="70"></Setter>
         <Setter Property="Template">
             <ControlTemplate>
-                <StackPanel Orientation="Vertical">
-                    <StackPanel Orientation="Horizontal" DataContext="{TemplateBinding MySliderData}">
+                <StackPanel Orientation="Vertical" Spacing="5" ClipToBounds="False">
+                    <StackPanel Orientation="Horizontal" DataContext="{TemplateBinding MySliderData}" ClipToBounds="False">
                         <TextBlock Text="{TemplateBinding ValueName}" VerticalAlignment="Center" />
                         <TextBlock Text=" = " VerticalAlignment="Center" />
-                        <TextBox VerticalAlignment="Center" Text="{CompiledBinding Value}" Name="ValueTextBlock" HorizontalContentAlignment="Center"  x:DataType="controls:SliderData" Width="NaN"/>
+                        <TextBox VerticalAlignment="Center" Text="{CompiledBinding Value}" Name="ValueTextBlock"
+                                 HorizontalContentAlignment="Center" x:DataType="controls:SliderData" Width="NaN" >
+                            <TextBox.Styles><FluentTheme/></TextBox.Styles>
+                        </TextBox>
                     </StackPanel>
                     <DockPanel LastChildFill="True" DataContext="{TemplateBinding MySliderData}">
-                        <TextBox Text="{CompiledBinding Min}" Width="NaN" DockPanel.Dock="Left" AcceptsReturn="False" AcceptsTab="False" MinWidth="0"
-                                   VerticalAlignment="Center" Name="RangeMinimum" x:DataType="controls:SliderData" />
-                        <TextBox Text="{CompiledBinding Max}" Width="NaN" DockPanel.Dock="Right" AcceptsReturn="False" AcceptsTab="False" MinWidth="0"
-                                   VerticalAlignment="Center" Name="RangeMaximum" x:DataType="controls:SliderData" />
+                        <TextBox Text="{CompiledBinding Min}" Width="NaN" DockPanel.Dock="Left" AcceptsReturn="False"
+                                 AcceptsTab="False" MinWidth="0"
+                                 VerticalAlignment="Center" Name="RangeMinimum" x:DataType="controls:SliderData" >
+                            <TextBox.Styles><FluentTheme/></TextBox.Styles>
+                        </TextBox>
+                        <TextBox Text="{CompiledBinding Max}" Width="NaN" DockPanel.Dock="Right" AcceptsReturn="False"
+                                 AcceptsTab="False" MinWidth="0"
+                                 VerticalAlignment="Center" Name="RangeMaximum" x:DataType="controls:SliderData" >
+                            <TextBox.Styles><FluentTheme/></TextBox.Styles>
+                        </TextBox>
                         <Slider Name="PART_Slider" Minimum="{CompiledBinding Min}" Maximum="{CompiledBinding Max}"
                                 Orientation="Horizontal" Value="{CompiledBinding Value,Mode=TwoWay}" Margin="5,0"
                                 x:DataType="controls:SliderData" />
@@ -34,5 +37,5 @@
                 </StackPanel>
             </ControlTemplate>
         </Setter>
-    </ControlTheme>
-</ResourceDictionary>
+    </Style>
+</Styles>

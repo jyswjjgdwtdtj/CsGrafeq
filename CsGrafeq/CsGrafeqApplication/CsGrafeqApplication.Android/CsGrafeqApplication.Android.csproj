@@ -20,13 +20,18 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Avalonia"/>
         <PackageReference Include="Avalonia.Android"/>
+        <PackageReference Include="Avalonia.Diagnostics"/>
+        <PackageReference Include="CSharpMath.Evaluation"/>
         <PackageReference Include="DialogHost.Avalonia" />
-        <PackageReference Include="SkiaSharp.NativeAssets.Android"/>
-        <PackageReference Include="Xamarin.AndroidX.Core.SplashScreen"/>
+        <PackageReference Include="Material.Avalonia" />
+        <PackageReference Include="Material.Avalonia.Dialogs" />
+        <PackageReference Include="SkiaSharp.NativeAssets.Android" />
+        <PackageReference Include="Xamarin.AndroidX.Core.SplashScreen" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\CsGrafeqApplication\CsGrafeqApplication.csproj"/>
+        <ProjectReference Include="..\CsGrafeqApplication\CsGrafeqApplication.csproj" />
     </ItemGroup>
 </Project>

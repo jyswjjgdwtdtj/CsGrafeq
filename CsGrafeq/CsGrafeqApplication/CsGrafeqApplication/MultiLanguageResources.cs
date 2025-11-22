@@ -35,7 +35,7 @@ public class MultiLanguageResources
             ["OnText"] = OnText,
             ["LightText"] = LightText,
             ["DarkText"] = DarkText,
-            ["FollowSystemText"] = FollowSystemText,
+            ["FollowSystemText"] = FollowSystemText
         };
     }
 

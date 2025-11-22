@@ -10,7 +10,6 @@
         Icon="/Assets/favicon.ico"
         Title="{CompiledBinding MultiLanguageResources.CsGrafeqText.Data}"
         ExtendClientAreaToDecorationsHint="True"
-        TransparencyLevelHint="Transparent"
-        >
+        TransparencyLevelHint="Transparent">
     <views:MainView />
 </Window>

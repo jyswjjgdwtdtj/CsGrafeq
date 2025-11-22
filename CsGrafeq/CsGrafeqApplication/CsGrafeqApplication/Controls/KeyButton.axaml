@@ -2,44 +2,64 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="using:CsGrafeqApplication.Controls">
     <Design.PreviewWith>
-        <controls:KeyButton Width="48" Height="48" FirstButton="G" SecondButton="Q" FontFamily="{StaticResource MapleMono}"/>
+        <controls:KeyButton Width="48" Height="48" FirstButton="G" SecondButton="Q"
+                            FontFamily="{StaticResource MapleMono}" IsFirst="False"/>
     </Design.PreviewWith>
 
     <Style Selector="controls|KeyButton">
-        <Setter Property="FontFamily" Value="{StaticResource MapleMono}"></Setter>
+        <Setter Property="FontFamily" Value="{StaticResource MapleMono}" />
+        <Style Selector="^ /template/ RepeatButton">
+            <Setter Property="Background" Value="{DynamicResource CgBackgroundBrush}" />
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource CgForegroundBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Height" Value="{CompiledBinding $parent[controls:KeyButton].Height}"/>
+            <Style Selector="^ Canvas">
+                <Setter Property="Focusable" Value="False"/>
+            </Style>
+            <Style Selector="^ AccessText">
+                <Setter Property="Focusable" Value="False"/>
+            </Style>
+            
+        </Style>
         <Style Selector="^:isfirst">
             <Setter Property="Template">
                 <ControlTemplate>
-                    <Border Name="PART_Border" CornerRadius="4" BorderBrush="{DynamicResource CgForegroundBrush}" BorderThickness="1" HorizontalAlignment="Stretch" Height="{CompiledBinding $parent[controls:KeyButton].Height}">
-                        <Border.Styles>
-                            <Style Selector="Border#PART_Border">
-                                <Setter Property="Background" Value="{DynamicResource CgBackgroundBrush}"></Setter>
+                    <RepeatButton Name="PART_Button">
+                        <RepeatButton.Styles>
+                            <Style Selector="Border#PART_Button">
+                                <Setter Property="Background" Value="{DynamicResource CgBackgroundBrush}" />
                             </Style>
-                        </Border.Styles>
+                        </RepeatButton.Styles>
                         <Canvas>
-                            <AccessText Canvas.Left="4" Canvas.Bottom="-2" Text="{TemplateBinding FirstButton}" Foreground="{DynamicResource CgForegroundBrush}" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="30"/>
-                            <AccessText Canvas.Right="4" Canvas.Top="0" Text="{TemplateBinding SecondButton}" Foreground="{DynamicResource CgHalfForegroundBrush}" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20"/>
-
+                            <AccessText Canvas.Right="0" Canvas.Top="-16" Text="{TemplateBinding FirstButton}"
+                                        Foreground="{DynamicResource CgForegroundBrush}" VerticalAlignment="Center"
+                                        HorizontalAlignment="Center" FontSize="30" />
+                            <AccessText Canvas.Left="6" Canvas.Bottom="-4" Text="{TemplateBinding SecondButton}"
+                                        Foreground="{DynamicResource CgHalfForegroundBrush}" VerticalAlignment="Center"
+                                        HorizontalAlignment="Center" FontSize="20" />
                         </Canvas>
-                    </Border>
+                    </RepeatButton>
                 </ControlTemplate>
             </Setter>
         </Style>
         <Style Selector="^:not(:isfirst)">
             <Setter Property="Template">
                 <ControlTemplate>
-                    <Border Name="PART_Border" CornerRadius="4" BorderBrush="{DynamicResource CgForegroundBrush}" BorderThickness="1" HorizontalAlignment="Stretch" Height="{CompiledBinding $parent[controls:KeyButton].Height}">
-                        <Border.Styles>
-                            <Style Selector="Border#PART_Border">
-                                <Setter Property="Background" Value="{DynamicResource CgBackgroundBrush}"></Setter>
-                            </Style>
-                        </Border.Styles>
-                        <Canvas>
-                            <AccessText Canvas.Left="4" Canvas.Bottom="-2" Text="{TemplateBinding SecondButton}" Foreground="{DynamicResource CgForegroundBrush}" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="30"/>
-                            <AccessText Canvas.Right="4" Canvas.Top="0" Text="{TemplateBinding FirstButton}" Foreground="{DynamicResource CgHalfForegroundBrush}" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20"/>
-
+                    <RepeatButton Name="PART_Button" Margin="0" Padding="0">
+                        <Canvas Margin="0">
+                            <AccessText Canvas.Right="0" Canvas.Top="-16" Text="{TemplateBinding SecondButton}"
+                                        Foreground="{DynamicResource CgForegroundBrush}" VerticalAlignment="Center"
+                                        HorizontalAlignment="Center" FontSize="30" />
+                            <AccessText Canvas.Left="6" Canvas.Bottom="-4" Text="{TemplateBinding FirstButton}"
+                                        Foreground="{DynamicResource CgHalfForegroundBrush}" VerticalAlignment="Center"
+                                        HorizontalAlignment="Center" FontSize="20" />
                         </Canvas>
-                    </Border>
+                    </RepeatButton>
                 </ControlTemplate>
             </Setter>
         </Style>

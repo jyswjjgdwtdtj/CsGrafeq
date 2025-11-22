@@ -20,6 +20,7 @@ public class DisplayControl : CartesianDisplayer
         AddHandler(TappedEvent, (_, e) => OnPointerTapped(e));
         AddHandler(DoubleTappedEvent, (_, e) => OnPointerDoubleTapped(e));
     }
+
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         Debug.LogPointer("PointerPressed");
@@ -71,7 +72,7 @@ public class DisplayControl : CartesianDisplayer
                         {
                             dc.Clear(AxisBackground);
                             RenderAxisLine(dc);
-                            if ((!MovingOptimization || (LastZeroPos - Zero).Length > 100))
+                            if (!MovingOptimization || (LastZeroPos - Zero).Length > 100)
                             {
                                 foreach (var adn in Addons)
                                 foreach (var rt in adn.Layers)
@@ -84,6 +85,7 @@ public class DisplayControl : CartesianDisplayer
                                         Throw("Bitmap size mismatch");
                                         return;
                                     }
+
                                     var newbmp = rt.GetCopy();
                                     using (var canvas = rt.GetBitmapCanvas())
                                     {
@@ -102,14 +104,15 @@ public class DisplayControl : CartesianDisplayer
                             else
                             {
                                 foreach (var adn in Addons)
-                                    foreach (var layer in adn.Layers)
-                                    {
-                                        if (!layer.IsActive)
-                                            continue;
-                                        layer.DrawBitmap(dc, (int)(Zero.X - LastZeroPos.X), (int)(Zero.Y - LastZeroPos.Y));
-                                        RenderMovedPlace(dc, layer.Render);
-                                    }
+                                foreach (var layer in adn.Layers)
+                                {
+                                    if (!layer.IsActive)
+                                        continue;
+                                    layer.DrawBitmap(dc, (int)(Zero.X - LastZeroPos.X), (int)(Zero.Y - LastZeroPos.Y));
+                                    RenderMovedPlace(dc, layer.Render);
+                                }
                             }
+
                             RenderAxisNumber(dc);
                         }
                     }
@@ -125,7 +128,7 @@ public class DisplayControl : CartesianDisplayer
             AskForRender();
         }
     }
-    
+
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
         Debug.LogPointer("PointerReleased");

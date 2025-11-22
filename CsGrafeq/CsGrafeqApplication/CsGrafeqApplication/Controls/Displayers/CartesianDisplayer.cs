@@ -8,8 +8,6 @@ using Avalonia.Input;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using SkiaSharp;
-using CsGrafeq.Utilities;
-using CGMath=CsGrafeq.Utilities.CsGrafeqMath;
 using static CsGrafeqApplication.Controls.SkiaEx;
 
 namespace CsGrafeqApplication.Controls.Displayers;
@@ -40,8 +38,9 @@ public class CartesianDisplayer : Displayer
         };
         RefreshPaint();
     }
+
     /// <summary>
-    /// 数学坐标原点的像素位置
+    ///     数学坐标原点的像素位置
     /// </summary>
     public PointL Zero
     {
@@ -73,8 +72,9 @@ public class CartesianDisplayer : Displayer
     ///     普通线
     /// </summary>
     public SKPaint AxisPaint2 { get; private set; }
+
     /// <summary>
-    /// 单位长度（每单位数学长度对应的像素长度）
+    ///     单位长度（每单位数学长度对应的像素长度）
     /// </summary>
     public double UnitLength
     {
@@ -86,16 +86,19 @@ public class CartesianDisplayer : Displayer
             AxisY = GetAxisYs().ToArray();
         }
     } = 20.0001d;
+
     /// <summary>
-    /// 横向坐标轴线的位置和类型
+    ///     横向坐标轴线的位置和类型
     /// </summary>
     public IEnumerable<(double, AxisType)> AxisX { get; private set; }
+
     /// <summary>
-    /// 纵向坐标轴线的位置和类型
+    ///     纵向坐标轴线的位置和类型
     /// </summary>
     public IEnumerable<(double, AxisType)> AxisY { get; private set; }
+
     /// <summary>
-    /// 重新刷新绘制用的画笔
+    ///     重新刷新绘制用的画笔
     /// </summary>
     protected void RefreshPaint()
     {
@@ -136,7 +139,7 @@ public class CartesianDisplayer : Displayer
     }
 
     /// <summary>
-    /// 获取横向坐标轴线的位置和类型
+    ///     获取横向坐标轴线的位置和类型
     /// </summary>
     /// <returns></returns>
     public IEnumerable<(double, AxisType)> GetAxisXs()
@@ -174,7 +177,7 @@ public class CartesianDisplayer : Displayer
     }
 
     /// <summary>
-    /// 获取纵向坐标轴线的位置和类型
+    ///     获取纵向坐标轴线的位置和类型
     /// </summary>
     /// <returns></returns>
     public IEnumerable<(double, AxisType)> GetAxisYs()
@@ -212,7 +215,7 @@ public class CartesianDisplayer : Displayer
     }
 
     /// <summary>
-    /// 绘制坐标轴线
+    ///     绘制坐标轴线
     /// </summary>
     /// <param name="dc"></param>
     protected void RenderAxisLine(SKCanvas dc)
@@ -309,8 +312,9 @@ public class CartesianDisplayer : Displayer
             );
         }
     }
+
     /// <summary>
-    /// 绘制坐标轴数字
+    ///     绘制坐标轴数字
     /// </summary>
     /// <param name="dc"></param>
     protected void RenderAxisNumber(SKCanvas dc)
@@ -326,7 +330,7 @@ public class CartesianDisplayer : Displayer
         var addnumY = Pow(10D, zsY);
         var addnumDX = SpecialPow(10M, zsX);
         var addnumDY = SpecialPow(10M, zsY);
-        var p =RangeTo(1, height - TextFont.Size - 2, Zero.Y);
+        var p = RangeTo(1, height - TextFont.Size - 2, Zero.Y);
         var fff = 1f / 4f * TextFont.Size;
         for (var i = Min(Zero.X - addnumX * UnitLength,
                  MathToPixelX(RoundTen(PixelToMathX(ValidRect.Right), -zsX)));
@@ -389,7 +393,7 @@ public class CartesianDisplayer : Displayer
         dc.DrawText("0", new SKPoint(Zero.X + 3, Zero.Y + TextFont.Size), SKTextAlign.Left, TextFont,
             AxisPaintMain);
     }
-   
+
     public override void CompoundBuffers()
     {
         lock (TotalBufferLock)
@@ -456,8 +460,8 @@ public class CartesianDisplayer : Displayer
         var times_y = (Zero.Y - y) / UnitLength;
         UnitLength *= delta;
         UnitLength *= delta;
-        UnitLength =CsGrafeqMath.RangeTo(0.01, 1000000, UnitLength);
-        UnitLength =CsGrafeqMath.RangeTo(0.01, 1000000, UnitLength);
+        UnitLength = RangeTo(0.01, 1000000, UnitLength);
+        UnitLength = RangeTo(0.01, 1000000, UnitLength);
         var ratioX = UnitLength / PreviousUnitLength;
         var ratioY = UnitLength / PreviousUnitLength;
         Zero = new PointL

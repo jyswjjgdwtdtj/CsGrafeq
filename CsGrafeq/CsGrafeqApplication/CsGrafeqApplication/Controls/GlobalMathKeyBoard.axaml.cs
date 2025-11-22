@@ -2,40 +2,30 @@
 using System.Runtime.CompilerServices;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
-using Avalonia.Markup.Xaml;
-using CsGrafeqApplication.ViewModels;
-using ReactiveUI;
+using Avalonia.Controls.Shapes;
+using Avalonia.Input;
+using Avalonia.Media;
 
 namespace CsGrafeqApplication.Controls;
-public partial class GlobalMathKeyBoard : ContentControl
-{
-    public GlobalMathKeyBoard()
-    {
-    }
 
-    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "get_PseudoClasses")]
-    private static extern IPseudoClasses GetPseudoClasses(StyledElement se);
+public class GlobalMathKeyBoard : ContentControl
+{
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
-        base.OnApplyTemplate(e);
-        var visibilityCheckBox=e.NameScope.Find<CheckBox>("VisibilityCheckBox");
-        var keyboardContainer=e.NameScope.Find<Border>("PART_KeyBoardContainer");
-        if (keyboardContainer != null && visibilityCheckBox != null)
+        var expander= e.NameScope.Find<Expander>("PART_Expander");
+        expander.TemplateApplied += (_, te) =>
         {
-            var kbcPs = GetPseudoClasses(keyboardContainer);
-            GetPseudoClasses(keyboardContainer).Add(":keyboardopened");
-            visibilityCheckBox.IsChecked = true;
-            visibilityCheckBox.IsCheckedChanged += (_, _) =>
+            var togglebtn= te.NameScope.Find<ToggleButton>("PART_ToggleButton");
+            togglebtn.TemplateApplied += (_, tte) =>
             {
-                kbcPs.Set(":keyboardopened", visibilityCheckBox.IsChecked??false);
+                var path= tte.NameScope.Find<Path>("PART_ExpandIcon");
+                Console.WriteLine(path?.GetType()?.ToString()??"null");
+                var border = path?.Parent as Border;
+            
+                border.RenderTransform = new RotateTransform() {Angle = 180};
             };
-            keyboardContainer.SizeChanged += (_, _) =>
-            {
-                keyboardContainer.InvalidateArrange();
-            };
-        }
+        };
     }
 }

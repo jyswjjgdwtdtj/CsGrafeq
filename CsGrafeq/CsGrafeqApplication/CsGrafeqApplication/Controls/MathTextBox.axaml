@@ -2,14 +2,18 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="using:CsGrafeqApplication.Controls">
     <Design.PreviewWith>
-        <controls:MathBox />
+        <controls:MathTextBox />
     </Design.PreviewWith>
 
-    <Style Selector="controls|MathBox">
+    <Style Selector="controls|MathTextBox">
         <!-- Set Defaults -->
         <Setter Property="Template">
             <ControlTemplate>
-                <TextBlock Text="Templated Control" />
+                <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled" HorizontalAlignment="Stretch">
+                    <controls:MathBox HorizontalAlignment="Left">
+                                
+                    </controls:MathBox>
+                </ScrollViewer>
             </ControlTemplate>
         </Setter>
     </Style>

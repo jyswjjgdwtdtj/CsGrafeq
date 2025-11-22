@@ -1,43 +1,48 @@
-﻿using Avalonia;
+﻿using System;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
+using Avalonia.Input;
+using CsGrafeq.CSharpMath.Editor;
 
 namespace CsGrafeqApplication.Controls;
 
 [PseudoClasses(":isfirst")]
 public class KeyButton : TemplatedControl
 {
-    public static readonly DirectProperty<KeyButton, string> FirstButtonProperty = AvaloniaProperty.RegisterDirect<KeyButton, string>(
-        nameof(FirstButton), o => o.FirstButton, (o, v) => o.FirstButton = v);
+    public static readonly DirectProperty<KeyButton, string> FirstButtonProperty =
+        AvaloniaProperty.RegisterDirect<KeyButton, string>(
+            nameof(FirstButton), o => o.FirstButton, (o, v) => o.FirstButton = v);
 
-    public static readonly DirectProperty<KeyButton, string> SecondButtonProperty = AvaloniaProperty.RegisterDirect<KeyButton, string>(
-        nameof(SecondButton), o => o.SecondButton, (o, v) => o.SecondButton = v);
+    public static readonly DirectProperty<KeyButton, string> SecondButtonProperty =
+        AvaloniaProperty.RegisterDirect<KeyButton, string>(
+            nameof(SecondButton), o => o.SecondButton, (o, v) => o.SecondButton = v);
 
-    public static readonly DirectProperty<KeyButton, bool> IsFirstProperty = AvaloniaProperty.RegisterDirect<KeyButton, bool>(
-        nameof(IsFirst), o => o.IsFirst, (o, v) => o.IsFirst = v);
+    public static readonly DirectProperty<KeyButton, CgMathKeyboardInput> FirstKeyboardInputProperty = AvaloniaProperty.RegisterDirect<KeyButton, CgMathKeyboardInput>(
+        nameof(FirstKeyboardInput), o => o.FirstKeyboardInput, (o, v) => o.FirstKeyboardInput = v);
 
-    public static readonly DirectProperty<KeyButton, string> CurrentButtonProperty = AvaloniaProperty.RegisterDirect<KeyButton, string>(
-        nameof(CurrentButton), o => o.CurrentButton, (o, v) => o.CurrentButton = v);
+    public static readonly DirectProperty<KeyButton, CgMathKeyboardInput> SecondKeyboardInputProperty = AvaloniaProperty.RegisterDirect<KeyButton, CgMathKeyboardInput>(
+        nameof(SecondKeyboardInput), o => o.SecondKeyboardInput, (o, v) => o.SecondKeyboardInput = v);
+    
 
+    
 
+    public static readonly DirectProperty<KeyButton, bool> IsFirstProperty =
+        AvaloniaProperty.RegisterDirect<KeyButton, bool>(
+            nameof(IsFirst), o => o.IsFirst, (o, v) => o.IsFirst = v);
+
+    public static readonly DirectProperty<KeyButton, string> CurrentButtonProperty =
+        AvaloniaProperty.RegisterDirect<KeyButton, string>(
+            nameof(CurrentButton), o => o.CurrentButton, (o, v) => o.CurrentButton = v);
 
     public KeyButton()
     {
-        PropertyChanged+=OnPropertyChanged;
+        PropertyChanged += OnPropertyChanged;
         IsFirst = true;
         CurrentButton = FirstButton;
     }
 
-    private void OnPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
-    {
-        if (e.Property == IsFirstProperty)
-        {
-            PseudoClasses.Set(":isfirst", IsFirst);
-            CurrentButton=IsFirst?FirstButton:SecondButton;
-        }
-    }
-    
     public string CurrentButton
     {
         get => field;
@@ -61,4 +66,42 @@ public class KeyButton : TemplatedControl
         get => field;
         set => SetAndRaise(FirstButtonProperty, ref field, value);
     } = "";
+    public CgMathKeyboardInput FirstKeyboardInput
+    {
+        get => field;
+        set => SetAndRaise(FirstKeyboardInputProperty, ref field, value);
+    }
+    public CgMathKeyboardInput SecondKeyboardInput
+    {
+        get => field;
+        set => SetAndRaise(SecondKeyboardInputProperty, ref field, value);
+    }
+
+    private void OnPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+    {
+        if (e.Property == IsFirstProperty)
+        {
+            PseudoClasses.Set(":isfirst", IsFirst);
+            CurrentButton = IsFirst ? FirstButton : SecondButton;
+        }
+    }
+    
+    protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
+    {
+        var part_Button = e.NameScope.Find<Button>("PART_Button");
+        if (part_Button != null)
+        {
+            var fm = TopLevel.GetTopLevel(this)?.FocusManager;
+            if (fm != null)
+            {
+                part_Button.Click += (s, e) =>
+                {
+                    if (fm.GetFocusedElement() is MathBox mb)
+                    {
+                        mb.PressKey(IsFirst?FirstKeyboardInput:SecondKeyboardInput);
+                    }
+                };
+            }
+        }
+    }
 }

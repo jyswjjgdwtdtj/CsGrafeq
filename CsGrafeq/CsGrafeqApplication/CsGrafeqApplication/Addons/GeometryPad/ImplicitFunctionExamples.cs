@@ -38,6 +38,6 @@ abs(sin(x^2-y^2))=sin(x+y)+cos(x*y);yes
 abs(sin(x^2+2*x*y))=sin(x-2*y);no
 tan(sin(x)+cos(y))=sin(tan(x+y));no
 arctan(sin(x)+cos(y))=sin(arctan(x+y));no
-0.25*(2*sin(x*sin(y)+y*sin(x)))>0;no".Replace("\r\n","@").Replace("\n","@").Split("@");
+0.25*(2*sin(x*sin(y)+y*sin(x)))>0;no".Replace("\r\n", "@").Replace("\n", "@").Split("@");
     }
 }

@@ -33,7 +33,7 @@
         <TabItem Header="_Implicit Function">
             <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto">
                 <TextBlock Grid.Row="0" Grid.Column="0">Default Opacity:</TextBlock>
-                <TextBox Grid.Row="1" Grid.Column="0" Text="{CompiledBinding Static.DefaultOpacity}"></TextBox>
+                <TextBox Grid.Row="1" Grid.Column="0" Text="{CompiledBinding Static.DefaultOpacity}" />
             </Grid>
         </TabItem>
     </TabControl>

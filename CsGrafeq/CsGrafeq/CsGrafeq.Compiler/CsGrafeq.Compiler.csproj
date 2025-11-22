@@ -8,12 +8,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\CsGrafeq.Base\CsGrafeq.Base.csproj"/>
+        <ProjectReference Include="..\CsGrafeq.Base\CsGrafeq.Base.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="DialogHost.Avalonia" Version="0.9.3"/>
-        <PackageReference Include="FastExpressionCompiler" Version="5.3.0"/>
+        <PackageReference Include="Avalonia" Version="11.3.7" />
+        <PackageReference Include="Avalonia.Diagnostics" Version="11.3.7" />
+        <PackageReference Include="CSharpMath.Evaluation" Version="0.5.1" />
+        <PackageReference Include="DialogHost.Avalonia" Version="0.10.0" />
+        <PackageReference Include="FastExpressionCompiler" Version="5.3.0" />
+        <PackageReference Include="Material.Avalonia" Version="3.13.3" />
+        <PackageReference Include="Material.Avalonia.Dialogs" Version="3.13.3" />
     </ItemGroup>
 
 </Project>
