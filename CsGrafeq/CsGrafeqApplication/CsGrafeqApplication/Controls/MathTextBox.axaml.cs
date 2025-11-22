@@ -1,6 +1,9 @@
-﻿using Avalonia;
+﻿using System;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Skia;
+using CsGrafeq.Utilities;
 
 namespace CsGrafeqApplication.Controls;
 
@@ -13,7 +16,7 @@ public class MathTextBox : TemplatedControl
     public string Text
     {
         get => field;
-        set => SetAndRaise(TextProperty, ref field, value);
+        private set => SetAndRaise(TextProperty, ref field, value);
     } = "";
 
 
@@ -23,6 +26,37 @@ public class MathTextBox : TemplatedControl
     public string Expression
     {
         get => field;
-        set => SetAndRaise(ExpressionProperty, ref field, value);
+        private set => SetAndRaise(ExpressionProperty, ref field, value);
     } = "";
+
+    private MathBox? MathBox;
+    private ScrollViewer?  ScrollViewer;
+    protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
+    {
+        base.OnApplyTemplate(e);
+        MathBox = e.NameScope.Find<MathBox>("PART_MathBox");
+        ScrollViewer = e.NameScope.Find<ScrollViewer>("PART_ScrollViewer");
+        if (MathBox != null&&ScrollViewer != null)
+        {
+            MathBox.MathInputted += (_, _) =>
+            {
+                var caret = MathBox.CaretPosition;
+                var offset = ScrollViewer.Offset.ToVec();
+                var width=ScrollViewer.Viewport.Width;
+                var mw = MathBox.MeasuredWidth;
+                if (mw < width)
+                {
+                    
+                }
+                else if (caret-offset.X > width-5)
+                {
+                    offset.X = caret - width+5;
+                }else if (caret < offset.X )
+                {
+                    offset.X = caret;
+                }
+                ScrollViewer.Offset = offset.ToVector();
+            };
+        }
+    }
 }

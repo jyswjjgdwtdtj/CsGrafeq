@@ -3,6 +3,10 @@
                     xmlns:controls="clr-namespace:CsGrafeqApplication.Controls">
     <Design.PreviewWith>
         <controls:GlobalMathKeyBoard Width="600" Height="400">
+            <controls:GlobalMathKeyBoard.Styles>
+                <Style Selector="controls|GlobalMathKeyBoard /template/ Expander#PART_Expander">
+                </Style>
+            </controls:GlobalMathKeyBoard.Styles>
             <Panel />
         </controls:GlobalMathKeyBoard>
     </Design.PreviewWith>
@@ -17,8 +21,13 @@
                     <DockPanel.Styles>
                         <StyleInclude Source="/Styles/Expander.axaml"></StyleInclude>
                     </DockPanel.Styles>
-                    <Expander DockPanel.Dock="Bottom" Name="PART_Expander" Background="{DynamicResource CgTranslucentBackgroundBrush}" ExpandDirection="Down" VerticalAlignment="Bottom" IsExpanded="False">
-                    <Grid RowDefinitions="50,50,50,50" RowSpacing="1">
+                    <Expander DockPanel.Dock="Bottom" Name="PART_Expander" Background="{DynamicResource CgTranslucentBackgroundBrush}" ExpandDirection="Down" VerticalAlignment="Bottom" IsExpanded="False" Focusable="False">
+                        <Expander.Styles>
+                            <Style Selector="Expander /template/ ToggleButton">
+                                <Setter Property="Focusable" Value="False"></Setter>
+                            </Style>
+                        </Expander.Styles>
+                        <Grid RowDefinitions="50,50,50,50" RowSpacing="1">
                             <Grid.Styles>
                                 <Style Selector="controls|KeyButton.Char">
                                     <Setter Property="Height" Value="48" />
@@ -74,46 +83,19 @@
                                                     IsFirst="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
                             </StackPanel>
                             <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="3" HorizontalAlignment="Center">
-                                <CheckBox Name="ShiftCheckBox" FontSize="20" Width="80" VerticalAlignment="Stretch">
-                                    <CheckBox.Styles>
-                                        <Style Selector="CheckBox">
-                                            <Setter Property="Template">
-                                                <ControlTemplate>
-                                                    <Border CornerRadius="4"
-                                                            BorderBrush="{DynamicResource CgForegroundBrush}"
-                                                            BorderThickness="1" HorizontalAlignment="Stretch"
-                                                            Height="{CompiledBinding $parent[CheckBox].Height}"
-                                                            Name="PART_Container"
-                                                            Background="{TemplateBinding Background}">
-                                                        <Border.Styles>
-                                                            <Style Selector="Border">
-                                                                <Setter Property="Background"
-                                                                        Value="{DynamicResource CgOppositeTranslucentBackgroundBrush0}" />
-                                                                <Style Selector="^:pressed">
-                                                                    <Setter Property="Background"
-                                                                            Value="{DynamicResource CgOppositeTranslucentBackgroundBrush1}" />
-                                                                </Style>
-                                                            </Style>
-                                                        </Border.Styles>
-                                                        <AccessText VerticalAlignment="Center"
-                                                                    HorizontalAlignment="Center"
-                                                                    Text="{TemplateBinding Content}"
-                                                                    FontFamily="{StaticResource MapleMono}"
-                                                                    FontSize="25" />
-                                                    </Border>
-                                                </ControlTemplate>
-                                            </Setter>
+                                <ToggleButton Name="ShiftCheckBox" FontSize="20" Width="80" VerticalAlignment="Stretch" Focusable="False" IsChecked="False" Height="48" BorderThickness="1" BorderBrush="{DynamicResource CgForegroundBrush}" FontFamily="{StaticResource MapleMono}" Padding="0">
+                                    <ToggleButton.Transitions>
+                                        <Transitions>
+                                            <BrushTransition Property="Background" Duration="0:0:0.2"></BrushTransition>
+                                        </Transitions>
+                                    </ToggleButton.Transitions>
+                                    <ToggleButton.Styles>
+                                        <Style Selector="ToggleButton:checked">
+                                            <Setter Property="Background" Value="{DynamicResource CgOppositeTranslucentBackgroundBrush0}"></Setter>
                                         </Style>
-                                        <Style Selector="CheckBox:checked">
-                                            <Setter Property="Background"
-                                                    Value="{DynamicResource CgOppositeTranslucentBackgroundBrush0}" />
-                                        </Style>
-                                        <Style Selector="CheckBox:not(:checked)">
-                                            <Setter Property="Background" Value="{DynamicResource CgBackgroundBrush}" />
-                                        </Style>
-                                    </CheckBox.Styles>
+                                    </ToggleButton.Styles>
                                     Shift
-                                </CheckBox>
+                                </ToggleButton>
                                 <controls:KeyButton Classes="KeyButton Char" FirstButton="a" SecondButton="A" FirstKeyboardInput="SmallA" SecondKeyboardInput="A" 
                                                     IsFirst="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
                                 <controls:KeyButton Classes="KeyButton Char" FirstButton="s" SecondButton="S" FirstKeyboardInput="SmallS" SecondKeyboardInput="S" 
@@ -132,17 +114,12 @@
                                                     IsFirst="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
                                 <controls:KeyButton Classes="KeyButton Char" FirstButton="l" SecondButton="L" FirstKeyboardInput="SmallL" SecondKeyboardInput="L" 
                                                     IsFirst="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                <Border CornerRadius="4" BorderBrush="{DynamicResource CgForegroundBrush}"
-                                        BorderThickness="1" Width="55"
-                                        Height="{CompiledBinding $parent[StackPanel].Height}">
-                                    <Border.Styles>
-                                        <Style Selector="Border">
-                                            <Setter Property="Background" Value="{DynamicResource CgBackgroundBrush}" />
-                                        </Style>
-                                    </Border.Styles>
+                                <RepeatButton CornerRadius="4" BorderBrush="{DynamicResource CgForegroundBrush}"
+                                        BorderThickness="1" Width="55" Focusable="False" Name="BackspaceButton"
+                                        Height="{CompiledBinding $parent[StackPanel].Height}" Background="{DynamicResource CgBackgroundBrush}" Padding="0">
                                     <AccessText VerticalAlignment="Center" HorizontalAlignment="Center" Text="⇦"
                                                 FontFamily="{StaticResource MapleMono}" FontSize="25" />
-                                </Border>
+                                </RepeatButton>
                             </StackPanel>
                             <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="3" HorizontalAlignment="Center">
                                 <controls:KeyButton Classes="KeyButton Char" FirstButton="z" SecondButton="Z" FirstKeyboardInput="SmallZ" SecondKeyboardInput="Z" 

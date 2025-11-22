@@ -2,11 +2,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="using:CsGrafeqApplication.Controls">
     <Design.PreviewWith>
-        <controls:KeyButton Width="48" Height="48" FirstButton="G" SecondButton="Q"
-                            FontFamily="{StaticResource MapleMono}" IsFirst="False"/>
+        <Border Width="60" Height="60">
+            <controls:KeyButton Width="48" Height="48" FirstButton="G" SecondButton="Q"
+                                FontFamily="{StaticResource MapleMono}" IsFirst="False"/>
+        </Border>
     </Design.PreviewWith>
 
     <Style Selector="controls|KeyButton">
+        <Setter Property="ClipToBounds" Value="False"></Setter>
         <Setter Property="FontFamily" Value="{StaticResource MapleMono}" />
         <Style Selector="^ /template/ RepeatButton">
             <Setter Property="Background" Value="{DynamicResource CgBackgroundBrush}" />
@@ -30,11 +33,6 @@
             <Setter Property="Template">
                 <ControlTemplate>
                     <RepeatButton Name="PART_Button">
-                        <RepeatButton.Styles>
-                            <Style Selector="Border#PART_Button">
-                                <Setter Property="Background" Value="{DynamicResource CgBackgroundBrush}" />
-                            </Style>
-                        </RepeatButton.Styles>
                         <Canvas>
                             <AccessText Canvas.Right="0" Canvas.Top="-16" Text="{TemplateBinding FirstButton}"
                                         Foreground="{DynamicResource CgForegroundBrush}" VerticalAlignment="Center"

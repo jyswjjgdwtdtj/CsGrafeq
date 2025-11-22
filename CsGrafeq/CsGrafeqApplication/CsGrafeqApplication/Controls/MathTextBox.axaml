@@ -9,8 +9,8 @@
         <!-- Set Defaults -->
         <Setter Property="Template">
             <ControlTemplate>
-                <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled" HorizontalAlignment="Stretch">
-                    <controls:MathBox HorizontalAlignment="Left">
+                <ScrollViewer Margin="3,0" Name="PART_ScrollViewer" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled" HorizontalAlignment="Stretch">
+                    <controls:MathBox Name="PART_MathBox" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                                 
                     </controls:MathBox>
                 </ScrollViewer>

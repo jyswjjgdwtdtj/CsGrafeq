@@ -6,6 +6,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Media;
+using CsGrafeq.CSharpMath.Editor;
 
 namespace CsGrafeqApplication.Controls;
 
@@ -28,5 +29,21 @@ public class GlobalMathKeyBoard : ContentControl
                 path.Bind(Path.FillProperty, Resources.GetResourceObservable("CgForegroundBrush"));
             };
         };
+
+        var bsbutten = e.NameScope.Find<Button>("BackspaceButton");
+        if (bsbutten != null)
+        {
+            var fm = TopLevel.GetTopLevel(this)?.FocusManager;
+            if (fm != null)
+            {
+                bsbutten.Click += (_,_) =>
+                {
+                    if (fm.GetFocusedElement() is MathBox mb)
+                    {
+                        mb.PressKey(CgMathKeyboardInput.Backspace);
+                    }
+                };
+            }
+        }
     }
 }

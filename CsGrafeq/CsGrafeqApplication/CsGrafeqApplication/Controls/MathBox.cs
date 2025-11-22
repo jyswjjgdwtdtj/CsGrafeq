@@ -11,6 +11,7 @@ using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using CsGrafeq.CSharpMath.Editor;
 using CSharpMath.SkiaSharp;
 using CSharpMath.Editor;
@@ -33,6 +34,7 @@ namespace CsGrafeqApplication.Controls;
 
 public class MathBox:Control
 {
+    public event EventHandler? MathInputted;
     private RectangleF CurrentMeasuredRect=new(Vector4.NaN);
     #if RECORD_INSTANCE
     private static readonly List<MathBox> Instances = new();
@@ -74,24 +76,28 @@ public class MathBox:Control
     public static readonly DirectProperty<MathBox, float> FontSizeProperty = AvaloniaProperty.RegisterDirect<MathBox, float>(
         nameof(FontSize), o => o.FontSize, (o, v) => o.FontSize = v);
 
-    private Fonts Fonts;
+    //private Fonts Fonts;
     public MathBox()
     {
+        ClipToBounds=false;
         var reader = new OpenFontReader();
-        Typography.OpenFont.Typeface? typeface = null;// reader.Read(SkiaSharp.SKData.Create(SkiaEx.MapleMono.Typeface.OpenStream()).AsStream());
-        Fonts =new Fonts(typeface==null?[]:[typeface],Scale*FontSize);
+        //Typography.OpenFont.Typeface? typeface = null;// reader.Read(SkiaSharp.SKData.Create(SkiaEx.MapleMono.Typeface.OpenStream()).AsStream());
+        //Fonts =new Fonts(typeface==null?Fonts.GlobalTypefaces:[typeface],Scale*FontSize);
         ClipToBounds = true;
         //Instances.Add(this);
         RenderOptions.SetEdgeMode(this, EdgeMode.Antialias);
         RenderOptions.SetTextRenderingMode(this,TextRenderingMode.Antialias);
         RenderOptions.SetBitmapInterpolationMode(this,BitmapInterpolationMode.HighQuality);
         VerticalAlignment= Avalonia.Layout.VerticalAlignment.Center;
-        Keyboard.Font = Fonts;
+        Keyboard.Font = new Fonts(Keyboard.Font,Scale*FontSize);
         Focusable = true;
         Painter.FontSize = FontSize*Scale;
-        Painter.LocalTypefaces= Fonts;
-        AffectsRender<MathBox>(LaTeXProperty);
+        Painter.LocalTypefaces = Keyboard.Font;
         AffectsArrange<MathBox>(LaTeXProperty);
+        AffectsMeasure<MathBox>(LaTeXProperty);
+        AffectsMeasure<MathBox>(VisualParentProperty);
+        AffectsArrange<MathBox>(VisualParentProperty);
+        InvalidateArrange();
         PressKey(CgMathKeyboardInput.Sine);
         PressKey(CgMathKeyboardInput.Sine);
         PressKey(CgMathKeyboardInput.Sine);
@@ -124,8 +130,7 @@ public class MathBox:Control
     {
         Painter.LaTeX = LaTeX;;
         e.PushTransform(Matrix.CreateTranslation(-CurrentMeasuredRect.Left,-CurrentMeasuredRect.Top));
-        Console.WriteLine(CurrentMeasuredRect = Painter.Measure());
-        var c = new AvaloniaCanvas(e, Bounds.Size*Scale);
+        var c = new AvaloniaCanvas(e, (Bounds.Size+new Size(20,20))*Scale);
         c.Save();
         c.Scale(1/Scale,1/Scale);
         Painter.Draw(c,0,0);
@@ -135,21 +140,26 @@ public class MathBox:Control
     }
 
     public float CaretPosition=>((Keyboard.Display?.PointForIndex(TypesettingContext.Instance, Keyboard.InsertionIndex) ?? Keyboard.Display?.Position)??new(0,0)).X;
+    public float MeasuredWidth=>CurrentMeasuredRect.Width;
     public void PressKey(params CgMathKeyboardInput[] keyboardInputs)
     {
         foreach (var keyboardInput in keyboardInputs)
         {
             Keyboard.KeyPress(keyboardInput);   
         }
-        CurrentMeasuredRect = Painter.Measure();
+        CurrentMeasuredRect = Keyboard.Measure;
         Keyboard.InsertionPositionHighlighted = true;
         LaTeX = Keyboard.LaTeX;
+        InvalidateMeasure();
+        InvalidateArrange();
+        MathInputted?.Invoke(this, EventArgs.Empty);
     }
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         base.OnPointerPressed(e);
         //MathBox.FocusedInstance = this;
+        Console.WriteLine(e.GetPosition(this));
         Keyboard.MoveCaretToPoint(e.GetPosition(this).ToSysPointF().Add(CurrentMeasuredRect.Left,CurrentMeasuredRect.Top));
     }
 
@@ -237,7 +247,7 @@ public class MathBox:Control
             case PhysicalKey.Enter:
             {
                 var (math, error) = Evaluate(Keyboard.MathList);
-                Console.WriteLine(error);
+                Console.WriteLine(error+" "+LaTeX);
                 switch (math)
                 {
                     case MathItem.Entity { Content: var entity }:
@@ -259,8 +269,9 @@ public class MathBox:Control
 
     protected override Size MeasureOverride(Size availableSize)
     {
-        Console.WriteLine(availableSize);
-        var size = Keyboard.Measure.Size;
-        return new Size(size.Width, size.Height);
+        CurrentMeasuredRect = Keyboard.Measure;
+        var size = CurrentMeasuredRect.Size;
+        Console.WriteLine("Measured");
+        return new Size(Max(size.Width,this.GetVisualParent()?.Bounds.Width??0), size.Height);
     }
 }

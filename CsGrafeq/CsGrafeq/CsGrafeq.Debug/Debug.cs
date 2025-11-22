@@ -5,8 +5,8 @@ public static class Debug
     static Debug()
     {
 #if DEBUG
-        Keyboard = true;
-        Pointer = true;
+        Keyboard = false;
+        Pointer = false;
         Error = false;
 #else
         Keyboard = false;
