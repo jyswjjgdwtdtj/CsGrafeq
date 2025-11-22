@@ -21,12 +21,8 @@ public static class SkiaEx
         new() { IsAntialias = true, Color = new SKColor(0x80, 0x80, 0x80, 70) };
 
     public static SKFont MapleMono;
-    public static SKPaint FilledGray1 = new() { IsAntialias = true, Color = new SKColor(190, 190, 190) };
-    public static SKPaint FilledGray2 = new() { IsAntialias = true, Color = new SKColor(128, 128, 128) };
     public static SKPaint ShadowFilledBlack = new() { IsAntialias = true, Color = SKColors.Black };
     public static SKPaint ShadowStrokeBlack = new() { IsAntialias = true, Color = SKColors.Black };
-    public static SKPaint FilledLight = new() { IsAntialias = true };
-    public static SKPaint StrokeLight = new() { IsAntialias = true, IsStroke = true };
     public static SKPaint FilledMedian = new() { IsAntialias = true };
     public static SKPaint ShadowFilledMedian = new() { IsAntialias = true };
     public static SKPaint StrokeMedian = new() { IsAntialias = true, IsStroke = true };
@@ -62,25 +58,8 @@ public static class SkiaEx
         object? temp;
         App.Current.Resources.TryGetResource("Median", null, out temp);
         Median = new SKColor(((Color)temp).ToUInt32());
-        App.Current.Resources.TryGetResource("Light", null, out temp);
-        Light = new SKColor(((Color)temp).ToUInt32());
 
-        FilledLight.Color = Light;
-        FilledLight.ImageFilter = SKImageFilter.CreateDropShadow(
-            0,
-            0,
-            2,
-            2,
-            Light
-        );
-        StrokeLight.Color = Light;
-        StrokeLight.ImageFilter = SKImageFilter.CreateDropShadow(
-            0,
-            0,
-            2,
-            2,
-            Light
-        );
+        
         FilledMedian.Color = Median;
         FilledMedian.ImageFilter = SKImageFilter.CreateDropShadow(
             0,

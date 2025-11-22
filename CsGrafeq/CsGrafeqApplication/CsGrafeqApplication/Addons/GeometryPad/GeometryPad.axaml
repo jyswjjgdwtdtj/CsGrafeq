@@ -68,7 +68,7 @@
             <Setter Property="VerticalContentAlignment" Value="Center" />
         </Style>
         <Style Selector="TextBox.Small">
-            <Setter Property="FontSize" Value="10" />
+            <Setter Property="FontSize" Value="12" />
             <Setter Property="Foreground" Value="{DynamicResource CgHalfForegroundBrush}" />
             <Setter Property="Height" Value="20" />
         </Style>
@@ -78,7 +78,7 @@
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
         <Style Selector="TextBlock.Small">
-            <Setter Property="FontSize" Value="10" />
+            <Setter Property="FontSize" Value="12" />
             <Setter Property="Foreground" Value="{DynamicResource CgHalfForegroundBrush}" />
             <Setter Property="Height" Value="20" />
         </Style>
@@ -209,10 +209,10 @@
                                                 <CheckBox
                                                     IsChecked="{CompiledBinding Visible,Mode=TwoWay}"
                                                     Classes="VisibilityCheckBox"
-                                                    VerticalAlignment="Center" Margin="5" />
-                                                <Button DockPanel.Dock="Right" VerticalAlignment="Center"
-                                                        Tag="{CompiledBinding .}" Click="DeleteButtonClicked"
-                                                        Background="{StaticResource HTMedianBrush}">
+                                                    VerticalAlignment="Center" Margin="5" Tapped="EventHandledTrue" DoubleTapped="EventHandledTrue" />
+                                                <Button DockPanel.Dock="Right" VerticalAlignment="Center" BorderThickness="0"
+                                                        Tag="{CompiledBinding .}" Click="DeleteButtonClicked" Width="30" Height="30" Margin="4"
+                                                        Background="{DynamicResource HTMedianBrush}">
                                                     <Svg Path="/Assets/delete.svg" Width="20" Height="20" Margin="0"
                                                          Css="{DynamicResource OppositeCssPathFillString}" />
                                                 </Button>
@@ -525,7 +525,7 @@
                                                                                 <TextBlock
                                                                                     Text="{CompiledBinding Name}"
                                                                                     VerticalAlignment="Center"
-                                                                                    Classes="Small" />
+                                                                                    Classes="Big" />
                                                                             </ctls:CheckedControl>
                                                                             <TextBlock Text="," TextAlignment="Left"
                                                                                     VerticalAlignment="Center"
@@ -595,8 +595,8 @@
                                                 <CheckBox
                                                     IsChecked="{CompiledBinding Visible,Mode=TwoWay}"
                                                     Classes="VisibilityCheckBox"
-                                                    VerticalAlignment="Center" Margin="5" />
-                                                <Button DockPanel.Dock="Right" VerticalAlignment="Center"
+                                                    VerticalAlignment="Center" Margin="5" Tapped="EventHandledTrue" DoubleTapped="EventHandledTrue"/>
+                                                <Button DockPanel.Dock="Right" VerticalAlignment="Center" Width="30" Height="30" Margin="4"
                                                         Tag="{CompiledBinding .}" Click="DeleteButtonClicked"
                                                         Tapped="EventHandledTrue"
                                                         Background="{StaticResource HTMedianBrush}">
@@ -650,7 +650,7 @@
                                       TemplateApplied="Expander_TemplateApplied"
                                       IsExpanded="True" CornerRadius="0" HorizontalAlignment="Stretch"
                                       Width="{CompiledBinding $parent[StackPanel].Bounds.Width}"
-                                      Padding="0" Background="Transparent">
+                                      Padding="0" Background="Transparent" Foreground="{DynamicResource CgForegroundBrush}">
                                 <Expander.Header>
                                     <TextBlock Text="{CompiledBinding Name.Data }" Margin="0"
                                                Padding="0" Classes="Big" />

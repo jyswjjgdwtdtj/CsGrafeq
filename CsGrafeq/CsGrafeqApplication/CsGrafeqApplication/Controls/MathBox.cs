@@ -1,4 +1,5 @@
-﻿using System;
+﻿//#define RECORD_INSTANCE
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Numerics;
@@ -33,7 +34,8 @@ namespace CsGrafeqApplication.Controls;
 public class MathBox:Control
 {
     private RectangleF CurrentMeasuredRect=new(Vector4.NaN);
-    /*private static readonly List<MathBox> Instances = new();
+    #if RECORD_INSTANCE
+    private static readonly List<MathBox> Instances = new();
 
     static MathBox()
     {
@@ -58,7 +60,8 @@ public class MathBox:Control
         AvaloniaProperty.RegisterAttached<MathBox, MathBox, bool>("MathBoxIsFocused");
 
     private static void SetMathBoxIsFocused(MathBox obj, bool value) => obj.SetValue(MathBoxIsFocusedProperty, value);
-    private static bool GetMathBoxIsFocused(MathBox obj) => obj.GetValue(MathBoxIsFocusedProperty);*/
+    private static bool GetMathBoxIsFocused(MathBox obj) => obj.GetValue(MathBoxIsFocusedProperty);
+    #endif
     
     private float Scale = 1;
     private CgMathKeyboard Keyboard { get; } = new();
@@ -88,7 +91,6 @@ public class MathBox:Control
         Painter.FontSize = FontSize*Scale;
         Painter.LocalTypefaces= Fonts;
         AffectsRender<MathBox>(LaTeXProperty);
-        AffectsMeasure<MathBox>(LaTeXProperty);
         AffectsArrange<MathBox>(LaTeXProperty);
         PressKey(CgMathKeyboardInput.Sine);
         PressKey(CgMathKeyboardInput.Sine);
@@ -102,7 +104,9 @@ public class MathBox:Control
 
     ~MathBox()
     {
-        //Instances.Remove(this);
+        #if RECORD_INSTANCE
+        Instances.Remove(this);
+        #endif
     }
 
     public string LaTeX
@@ -236,15 +240,15 @@ public class MathBox:Control
                 Console.WriteLine(error);
                 switch (math)
                 {
-                    case CSharpMath.Evaluation.MathItem.Entity { Content: var entity }:
+                    case MathItem.Entity { Content: var entity }:
                         // entity is an AngouriMath.Entity
                         var simplifiedEntity = entity.Simplify();
                         Console.WriteLine(simplifiedEntity);
                         break;
-                    case CSharpMath.Evaluation.MathItem.Comma comma:
+                    case MathItem.Comma comma:
                         // comma is a System.Collections.Generic.IEnumerable<CSharpMath.Evaluation.MathItem>
                         break;
-                    case CSharpMath.Evaluation.MathItem.Set { Content: var set }:
+                    case MathItem.Set { Content: var set }:
                         // set is an AngouriMath.Core.Set
                         break;
                 }

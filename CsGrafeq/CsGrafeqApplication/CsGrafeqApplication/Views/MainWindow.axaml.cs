@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 
 namespace CsGrafeqApplication.Views;
 
@@ -9,5 +10,15 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         this.AttachDevTools();
+    }
+
+    private void MinimizeClicked(object? sender, RoutedEventArgs e)
+    {
+        this.WindowState= WindowState.Minimized;
+    }
+
+    private void CloseWindowClicked(object? sender, RoutedEventArgs e)
+    {
+        this.Close();
     }
 }

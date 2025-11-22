@@ -6,4 +6,6 @@
     <valueConverter:DoubleToString x:Key="DoubleToString" />
     <valueConverter:IntToBool x:Key="IntToBool" />
     <valueConverter:BoolToDouble x:Key="BoolToDouble" />
+    <valueConverter:IIfConverter x:Key="IIf"></valueConverter:IIfConverter>
+    <valueConverter:AddConverter x:Key="Add"></valueConverter:AddConverter>
 </ResourceDictionary>

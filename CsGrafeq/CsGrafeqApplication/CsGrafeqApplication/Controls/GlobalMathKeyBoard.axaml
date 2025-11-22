@@ -8,11 +8,15 @@
     </Design.PreviewWith>
     <ControlTheme x:Key="{x:Type controls:GlobalMathKeyBoard}"
                   TargetType="controls:GlobalMathKeyBoard">
+        <Setter Property="Foreground" Value="{DynamicResource CgForegroundBrush}"></Setter>
         <Setter Property="VerticalAlignment" Value="Stretch" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="Template">
             <ControlTemplate>
                 <DockPanel LastChildFill="True">
+                    <DockPanel.Styles>
+                        <StyleInclude Source="/Styles/Expander.axaml"></StyleInclude>
+                    </DockPanel.Styles>
                     <Expander DockPanel.Dock="Bottom" Name="PART_Expander" Background="{DynamicResource CgTranslucentBackgroundBrush}" ExpandDirection="Down" VerticalAlignment="Bottom" IsExpanded="False">
                     <Grid RowDefinitions="50,50,50,50" RowSpacing="1">
                             <Grid.Styles>

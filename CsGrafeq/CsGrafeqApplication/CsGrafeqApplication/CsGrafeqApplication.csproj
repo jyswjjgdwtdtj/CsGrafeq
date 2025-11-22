@@ -82,6 +82,14 @@
         <AvaloniaResource Include="Assets\theme.svg" />
         <None Remove="Assets\save.svg" />
         <AvaloniaResource Include="Assets\save.svg" />
+        <None Remove="Assets\close.svg" />
+        <AvaloniaResource Include="Assets\close.svg" />
+        <None Remove="Assets\closefullscreen.svg" />
+        <AvaloniaResource Include="Assets\closefullscreen.svg" />
+        <None Remove="Assets\openfullscreen.svg" />
+        <AvaloniaResource Include="Assets\openfullscreen.svg" />
+        <None Remove="Assets\minimize.svg" />
+        <AvaloniaResource Include="Assets\minimize.svg" />
     </ItemGroup>
 
     <ItemGroup>

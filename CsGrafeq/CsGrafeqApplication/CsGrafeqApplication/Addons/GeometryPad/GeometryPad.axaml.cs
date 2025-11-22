@@ -5,6 +5,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Shapes;
 using Avalonia.Controls.Templates;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -57,7 +58,7 @@ public partial class GeometryPad : Addon
                 Owner?.ZoomingOptimization = true;
             }
 
-            var newshapes = e.NewItems?.OfType<Shape>() ?? [];
+            var newshapes = e.NewItems?.OfType<GeoShape>() ?? [];
             var newfuncs = newshapes.OfType<ImplicitFunction>();
             // 设置隐函数渲染目标大小
             foreach (var fn in newfuncs)
@@ -190,7 +191,7 @@ public partial class GeometryPad : Addon
     /// <typeparam name="T"></typeparam>
     /// <param name="shape"></param>
     /// <returns></returns>
-    public T? AddShape<T>(T shape) where T : Shape
+    public T? AddShape<T>(T shape) where T : GeoShape
     {
         if (shape.IsDeleted)
             return null;
@@ -286,11 +287,23 @@ public partial class GeometryPad : Addon
 
     private void Expander_TemplateApplied(object? sender, TemplateAppliedEventArgs e)
     {
+        if (sender is Expander expander)
+        {
+            Console.WriteLine(123);
+            expander.TemplateApplied += (_, te) =>
+            {
+                var togglebtn= te.NameScope.Find<ToggleButton>("PART_ToggleButton");
+                togglebtn.TemplateApplied += (_, tte) =>
+                {
+                    var path= tte.NameScope.Find<Path>("PART_ExpandIcon");
+                    path.Bind(Path.FillProperty, Resources.GetResourceObservable("CgForegroundBrush"));
+                };
+            };
+        }
     }
 
     private void AddFuncQuestionsClicked(object? sender, RoutedEventArgs e)
     {
-        return;
         var tp = TopLevel.GetTopLevel(this);
         if (tp != null)
         {
@@ -1023,9 +1036,9 @@ public partial class GeometryPad : Addon
     {
         var disp = (Owner as DisplayControl)!;
         var mathcursor = PixelToMath(Location);
-        var shapes = new List<(double, Shape)>();
+        var shapes = new List<(double, GeoShape)>();
         foreach (var geoshape in Shapes.GetShapes<GeometryShape>())
-            if (geoshape is Line || geoshape is Circle)
+            if (geoshape is GeoLine || geoshape is Circle)
             {
                 var dist = ((geoshape.DistanceTo(mathcursor) - mathcursor) * disp.UnitLength).GetLength();
                 if (dist < 5) shapes.Add((dist, geoshape));
@@ -1040,17 +1053,17 @@ public partial class GeometryPad : Addon
             if (shape is GeoCircle)
                 return new PointGetter_OnCircle((Circle)shape, PixelToMath(Location));
             if (shape is GeoLine)
-                return new PointGetter_OnLine((Line)shape, PixelToMath(Location));
+                return new PointGetter_OnLine((GeoLine)shape, PixelToMath(Location));
             return new PointGetter_FromLocation(PixelToMath(Location));
         }
 
         var s1 = ss[0].Item2;
         var s2 = ss[1].Item2;
-        if (s1 is Line && s2 is Line) return new PointGetter_FromTwoLine(s1 as Line, s2 as Line);
+        if (s1 is GeoLine && s2 is GeoLine) return new PointGetter_FromTwoLine(s1 as GeoLine, s2 as GeoLine);
 
-        if (s1 is Line l1 && s2 is Circle c1) (s1, s2) = (s2, s1);
+        if (s1 is GeoLine l1 && s2 is Circle c1) (s1, s2) = (s2, s1);
 
-        if (s1 is Circle c2 && s2 is Line l2)
+        if (s1 is Circle c2 && s2 is GeoLine l2)
         {
             Vec v1, v2;
             (v1, v2) = IntersectionMath.FromLineAndCircle(l2.Current, c2.InnerCircle);
@@ -1186,7 +1199,7 @@ public partial class GeometryPad : Addon
     ///     添加“添加图形”操作到CmdManager
     /// </summary>
     /// <param name="shape"></param>
-    private void DoShapeAdd(Shape shape)
+    private void DoShapeAdd(GeoShape shape)
     {
         CmdManager.Do(
             shape,
@@ -1212,7 +1225,7 @@ public partial class GeometryPad : Addon
     ///     添加“删除图形”操作到CmdManager
     /// </summary>
     /// <param name="shape"></param>
-    private void DoShapeDelete(Shape shape)
+    private void DoShapeDelete(GeoShape shape)
     {
         if (shape is GeometryShape geo)
             DoGeoShapesDelete([geo]);
@@ -1363,7 +1376,7 @@ public partial class GeometryPad : Addon
         if (sender is Button btn)
             if (btn.Tag is GeometryShape shape)
                 DoGeoShapesDelete([shape]);
-            else if (btn.Tag is Shape s) DoShapeDelete(s);
+            else if (btn.Tag is GeoShape s) DoShapeDelete(s);
 
         e.Handled = true;
     }

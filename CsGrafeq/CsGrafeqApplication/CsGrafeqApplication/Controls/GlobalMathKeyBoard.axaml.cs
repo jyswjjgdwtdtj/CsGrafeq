@@ -25,6 +25,7 @@ public class GlobalMathKeyBoard : ContentControl
                 var border = path?.Parent as Border;
             
                 border.RenderTransform = new RotateTransform() {Angle = 180};
+                path.Bind(Path.FillProperty, Resources.GetResourceObservable("CgForegroundBrush"));
             };
         };
     }
