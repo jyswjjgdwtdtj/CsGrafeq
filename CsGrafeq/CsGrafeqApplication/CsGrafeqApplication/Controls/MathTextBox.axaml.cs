@@ -2,6 +2,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Interactivity;
 using Avalonia.Skia;
 using CsGrafeq.Utilities;
 
@@ -10,24 +11,16 @@ namespace CsGrafeqApplication.Controls;
 public class MathTextBox : TemplatedControl
 {
 
-    public static readonly DirectProperty<MathTextBox, string> TextProperty = AvaloniaProperty.RegisterDirect<MathTextBox, string>(
-        nameof(Text), o => o.Text, (o, v) => o.Text = v);
+    public static readonly DirectProperty<MathTextBox, MathBox?> InnerMathBoxProperty = AvaloniaProperty.RegisterDirect<MathTextBox, MathBox?>(
+        nameof(InnerMathBox), o => o.InnerMathBox);
 
-    public string Text
+    public MathBox? InnerMathBox
     {
         get => field;
-        private set => SetAndRaise(TextProperty, ref field, value);
-    } = "";
+        private set => SetAndRaise(InnerMathBoxProperty, ref field, value);
+    }
 
-
-    public static readonly DirectProperty<MathTextBox, string> ExpressionProperty = AvaloniaProperty.RegisterDirect<MathTextBox, string>(
-        nameof(Expression), o => o.Expression, (o, v) => o.Expression = v);
-
-    public string Expression
-    {
-        get => field;
-        private set => SetAndRaise(ExpressionProperty, ref field, value);
-    } = "";
+    public event EventHandler<RoutedEventArgs>? MathInputted;
 
     private MathBox? MathBox;
     private ScrollViewer?  ScrollViewer;
@@ -38,6 +31,7 @@ public class MathTextBox : TemplatedControl
         ScrollViewer = e.NameScope.Find<ScrollViewer>("PART_ScrollViewer");
         if (MathBox != null&&ScrollViewer != null)
         {
+            InnerMathBox=MathBox;
             MathBox.MathInputted += (_, _) =>
             {
                 var caret = MathBox.CaretPosition;
@@ -56,7 +50,12 @@ public class MathTextBox : TemplatedControl
                     offset.X = caret;
                 }
                 ScrollViewer.Offset = offset.ToVector();
+                MathInputted?.Invoke(MathBox,new RoutedEventArgs());
             };
+        }
+        else
+        {
+            InnerMathBox = null;
         }
     }
 }

@@ -7,6 +7,7 @@
              xmlns:shapes="clr-namespace:CsGrafeq.Shapes;assembly=CsGrafeq.Shapes"
              xmlns:getter="clr-namespace:CsGrafeq.Shapes.ShapeGetter;assembly=CsGrafeq.Shapes"
              xmlns:shapes1="clr-namespace:CsGrafeq.Shapes"
+             xmlns:valueConverter="clr-namespace:CsGrafeqApplication.ValueConverter"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CsGrafeqApplication.Addons.GeometryPad.GeometryPad" x:DataType="geopad:GeometryPadViewModel">
     <UserControl.Styles>
@@ -144,8 +145,8 @@
                      Css="{DynamicResource OppositeCssPathFillString}" />
             </TabItem.Header>
             <DockPanel ZIndex="1" LastChildFill="True">
-                <Border DockPanel.Dock="Top">
-                    <DockPanel LastChildFill="True" HorizontalAlignment="Stretch" Margin="5">
+                <Border DockPanel.Dock="Top" Background="{StaticResource HTMedian}" CornerRadius="0,0,5,5">
+                    <DockPanel LastChildFill="True" HorizontalAlignment="Stretch" Margin="5" >
                         <Border Width="30" Height="30" DockPanel.Dock="Left">
                             <Svg Path="/Assets/add.svg" Width="25" Height="25" Margin="0" VerticalAlignment="Center"
                                  HorizontalAlignment="Center" Css="{DynamicResource OppositeCssPathFillString}" />
@@ -153,12 +154,14 @@
                         <Button DockPanel.Dock="Right" Margin="0" Background="Transparent" Width="30"
                                 HorizontalContentAlignment="Center" VerticalAlignment="Center"
                                 Click="AddFuncQuestionsClicked" Content="?" FontFamily="{StaticResource MapleMono}" Padding="0" Height="30"/>
-                        <Border>
+                        
+                        <Border Tapped="EventHandledTrue" DoubleTapped="EventHandledTrue" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="{DynamicResource CgTranslucentBackgroundBrush}" Padding="10" CornerRadius="5"
+                                BorderThickness="2" Margin="5">
                             <!--<TextBox BorderThickness="0" Classes="NoDataValidation" AcceptsReturn="False"
                                      AcceptsTab="False" KeyUp="NewFuncOnClick" Name="NewFuncTextBox"
                                      TemplateApplied="NewFuncTextBoxTemplateApplied"
                                      PropertyChanged="NewFuncPropertyChanged" Margin="0,0,5,0" />-->
-                            <ctls:MathTextBox HorizontalAlignment="Stretch"/>
+                            <ctls:MathTextBox HorizontalAlignment="Stretch" Name="MathTextBox" KeyDown="MathTextBoxKeyDown"/>
                         </Border>
                     </DockPanel>
                 </Border>
@@ -591,7 +594,7 @@
                                                     </Grid>
                                                 </Flyout>
                                             </FlyoutBase.AttachedFlyout>
-                                            <DockPanel LastChildFill="True">
+                                            <DockPanel>
                                                 <CheckBox
                                                     IsChecked="{CompiledBinding Visible,Mode=TwoWay}"
                                                     Classes="VisibilityCheckBox"
@@ -603,13 +606,15 @@
                                                     <Svg Path="/Assets/delete.svg" Width="20" Height="20" Margin="0"
                                                          Css="{DynamicResource OppositeCssPathFillString}" />
                                                 </Button>
-                                                <TextBox
-                                                    Text="{CompiledBinding Expression,Mode=TwoWay}"
-                                                    Tapped="EventHandledTrue" PropertyChanged="ImpFuncPropertyChanged"
-                                                    Tag="{CompiledBinding .}" Loaded="ImpFuncLoaded"
-                                                    Classes="CommonTextBox Big" HorizontalAlignment="Left" >
-                                                    <TextBox.Styles><FluentTheme/></TextBox.Styles>
-                                                </TextBox>
+                                                <Border Tapped="EventHandledTrue" DoubleTapped="EventHandledTrue" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="{DynamicResource CgTranslucentBackgroundBrush}" Padding="10" CornerRadius="5"
+                                                        BorderThickness="2" BorderBrush="{CompiledBinding BorderBrush}">
+                                                    <ctls:MathBox
+                                                        MathList="{CompiledBinding MathList,Mode=OneTime}" PropertyToTransmitMathInputEvent="{CompiledBinding PropertyToReceiveMathListChanged,Mode=OneWayToSource}"
+                                                        DoubleTapped="EventHandledTrue"
+                                                        Tapped="EventHandledTrue" PropertyChanged="ImpFuncPropertyChanged"
+                                                        Tag="{CompiledBinding .}" Loaded="MathBoxLoaded"
+                                                        HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                                                </Border>
                                             </DockPanel>
                                         </Border>
                                     </DataTemplate>

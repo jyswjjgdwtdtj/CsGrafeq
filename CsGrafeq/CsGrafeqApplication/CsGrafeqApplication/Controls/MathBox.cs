@@ -1,6 +1,7 @@
 ﻿//#define RECORD_INSTANCE
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Numerics;
 using Avalonia;
@@ -66,46 +67,85 @@ public class MathBox:Control
     #endif
     
     private float Scale = 1;
-    private CgMathKeyboard Keyboard { get; } = new();
+    private CgMathKeyboard Keyboard { get; set; } = new(new());
     private MathPainter Painter { get; } = new();
-    
-    public static readonly DirectProperty<MathBox, string> LaTeXProperty =
-        AvaloniaProperty.RegisterDirect<MathBox, string>(
-            nameof(LaTeX), o => o.LaTeX, (o, v) => o.LaTeX = v,"",BindingMode.OneWay,false);
 
     public static readonly DirectProperty<MathBox, float> FontSizeProperty = AvaloniaProperty.RegisterDirect<MathBox, float>(
         nameof(FontSize), o => o.FontSize, (o, v) => o.FontSize = v);
 
-    //private Fonts Fonts;
-    public MathBox()
+
+    public static readonly DirectProperty<MathBox, string> ExpressionProperty = AvaloniaProperty.RegisterDirect<MathBox, string>(
+        nameof(Expression), o => o.Expression);
+
+    public static readonly DirectProperty<MathBox, bool> IsCorrectProperty = AvaloniaProperty.RegisterDirect<MathBox, bool>(
+        nameof(IsCorrect), o => o.IsCorrect);
+
+    public static readonly DirectProperty<MathBox, MathList> MathListProperty =
+        AvaloniaProperty.RegisterDirect<MathBox, MathList>(
+            nameof(MathList), o => o.MathList, (o, v) => o.MathList = v);
+
+    public static readonly DirectProperty<MathBox, bool> PropertyToTransmitMathInputEventProperty = AvaloniaProperty.RegisterDirect<MathBox, bool>(
+        nameof(PropertyToTransmitMathInputEvent), o => o.PropertyToTransmitMathInputEvent, (o, v) => o.PropertyToTransmitMathInputEvent = v);
+
+    public bool PropertyToTransmitMathInputEvent
     {
+        get => field;
+        set => SetAndRaise(PropertyToTransmitMathInputEventProperty, ref field, value);
+    }
+
+    public MathList MathList
+    {
+        get => Keyboard.MathList;
+        set
+        {
+            Keyboard?.RedrawRequested -= InvokeAsyncInvalidateVisual;
+            Keyboard = new(value);
+            Keyboard.RedrawRequested += InvokeAsyncInvalidateVisual;
+            Keyboard.Font = new Fonts(Keyboard.Font,Scale*FontSize);
+            Keyboard.InsertionPositionHighlighted = true;
+            
+        }
+    }
+
+    public bool IsCorrect
+    {
+        get => field;
+        private set => SetAndRaise(IsCorrectProperty, ref field, value);
+    } = false;
+
+    private void InvokeAsyncInvalidateVisual(object? sender, EventArgs e)
+    {
+        Dispatcher.UIThread.InvokeAsync(InvalidateVisual);
+    }
+
+    public string Expression
+    {
+        get => field;
+        private set => SetAndRaise(ExpressionProperty, ref field, value);
+    } = "";
+
+    //private Fonts Fonts;
+    public MathBox():this(1){}
+    public MathBox(float scale=1)
+    {
+        Scale = scale;
         ClipToBounds=false;
-        var reader = new OpenFontReader();
+        MathList = new();
+        //var reader = new OpenFontReader();
         //Typography.OpenFont.Typeface? typeface = null;// reader.Read(SkiaSharp.SKData.Create(SkiaEx.MapleMono.Typeface.OpenStream()).AsStream());
         //Fonts =new Fonts(typeface==null?Fonts.GlobalTypefaces:[typeface],Scale*FontSize);
-        ClipToBounds = true;
         //Instances.Add(this);
         RenderOptions.SetEdgeMode(this, EdgeMode.Antialias);
         RenderOptions.SetTextRenderingMode(this,TextRenderingMode.Antialias);
         RenderOptions.SetBitmapInterpolationMode(this,BitmapInterpolationMode.HighQuality);
         VerticalAlignment= Avalonia.Layout.VerticalAlignment.Center;
-        Keyboard.Font = new Fonts(Keyboard.Font,Scale*FontSize);
         Focusable = true;
         Painter.FontSize = FontSize*Scale;
-        Painter.LocalTypefaces = Keyboard.Font;
-        AffectsArrange<MathBox>(LaTeXProperty);
-        AffectsMeasure<MathBox>(LaTeXProperty);
+        Painter.LocalTypefaces = new Fonts(Keyboard.Font,Scale*FontSize);
         AffectsMeasure<MathBox>(VisualParentProperty);
         AffectsArrange<MathBox>(VisualParentProperty);
+        //PressKey(CgMathKeyboardInput.Sine,CgMathKeyboardInput.SmallX,CgMathKeyboardInput.Slash,CgMathKeyboardInput.Cosine,CgMathKeyboardInput.SmallX);
         InvalidateArrange();
-        PressKey(CgMathKeyboardInput.Sine);
-        PressKey(CgMathKeyboardInput.Sine);
-        PressKey(CgMathKeyboardInput.Sine);
-        PressKey(CgMathKeyboardInput.Sine);
-        Keyboard.RedrawRequested += (_,_) =>
-        {
-            Dispatcher.UIThread.InvokeAsync(InvalidateVisual);
-        };
     }
 
     ~MathBox()
@@ -115,12 +155,6 @@ public class MathBox:Control
         #endif
     }
 
-    public string LaTeX
-    {
-        get => field;
-        private set => SetAndRaise(LaTeXProperty, ref field, value);
-    } = "";
-
     public float FontSize
     {
         get => field;
@@ -128,15 +162,28 @@ public class MathBox:Control
     } = 15;
     public override void Render(DrawingContext e)
     {
-        Painter.LaTeX = LaTeX;;
-        e.PushTransform(Matrix.CreateTranslation(-CurrentMeasuredRect.Left,-CurrentMeasuredRect.Top));
-        var c = new AvaloniaCanvas(e, (Bounds.Size+new Size(20,20))*Scale);
+        e.DrawRectangle(new SolidColorBrush(0x00000000),null,Bounds);
+        if (!Keyboard.HasText)
+        {
+            if (Keyboard.ShouldDrawCaret && IsFocused)
+            {
+                var y = (float)((Bounds.Height - FontSize*2/3) / 2);
+                e.DrawLine(new Pen(Brushes.Black,1.5),new(0,y),new(0,y+FontSize*2/3));
+                return;
+            }
+        }
+        Painter.LaTeX = Keyboard.LaTeX;
+        e.PushTransform(Matrix.CreateTranslation(-CurrentMeasuredRect.Left,-CurrentMeasuredRect.Top+(float)((Bounds.Height-CurrentMeasuredRect.Height)/2)));
+
+        var c = new AvaloniaCanvas(e, (Bounds.Size)*Scale);
         c.Save();
         c.Scale(1/Scale,1/Scale);
-        Painter.Draw(c,0,0);
-        c.Restore();
-        if (Keyboard.ShouldDrawCaret&&IsFocused)
+        Painter.Draw(c,0f,0f);
+        if (Keyboard.ShouldDrawCaret && IsFocused)
+        {
             Keyboard.DrawCaret(c, Color.Black, CaretShape.IBeam);
+        }
+        c.Restore();
     }
 
     public float CaretPosition=>((Keyboard.Display?.PointForIndex(TypesettingContext.Instance, Keyboard.InsertionIndex) ?? Keyboard.Display?.Position)??new(0,0)).X;
@@ -148,19 +195,26 @@ public class MathBox:Control
             Keyboard.KeyPress(keyboardInput);   
         }
         CurrentMeasuredRect = Keyboard.Measure;
-        Keyboard.InsertionPositionHighlighted = true;
-        LaTeX = Keyboard.LaTeX;
+        var expres = MathList.Parse();
+        expres.Match((string exp) =>
+        {
+            Expression = exp;
+            IsCorrect = true;
+        },(exception =>
+        {
+            IsCorrect = false;
+        }));
         InvalidateMeasure();
         InvalidateArrange();
         MathInputted?.Invoke(this, EventArgs.Empty);
+        PropertyToTransmitMathInputEvent=!PropertyToTransmitMathInputEvent;
     }
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         base.OnPointerPressed(e);
-        //MathBox.FocusedInstance = this;
-        Console.WriteLine(e.GetPosition(this));
         Keyboard.MoveCaretToPoint(e.GetPosition(this).ToSysPointF().Add(CurrentMeasuredRect.Left,CurrentMeasuredRect.Top));
+        e.Handled = true;
     }
 
     protected override void OnKeyDown(KeyEventArgs e)
@@ -171,107 +225,105 @@ public class MathBox:Control
             switch (keyChar)
             {
                 case >= 'a' and <= 'z':
-                {
                     PressKey(CgMathKeyboardInput.SmallA+(keyChar-'a'));
-                }
-                    return;
+                    goto HandledEvent;
                 case >= 'A' and <= 'Z':
-                {
                     PressKey(CgMathKeyboardInput.A+(keyChar-'A'));
-                }
-                    return;
+                    goto HandledEvent;
                 case '/':
                     PressKey(CgMathKeyboardInput.Slash);
-                    return;
+                    goto HandledEvent;
                 case '|':
                     PressKey(CgMathKeyboardInput.Cup);
-                    return;
+                    goto HandledEvent;
                 case '&':
                     PressKey(CgMathKeyboardInput.Cap);
-                    return;
+                    goto HandledEvent;
                 case '%':
                     PressKey(CgMathKeyboardInput.Modulo);
-                    return;
+                    goto HandledEvent;
                 case '*':
                     PressKey(CgMathKeyboardInput.Multiply);
-                    return;
+                    goto HandledEvent;
                 case '+':
                     PressKey(CgMathKeyboardInput.Plus);
-                    return;
+                    goto HandledEvent;
                 case '-':
                     PressKey(CgMathKeyboardInput.Minus);
-                    return;
+                    goto HandledEvent;
                 case '^':
                     PressKey(CgMathKeyboardInput.Power);
-                    return;
+                    goto HandledEvent;
                 case >= '0' and <= '9':
                     PressKey(CgMathKeyboardInput.D0+(keyChar-'0'));
-                    return;
+                    goto HandledEvent;
                 case '(':
                     PressKey(CgMathKeyboardInput.LeftRoundBracket);
-                    return;
+                    goto HandledEvent;
                 case ')':
                     PressKey(CgMathKeyboardInput.RightRoundBracket);
-                    return;
+                    goto HandledEvent;
                 case '>':
                     PressKey(CgMathKeyboardInput.GreaterThan);
-                    return;
+                    goto HandledEvent;
                 case '<':
                     PressKey(CgMathKeyboardInput.LessThan);
-                    return;
+                    goto HandledEvent;
                 case '=':
                     PressKey(CgMathKeyboardInput.Equals);
-                    return;
+                    goto HandledEvent;
+                case '.':
+                    PressKey(CgMathKeyboardInput.Decimal);
+                    goto HandledEvent;
             }
         }
-        switch (e.PhysicalKey)
+
+        if (e.KeyModifiers == KeyModifiers.None)
         {
-            case PhysicalKey.Backspace:
-                PressKey(CgMathKeyboardInput.Backspace);
-                return;
-            case PhysicalKey.Delete:
-                PressKey(CgMathKeyboardInput.Right,CgMathKeyboardInput.Backspace);
-                return;
-            case PhysicalKey.ArrowLeft:
-                PressKey(CgMathKeyboardInput.Left);
-                return;
-            case PhysicalKey.ArrowRight:
-                PressKey(CgMathKeyboardInput.Right);
-                return;
-            case PhysicalKey.ArrowUp:
-                PressKey(CgMathKeyboardInput.Up);
-                return;
-            case PhysicalKey.ArrowDown:
-                PressKey(CgMathKeyboardInput.Down);
-                return;
-            case PhysicalKey.Enter:
+            switch (e.PhysicalKey)
             {
-                var (math, error) = Evaluate(Keyboard.MathList);
-                Console.WriteLine(error+" "+LaTeX);
-                switch (math)
-                {
-                    case MathItem.Entity { Content: var entity }:
-                        // entity is an AngouriMath.Entity
-                        var simplifiedEntity = entity.Simplify();
-                        Console.WriteLine(simplifiedEntity);
-                        break;
-                    case MathItem.Comma comma:
-                        // comma is a System.Collections.Generic.IEnumerable<CSharpMath.Evaluation.MathItem>
-                        break;
-                    case MathItem.Set { Content: var set }:
-                        // set is an AngouriMath.Core.Set
-                        break;
-                }
+                case PhysicalKey.Backspace:
+                    PressKey(CgMathKeyboardInput.Backspace);
+                    goto HandledEvent;
+                case PhysicalKey.Delete:
+                    PressKey(CgMathKeyboardInput.Right,CgMathKeyboardInput.Backspace);
+                    goto HandledEvent;
+                case PhysicalKey.ArrowLeft:
+                    PressKey(CgMathKeyboardInput.Left);
+                    goto HandledEvent;
+                case PhysicalKey.ArrowRight:
+                    PressKey(CgMathKeyboardInput.Right);
+                    goto HandledEvent;
+                case PhysicalKey.ArrowUp:
+                    PressKey(CgMathKeyboardInput.Up);
+                    goto HandledEvent;
+                case PhysicalKey.ArrowDown:
+                    PressKey(CgMathKeyboardInput.Down);
+                    goto HandledEvent;
             }
-                return;
         }
+
+        if (e.KeyModifiers == KeyModifiers.Control)
+        {
+            switch (e.Key)
+            {
+                case  Key.Z:
+                    goto HandledEvent;
+                case Key.A:
+                    goto HandledEvent;
+                case Key.Y:
+                    goto HandledEvent;
+            }
+        }
+        return;
+        HandledEvent:
+        e.Handled = true;
     }
 
     protected override Size MeasureOverride(Size availableSize)
     {
         CurrentMeasuredRect = Keyboard.Measure;
         var size = CurrentMeasuredRect.Size;
-        Console.WriteLine("Measured");
-        return new Size(Max(size.Width,this.GetVisualParent()?.Bounds.Width??0), size.Height);
+        return new Size(Max(size.Width,30), Max(size.Height,30));
     }
 }

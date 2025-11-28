@@ -240,7 +240,7 @@ public static class Compiler
         //return expres.Compile();
     }
 
-    internal static Element[] ParseTokens(this Token[] Tokens)
+    public static Element[] ParseTokens(this Token[] Tokens)
     {
         var op = new Stack<OperatorType>();
         var exp = new Stack<Element>();
@@ -361,7 +361,7 @@ public static class Compiler
         return exp.Reverse().ToArray();
     }
 
-    internal static Token[] GetTokens(this string script) //词法分析器
+    public static Token[] GetTokens(this string script) //词法分析器
     {
         script += '#';
         var loc = 0;

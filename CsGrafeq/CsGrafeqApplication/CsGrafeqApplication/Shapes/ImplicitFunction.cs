@@ -1,7 +1,10 @@
 using System;
+using Avalonia.Media;
+using CsGrafeq.CSharpMath.Editor;
 using CsGrafeq.Interval;
 using CsGrafeqApplication;
 using CsGrafeqApplication.Addons;
+using CSharpMath.Atom;
 using ReactiveUI;
 using SkiaSharp;
 
@@ -11,16 +14,42 @@ public class ImplicitFunction : Shape
 {
     public readonly Renderable RenderTarget = new();
 
-    public ImplicitFunction(string expression = "y=x+1")
+    public ImplicitFunction(MathList ml)
     {
+        PropertyChanged += (s, e) =>
+        {
+            RefreshIsActive();
+            if (e.PropertyName == nameof(PropertyToReceiveMathListChanged))
+            {
+                RefreshExpression();
+            }else if (e.PropertyName == nameof(IsCorrect))
+            {
+                BorderBrush = IsCorrect ? Brushes.Blue : Brushes.Red;
+            }
+        };
         Description = "ImplicitFunction";
-        Expression = expression;
+        MathList = ml.Clone(false);
         EnglishChar.Instance.CharValueChanged += CharValueChanged;
         RenderTarget.OnRender += RenderTarget_OnRender;
-        PropertyChanged += (s, e) => { RefreshIsActive(); };
         Opacity = Static.Instance.DefaultOpacity;
+        BorderBrush = IsCorrect ? Brushes.Blue : Brushes.Red;
     }
 
+    private void RefreshExpression()
+    {
+        var res = MathList.Parse();
+        res.Match(exp =>
+        {
+            Expression = exp;
+        }, _ =>
+        {
+            IsCorrect=false;
+        });
+    }
+    public bool PropertyToReceiveMathListChanged { 
+        get;
+        set => this.RaiseAndSetIfChanged(ref field, value);
+    }
     public byte Opacity
     {
         get => field;
@@ -43,16 +72,29 @@ public class ImplicitFunction : Shape
         private set => this.RaiseAndSetIfChanged(ref field, value);
     } = false;
 
+    public IBrush BorderBrush
+    {
+        get=>field;
+        private set=>this.RaiseAndSetIfChanged(ref field, value);
+    }=Brushes.Blue;
+
     public HasReferenceIntervalSetFunc<IntervalSet> Function
     {
         get => field;
         private set => this.RaiseAndSetIfChanged(ref field, value);
     } = new((x, y) => Def.FF, EnglishCharEnum.None);
 
+    public MathList Original;
+    public MathList MathList
+    {
+        get=>field;
+        set => this.RaiseAndSetIfChanged(ref field, value);
+    }
+
     public string Expression
     {
         get => field;
-        set
+        private set
         {
             this.RaiseAndSetIfChanged(ref field, value);
             try

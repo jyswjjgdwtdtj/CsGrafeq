@@ -9,11 +9,13 @@
         <!-- Set Defaults -->
         <Setter Property="Template">
             <ControlTemplate>
-                <ScrollViewer Margin="3,0" Name="PART_ScrollViewer" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled" HorizontalAlignment="Stretch">
-                    <controls:MathBox Name="PART_MathBox" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <Border Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                    <ScrollViewer Margin="3,0" Name="PART_ScrollViewer" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled" HorizontalAlignment="Stretch">
+                        <controls:MathBox Name="PART_MathBox" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                                 
-                    </controls:MathBox>
-                </ScrollViewer>
+                        </controls:MathBox>
+                    </ScrollViewer>
+                </Border>
             </ControlTemplate>
         </Setter>
     </Style>

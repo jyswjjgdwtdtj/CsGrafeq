@@ -22,7 +22,6 @@ public class GlobalMathKeyBoard : ContentControl
             togglebtn.TemplateApplied += (_, tte) =>
             {
                 var path= tte.NameScope.Find<Path>("PART_ExpandIcon");
-                Console.WriteLine(path?.GetType()?.ToString()??"null");
                 var border = path?.Parent as Border;
             
                 border.RenderTransform = new RotateTransform() {Angle = 180};
