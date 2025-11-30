@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Text;
 using CsGrafeq.Collections;
-using DynamicData;
 
 namespace CsGrafeq.Shapes;
 
@@ -76,6 +75,10 @@ public class ShapeList : ObservableCollection<Shape>
         base.Add(shape);
     }
 
+    /// <summary>
+    ///     移除几何图形
+    /// </summary>
+    /// <param name="shape"></param>
     private void RemoveGeometry(GeometryShape shape)
     {
         base.Remove(shape);
@@ -84,11 +87,20 @@ public class ShapeList : ObservableCollection<Shape>
             RemoveGeometry(i);
     }
 
+    /// <summary>
+    ///     移除非GeometryShape
+    /// </summary>
+    /// <param name="shape"></param>
     private void RemoveNotGeometry(Shape shape)
     {
         base.Remove(shape);
     }
 
+    /// <summary>
+    ///     从序号获取到类似于“A”,“B”，“ABC”的字符串
+    /// </summary>
+    /// <param name="index"></param>
+    /// <returns></returns>
     public static string GetNameFromIndex(int index)
     {
         if (index < 0)
@@ -110,19 +122,21 @@ public class ShapeList : ObservableCollection<Shape>
         return sb.ToString();
     }
 
-    public void InvalidateBuffers()
-    {
-        var newarr = new Shape[Count];
-        CopyTo(newarr, 0);
-        ClearItems();
-        this.AddRange(newarr);
-    }
-
+    /// <summary>
+    ///     获取指定类型的Shape
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
     public IEnumerable<T> GetShapes<T>()
     {
         return this.OfType<T>();
     }
 
+    /// <summary>
+    ///     从类似于“AA”，“A”，“ABC”获取到序号
+    /// </summary>
+    /// <param name="str"></param>
+    /// <returns></returns>
     public static int GetIndexFromString(string str)
     {
         var res = 0;
@@ -136,12 +150,22 @@ public class ShapeList : ObservableCollection<Shape>
         return res;
     }
 
+    /// <summary>
+    ///     获取所有被选中的图形
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
     public IEnumerable<T> GetSelectedShapes<T>() where T : GeometryShape
     {
         foreach (var i in SelectedShapes.OfType<T>())
             yield return i;
     }
 
+    /// <summary>
+    ///     递归获取所有子Shape
+    /// </summary>
+    /// <param name="shape"></param>
+    /// <returns></returns>
     public static IEnumerable<GeometryShape> GetAllChildren(GeometryShape shape)
     {
         if (!shape.IsDeleted)

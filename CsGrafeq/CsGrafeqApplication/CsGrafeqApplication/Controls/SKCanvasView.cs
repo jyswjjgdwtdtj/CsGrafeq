@@ -1,14 +1,18 @@
-﻿using System;
+﻿#define  USE_FIRST
+using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using Avalonia.Media.Immutable;
+using Avalonia.Platform;
 using Avalonia.Rendering.SceneGraph;
 using Avalonia.Skia;
+using Avalonia.Threading;
 using SkiaSharp;
 
 namespace CsGrafeqApplication.Controls;
-
+#if  USE_FIRST
 /// <summary>
 ///     A Xaml canvas control that can be drawn on using SkiaSharp drawing commands
 ///     which facilitates porting from existing Xamarin Forms applications.
@@ -18,7 +22,7 @@ namespace CsGrafeqApplication.Controls;
 ///     <see cref="Decorator" /> was used instead of <see cref="Canvas" />,
 ///     because <see cref="Decorator" /> facilitates the relative positioning of any additional controls.
 /// </remarks>
-public class SKCanvasView : UserControl
+public class SKCanvasView : Control
 {
     /// <summary>
     ///     用于DrawingContext的Custom方法
@@ -27,13 +31,10 @@ public class SKCanvasView : UserControl
 
     public SKCanvasView()
     {
-        Background = new SolidColorBrush(Colors.Transparent);
-        customDrawOper = new CustomDrawOperation(ValidRect,this);
-        customDrawOper.SKDraw += (s, e) => { OnSkiaRender(e); };
+        customDrawOper = new CustomDrawOperation(ValidRect, this);
+        customDrawOper.SKDraw += (s, e) => { OnSKRender(e); };
         OnValidRectRefresh();
         SizeChanged += (s, e) => { OnValidRectRefresh(); };
-#if Windows
-#endif
     }
 
     public Rect ValidRect
@@ -54,7 +55,7 @@ public class SKCanvasView : UserControl
     /// <summary>
     ///     绘制函数
     /// </summary>
-    protected virtual void OnSkiaRender(SKRenderEventArgs e)
+    protected virtual void OnSKRender(SKRenderEventArgs e)
     {
         SkiaRender?.Invoke(this, e);
     }
@@ -75,7 +76,7 @@ public class SKCanvasView : UserControl
         private WriteableBitmap Buffer;
         private SKCanvasView Canvas;
 
-        public CustomDrawOperation(Rect bounds,SKCanvasView canvas, uint clearColor = 0x00FFFFFF)
+        public CustomDrawOperation(Rect bounds, SKCanvasView canvas, uint clearColor = 0x00FFFFFF)
         {
             Bounds = bounds;
             SKDraw += (s, e) => { e.Canvas.Clear(clearColor); };
@@ -122,6 +123,7 @@ public class SKCanvasView : UserControl
 
         public void Render(ImmediateDrawingContext context)
         {
+            context.DrawRectangle(new ImmutableSolidColorBrush(Colors.Green),null, new Rect(Bounds.Size));
             lock (BufferLock)
             {
                 using (var lb = Buffer.Lock())
@@ -134,7 +136,8 @@ public class SKCanvasView : UserControl
                         SKDraw?.Invoke(null, new SKRenderEventArgs(canvas));
                     }
                 }
-                context.DrawBitmap(Buffer, Bounds, Bounds);
+
+                context.DrawBitmap(Buffer, Bounds, new Rect(Bounds.Size));
             }
         }
 
@@ -150,4 +153,81 @@ public class SKCanvasView : UserControl
 
         public SKCanvas Canvas { get; init; }
     }
+
+    protected override void OnSizeChanged(SizeChangedEventArgs e)
+    {
+        base.OnSizeChanged(e);
+        Dispatcher.UIThread.InvokeAsync(InvalidateVisual);
+    }
 }
+#else
+public class SKCanvasView : Control
+{
+    class RenderingLogic : ICustomDrawOperation
+    {
+        public Action<SKCanvas>? RenderCall;
+        public Rect Bounds { get; set; }
+        public void Dispose() {}
+        public bool Equals(ICustomDrawOperation? other) => other == this;
+        public bool HitTest(Point p) { return false; }
+
+        public void Render(ImmediateDrawingContext context)
+        {
+            context.DrawRectangle(new ImmutableSolidColorBrush(Colors.Transparent),null, Bounds);
+            var skia = context.TryGetFeature<ISkiaSharpApiLeaseFeature>();
+            if (skia != null)
+            {
+                using (var lease = skia.Lease()) {
+                    SKCanvas canvas = lease.SkCanvas;
+                    canvas.ClipRect(new Rect(Bounds.Size).ToSKRect());
+                    canvas.Clear(SKColors.Transparent);
+                    RenderCall?.Invoke(canvas);
+                }
+            }
+        }
+    }
+
+    private RenderingLogic renderingLogic;
+    protected virtual void OnSKRender(SKRenderEventArgs e)
+    {
+        SKRender?.Invoke(this, e);
+    }
+
+    public event EventHandler<SKRenderEventArgs>? SKRender;
+
+    public SKCanvasView()
+    {
+        renderingLogic = new RenderingLogic();
+        renderingLogic.RenderCall += (canvas) => OnSKRender(new SKRenderEventArgs(canvas));
+        OnValidRectRefresh();
+        SizeChanged += (s, e) => { OnValidRectRefresh(); };
+    }
+
+    public sealed override void Render(DrawingContext context)
+    {
+        context.Custom(renderingLogic);
+    }
+    protected virtual void OnValidRectRefresh()
+    {
+        ValidRect = Bounds;
+    }
+    public Rect ValidRect
+    {
+        get => field;
+        private set
+        {
+            field = value;
+            renderingLogic.Bounds = value;
+        }
+    }
+}
+public class SKRenderEventArgs : EventArgs
+{
+    public SKRenderEventArgs(SKCanvas canvas)
+    {
+        Canvas = canvas;
+    }
+
+    public SKCanvas Canvas { get; init; }
+}
+#endif

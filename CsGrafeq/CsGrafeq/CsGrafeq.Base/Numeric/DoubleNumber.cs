@@ -1,4 +1,3 @@
-using CsGrafeq.Utilities;
 using System.Runtime.CompilerServices;
 using CGMath = CsGrafeq.Utilities.CsGrafeqMath;
 
@@ -172,7 +171,7 @@ public struct DoubleNumber : IComputableNumber<DoubleNumber>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static DoubleNumber Median(DoubleNumber num1, DoubleNumber num2, DoubleNumber num3)
     {
-        return new DoubleNumber(CGMath.DoubleMedian(num1.Value, num2.Value, num3.Value));
+        return new DoubleNumber(CGMath.Median(num1.Value, num2.Value, num3.Value));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -228,9 +227,11 @@ public struct DoubleNumber : IComputableNumber<DoubleNumber>
     {
         return new DoubleNumber(num);
     }
+
     public static DoubleNumber Clone(DoubleNumber Value)
     {
         throw new NotImplementedException();
     }
+
     public static bool NeedClone => false;
 }

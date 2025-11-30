@@ -1,6 +1,7 @@
 ﻿using CsGrafeq.Collections;
 using CsGrafeq.Shapes.ShapeGetter;
 using ReactiveUI;
+using static CsGrafeq.Utilities.CsGrafeqMath;
 
 namespace CsGrafeq.Shapes;
 
@@ -34,8 +35,14 @@ public class Point : GeometryShape
         InvokeShapeChanged();
     }
 
-    public override Vec NearestOf(Vec vec)
+    public override Vec DistanceTo(Vec vec)
     {
         return Location;
+    }
+
+    public override bool IsIntersectedWithRect(CgRectangle rect)
+    {
+        var v = Location - rect.Location;
+        return RangeIn(0, rect.Size.X, v.X) && RangeIn(0, rect.Size.Y, v.Y);
     }
 }

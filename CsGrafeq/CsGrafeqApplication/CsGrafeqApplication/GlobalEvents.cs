@@ -3,7 +3,7 @@ using Avalonia.Input;
 
 namespace CsGrafeqApplication;
 
-internal static class Global
+internal static class GlobalEvents
 {
     public static event EventHandler<KeyEventArgs>? KeyDown;
     public static event EventHandler<KeyEventArgs>? KeyUp;

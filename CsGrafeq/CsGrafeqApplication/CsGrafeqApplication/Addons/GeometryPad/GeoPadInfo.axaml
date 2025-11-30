@@ -4,9 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              xmlns:geopad="clr-namespace:CsGrafeqApplication.Addons.GeometryPad;assembly=CsGrafeqApplication"
-             xmlns:shapes="clr-namespace:CsGrafeq.Shapes" 
+             xmlns:shapes="clr-namespace:CsGrafeq.Shapes"
              x:Class="CsGrafeqApplication.Addons.GeometryPad.GeoPadInfo" x:DataType="geopad:GeometryPadViewModel">
-    <Border  CornerRadius="5" Background="{DynamicResource CgBackgroundBrush}">
+    <Border CornerRadius="5" Background="{DynamicResource CgTranslucentBackgroundBrush}">
         <ItemsControl ItemsSource="{CompiledBinding Shapes}">
             <ItemsControl.ItemTemplate>
                 <geopad:ImpFuncShowDataTemplate>
@@ -17,9 +17,11 @@
                                     <Border IsVisible="{CompiledBinding IsCorrect}">
                                         <DockPanel LastChildFill="True" Height="40">
                                             <Border Width="40" Height="40" DockPanel.Dock="Left">
-                                                <Rectangle Fill="{CompiledBinding Color,Converter={StaticResource UIntColorToBrush},ConverterParameter='255',Mode=OneWay}"  Stroke="Black" Width="15" Height="15" StrokeThickness="1"></Rectangle>
+                                                <Rectangle
+                                                    Fill="{CompiledBinding Color,Converter={StaticResource UIntColorToBrush},ConverterParameter='255',Mode=OneWay}"
+                                                    Stroke="Black" Width="15" Height="15" StrokeThickness="1" />
                                             </Border>
-                                            <TextBlock Text="{CompiledBinding Expression}" VerticalAlignment="Center"></TextBlock>
+                                            <TextBlock Text="{CompiledBinding Expression}" VerticalAlignment="Center" />
                                         </DockPanel>
                                     </Border>
                                 </Border>
@@ -27,7 +29,7 @@
                         </DataTemplate>
                     </geopad:ImpFuncShowDataTemplate.ImpFuncDataTemplate>
                 </geopad:ImpFuncShowDataTemplate>
-            
+
             </ItemsControl.ItemTemplate>
         </ItemsControl>
     </Border>

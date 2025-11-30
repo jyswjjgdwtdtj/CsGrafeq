@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using Avalonia;
 using Avalonia.Animation;
+using Avalonia.Animation.Easings;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
@@ -153,21 +154,25 @@ public class ShownControl : TemplatedControl
         AnimToVer.FillMode = FillMode.Forward;
         AnimToVer.Children.Add(new KeyFrame { Cue = new Cue(0), Setters = { new Setter(HeightProperty, 0d) } });
         AnimToVer.Children.Add(new KeyFrame { Cue = new Cue(1), Setters = { TargetSetterVer } });
+        AnimToVer.Easing = Easing.Parse("SineEaseInOut");
 
         AnimBackVer.Duration = TimeSpan.FromSeconds(0.05);
         AnimBackVer.FillMode = FillMode.Forward;
         AnimBackVer.Children.Add(new KeyFrame { Cue = new Cue(0), Setters = { TargetSetterVer } });
         AnimBackVer.Children.Add(new KeyFrame { Cue = new Cue(1), Setters = { new Setter(HeightProperty, 0d) } });
+        AnimBackVer.Easing = Easing.Parse("SineEaseInOut");
 
         AnimToHor.Duration = TimeSpan.FromSeconds(0.05);
         AnimToHor.FillMode = FillMode.Forward;
         AnimToHor.Children.Add(new KeyFrame { Cue = new Cue(0), Setters = { new Setter(WidthProperty, 0d) } });
         AnimToHor.Children.Add(new KeyFrame { Cue = new Cue(1), Setters = { TargetSetterHor } });
+        AnimToHor.Easing = Easing.Parse("SineEaseInOut");
 
         AnimBackHor.Duration = TimeSpan.FromSeconds(0.05);
         AnimBackHor.FillMode = FillMode.Forward;
         AnimBackHor.Children.Add(new KeyFrame { Cue = new Cue(0), Setters = { TargetSetterHor } });
         AnimBackHor.Children.Add(new KeyFrame { Cue = new Cue(1), Setters = { new Setter(WidthProperty, 0d) } });
+        AnimBackHor.Easing = Easing.Parse("SineEaseInOut");
     }
 
     [Content]

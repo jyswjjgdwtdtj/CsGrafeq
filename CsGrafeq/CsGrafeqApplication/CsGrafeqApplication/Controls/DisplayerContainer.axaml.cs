@@ -1,13 +1,11 @@
 using System;
+using System.Diagnostics;
 using System.Threading;
 using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Layout;
-using Avalonia.LogicalTree;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
@@ -77,28 +75,29 @@ public partial class DisplayerContainer : UserControl
         };
         Static.Info = Info;
     }
+
     protected override void OnSizeChanged(SizeChangedEventArgs e)
     {
         base.OnSizeChanged(e);
     }
 
 
-    
-    private async void Info(Control content,Static.InfoType infotype)
+    private async void Info(Control content, Static.InfoType infotype)
     {
         var color = infotype switch
         {
-            Static.InfoType.Warning=>Colors.Yellow,
-            Static.InfoType.Error=>Colors.Red,
-            _ => Color.FromRgb(0x77,0xcc,0xbb)
+            Static.InfoType.Warning => Colors.Yellow,
+            Static.InfoType.Error => Colors.Red,
+            _ => Color.FromRgb(0x77, 0xcc, 0xbb)
         };
-        InfoOuterContainer.Background=new SolidColorBrush(Color.FromArgb(128,color.R,color.G,color.B));
+        InfoOuterContainer.Background = new SolidColorBrush(Color.FromArgb(128, color.R, color.G, color.B));
         InfoCancellation.Cancel();
         InfoCancellation = new CancellationTokenSource();
         InfoPresenter.Content = content;
         ((Control)InfoPresenter.Parent).Opacity = 1;
         await anim.RunAsync(InfoPresenter.Parent, InfoCancellation.Token);
     }
+
     private void GlobalKeyDown(object? sender, KeyEventArgs e)
     {
         switch (e.Key)
@@ -113,22 +112,22 @@ public partial class DisplayerContainer : UserControl
             }
                 break;
             case Key.A:
+            {
+                if (e.KeyModifiers == KeyModifiers.Control)
                 {
-                    if (e.KeyModifiers == KeyModifiers.Control)
-                    {
-                        SelectAll_Clicked(sender, e);
-                        e.Handled = true;
-                    }
+                    SelectAll_Clicked(sender, e);
+                    e.Handled = true;
                 }
+            }
                 break;
             case Key.S:
+            {
+                if (e.KeyModifiers == KeyModifiers.Control)
                 {
-                    if (e.KeyModifiers == KeyModifiers.Control)
-                    {
-                        SaveClicked(sender, e);
-                        e.Handled = true;
-                    }
+                    SaveClicked(sender, e);
+                    e.Handled = true;
                 }
+            }
                 break;
             case Key.OemComma: // Ctrl + ,
             {
@@ -233,6 +232,7 @@ public partial class DisplayerContainer : UserControl
     {
         VM.Displayer.Addons[0].Delete();
     }
+
     private void SelectAll_Clicked(object? sender, RoutedEventArgs e)
     {
         VM.Displayer.Addons[0].SelectAll();
@@ -250,18 +250,15 @@ public partial class DisplayerContainer : UserControl
 
     private void Github_Clicked(object? sender, RoutedEventArgs e)
     {
-        RegistryKey key = Registry.ClassesRoot.OpenSubKey(@"http\shell\open\command\");
-        string s = key.GetValue("").ToString();
-        Console.WriteLine(s);
-        System.Diagnostics.Process.Start(s, "https://github.com/jyswjjgdwtdtj/CsGrafeq");
-    
+        var key = Registry.ClassesRoot.OpenSubKey(@"http\shell\open\command\");
+        var s = key.GetValue("").ToString();
+        Process.Start(s, "https://github.com/jyswjjgdwtdtj/CsGrafeq");
     }
 
     private void ThemeSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
         (TopLevel.GetTopLevel(this) as Window)?.SystemDecorations = SystemDecorations.Full;
         if (sender is ComboBox comboBox)
-        {
             switch (comboBox.SelectedIndex)
             {
                 case 0:
@@ -274,8 +271,8 @@ public partial class DisplayerContainer : UserControl
                     Application.Current.RequestedThemeVariant = ThemeVariant.Default;
                     break;
             }
-        }
     }
+
 /*
     private static bool IsWindow = (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime)!;
     private Window CurrentWindow;
@@ -323,35 +320,35 @@ public partial class DisplayerContainer : UserControl
             preventMove=true;
         }
     }*/
-private async void SaveClicked(object? sender, RoutedEventArgs e)
-{
-    var topLevel = TopLevel.GetTopLevel(this);
-    if (topLevel != null)
+    private async void SaveClicked(object? sender, RoutedEventArgs e)
     {
-        var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions()
+        var topLevel = TopLevel.GetTopLevel(this);
+        if (topLevel != null)
         {
-            Title = "Open Text File",
-            FileTypeChoices = [FilePickerFileTypes.ImageAll],
-            DefaultExtension = ".jpg",
-            ShowOverwritePrompt = true
-        });
-        if (file != null)
-        {
+            var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+            {
+                Title = "Open Text File",
+                FileTypeChoices = [FilePickerFileTypes.ImageAll],
+                DefaultExtension = ".jpg",
+                ShowOverwritePrompt = true
+            });
+            if (file != null)
+            {
                 var size = new PixelSize((int)VM.Displayer.Bounds.Width, (int)VM.Displayer.Bounds.Height);
                 var rr = new RenderTargetBitmap(size);
                 using (var dc = rr.CreateDrawingContext())
                 {
-                    RenderTargetBitmap rt = new RenderTargetBitmap(size);
+                    var rt = new RenderTargetBitmap(size);
                     rt.Render(VM.Displayer);
                     dc.DrawImage(rt, VM.Displayer.Bounds);
-                    rt = new RenderTargetBitmap(new((int)InfoCanvas.Bounds.Width, (int)InfoCanvas.Bounds.Height));
+                    rt = new RenderTargetBitmap(new PixelSize((int)InfoCanvas.Bounds.Width,
+                        (int)InfoCanvas.Bounds.Height));
                     rt.Render(InfoCanvas);
                     dc.DrawImage(rt, InfoCanvas.Bounds);
                 }
-                rr.Save(file.Path.AbsolutePath);
-                
 
+                rr.Save(file.Path.AbsolutePath);
             }
+        }
     }
-}
 }

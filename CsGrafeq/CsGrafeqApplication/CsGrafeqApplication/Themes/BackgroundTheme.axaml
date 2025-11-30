@@ -5,11 +5,14 @@
         <ResourceDictionary x:Key='Light'>
             <system:Boolean x:Key="IsLight">True</system:Boolean>
             <system:Boolean x:Key="IsDark">False</system:Boolean>
-            <SolidColorBrush x:Key='CgBackgroundBrush' Opacity="0.6" Color="White" />
+            <SolidColorBrush x:Key='CgBackgroundBrush' Opacity="1" Color="White" />
+            <SolidColorBrush x:Key='CgTranslucentBackgroundBrush' Opacity="0.6" Color="White" />
             <SolidColorBrush x:Key='CgForegroundBrush' Opacity="1" Color="Black" />
             <SolidColorBrush x:Key='CgHalfForegroundBrush' Opacity="1" Color="Gray" />
-            <SolidColorBrush x:Key="CgCtPureBackgroundBrush" Color="Black" />
-            <SolidColorBrush x:Key="CgHTCtPureBackgroundBrush" Color="Black" Opacity="0.3" />
+            <SolidColorBrush x:Key="CgOppositeBackgroundBrush" Color="Black" />
+            <SolidColorBrush x:Key="CgOppositeTranslucentBackgroundBrush0" Color="Black" Opacity="0.05" />
+            <SolidColorBrush x:Key="CgOppositeTranslucentBackgroundBrush1" Color="Black" Opacity="0.3" />
+            <SolidColorBrush x:Key="CgOppositeTranslucentBackgroundBrush2" Color="Black" Opacity="0.7" />
             <SolidColorBrush x:Key="CgTransparentBrush" Opacity="0" Color="White" />
             <SolidColorBrush x:Key="AxisBackgroundBrush" Opacity="0" Color="#ffffff" />
             <Color x:Key="CgTransparentColor">#00ffffff</Color>
@@ -21,11 +24,14 @@
         <ResourceDictionary x:Key='Dark'>
             <system:Boolean x:Key="IsLight">False</system:Boolean>
             <system:Boolean x:Key="IsDark">True</system:Boolean>
-            <SolidColorBrush x:Key='CgBackgroundBrush' Opacity="0.4" Color="Black" />
+            <SolidColorBrush x:Key='CgBackgroundBrush' Color="Black" />
+            <SolidColorBrush x:Key='CgTranslucentBackgroundBrush' Opacity="0.4" Color="Black" />
             <SolidColorBrush x:Key='CgForegroundBrush' Opacity="1" Color="White" />
             <SolidColorBrush x:Key='CgHalfForegroundBrush' Opacity="1" Color="#FFDDDDDD" />
-            <SolidColorBrush x:Key="CgCtPureBackgroundBrush" Color="White" />
-            <SolidColorBrush x:Key="CgHTCtPureBackgroundBrush" Color="White" Opacity="0.3" />
+            <SolidColorBrush x:Key="CgOppositeBackgroundBrush" Color="White" />
+            <SolidColorBrush x:Key="CgOppositeTranslucentBackgroundBrush0" Color="White" Opacity="0.05" />
+            <SolidColorBrush x:Key="CgOppositeTranslucentBackgroundBrush1" Color="White" Opacity="0.3" />
+            <SolidColorBrush x:Key="CgOppositeTranslucentBackgroundBrush2" Color="White" Opacity="0.7" />
             <SolidColorBrush x:Key="CgTransparentBrush" Opacity="0" Color="Black" />
             <Color x:Key="CgTransparentColor">#00000000</Color>
             <SolidColorBrush x:Key="AxisBackground" Opacity="0" Color="#1e1e1e" />

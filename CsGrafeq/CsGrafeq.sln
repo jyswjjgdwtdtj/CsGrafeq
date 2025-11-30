@@ -29,6 +29,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsGrafeq.Debug", "CsGrafeq\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsGrafeq.Test", "CsGrafeq\CsGrafeq.Test\CsGrafeq.Test.csproj", "{322842E4-7BC3-4033-938A-18A488A5ADC5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsGrafeq.Windows", "CsGrafeq\CsGrafeq.Windows\CsGrafeq.Windows.csproj", "{1471EB2D-B61A-4AB9-922E-53C8B775944C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsGrafeq.CSharpMath.Editor", "CsGrafeq\CsGrafeq.CSharpMath.Editor\CsGrafeq.CSharpMath.Editor.csproj", "{DB6EF716-D113-4438-8E24-A78C923EF491}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +87,14 @@ Global
 		{322842E4-7BC3-4033-938A-18A488A5ADC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{322842E4-7BC3-4033-938A-18A488A5ADC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{322842E4-7BC3-4033-938A-18A488A5ADC5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1471EB2D-B61A-4AB9-922E-53C8B775944C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1471EB2D-B61A-4AB9-922E-53C8B775944C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1471EB2D-B61A-4AB9-922E-53C8B775944C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1471EB2D-B61A-4AB9-922E-53C8B775944C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB6EF716-D113-4438-8E24-A78C923EF491}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB6EF716-D113-4438-8E24-A78C923EF491}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB6EF716-D113-4438-8E24-A78C923EF491}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB6EF716-D113-4438-8E24-A78C923EF491}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -99,6 +111,8 @@ Global
 		{23EB97D9-FB60-4346-A4BB-B0CF592F6C63} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{F4EB3AF3-1C65-46F7-AF1A-E4BB44245664} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{322842E4-7BC3-4033-938A-18A488A5ADC5} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{1471EB2D-B61A-4AB9-922E-53C8B775944C} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{DB6EF716-D113-4438-8E24-A78C923EF491} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5A59E9EE-CB1C-46E4-84FF-9F8B019627AD}

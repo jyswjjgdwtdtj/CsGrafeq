@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using CsGrafeq.Shapes.ShapeGetter;
 using static CsGrafeq.Shapes.GeometryMath;
+using static CsGrafeq.Utilities.CsGrafeqMath;
 
 namespace CsGrafeq.Shapes;
 
@@ -31,10 +32,17 @@ public abstract class Line : GeometryShape
 
     public abstract bool CheckIsValid(Vec vec);
 
-    public override Vec NearestOf(Vec vec)
+    public override Vec DistanceTo(Vec vec)
     {
         var res = DistanceToLine(Current.Point1, Current.Point2, vec, out var point);
         return CheckIsValid(point) ? point : Vec.Infinity;
+    }
+
+    public override bool IsIntersectedWithRect(CgRectangle rect)
+    {
+        return RangeIn(rect.Location.X, rect.Location.X + rect.Size.X,
+            ((Current.Point1 + Current.Point2) / 2).X) && RangeIn(rect.Location.Y,
+            rect.Location.Y + rect.Size.Y, ((Current.Point1 + Current.Point2) / 2).Y);
     }
 }
 

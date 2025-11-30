@@ -1,5 +1,6 @@
 ﻿using CsGrafeq.Compiler;
 using CsGrafeq.Numeric;
+using CsGrafeq.Utilities;
 using ReactiveUI;
 using static CsGrafeq.Utilities.DoubleCompareHelper;
 
@@ -11,11 +12,11 @@ namespace CsGrafeq;
 /// </summary>
 public class ExpNumber : ReactiveObject
 {
-    private readonly HasReferenceFunction0<DoubleNumber> Direct;
+    private readonly HasReferenceFunction<Func<DoubleNumber>> Direct;
 
-    private readonly HasReferenceFunction0<DoubleNumber> None = new(NoneFunc, EnglishCharEnum.None);
+    private readonly HasReferenceFunction<Func<DoubleNumber>> None = new(NoneFunc, EnglishCharEnum.None);
     public readonly object Owner;
-    private HasReferenceFunction0<DoubleNumber> Func;
+    private HasReferenceFunction<Func<DoubleNumber>> Func;
     private DoubleNumber Number;
     private int NumberChangedSuspended;
     private string ShownText = "0";
@@ -23,7 +24,7 @@ public class ExpNumber : ReactiveObject
     public ExpNumber(double initialNumber = 0, object owner = null)
     {
         Owner = owner;
-        Direct = new HasReferenceFunction0<DoubleNumber>(DirectFunc, EnglishCharEnum.None);
+        Direct = new HasReferenceFunction<Func<DoubleNumber>>(DirectFunc, EnglishCharEnum.None);
         Func = Direct;
         EnglishChar.Instance.CharValueChanged += CharValueChanged;
         PropertyChanged += (s, e) => { };
@@ -106,9 +107,9 @@ public class ExpNumber : ReactiveObject
 
         Func.Dispose();
         IsExpression = true;
-        if (Compiler.Compiler.TryCompile0<DoubleNumber>(expression, out var expfunc, out _))
+        if (Compiler.Compiler.TryCompile<DoubleNumber>(expression, 0, out var expFunc, out var usedVars, out _))
         {
-            Func = expfunc;
+            Func = new HasReferenceFunction<Func<DoubleNumber>>((Func<DoubleNumber>)expFunc, usedVars);
             IsError = false;
             SetValue(Func.Function().Value);
             UserSetValueStr?.Invoke();
@@ -132,7 +133,7 @@ public class ExpNumber : ReactiveObject
 
         if (!IsExpression)
         {
-            ShownText = double.IsNaN(value) ? "" : value.ToString();
+            ShownText = double.IsNaN(value) ? "" : value.CustomToString(8, 1e-8);
             this.RaisePropertyChanged(nameof(ValueStr));
         }
     }

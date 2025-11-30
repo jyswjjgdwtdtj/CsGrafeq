@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Specialized;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Input.GestureRecognizers;
-using Avalonia.Media;
 using Avalonia.Metadata;
 using Avalonia.Rendering;
 using Avalonia.Threading;
@@ -14,10 +12,10 @@ using AddonPointerEventArgs = CsGrafeqApplication.Addons.Addon.AddonPointerEvent
 using AddonPointerEventArgsBase = CsGrafeqApplication.Addons.Addon.AddonPointerEventArgsBase;
 using AddonPointerWheelEventArgs = CsGrafeqApplication.Addons.Addon.AddonPointerWheelEventArgs;
 using AvaPoint = Avalonia.Point;
-using Avalonia.Skia;
+
 namespace CsGrafeqApplication.Controls.Displayers;
 
-public abstract class Displayer : SKCanvasView,ICustomHitTest
+public abstract class Displayer : SKCanvasView, ICustomHitTest
 {
     public const bool DoNext = true;
     public const bool Intercept = false;
@@ -41,16 +39,18 @@ public abstract class Displayer : SKCanvasView,ICustomHitTest
         Languages.LanguageChanged += ForceToRender;
         RenderClock.OnElapsed += Render;
         IsHitTestVisible = true;
-        
     }
+
     /// <summary>
-    /// 缩放优化
+    ///     缩放优化
     /// </summary>
     public bool ZoomingOptimization { get; set; } = false;
+
     /// <summary>
-    /// 移动优化
+    ///     移动优化
     /// </summary>
     public bool MovingOptimization { get; set; } = false;
+
     public bool ZOPEnable { get; set; } = true;
     public bool MOPEnable { get; set; } = true;
 
@@ -58,26 +58,24 @@ public abstract class Displayer : SKCanvasView,ICustomHitTest
 
     public DisplayerContainer Owner { get; set; }
 
-    protected sealed override void OnSkiaRender(SKRenderEventArgs e)
+    /// <summary>
+    ///     并无卵用
+    /// </summary>
+    /// <param name="point"></param>
+    /// <returns></returns>
+    public bool HitTest(AvaPoint point)
+    {
+        if (point.Y < 30) return false;
+        return true;
+    }
+
+    protected sealed override void OnSKRender(SKRenderEventArgs e)
     {
         var dc = e.Canvas;
         lock (TotalBufferLock)
         {
             dc.DrawBitmap(TotalBuffer, SKPoint.Empty);
         }
-    }
-    /// <summary>
-    /// 并无卵用
-    /// </summary>
-    /// <param name="point"></param>
-    /// <returns></returns>
-    public bool HitTest(AvaPoint point)
-    {
-        if (point.Y < 30)
-        {
-            return false;
-        }
-        return true;
     }
 
     public abstract double MathToPixelX(double x);
@@ -191,11 +189,11 @@ public abstract class Displayer : SKCanvasView,ICustomHitTest
                 return Intercept;
         return DoNext;
     }
+
     protected override void OnSizeChanged(SizeChangedEventArgs e)
     {
         base.OnSizeChanged(e);
         if (e.NewSize.Width > e.PreviousSize.Width || e.NewSize.Height > e.PreviousSize.Height)
-        {
             if (e.NewSize.Width > TotalBuffer.Width || e.NewSize.Height > TotalBuffer.Height)
             {
                 lock (TotalBufferLock)
@@ -206,20 +204,21 @@ public abstract class Displayer : SKCanvasView,ICustomHitTest
                     foreach (var layer in adn.Layers)
                         layer.SetBitmapSize(new SKSizeI((int)e.NewSize.Width, (int)e.NewSize.Height));
                 }
+
                 ForceToRender();
-                
             }
-        }
     }
+
     /// <summary>
-    /// 使所有层无效
+    ///     使所有层无效
     /// </summary>
     protected void Invalidate()
     {
         foreach (var i in Addons) Invalidate(i);
     }
+
     /// <summary>
-    /// 使Renderable层无效
+    ///     使Renderable层无效
     /// </summary>
     /// <param name="layer"></param>
     protected void Invalidate(Renderable layer)
@@ -230,10 +229,12 @@ public abstract class Displayer : SKCanvasView,ICustomHitTest
             dc?.Flush();
             layer.Render(dc, Bounds.ToSKRect());
         }
+
         layer.Changed = false;
     }
+
     /// <summary>
-    /// 使Addon中的所有层无效
+    ///     使Addon中的所有层无效
     /// </summary>
     /// <param name="adn"></param>
     protected void Invalidate(Addon adn)
@@ -242,8 +243,9 @@ public abstract class Displayer : SKCanvasView,ICustomHitTest
             Invalidate(layer);
         adn.Changed = false;
     }
+
     /// <summary>
-    /// 强制重绘
+    ///     强制重绘
     /// </summary>
     protected void ForceToRender()
     {
@@ -280,8 +282,9 @@ public abstract class Displayer : SKCanvasView,ICustomHitTest
             Dispatcher.UIThread.InvokeAsync(InvalidateVisual);
         }
     }
+
     /// <summary>
-    /// 要求重绘
+    ///     要求重绘
     /// </summary>
     internal void AskForRender()
     {

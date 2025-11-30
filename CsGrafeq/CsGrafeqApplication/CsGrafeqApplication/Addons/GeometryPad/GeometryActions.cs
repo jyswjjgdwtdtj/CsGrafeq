@@ -296,8 +296,10 @@ internal static class GeometryActions
                 return new Circle((CircleGetter)getter);
             case ShownShapeArg.Polygon:
                 return new Polygon((PolygonGetter)getter);
+            case ShownShapeArg.Angle:
+                return new Angle((AngleGetter)getter);
             default:
-                return Throw<GeometryShape>("");
+                return Throw<GeometryShape>("Shape not supported:"+target);
         }
     }
 }

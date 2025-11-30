@@ -1,50 +1,58 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using CsGrafeq.Interval.Interface;
-using CsGrafeq.Utilities;
 using static CsGrafeq.Interval.Def;
 using static CsGrafeq.Interval.Extensions.IntervalSetExtension;
-using CGMath=CsGrafeq.Utilities.CsGrafeqMath;
+using CGMath = CsGrafeq.Utilities.CsGrafeqMath;
 
 namespace CsGrafeq.Interval;
 
 public readonly struct IntervalSet : IInterval<IntervalSet>
 {
     #region 定义
+
     public static bool NeedClone => true;
 
     public static readonly IntervalSet Empty = new(new Range[0], FF, false, double.NaN, double.NaN, double.NaN);
     public static readonly Range EmptyRange = new(double.NaN);
     internal readonly Range[] Intervals;
     public readonly Def Def => _Def;
+
     /// <summary>
-    /// 最大值
+    ///     最大值
     /// </summary>
     public readonly double Sup => _Sup;
+
     /// <summary>
-    /// 最小值
+    ///     最小值
     /// </summary>
     public readonly double Inf => _Inf;
 
     public readonly Def _Def;
-/// <summary>
-/// 最大值字段
-/// </summary>
+
+    /// <summary>
+    ///     最大值字段
+    /// </summary>
     public readonly double _Sup;
-/// <summary>
-/// 最小值字段
-/// </summary>
+
+    /// <summary>
+    ///     最小值字段
+    /// </summary>
     public readonly double _Inf;
-/// <summary>
-/// 是否是单个数
-/// </summary>
+
+    /// <summary>
+    ///     是否是单个数
+    /// </summary>
     internal readonly bool IsNumber;
-/// <summary>
-/// 数
-/// </summary>
+
+    /// <summary>
+    ///     数
+    /// </summary>
     internal readonly double Number;
 
-    public IntervalSet() : this([],TT,false,double.NaN,double.NaN,double.NaN) { 
+    public IntervalSet() : this([], TT, false, double.NaN, double.NaN, double.NaN)
+    {
     }
+
     public IntervalSet(Range[] ranges, Def def, bool isNumber, double inf, double sup, double number)
     {
         Intervals = ranges;
@@ -67,7 +75,7 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
 
     public static IntervalSet Create(double min, double max, Def def)
     {
-        CsGrafeqMath.SwapIfNotLess(ref min, ref max);
+        CGMath.SwapIfNotLess(ref min, ref max);
         return new IntervalSet(new Range[1] { new(min, max) }, TT, false, min, max, double.NaN);
     }
 
@@ -99,19 +107,6 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
     {
         number = Number;
         return IsNumber;
-    }
-
-    public bool TryGetInteger(out int integer)
-    {
-        integer = 0;
-        if (TryGetNumber(out var number))
-        {
-            integer = (int)number;
-            if (number == integer)
-                return true;
-        }
-
-        return false;
     }
 
     public bool Contains(double num)
@@ -215,7 +210,7 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
             return EmptyRange;
         if (i1._Inf > 0 && i2._Inf > 0) return new Range { _Inf = i1._Inf * i2._Inf, _Sup = i1._Sup * i2._Sup };
         if (i1._Sup < 0 && i2._Sup < 0) return new Range { _Inf = i1._Sup * i2._Sup, _Sup = i1._Inf * i2._Inf };
-        var res = CGMath.GetMinMax4(i1._Inf * i2._Inf, i1._Inf * i2._Sup, i1._Sup * i2._Inf, i1._Sup * i2._Sup);
+        var res = CGMath.GetMinMax(i1._Inf * i2._Inf, i1._Inf * i2._Sup, i1._Sup * i2._Inf, i1._Sup * i2._Sup);
         return new Range(res.Item1, res.Item2);
     }
 
@@ -394,14 +389,14 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
 
         if (i.IsNumber) return Create(Math.Sign(i.Number));
         var tmp = new Range[3];
-        int loc = 0;
+        var loc = 0;
         if (i._Inf < 0)
-            tmp[loc++] = new(-1);
-        if(i.Contains(0))
-            tmp[loc++] = new(0);
+            tmp[loc++] = new Range(-1);
+        if (i.Contains(0))
+            tmp[loc++] = new Range(0);
         if (i._Sup > 0)
-            tmp[loc++] = new(1);
-        return Create(tmp.Slice(0,loc), FT);
+            tmp[loc++] = new Range(1);
+        return Create(tmp.Slice(0, loc), FT);
     }
 
     public static unsafe IntervalSet Abs(IntervalSet i1)
@@ -414,12 +409,9 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
 
     private static Range RangeAbs(Range i)
     {
-        if (i.ContainsEqual(0))
-        {
-            return new Range(0, Math.Max(-i._Inf, i._Sup));
-        }
+        if (i.ContainsEqual(0)) return new Range(0, Math.Max(-i._Inf, i._Sup));
 
-        if (i._Sup < 0) return new(-i._Sup,-i.Inf);
+        if (i._Sup < 0) return new Range(-i._Sup, -i.Inf);
         return new Range(i._Inf, i._Sup);
     }
 
@@ -709,7 +701,7 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
             break;
         }
 
-        var res =ranges.Slice(0, loc);
+        var res = ranges.Slice(0, loc);
         return Create(res, FT);
     }
 

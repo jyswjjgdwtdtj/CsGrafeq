@@ -1,11 +1,9 @@
-﻿using CsGrafeq.Interval.Interface;
-using CsGrafeq.Numeric;
-using FastExpressionCompiler;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Runtime.CompilerServices;
-using CsGrafeq.Debug;
+using CsGrafeq.Interval.Interface;
+using FastExpressionCompiler;
+
 namespace CsGrafeq.Interval;
 
 public static class IntervalCompiler
@@ -17,23 +15,23 @@ public static class IntervalCompiler
         var exptree =
             Compiler.Compiler.ConstructExpTree<IntervalSet>(expression, 2, out var xVar, out var yVar, out _,
                 out var reference).Reduce();
-        Console.WriteLine(exptree.ToString());
         return new HasReferenceIntervalSetFunc<IntervalSet>(
             CompileByDynamicMethod(Expression.Lambda<IntervalHandler<IntervalSet>>(exptree, xVar, yVar)), reference);
-        //return new HasReferenceIntervalSetFunc<IntervalSet>(Expression.Lambda<IntervalHandler<IntervalSet>>(exptree.Reduce(), xVar, yVar).Compile(), reference);
     }
 
-    public static IntervalHandler<IntervalSet> CompileByDynamicMethod(Expression<IntervalHandler<IntervalSet>> expression)
+    public static IntervalHandler<IntervalSet> CompileByDynamicMethod(
+        Expression<IntervalHandler<IntervalSet>> expression)
     {
         expression.CompileFast();
         if (expression == null)
             throw new ArgumentNullException("expression");
-        var dynamicMethod = new DynamicMethod("dynamicmethod", typeof(Def), new Type[] { typeof(IntervalSet), typeof(IntervalSet) }, typeof(IntervalSet).Module, true);
+        var dynamicMethod = new DynamicMethod("dynamicmethod", typeof(Def),
+            new[] { typeof(IntervalSet), typeof(IntervalSet) }, typeof(IntervalSet).Module, true);
         var ilg = dynamicMethod.GetILGenerator();
         var ilr = new ILRecorder(ilg);
         CompileToILGenerator<IntervalSet>(ilr, expression.Body);
         ilr.Emit(OpCodes.Ret);
-        var func=dynamicMethod.CreateDelegate<IntervalHandler<IntervalSet>>();
+        var func = dynamicMethod.CreateDelegate<IntervalHandler<IntervalSet>>();
         try
         {
             var testInterval = IntervalSet.CreateFromDouble(-1.0);
@@ -43,10 +41,11 @@ public static class IntervalCompiler
         {
             throw new Exception("Failed to compile the expression to IL code.", ex);
         }
+
         return func;
     }
 
-    public static void CompileToILGenerator<T>(ILRecorder ilGenerator, Expression expression) where T:IInterval<T>
+    public static void CompileToILGenerator<T>(ILRecorder ilGenerator, Expression expression) where T : IInterval<T>
     {
         switch (expression.NodeType)
         {
@@ -62,78 +61,73 @@ public static class IntervalCompiler
             case ExpressionType.GreaterThan:
             case ExpressionType.LessThanOrEqual:
             case ExpressionType.GreaterThanOrEqual:
-                {
-                    var exp = (BinaryExpression)expression;
-                    CompileToILGenerator<T>(ilGenerator, exp.Left);
-                    CompileToILGenerator<T>(ilGenerator, exp.Right);
-                    EmitExpressionMethod<T>(ilGenerator, exp.Method);
-                }
+            {
+                var exp = (BinaryExpression)expression;
+                CompileToILGenerator<T>(ilGenerator, exp.Left);
+                CompileToILGenerator<T>(ilGenerator, exp.Right);
+                EmitExpressionMethod<T>(ilGenerator, exp.Method);
+            }
                 break;
 
             case ExpressionType.Negate:
-                {
-                    var exp= (UnaryExpression)expression;
-                    CompileToILGenerator<T>(ilGenerator, exp.Operand);
-                    EmitExpressionMethod<T>(ilGenerator, exp.Method);
-                }
+            {
+                var exp = (UnaryExpression)expression;
+                CompileToILGenerator<T>(ilGenerator, exp.Operand);
+                EmitExpressionMethod<T>(ilGenerator, exp.Method);
+            }
                 break;
             case ExpressionType.Call:
-                {
-                    var exp = (MethodCallExpression)expression;
-                    MethodInfo method = exp.Method!;
-                    foreach (var arg in exp.Arguments)
-                    {
-                        CompileToILGenerator<T>(ilGenerator, arg);
-                    }
-                    EmitExpressionMethod<T>(ilGenerator, method);
-                }
+            {
+                var exp = (MethodCallExpression)expression;
+                var method = exp.Method!;
+                foreach (var arg in exp.Arguments) CompileToILGenerator<T>(ilGenerator, arg);
+                EmitExpressionMethod<T>(ilGenerator, method);
+            }
                 break;
             case ExpressionType.Constant:
-                {
-                    var exp = (ConstantExpression)expression;
-                    var value = exp.Value;
-                    if (value is double d)
-                        ilGenerator.Emit(OpCodes.Ldc_R8, d);
-                    else if(value is int c)
-                        ilGenerator.Emit(OpCodes.Ldc_I4, c);
-                    else if(value is char ch)
-                        ilGenerator.Emit(OpCodes.Ldc_I4, ch);
-                    else if(value is float f)
-                        ilGenerator.Emit(OpCodes.Ldc_R4, f);
-                    else
-                        throw new Exception();
-                }
+            {
+                var exp = (ConstantExpression)expression;
+                var value = exp.Value;
+                if (value is double d)
+                    ilGenerator.Emit(OpCodes.Ldc_R8, d);
+                else if (value is int c)
+                    ilGenerator.Emit(OpCodes.Ldc_I4, c);
+                else if (value is char ch)
+                    ilGenerator.Emit(OpCodes.Ldc_I4, ch);
+                else if (value is float f)
+                    ilGenerator.Emit(OpCodes.Ldc_R4, f);
+                else
+                    throw new Exception();
+            }
                 break;
             case ExpressionType.Parameter:
-                {
-                    var exp = (ParameterExpression)expression;
-                    if (exp.Name == "x")
-                        ilGenerator.Emit(OpCodes.Ldarg_0);
-                    else if (exp.Name == "y")
-                        ilGenerator.Emit(OpCodes.Ldarg_1);
-                    else
-                        throw new Exception();
-                }
+            {
+                var exp = (ParameterExpression)expression;
+                if (exp.Name == "x")
+                    ilGenerator.Emit(OpCodes.Ldarg_0);
+                else if (exp.Name == "y")
+                    ilGenerator.Emit(OpCodes.Ldarg_1);
+                else
+                    throw new Exception();
+            }
                 break;
             default:
-                {
-                    throw new NotSupportedException();
-                }
+            {
+                throw new NotSupportedException();
+            }
         }
     }
+
     public static void EmitExpressionMethod<T>(ILRecorder ilGenerator, MethodInfo? mi) where T : IInterval<T>
     {
         if (mi is null)
             throw new ArgumentNullException(nameof(mi));
-        string name = mi.Name.ToLower();
-        Type[] ts=new Type[mi.GetParameters().Length];
+        var name = mi.Name.ToLower();
+        var ts = new Type[mi.GetParameters().Length];
         for (var i = 0; i < ts.Length; i++)
             ts[i] = typeof(T);
-        if (name.StartsWith("op_"))//like op_Addition...... the operator overload method
-        {
+        if (name.StartsWith("op_")) //like op_Addition...... the operator overload method
             ilGenerator.Emit(OpCodes.Call, mi);
-            return;
-        }
         /*if (IHasOperatorNumber<T>.HasOperatorNumberPtrMethodDictionary.TryGetValue(name, out var ptr))
         {
             ilGenerator.Emit(OpCodes.Ldc_I8, ptr.ToInt64()); // 常量 64 位
@@ -157,11 +151,9 @@ public static class IntervalCompiler
             return;
         }*/
         else
-        {
             ilGenerator.Emit(OpCodes.Call, mi);
-            return;
-        }
     }
+
     public static bool TryCompile(string expression)
     {
         try
@@ -169,7 +161,7 @@ public static class IntervalCompiler
             Compile(expression);
             return true;
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             Debug.Debug.LogError(e.ToString());
             return false;

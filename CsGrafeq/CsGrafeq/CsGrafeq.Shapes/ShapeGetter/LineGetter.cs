@@ -25,8 +25,8 @@ public abstract class LineGetter_TwoPoint : LineGetter
     {
         Point1.AddSubShape(subShape);
         Point2.AddSubShape(subShape);
-;
-;
+        ;
+        ;
     }
 
     public override void UnAttach(GeometryShape subShape)
@@ -115,9 +115,9 @@ public class LineGetter_AngleBisector : LineGetter
         Point1.AddSubShape(subShape);
         Point2.AddSubShape(subShape);
         AnglePoint.AddSubShape(subShape);
-;
-;
-;
+        ;
+        ;
+        ;
     }
 
     public override void UnAttach(GeometryShape subShape)
@@ -164,8 +164,8 @@ public abstract class LineGetter_PointAndLine : LineGetter
     {
         Line.AddSubShape(subShape);
         Point.AddSubShape(subShape);
-;
-;
+        ;
+        ;
     }
 
     public override void UnAttach(GeometryShape subShape)
@@ -276,17 +276,11 @@ public class LineGetter_Fitted : LineGetter
 
     public override void Attach(GeometryShape subShape)
     {
-        foreach (var i in Points)
-        {
-            i.AddSubShape(subShape);
-        }
+        foreach (var i in Points) i.AddSubShape(subShape);
     }
 
     public override void UnAttach(GeometryShape subShape)
     {
-        foreach (var i in Points)
-        {
-            i.RemoveSubShape(subShape);
-        }
+        foreach (var i in Points) i.RemoveSubShape(subShape);
     }
 }
