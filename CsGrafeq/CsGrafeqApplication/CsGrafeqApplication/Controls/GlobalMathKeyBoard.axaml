@@ -35,29 +35,29 @@
                                 </Style>
                             </Grid.Styles>
                             <StackPanel Orientation="Horizontal" Spacing="3" HorizontalAlignment="Center">
-                                <controls:KeyButton Classes="KeyButton Char" FirstButton="1" SecondButton="!" FirstKeyboardInput="D1" SecondKeyboardInput="Factorial" 
+                                <controls:KeyButton Classes="KeyButton Char" FirstButton="1" SecondButton="+" FirstKeyboardInput="D1" SecondKeyboardInput="Plus" 
                                                     IsFirst="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                <controls:KeyButton Classes="KeyButton Char" FirstButton="2" SecondButton="+" FirstKeyboardInput="D2" SecondKeyboardInput="Plus" 
+                                <controls:KeyButton Classes="KeyButton Char" FirstButton="2" SecondButton="-" FirstKeyboardInput="D2" SecondKeyboardInput="Minus" 
                                                     IsFirst="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                <controls:KeyButton Classes="KeyButton Char" FirstButton="3" SecondButton="-" FirstKeyboardInput="D3" SecondKeyboardInput="Subscript" 
+                                <controls:KeyButton Classes="KeyButton Char" FirstButton="3" SecondButton="*" FirstKeyboardInput="D3" SecondKeyboardInput="Multiply" 
                                                     IsFirst="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                <controls:KeyButton Classes="KeyButton Char" FirstButton="4" SecondButton="(" FirstKeyboardInput="D4" SecondKeyboardInput="LeftRoundBracket" 
+                                <controls:KeyButton Classes="KeyButton Char" FirstButton="4" SecondButton="/" FirstKeyboardInput="D4" SecondKeyboardInput="Slash" 
                                                     IsFirst="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                <controls:KeyButton Classes="KeyButton Char" FirstButton="5" SecondButton=")" FirstKeyboardInput="D5" SecondKeyboardInput="RightRoundBracket" 
+                                <controls:KeyButton Classes="KeyButton Char" FirstButton="5" SecondButton="^" FirstKeyboardInput="D5" SecondKeyboardInput="Power" 
                                                     IsFirst="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                <controls:KeyButton Classes="KeyButton Char" FirstButton="6" SecondButton="*" FirstKeyboardInput="D6" SecondKeyboardInput="Multiply" 
+                                <controls:KeyButton Classes="KeyButton Char" FirstButton="6" SecondButton="%" FirstKeyboardInput="D6" SecondKeyboardInput="Modulo" 
                                                     IsFirst="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                <controls:KeyButton Classes="KeyButton Char" FirstButton="7" SecondButton="/" FirstKeyboardInput="D7" SecondKeyboardInput="Slash" 
+                                <controls:KeyButton Classes="KeyButton Char" FirstButton="7" SecondButton="=" FirstKeyboardInput="D7" SecondKeyboardInput="Equals" 
                                                     IsFirst="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                <controls:KeyButton Classes="KeyButton Char" FirstButton="8" SecondButton="=" FirstKeyboardInput="D8" SecondKeyboardInput="Equals" 
+                                <controls:KeyButton Classes="KeyButton Char" FirstButton="8" SecondButton="&lt;" FirstKeyboardInput="D8" SecondKeyboardInput="LessThan" 
                                                     IsFirst="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                <controls:KeyButton Classes="KeyButton Char" FirstButton="9" SecondButton="|" FirstKeyboardInput="D9" SecondKeyboardInput="Cup" 
+                                <controls:KeyButton Classes="KeyButton Char" FirstButton="9" SecondButton="&gt;" FirstKeyboardInput="D9" SecondKeyboardInput="GreaterThan" 
                                                     IsFirst="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                <controls:KeyButton Classes="KeyButton Char" FirstButton="0" SecondButton="&amp;" FirstKeyboardInput="D0" SecondKeyboardInput="Cap" 
+                                <controls:KeyButton Classes="KeyButton Char" FirstButton="0" SecondButton="()" FirstKeyboardInput="D0" SecondKeyboardInput="BothRoundBrackets" 
                                                     IsFirst="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                <controls:KeyButton Classes="KeyButton Char" FirstButton="&lt;" SecondButton="%" FirstKeyboardInput="LessThan" SecondKeyboardInput="Modulo" 
+                                <controls:KeyButton Classes="KeyButton Char" FirstButton="&lt;" SecondButton="⌊⌋" FirstKeyboardInput="LessThan" SecondKeyboardInput="BothFloor" 
                                                     IsFirst="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                <controls:KeyButton Classes="KeyButton Char" FirstButton="&gt;" SecondButton="^" FirstKeyboardInput="GreaterThan" SecondKeyboardInput="Power" 
+                                <controls:KeyButton Classes="KeyButton Char" FirstButton="&gt;" SecondButton="⌈⌉" FirstKeyboardInput="GreaterThan" SecondKeyboardInput="BothCeiling" 
                                                     IsFirst="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
                             </StackPanel>
                             <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="3" HorizontalAlignment="Center">

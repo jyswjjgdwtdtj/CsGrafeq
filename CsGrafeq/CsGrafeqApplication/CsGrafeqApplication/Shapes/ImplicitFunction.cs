@@ -19,7 +19,7 @@ public class ImplicitFunction : Shape
         PropertyChanged += (s, e) =>
         {
             RefreshIsActive();
-            if (e.PropertyName == nameof(PropertyToReceiveMathListChanged))
+            if (e.PropertyName == nameof(PropertyToReceiveMathListChanged)||e.PropertyName==nameof(MathList))
             {
                 RefreshExpression();
             }else if (e.PropertyName == nameof(IsCorrect))
@@ -41,9 +41,11 @@ public class ImplicitFunction : Shape
         res.Match(exp =>
         {
             Expression = exp;
-        }, _ =>
+            Console.WriteLine(exp);
+        }, ex =>
         {
             IsCorrect=false;
+            Console.WriteLine(ex);
         });
     }
     public bool PropertyToReceiveMathListChanged { 

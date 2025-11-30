@@ -21,11 +21,15 @@
             <Setter Property="Margin" Value="0"/>
             <Setter Property="Padding" Value="0"/>
             <Setter Property="Height" Value="{CompiledBinding $parent[controls:KeyButton].Height}"/>
-            <Style Selector="^ Canvas">
+            <Style Selector="^ Panel">
                 <Setter Property="Focusable" Value="False"/>
+                <Setter Property="Margin" Value="0"></Setter>
+                <Setter Property="Height" Value="46"></Setter>
+                <Setter Property="Width" Value="46"></Setter>
             </Style>
-            <Style Selector="^ AccessText">
+            <Style Selector="^ TextBlock">
                 <Setter Property="Focusable" Value="False"/>
+                <Setter Property="Margin" Value="5,0"></Setter>
             </Style>
             
         </Style>
@@ -33,14 +37,14 @@
             <Setter Property="Template">
                 <ControlTemplate>
                     <RepeatButton Name="PART_Button">
-                        <Canvas>
-                            <AccessText Canvas.Right="0" Canvas.Top="-16" Text="{TemplateBinding FirstButton}"
-                                        Foreground="{DynamicResource CgForegroundBrush}" VerticalAlignment="Center"
-                                        HorizontalAlignment="Center" FontSize="30" />
-                            <AccessText Canvas.Left="6" Canvas.Bottom="-4" Text="{TemplateBinding SecondButton}"
-                                        Foreground="{DynamicResource CgHalfForegroundBrush}" VerticalAlignment="Center"
-                                        HorizontalAlignment="Center" FontSize="20" />
-                        </Canvas>
+                        <Panel>
+                            <TextBlock Text="{TemplateBinding FirstButton}"
+                                        Foreground="{DynamicResource CgForegroundBrush}" VerticalAlignment="Bottom"
+                                        HorizontalAlignment="Left" FontSize="30" />
+                            <TextBlock Text="{TemplateBinding SecondButton}"
+                                        Foreground="{DynamicResource CgHalfForegroundBrush}" VerticalAlignment="Top"
+                                        HorizontalAlignment="Right" FontSize="20" />
+                        </Panel>
                     </RepeatButton>
                 </ControlTemplate>
             </Setter>
@@ -49,14 +53,14 @@
             <Setter Property="Template">
                 <ControlTemplate>
                     <RepeatButton Name="PART_Button" Margin="0" Padding="0">
-                        <Canvas Margin="0">
-                            <AccessText Canvas.Right="0" Canvas.Top="-16" Text="{TemplateBinding SecondButton}"
-                                        Foreground="{DynamicResource CgForegroundBrush}" VerticalAlignment="Center"
-                                        HorizontalAlignment="Center" FontSize="30" />
-                            <AccessText Canvas.Left="6" Canvas.Bottom="-4" Text="{TemplateBinding FirstButton}"
-                                        Foreground="{DynamicResource CgHalfForegroundBrush}" VerticalAlignment="Center"
-                                        HorizontalAlignment="Center" FontSize="20" />
-                        </Canvas>
+                        <Panel Margin="0">
+                            <TextBlock Text="{TemplateBinding SecondButton}"
+                                        Foreground="{DynamicResource CgForegroundBrush}" VerticalAlignment="Bottom"
+                                        HorizontalAlignment="Left" FontSize="30" />
+                            <TextBlock Text="{TemplateBinding FirstButton}"
+                                        Foreground="{DynamicResource CgHalfForegroundBrush}" VerticalAlignment="Top"
+                                        HorizontalAlignment="Right" FontSize="20" />
+                        </Panel>
                     </RepeatButton>
                 </ControlTemplate>
             </Setter>

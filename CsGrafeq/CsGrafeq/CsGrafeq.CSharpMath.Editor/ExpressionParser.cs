@@ -5,7 +5,9 @@ using CsGrafeq;
 using CSharpMath;
 using CSharpMath.Atom;
 using CSharpMath.Atom.Atoms;
+using CSharpMath.Rendering.Text;
 using CSharpMath.Structures;
+using DynamicData;
 using StrResult=CsGrafeq.Result<string>;
 using Space = CSharpMath.Atom.Atoms.Space;
 
@@ -13,12 +15,15 @@ namespace CsGrafeq.CSharpMath.Editor;
 
 public static class ExpressionParser
 {
-    private static string BoundaryToLaTeX(Boundary delimiter)
+    private static Dictionary<string, string> SymbolToReplace = new Dictionary<string, string>()
     {
-        return LaTeXSettings.BoundaryDelimitersReverse.TryGetValue(delimiter, out var command)
-            ? command
-            : delimiter.Nucleus ?? "";
-    }
+        {"≤","<="},
+        {"≥",">="},
+        {"∧","|"},
+        {"∨","&"},
+        {"×","*"},
+        
+    };
 
     public static StrResult Parse(this MathList mathList)
     {
@@ -31,8 +36,80 @@ public static class ExpressionParser
         {
             return StrResult.Error(e);
         }
-        return StrResult.Success(builder.ToString().Replace("≤","<=").Replace("≥",">="));
+        return StrResult.Success(builder.ToString().ForEachReplace(SymbolToReplace));
     }
+/*
+    internal static MathAtom PreProcessMathAtom(MathAtom source)
+    {
+        MathAtom res;
+        switch (source)
+        {
+            case Inner inner:
+                res= new Inner(new("("), PreProcessMathList(inner.InnerList), new(")"));
+                break;
+            default:
+                
+                break;
+        }
+        res.Superscript.Append(source.Superscript);
+    }
+    internal static MathList PreProcessMathList(MathList mathList)
+    {
+        var myml = mathList.Clone(false);
+        int brackets = 0;
+        for (var i = 0; i < myml.Count; i++)
+        {
+            var cur = myml[i];
+            switch (cur)
+            {
+                case Open:
+                    if (brackets == 0)
+                    {
+                        myml[i] = new TempMathAtom(0);
+                    }
+                    if (cur.Superscript.IsNonEmpty())
+                        throw new Exception();
+                    brackets++;
+                    break;
+                case Close:
+                    if (brackets == 1)
+                    {
+                        myml[i] = new TempMathAtom(1);
+                        myml[i].Superscript.Append(cur.Superscript);
+                    }
+                    brackets--;
+                    break;
+                default:
+                    break;
+            }
+        }
+        var newml=new MathList();
+        for (var i = 0; i < myml.Count; i++)
+        {
+            var cur = myml[i];
+            switch (cur)
+            {
+                case TempMathAtom:
+                    var inner = new MathList();
+                    while (true)
+                    {
+                        cur = myml[++i];
+                        if (cur is TempMathAtom)
+                        {
+                            newml.Add(new Inner(new Boundary("("),inner,new Boundary(")")));
+                            break;
+                        }
+                        inner.Add(cur);
+                    }
+                    break;
+                default:
+                    newml.Add(cur);
+                    break;
+            }
+        }
+        return newml;
+    }
+    */
     private static void MathListToExpression
         (MathList mathList, CursorStringBuilder builder)
     {
@@ -101,6 +178,16 @@ public static class ExpressionParser
                     }else if (left.Nucleus == "|" && right.Nucleus == "|")
                     {
                         builder.Insert(@"abs(");
+                        MathListToExpression(list, builder);
+                        builder.Insert(@")");
+                    }else if (left.Nucleus == Symbols.LeftCeiling&& right.Nucleus == Symbols.RightCeiling)
+                    {
+                        builder.Insert(@"ceiling(");
+                        MathListToExpression(list, builder);
+                        builder.Insert(@")");
+                    }else if (left.Nucleus == Symbols.LeftFloor&& right.Nucleus == Symbols.RightFloor)
+                    {
+                        builder.Insert(@"floor(");
                         MathListToExpression(list, builder);
                         builder.Insert(@")");
                     }
@@ -218,9 +305,12 @@ public static class ExpressionParser
                     }
                     builder.Insert(numstr.ToString());
                 }
-                    break;
+                    goto NextShouldBeMultiply;
                 case Placeholder:
                     builder.ForceToBeEmpty=true;
+                    break;
+                case Punctuation punc when punc.Nucleus==",":
+                    builder.Insert(",");
                     break;
                 default:
                     throw new Exception(atom.ToString() + "|" + atom.Nucleus + "|" + atom.GetType()); 
@@ -259,6 +349,31 @@ public static class ExpressionParser
             builder.Insert(@"^(");
             MathListToExpression(script,builder);
             builder.Insert(")");
+        }
+    }
+
+    private static string ForEachReplace(this string input, IDictionary<string, string> toReplace)
+    {
+        foreach (var kvpair in toReplace)
+        {
+            input=input.Replace(kvpair.Key, kvpair.Value);
+        }
+
+        return input;
+    }
+
+    private class TempMathAtom: MathAtom
+    {
+        public int Identifier;
+        public override bool ScriptsAllowed { get; } = true;
+        protected override MathAtom CloneInside(bool finalize)
+        {
+            throw new NotSupportedException();
+        }
+
+        public TempMathAtom(int identifier)
+        {
+            Identifier = identifier;
         }
     }
 }

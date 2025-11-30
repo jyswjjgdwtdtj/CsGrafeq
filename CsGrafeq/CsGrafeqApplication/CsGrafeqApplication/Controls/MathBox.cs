@@ -87,6 +87,15 @@ public class MathBox:Control
     public static readonly DirectProperty<MathBox, bool> PropertyToTransmitMathInputEventProperty = AvaloniaProperty.RegisterDirect<MathBox, bool>(
         nameof(PropertyToTransmitMathInputEvent), o => o.PropertyToTransmitMathInputEvent, (o, v) => o.PropertyToTransmitMathInputEvent = v);
 
+    public static readonly DirectProperty<MathBox, bool> HasTextProperty = AvaloniaProperty.RegisterDirect<MathBox, bool>(
+        nameof(HasText), o => o.HasText, (o, v) => o.HasText = v);
+
+    public bool HasText
+    {
+        get => field;
+        set => SetAndRaise(HasTextProperty, ref field, value);
+    }
+
     public bool PropertyToTransmitMathInputEvent
     {
         get => field;
@@ -142,8 +151,6 @@ public class MathBox:Control
         Focusable = true;
         Painter.FontSize = FontSize*Scale;
         Painter.LocalTypefaces = new Fonts(Keyboard.Font,Scale*FontSize);
-        AffectsMeasure<MathBox>(VisualParentProperty);
-        AffectsArrange<MathBox>(VisualParentProperty);
         //PressKey(CgMathKeyboardInput.Sine,CgMathKeyboardInput.SmallX,CgMathKeyboardInput.Slash,CgMathKeyboardInput.Cosine,CgMathKeyboardInput.SmallX);
         InvalidateArrange();
     }
@@ -206,6 +213,7 @@ public class MathBox:Control
         }));
         InvalidateMeasure();
         InvalidateArrange();
+        HasText=Keyboard.HasText;
         MathInputted?.Invoke(this, EventArgs.Empty);
         PropertyToTransmitMathInputEvent=!PropertyToTransmitMathInputEvent;
     }
@@ -275,6 +283,9 @@ public class MathBox:Control
                 case '.':
                     PressKey(CgMathKeyboardInput.Decimal);
                     goto HandledEvent;
+                case ',':
+                    PressKey(CgMathKeyboardInput.Comma);
+                    break;
             }
         }
 
@@ -324,6 +335,6 @@ public class MathBox:Control
     {
         CurrentMeasuredRect = Keyboard.Measure;
         var size = CurrentMeasuredRect.Size;
-        return new Size(Max(size.Width,30), Max(size.Height,30));
+        return new Size(Max(size.Width,FontSize*1.5), Max(size.Height,30));
     }
 }

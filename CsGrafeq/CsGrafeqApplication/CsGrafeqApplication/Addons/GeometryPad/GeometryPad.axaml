@@ -156,12 +156,12 @@
                                 Click="AddFuncQuestionsClicked" Content="?" FontFamily="{StaticResource MapleMono}" Padding="0" Height="30"/>
                         
                         <Border Tapped="EventHandledTrue" DoubleTapped="EventHandledTrue" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="{DynamicResource CgTranslucentBackgroundBrush}" Padding="10" CornerRadius="5"
-                                BorderThickness="2" Margin="5">
+                                BorderThickness="2" Margin="5" Name="MathTextBoxContainer">
                             <!--<TextBox BorderThickness="0" Classes="NoDataValidation" AcceptsReturn="False"
                                      AcceptsTab="False" KeyUp="NewFuncOnClick" Name="NewFuncTextBox"
                                      TemplateApplied="NewFuncTextBoxTemplateApplied"
                                      PropertyChanged="NewFuncPropertyChanged" Margin="0,0,5,0" />-->
-                            <ctls:MathTextBox HorizontalAlignment="Stretch" Name="MathTextBox" KeyDown="MathTextBoxKeyDown"/>
+                            <ctls:MathTextBox HorizontalAlignment="Stretch" Name="MathTextBox" KeyDown="MathTextBoxKeyDown" MathInputted="MathTextBoxMathInputted"/>
                         </Border>
                     </DockPanel>
                 </Border>
@@ -612,7 +612,7 @@
                                                         MathList="{CompiledBinding MathList,Mode=OneTime}" PropertyToTransmitMathInputEvent="{CompiledBinding PropertyToReceiveMathListChanged,Mode=OneWayToSource}"
                                                         DoubleTapped="EventHandledTrue"
                                                         Tapped="EventHandledTrue" PropertyChanged="ImpFuncPropertyChanged"
-                                                        Tag="{CompiledBinding .}" Loaded="MathBoxLoaded"
+                                                        Tag="{CompiledBinding .}"
                                                         HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
                                                 </Border>
                                             </DockPanel>

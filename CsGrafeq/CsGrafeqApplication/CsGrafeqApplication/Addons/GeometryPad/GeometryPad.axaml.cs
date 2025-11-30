@@ -11,6 +11,7 @@ using Avalonia.Controls.Templates;
 using Avalonia.Data.Core;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Layout;
 using Avalonia.LogicalTree;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Markup.Xaml.MarkupExtensions.CompiledBindings;
@@ -23,6 +24,7 @@ using CsGrafeq.Shapes.ShapeGetter;
 using CsGrafeqApplication.Controls;
 using CsGrafeqApplication.Controls.Displayers;
 using CSharpMath.Atom;
+using CSharpMath.Avalonia;
 using DialogHostAvalonia;
 using SkiaSharp;
 using static CsGrafeq.Shapes.GeometryMath;
@@ -298,8 +300,26 @@ public partial class GeometryPad : Addon
         }
     }
 
+    private class LbDataTemplate : IDataTemplate
+    {
+        public bool Match(object? data)
+        {
+            return data is string;
+        }
+
+        public Control? Build(object? param)
+        {
+            if (param is string str)
+            {
+                return new MathView() { LaTeX = str,HorizontalAlignment = HorizontalAlignment.Left};
+            }
+
+            return null;
+        }
+    }
     private void AddFuncQuestionsClicked(object? sender, RoutedEventArgs e)
     {
+
         var tp = TopLevel.GetTopLevel(this);
         if (tp != null)
         {
@@ -308,6 +328,7 @@ public partial class GeometryPad : Addon
             for (var i = 0; i < examples.Count; i++) examples[i] = examples[i].Split(";")[0];
             lb.ItemsSource = examples;
             lb.SelectionMode = SelectionMode.Single;
+            lb.ItemTemplate = new LbDataTemplate();
             lb.SelectionChanged += (s, se) =>
             {
                 /*NewFuncTextBox.Text = lb?.SelectedItem?.ToString() ?? NewFuncTextBox.Text;
@@ -1511,14 +1532,13 @@ public partial class GeometryPad : Addon
         if (e.Key == Key.Enter && e.KeyModifiers == KeyModifiers.None && box?.IsCorrect == true)
         {
             AddShape(CreateImpFunc(box.MathList));
+            box.PressKey(CgMathKeyboardInput.Clear);
         }
     }
 
-    private void MathBoxLoaded(object? sender, RoutedEventArgs e)
+    private void MathTextBoxMathInputted(object? sender, RoutedEventArgs e)
     {
-        if (sender is MathBox mb&&mb.Tag is ImplicitFunction ipf)
-        {
-           // mb.MathList = ipf.Original;
-        }
+        var s=(sender as MathBox)!;
+        MathTextBoxContainer.BorderBrush = (!s.HasText)||(s.IsCorrect&&IntervalCompiler.TryCompile(s.Expression)) ? Brushes.Blue : Brushes.Red;
     }
 }

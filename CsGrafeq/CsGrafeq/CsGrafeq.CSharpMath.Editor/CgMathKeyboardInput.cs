@@ -298,5 +298,5 @@ public enum CgMathKeyboardInput
     ContourIntegral = '∮', DoubleContourIntegral = '∯', TripleContourIntegral = '∰',
     ClockwiseIntegral = '∱', ClockwiseContourIntegral = '∲', CounterClockwiseContourIntegral = '∳',
     
-    Modulo='⊘',Cap='∩',Cup='⋃'
+    Modulo='⊘',Cap='∧',Cup='∨',BothCeiling='⌈',BothFloor='⌊'
 }

@@ -26,6 +26,11 @@ public sealed class CgMathKeyboard : IDisposable
     private bool _insertionPositionHighlighted;
     private readonly Timer blinkTimer;
 
+    static CgMathKeyboard()
+    {
+        LaTeXSettings.CommandSymbols.Add("\\lcm",new LargeOperator("lcm", false, true));
+    }
+
     public CgMathKeyboard(MathList ml)
     {
         MathList = ml;
@@ -486,6 +491,7 @@ public sealed class CgMathKeyboard : IDisposable
             if (!HasText) return false;
             if (_insertionIndex.Previous is MathListIndex previous)
             {
+                Console.WriteLine(previous.FinalSubIndexType);
                 _insertionIndex = previous;
                 MathList.RemoveAt(ref _insertionIndex);
                 return true;
@@ -735,6 +741,12 @@ public sealed class CgMathKeyboard : IDisposable
             case CgMathKeyboardInput.BothCurlyBrackets:
                 InsertInner("{", "}");
                 break;
+            case CgMathKeyboardInput.BothCeiling:
+                InsertInner(Symbols.LeftCeiling, Symbols.RightCeiling);
+                break;
+            case CgMathKeyboardInput.BothFloor:
+                InsertInner(Symbols.LeftFloor, Symbols.RightFloor);
+                break;
             case CgMathKeyboardInput.Absolute:
                 InsertInner("|", "|");
                 break;
@@ -949,13 +961,17 @@ public sealed class CgMathKeyboard : IDisposable
                 InsertSymbolName(@"\%");
                 break;
             case CgMathKeyboardInput.Cap:
-                InsertSymbolName(@"\Cap");
+                InsertSymbolName(@"\land");
                 break;
             case CgMathKeyboardInput.Cup:
-                InsertSymbolName(@"\cup");
+                InsertSymbolName(@"\lor");
                 break;
             case CgMathKeyboardInput.LeftRoundBracket:
+                InsertInner("(",")");
+                break;
             case CgMathKeyboardInput.RightRoundBracket:
+                
+                break;
             case CgMathKeyboardInput.LeftSquareBracket:
             case CgMathKeyboardInput.RightSquareBracket:
             case CgMathKeyboardInput.D0:
