@@ -1,13 +1,12 @@
-﻿[English](README.md)|[中文](README_ZH.md)
+[English](README.md)|[中文](README_ZH.md)
 
 # CsGrafeq
 
 ## Description
 
-CsGrafeq is a geometry sketchpad. For the sake of performance and multi-platform, implicit function plotting is
-temporarily not supported in CsGrafeq. \
-[Project](./OldVersion/README.md) in old version folder is for implicit function plotting. Implicit function plotting
-will be added to CsGrafeq in future.\
+CsGrafeq is a geometry sketchpad. For the sake that JIT is unavailable in mobile platforms and browser, CsGrafeq now only support Windows. \
+[Project](./OldVersion/README.md) in old version folder is for stably implicit function plotting. The function of Implicit function plotting
+is being made now.\
 ![image](Example/1.jpg)
 ![image](Example/2.jpg)
 ![image](Example/3.jpg)
@@ -16,7 +15,7 @@ will be added to CsGrafeq in future.\
 
 ## Features
 
-AOT(Ahead Of Time), no .Net Runtime environment required.
+ReadyToRun compiled, no .Net Runtime environment required.
 
 ## Future
 
@@ -41,7 +40,7 @@ Each of your stars🌟 is the motivation for my development. Thank you🙏😊.
 
 ## Function Example
 
-These are the screenshot from old version.\
+These are the screenshot from old version, and new plots will.be added.\
 ![image](OldVersion/ExampleImage/1-1.jpg)
 ![image](OldVersion/ExampleImage/1-2.jpg)
 ![image](OldVersion/ExampleImage/1-3.jpg)
