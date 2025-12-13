@@ -1,6 +1,6 @@
 ﻿using ReactiveUI;
 
-namespace CsGrafeqApplication;
+namespace CsGrafeq.I18N;
 
 public class MultiLanguageData : ReactiveObject
 {

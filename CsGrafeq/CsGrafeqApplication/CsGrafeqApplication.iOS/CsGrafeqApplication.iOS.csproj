@@ -10,10 +10,6 @@
         <PackageReference Include="Avalonia"/>
         <PackageReference Include="Avalonia.Diagnostics"/>
         <PackageReference Include="Avalonia.iOS"/>
-        <PackageReference Include="CSharpMath.Evaluation" />
-        <PackageReference Include="DialogHost.Avalonia" />
-        <PackageReference Include="Material.Avalonia" />
-        <PackageReference Include="Material.Avalonia.Dialogs" />
     </ItemGroup>
 
     <ItemGroup>

@@ -1,4 +1,5 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:controls="using:CsGrafeqApplication.Controls"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -6,24 +7,22 @@
              xmlns:geopad="clr-namespace:CsGrafeqApplication.Addons.GeometryPad;assembly=CsGrafeqApplication"
              xmlns:shapes="clr-namespace:CsGrafeq.Shapes"
              x:Class="CsGrafeqApplication.Addons.GeometryPad.GeoPadInfo" x:DataType="geopad:GeometryPadViewModel">
-    <Border CornerRadius="5" Background="{DynamicResource CgTranslucentBackgroundBrush}">
+    <Border CornerRadius="5">
         <ItemsControl ItemsSource="{CompiledBinding Shapes}">
             <ItemsControl.ItemTemplate>
                 <geopad:ImpFuncShowDataTemplate>
                     <geopad:ImpFuncShowDataTemplate.ImpFuncDataTemplate>
                         <DataTemplate DataType="shapes:ImplicitFunction">
                             <Border IsVisible="{CompiledBinding ShowFormula}">
-                                <Border IsVisible="{CompiledBinding IsDeleted,Converter={StaticResource Not}}">
-                                    <Border IsVisible="{CompiledBinding IsCorrect}">
-                                        <DockPanel LastChildFill="True" Height="40">
-                                            <Border Width="40" Height="40" DockPanel.Dock="Left">
-                                                <Rectangle
-                                                    Fill="{CompiledBinding Color,Converter={StaticResource UIntColorToBrush},ConverterParameter='255',Mode=OneWay}"
-                                                    Stroke="Black" Width="15" Height="15" StrokeThickness="1" />
-                                            </Border>
-                                            <TextBlock Text="{CompiledBinding Expression}" VerticalAlignment="Center" />
-                                        </DockPanel>
-                                    </Border>
+                                <Border IsVisible="{CompiledBinding !IsDeleted}">
+                                    <DockPanel LastChildFill="True">
+                                        <Border Width="40" Height="40" DockPanel.Dock="Left">
+                                            <Rectangle VerticalAlignment="Center"
+                                                       Fill="{CompiledBinding Color,Converter={StaticResource UIntColorToBrush},ConverterParameter='255',Mode=OneWay}"
+                                                       Stroke="Black" Width="15" Height="15" StrokeThickness="1" />
+                                        </Border>
+                                        <controls:MathBox MathList="{CompiledBinding MathList}" CanInput="False"/>
+                                    </DockPanel>
                                 </Border>
                             </Border>
                         </DataTemplate>

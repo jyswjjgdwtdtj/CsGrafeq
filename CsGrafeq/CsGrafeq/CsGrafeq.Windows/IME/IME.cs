@@ -11,7 +11,7 @@ public static class IME
     /// Disable the IME of a WIN32 control
     /// </summary>
     /// <param name="handle">the hwnd of a control</param>
-    public static void DisableIME(Window window)
+    public static void DisableIme(Window window)
     {
         var handle=window.TryGetPlatformHandle()?.Handle??IntPtr.Zero;
         if (handle == IntPtr.Zero)
@@ -24,7 +24,7 @@ public static class IME
         }
         ImePInvoke.ImmAssociateContext(handle, IntPtr.Zero);
     }
-    internal static void SetOpenStatus(bool open, IntPtr handle)
+    private static void SetOpenStatus(bool open, IntPtr handle)
     {
 
         nint inputContext = ImePInvoke.ImmGetContext(handle);

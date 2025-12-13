@@ -6,21 +6,21 @@
   <ItemGroup>
     <!-- Avalonia packages -->
     <!-- Important: keep version in sync! -->
-    <PackageVersion Include="Avalonia" Version="11.3.9" />
+    <PackageVersion Include="Avalonia" Version="11.3.7" />
     <PackageVersion Include="Avalonia.Browser.Blazor" Version="11.3.7" />
-    <PackageVersion Include="Avalonia.Controls.ColorPicker" Version="11.3.9" />
+    <PackageVersion Include="Avalonia.Controls.ColorPicker" Version="11.3.7" />
     <PackageVersion Include="Avalonia.Controls.DataGrid" Version="11.3.9" />
     <PackageVersion Include="Avalonia.Controls.ItemsRepeater" Version="11.1.5" />
     <PackageVersion Include="Avalonia.Controls.TreeDataGrid" Version="11.2.3" />
-    <PackageVersion Include="Avalonia.Skia" Version="11.3.9" />
+    <PackageVersion Include="Avalonia.Skia" Version="11.3.7" />
     <PackageVersion Include="Avalonia.Svg.Skia" Version="11.3.0" />
     <PackageVersion Include="Avalonia.Themes.Fluent" Version="11.3.7" />
-    <PackageVersion Include="Avalonia.Fonts.Inter" Version="11.3.9" />
+    <PackageVersion Include="Avalonia.Fonts.Inter" Version="11.3.7" />
     <PackageVersion Include="Avalonia.Diagnostics" Version="11.3.7" />
-    <PackageVersion Include="Avalonia.Desktop" Version="11.3.9" />
+    <PackageVersion Include="Avalonia.Desktop" Version="11.3.7" />
     <PackageVersion Include="Avalonia.iOS" Version="11.3.9" />
-    <PackageVersion Include="Avalonia.Browser" Version="11.3.9" />
-    <PackageVersion Include="Avalonia.Android" Version="11.3.9" />
+    <PackageVersion Include="Avalonia.Browser" Version="11.3.7" />
+    <PackageVersion Include="Avalonia.Android" Version="11.3.7" />
     <PackageVersion Include="Avalonia.ReactiveUI" Version="11.3.7" />
     <PackageVersion Include="CSharpMath" Version="0.5.1" />
     <PackageVersion Include="CSharpMath.Avalonia" Version="0.5.1" />

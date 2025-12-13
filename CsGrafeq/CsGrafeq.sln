@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsGrafeq.Windows", "CsGrafe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsGrafeq.CSharpMath.Editor", "CsGrafeq\CsGrafeq.CSharpMath.Editor\CsGrafeq.CSharpMath.Editor.csproj", "{DB6EF716-D113-4438-8E24-A78C923EF491}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsGrafeq.I18N", "CsGrafeq\CsGrafeq.I18N\CsGrafeq.I18N.csproj", "{3A8DE0D5-8007-4A38-A459-482419CF7582}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -95,6 +97,10 @@ Global
 		{DB6EF716-D113-4438-8E24-A78C923EF491}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DB6EF716-D113-4438-8E24-A78C923EF491}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DB6EF716-D113-4438-8E24-A78C923EF491}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A8DE0D5-8007-4A38-A459-482419CF7582}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A8DE0D5-8007-4A38-A459-482419CF7582}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A8DE0D5-8007-4A38-A459-482419CF7582}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A8DE0D5-8007-4A38-A459-482419CF7582}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -113,6 +119,7 @@ Global
 		{322842E4-7BC3-4033-938A-18A488A5ADC5} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{1471EB2D-B61A-4AB9-922E-53C8B775944C} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{DB6EF716-D113-4438-8E24-A78C923EF491} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{3A8DE0D5-8007-4A38-A459-482419CF7582} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5A59E9EE-CB1C-46E4-84FF-9F8B019627AD}

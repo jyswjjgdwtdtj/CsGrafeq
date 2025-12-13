@@ -18,7 +18,6 @@ namespace CsGrafeq.Windows.IME
 		/// <returns>Returns the handle to the input context previously associated with the window.</returns>
 		/// <remarks>When associating an input context with a window, an application must remove the association before destroying the input context. One way to do this is to save the handle and reassociate it to the default input context with the window.</remarks>
 		[DllImport("IMM32.dll", ExactSpelling = true),DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-		[SupportedOSPlatform("windows5.1.2600")]
 		internal static extern nint ImmAssociateContext(nint param0, nint param1);
 
 		/// <summary>The ImmGetContext function (immdev.h) returns the input context associated with the specified window.</summary>
@@ -28,7 +27,6 @@ namespace CsGrafeq.Windows.IME
 		/// <para><see href="https://learn.microsoft.com/windows/win32/api/immdev/nf-immdev-immgetcontext#">Read more on docs.microsoft.com</see>.</para>
 		/// </remarks>
 		[DllImport("IMM32.dll", ExactSpelling = true),DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-		[SupportedOSPlatform("windows5.1.2600")]
 		internal static extern nint ImmGetContext(nint param0);
 
 		/// <summary>The ImmGetOpenStatus function (immdev.h) determines whether the IME is open or closed.</summary>
@@ -37,7 +35,6 @@ namespace CsGrafeq.Windows.IME
 		/// <para><see href="https://learn.microsoft.com/windows/win32/api/immdev/nf-immdev-immgetopenstatus">Learn more about this API from docs.microsoft.com</see>.</para>
 		/// </remarks>
 		[DllImport("IMM32.dll", ExactSpelling = true),DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-		[SupportedOSPlatform("windows5.1.2600")]
 		[return: MarshalAs(UnmanagedType.I1)]
 		internal static extern bool ImmGetOpenStatus(nint param0);
 
@@ -47,7 +44,6 @@ namespace CsGrafeq.Windows.IME
 		/// <para><see href="https://learn.microsoft.com/windows/win32/api/immdev/nf-immdev-immreleasecontext">Learn more about this API from docs.microsoft.com</see>.</para>
 		/// </remarks>
 		[DllImport("IMM32.dll", ExactSpelling = true),DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-		[SupportedOSPlatform("windows5.1.2600")]
 		[return: MarshalAs(UnmanagedType.I1)]
 		internal static extern bool ImmReleaseContext(nint param0, nint param1);
 
@@ -55,7 +51,6 @@ namespace CsGrafeq.Windows.IME
 		/// <returns>Returns a nonzero value if successful, or 0 otherwise.</returns>
 		/// <remarks>This function causes an <a href="https://docs.microsoft.com/windows/desktop/Intl/imn-setopenstatus">IMN_SETOPENSTATUS</a> command to be sent to the application.</remarks>
 		[DllImport("IMM32.dll", ExactSpelling = true),DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-		[SupportedOSPlatform("windows5.1.2600")]
 		[return: MarshalAs(UnmanagedType.I1)]
 		internal static extern bool ImmSetOpenStatus(nint param0, UnmanagedBOOL param1);
 	}

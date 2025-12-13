@@ -36,8 +36,20 @@ namespace CsGrafeqApplication.Controls;
 public class MathBox:Control
 {
     public event EventHandler? MathInputted;
-    private RectangleF CurrentMeasuredRect=new(Vector4.NaN);
-    #if RECORD_INSTANCE
+    private RectangleF CurrentMeasuredRect
+    {
+        get => field;
+        set
+        {
+            if (field != value)
+            {
+                InvalidateMeasure();
+                InvalidateArrange();
+                field = value;
+            }
+        }
+    } = new(Vector4.NaN);
+#if RECORD_INSTANCE
     private static readonly List<MathBox> Instances = new();
 
     static MathBox()
@@ -89,6 +101,22 @@ public class MathBox:Control
 
     public static readonly DirectProperty<MathBox, bool> HasTextProperty = AvaloniaProperty.RegisterDirect<MathBox, bool>(
         nameof(HasText), o => o.HasText, (o, v) => o.HasText = v);
+    
+    public static readonly StyledProperty<bool> CanInputProperty = AvaloniaProperty.Register<MathBox, bool>(
+        nameof(CanInput),defaultValue:true);
+
+    public bool CanInput
+    {
+        get => GetValue(CanInputProperty);
+        set
+        {
+            SetValue(CanInputProperty, value);
+            if(CanInput)
+                Keyboard.StartBlinking();
+            else
+                Keyboard.StopBlinking();
+        }
+    }
 
     public bool HasText
     {
@@ -112,7 +140,6 @@ public class MathBox:Control
             Keyboard.RedrawRequested += InvokeAsyncInvalidateVisual;
             Keyboard.Font = new Fonts(Keyboard.Font,Scale*FontSize);
             Keyboard.InsertionPositionHighlighted = true;
-            
         }
     }
 
@@ -169,6 +196,7 @@ public class MathBox:Control
     } = 15;
     public override void Render(DrawingContext e)
     {
+        CurrentMeasuredRect = Keyboard.Measure;
         e.DrawRectangle(new SolidColorBrush(0x00000000),null,Bounds);
         if (!Keyboard.HasText)
         {
@@ -186,7 +214,7 @@ public class MathBox:Control
         c.Save();
         c.Scale(1/Scale,1/Scale);
         Painter.Draw(c,0f,0f);
-        if (Keyboard.ShouldDrawCaret && IsFocused)
+        if (Keyboard.ShouldDrawCaret && IsFocused&&CanInput)
         {
             Keyboard.DrawCaret(c, Color.Black, CaretShape.IBeam);
         }
@@ -197,6 +225,8 @@ public class MathBox:Control
     public float MeasuredWidth=>CurrentMeasuredRect.Width;
     public void PressKey(params CgMathKeyboardInput[] keyboardInputs)
     {
+        if(!CanInput)
+            return;
         foreach (var keyboardInput in keyboardInputs)
         {
             Keyboard.KeyPress(keyboardInput);   
@@ -211,8 +241,6 @@ public class MathBox:Control
         {
             IsCorrect = false;
         }));
-        InvalidateMeasure();
-        InvalidateArrange();
         HasText=Keyboard.HasText;
         MathInputted?.Invoke(this, EventArgs.Empty);
         PropertyToTransmitMathInputEvent=!PropertyToTransmitMathInputEvent;
@@ -227,6 +255,8 @@ public class MathBox:Control
 
     protected override void OnKeyDown(KeyEventArgs e)
     {
+        if(!CanInput)
+            return;
         if (e.KeySymbol?.Length == 1 && (e.KeySymbol?[0]??0)>=33 && (e.KeySymbol?[0]??0)<127)
         {
             char keyChar = e.KeySymbol[0];

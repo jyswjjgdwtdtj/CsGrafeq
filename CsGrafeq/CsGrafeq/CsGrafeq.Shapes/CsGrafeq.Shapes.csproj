@@ -10,16 +10,13 @@
     <ItemGroup>
         <ProjectReference Include="..\CsGrafeq.Base\CsGrafeq.Base.csproj" />
         <ProjectReference Include="..\CsGrafeq.Compiler\CsGrafeq.Compiler.csproj" />
+        <ProjectReference Include="..\CsGrafeq.I18N\CsGrafeq.I18N.csproj" />
         <ProjectReference Include="..\CsGrafeq.Interval\CsGrafeq.Interval.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="11.3.7" />
-        <PackageReference Include="Avalonia.Diagnostics" Version="11.3.7" />
         <PackageReference Include="CSharpMath.Evaluation" Version="0.5.1" />
         <PackageReference Include="DialogHost.Avalonia" Version="0.10.0" />
-        <PackageReference Include="Material.Avalonia" Version="3.13.3" />
-        <PackageReference Include="Material.Avalonia.Dialogs" Version="3.13.3" />
     </ItemGroup>
 
 </Project>

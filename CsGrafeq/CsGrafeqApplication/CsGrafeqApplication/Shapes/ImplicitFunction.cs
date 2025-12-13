@@ -41,11 +41,9 @@ public class ImplicitFunction : Shape
         res.Match(exp =>
         {
             Expression = exp;
-            Console.WriteLine(exp);
         }, ex =>
         {
             IsCorrect=false;
-            Console.WriteLine(ex);
         });
     }
     public bool PropertyToReceiveMathListChanged { 
@@ -86,7 +84,6 @@ public class ImplicitFunction : Shape
         private set => this.RaiseAndSetIfChanged(ref field, value);
     } = new((x, y) => Def.FF, EnglishCharEnum.None);
 
-    public MathList Original;
     public MathList MathList
     {
         get=>field;

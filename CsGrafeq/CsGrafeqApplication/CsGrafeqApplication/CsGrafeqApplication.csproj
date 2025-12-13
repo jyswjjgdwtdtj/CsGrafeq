@@ -93,13 +93,12 @@
     </ItemGroup>
 
     <ItemGroup>
+        <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
         <PackageReference Include="Avalonia" />
         <PackageReference Include="Avalonia.Controls.ColorPicker" />
-        <PackageReference Include="Avalonia.Diagnostics" />
+        <PackageReference Include="Avalonia.Fonts.Inter" />
         <PackageReference Include="Avalonia.Skia" />
         <PackageReference Include="Avalonia.Themes.Fluent" />
-        <PackageReference Include="Avalonia.Fonts.Inter" />
-        <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
         <PackageReference Include="CSharpMath" />
         <PackageReference Include="CSharpMath.Editor" />
         <PackageReference Include="CSharpMath.Evaluation" />
@@ -120,6 +119,7 @@
         <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Compiler\CsGrafeq.Compiler.csproj" />
         <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.CSharpMath.Editor\CsGrafeq.CSharpMath.Editor.csproj" />
         <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Debug\CsGrafeq.Debug.csproj" />
+        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.I18N\CsGrafeq.I18N.csproj" />
         <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Interval\CsGrafeq.Interval.csproj" />
         <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Shapes\CsGrafeq.Shapes.csproj" />
         <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Windows\CsGrafeq.Windows.csproj" />
@@ -139,6 +139,14 @@
         </Compile>
         <Compile Update="Controls\ShownControl.cs">
             <DependentUpon>ShownControl.axaml</DependentUpon>
+        </Compile>
+        <Compile Update="Controls\OneSymbolKeyButton.axaml.cs">
+          <DependentUpon>OneSymbolKeyButton.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Controls\TwoSymbolKeyButtonInPlace.axaml.cs">
+          <DependentUpon>TwoSymbolKeyButtonInPlace.axaml</DependentUpon>
+          <SubType>Code</SubType>
         </Compile>
     </ItemGroup>
 

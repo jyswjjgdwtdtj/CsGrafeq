@@ -25,6 +25,7 @@ public sealed class CgMathKeyboard : IDisposable
     private MathListIndex _insertionIndex = MathListIndex.Level0Index(0);
     private bool _insertionPositionHighlighted;
     private readonly Timer blinkTimer;
+    private bool blinking=false;
 
     static CgMathKeyboard()
     {
@@ -37,9 +38,23 @@ public sealed class CgMathKeyboard : IDisposable
         Context = TypesettingContext.Instance;
         Font = new Fonts(Array.Empty<Typeface>(), PainterConstants.DefaultFontSize);
         blinkTimer = new Timer(DefaultBlinkMilliseconds);
+        var lastCount = -1;
+        var lastHash = -1;
         blinkTimer.Elapsed += (sender, e) =>
         {
-            InsertionPositionHighlighted = !InsertionPositionHighlighted;
+            if (blinking)
+            {
+                InsertionPositionHighlighted = !InsertionPositionHighlighted;
+            }
+            else
+            {
+                if (lastCount != MathList.Count || lastHash != MathList.GetHashCode())
+                {
+                    RedrawRequested?.Invoke(this, EventArgs.Empty);
+                }
+            }
+            lastCount = MathList.Count;
+            lastHash = MathList.GetHashCode();
         };
         blinkTimer.Start();
     }
@@ -99,12 +114,12 @@ public sealed class CgMathKeyboard : IDisposable
 
     public void StartBlinking()
     {
-        blinkTimer.Start();
+        blinking = true;
     }
 
     public void StopBlinking()
     {
-        blinkTimer.Stop();
+        blinking=false;
     }
 
     private static void ResetPlaceholders(MathList mathList)
@@ -491,7 +506,6 @@ public sealed class CgMathKeyboard : IDisposable
             if (!HasText) return false;
             if (_insertionIndex.Previous is MathListIndex previous)
             {
-                Console.WriteLine(previous.FinalSubIndexType);
                 _insertionIndex = previous;
                 MathList.RemoveAt(ref _insertionIndex);
                 return true;

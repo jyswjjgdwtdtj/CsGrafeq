@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -235,8 +236,8 @@ public class CartesianDisplayer : Displayer
             return;
         var zsX = (int)Floor(Log(350 / UnitLength, 10));
         var zsY = (int)Floor(Log(350 / UnitLength, 10));
-        var addnumX = Pow(10D, zsX);
-        var addnumY = Pow(10D, zsY);
+        var addnumX = SpecialPow(10D, zsX);
+        var addnumY = SpecialPow(10D, zsY);
         var addnumDX = SpecialPow(10M, zsX);
         var addnumDY = SpecialPow(10M, zsY);
         SKPaint targetPen;
@@ -326,8 +327,8 @@ public class CartesianDisplayer : Displayer
         var height = Bounds.Height;
         var zsX = (int)Floor(Log(350 / UnitLength, 10));
         var zsY = (int)Floor(Log(350 / UnitLength, 10));
-        var addnumX = Pow(10D, zsX);
-        var addnumY = Pow(10D, zsY);
+        var addnumX = SpecialPow(10D, zsX);
+        var addnumY = SpecialPow(10D, zsY);
         var addnumDX = SpecialPow(10M, zsX);
         var addnumDY = SpecialPow(10M, zsY);
         var p = RangeTo(1, height - TextFont.Size - 2, Zero.Y);

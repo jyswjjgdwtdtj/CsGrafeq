@@ -7,6 +7,7 @@
              xmlns:shapes="clr-namespace:CsGrafeq.Shapes;assembly=CsGrafeq.Shapes"
              xmlns:getter="clr-namespace:CsGrafeq.Shapes.ShapeGetter;assembly=CsGrafeq.Shapes"
              xmlns:shapes1="clr-namespace:CsGrafeq.Shapes"
+             xmlns:cga="clr-namespace:CsGrafeqApplication"
              xmlns:valueConverter="clr-namespace:CsGrafeqApplication.ValueConverter"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CsGrafeqApplication.Addons.GeometryPad.GeometryPad" x:DataType="geopad:GeometryPadViewModel">
@@ -145,13 +146,13 @@
                      Css="{DynamicResource OppositeCssPathFillString}" />
             </TabItem.Header>
             <DockPanel ZIndex="1" LastChildFill="True">
-                <Border DockPanel.Dock="Top" Background="{StaticResource HTMedian}" CornerRadius="0,0,5,5">
+                <Border DockPanel.Dock="Top" Background="{StaticResource HTMedian}" CornerRadius="0,0,5,5" IsVisible="{x:Static cga:GlobalSetting.AllowExpression}">
                     <DockPanel LastChildFill="True" HorizontalAlignment="Stretch" Margin="5" >
                         <Border Width="30" Height="30" DockPanel.Dock="Left">
                             <Svg Path="/Assets/add.svg" Width="25" Height="25" Margin="0" VerticalAlignment="Center"
                                  HorizontalAlignment="Center" Css="{DynamicResource OppositeCssPathFillString}" />
                         </Border>
-                        <Button DockPanel.Dock="Right" Margin="0" Background="Transparent" Width="30"
+                        <Button IsVisible="False" DockPanel.Dock="Right" Margin="0" Background="Transparent" Width="30"
                                 HorizontalContentAlignment="Center" VerticalAlignment="Center"
                                 Click="AddFuncQuestionsClicked" Content="?" FontFamily="{StaticResource MapleMono}" Padding="0" Height="30"/>
                         
@@ -269,7 +270,7 @@
                                                                                 PropertyChanged="Number_OnPropertyChanged"
                                                                                 Tapped="EventHandledTrue"
                                                                                 Focusable="True"
-                                                                                IsReadOnly="{CompiledBinding IsUserEnabled,Converter={StaticResource Not}}" ><TextBox.Styles>
+                                                                                IsReadOnly="{CompiledBinding !IsUserEnabled}" ><TextBox.Styles>
                                                                                 <FluentTheme></FluentTheme>
                                                                             </TextBox.Styles></TextBox>
                                                                             <TextBlock Text=")" TextAlignment="Left"
@@ -565,13 +566,13 @@
                                             CornerRadius="5" BorderThickness="0" Tapped="ImpFuncOnTapped">
                                             <FlyoutBase.AttachedFlyout>
                                                 <Flyout ShowMode="Standard" Placement="BottomEdgeAlignedLeft">
-                                                    <Grid ColumnDefinitions="80,120" RowDefinitions="Auto,Auto,Auto"
+                                                    <Grid ColumnDefinitions="120,120" RowDefinitions="30,30,30"
                                                           RowSpacing="3">
                                                         <TextBlock Grid.Row="0" Grid.Column="0"
                                                                    VerticalAlignment="Center">
                                                             Color:
                                                         </TextBlock>
-                                                        <ColorPicker Grid.Column="1" Grid.Row="0"
+                                                        <ColorPicker HorizontalAlignment="Stretch" Grid.Column="1" Grid.Row="0"
                                                                      Color="{CompiledBinding Color,Converter={StaticResource UIntToColor}}"
                                                                      IsAlphaVisible="False"
                                                                      IsAccentColorsVisible="False" />
@@ -696,49 +697,49 @@
             </TabItem.Header>
             <ScrollViewer Name="PART_VariableViewer">
                 <StackPanel Orientation="Vertical">
-                    <ctls:VariableBox ValueName="a" Value="{CompiledBinding Variables.A,Mode=TwoWay}"
+                    <ctls:VariableBox VariableName="a" Value="{CompiledBinding Variables.A,Mode=TwoWay}"
                                       IsVisible="{CompiledBinding Variables.CharsReferenceCounter[0],Converter={StaticResource IntToBool},Mode=OneWay}" />
-                    <ctls:VariableBox ValueName="b" Value="{CompiledBinding Variables.B,Mode=TwoWay}"
+                    <ctls:VariableBox VariableName="b" Value="{CompiledBinding Variables.B,Mode=TwoWay}"
                                       IsVisible="{CompiledBinding Variables.CharsReferenceCounter[1],Converter={StaticResource IntToBool},Mode=OneWay}" />
-                    <ctls:VariableBox ValueName="c" Value="{CompiledBinding Variables.C,Mode=TwoWay}"
+                    <ctls:VariableBox VariableName="c" Value="{CompiledBinding Variables.C,Mode=TwoWay}"
                                       IsVisible="{CompiledBinding Variables.CharsReferenceCounter[2],Converter={StaticResource IntToBool},Mode=OneWay}" />
-                    <ctls:VariableBox ValueName="d" Value="{CompiledBinding Variables.D,Mode=TwoWay}"
+                    <ctls:VariableBox VariableName="d" Value="{CompiledBinding Variables.D,Mode=TwoWay}"
                                       IsVisible="{CompiledBinding Variables.CharsReferenceCounter[3],Converter={StaticResource IntToBool},Mode=OneWay}" />
-                    <ctls:VariableBox ValueName="f" Value="{CompiledBinding Variables.F,Mode=TwoWay}"
+                    <ctls:VariableBox VariableName="f" Value="{CompiledBinding Variables.F,Mode=TwoWay}"
                                       IsVisible="{CompiledBinding Variables.CharsReferenceCounter[5],Converter={StaticResource IntToBool},Mode=OneWay}" />
-                    <ctls:VariableBox ValueName="g" Value="{CompiledBinding Variables.G,Mode=TwoWay}"
+                    <ctls:VariableBox VariableName="g" Value="{CompiledBinding Variables.G,Mode=TwoWay}"
                                       IsVisible="{CompiledBinding Variables.CharsReferenceCounter[6],Converter={StaticResource IntToBool},Mode=OneWay}" />
-                    <ctls:VariableBox ValueName="h" Value="{CompiledBinding Variables.H,Mode=TwoWay}"
+                    <ctls:VariableBox VariableName="h" Value="{CompiledBinding Variables.H,Mode=TwoWay}"
                                       IsVisible="{CompiledBinding Variables.CharsReferenceCounter[7],Converter={StaticResource IntToBool},Mode=OneWay}" />
-                    <ctls:VariableBox ValueName="i" Value="{CompiledBinding Variables.I,Mode=TwoWay}"
+                    <ctls:VariableBox VariableName="i" Value="{CompiledBinding Variables.I,Mode=TwoWay}"
                                       IsVisible="{CompiledBinding Variables.CharsReferenceCounter[8],Converter={StaticResource IntToBool},Mode=OneWay}" />
-                    <ctls:VariableBox ValueName="j" Value="{CompiledBinding Variables.J,Mode=TwoWay}"
+                    <ctls:VariableBox VariableName="j" Value="{CompiledBinding Variables.J,Mode=TwoWay}"
                                       IsVisible="{CompiledBinding Variables.CharsReferenceCounter[9],Converter={StaticResource IntToBool},Mode=OneWay}" />
-                    <ctls:VariableBox ValueName="k" Value="{CompiledBinding Variables.K,Mode=TwoWay}"
+                    <ctls:VariableBox VariableName="k" Value="{CompiledBinding Variables.K,Mode=TwoWay}"
                                       IsVisible="{CompiledBinding Variables.CharsReferenceCounter[10],Converter={StaticResource IntToBool},Mode=OneWay}" />
-                    <ctls:VariableBox ValueName="l" Value="{CompiledBinding Variables.L,Mode=TwoWay}"
+                    <ctls:VariableBox VariableName="l" Value="{CompiledBinding Variables.L,Mode=TwoWay}"
                                       IsVisible="{CompiledBinding Variables.CharsReferenceCounter[11],Converter={StaticResource IntToBool},Mode=OneWay}" />
-                    <ctls:VariableBox ValueName="m" Value="{CompiledBinding Variables.M,Mode=TwoWay}"
+                    <ctls:VariableBox VariableName="m" Value="{CompiledBinding Variables.M,Mode=TwoWay}"
                                       IsVisible="{CompiledBinding Variables.CharsReferenceCounter[12],Converter={StaticResource IntToBool},Mode=OneWay}" />
-                    <ctls:VariableBox ValueName="n" Value="{CompiledBinding Variables.N,Mode=TwoWay}"
+                    <ctls:VariableBox VariableName="n" Value="{CompiledBinding Variables.N,Mode=TwoWay}"
                                       IsVisible="{CompiledBinding Variables.CharsReferenceCounter[13],Converter={StaticResource IntToBool},Mode=OneWay}" />
-                    <ctls:VariableBox ValueName="o" Value="{CompiledBinding Variables.O,Mode=TwoWay}"
+                    <ctls:VariableBox VariableName="o" Value="{CompiledBinding Variables.O,Mode=TwoWay}"
                                       IsVisible="{CompiledBinding Variables.CharsReferenceCounter[14],Converter={StaticResource IntToBool},Mode=OneWay}" />
-                    <ctls:VariableBox ValueName="p" Value="{CompiledBinding Variables.P,Mode=TwoWay}"
+                    <ctls:VariableBox VariableName="p" Value="{CompiledBinding Variables.P,Mode=TwoWay}"
                                       IsVisible="{CompiledBinding Variables.CharsReferenceCounter[15],Converter={StaticResource IntToBool},Mode=OneWay}" />
-                    <ctls:VariableBox ValueName="q" Value="{CompiledBinding Variables.Q,Mode=TwoWay}"
+                    <ctls:VariableBox VariableName="q" Value="{CompiledBinding Variables.Q,Mode=TwoWay}"
                                       IsVisible="{CompiledBinding Variables.CharsReferenceCounter[16],Converter={StaticResource IntToBool},Mode=OneWay}" />
-                    <ctls:VariableBox ValueName="r" Value="{CompiledBinding Variables.R,Mode=TwoWay}"
+                    <ctls:VariableBox VariableName="r" Value="{CompiledBinding Variables.R,Mode=TwoWay}"
                                       IsVisible="{CompiledBinding Variables.CharsReferenceCounter[17],Converter={StaticResource IntToBool},Mode=OneWay}" />
-                    <ctls:VariableBox ValueName="s" Value="{CompiledBinding Variables.S,Mode=TwoWay}"
+                    <ctls:VariableBox VariableName="s" Value="{CompiledBinding Variables.S,Mode=TwoWay}"
                                       IsVisible="{CompiledBinding Variables.CharsReferenceCounter[18],Converter={StaticResource IntToBool},Mode=OneWay}" />
-                    <ctls:VariableBox ValueName="t" Value="{CompiledBinding Variables.T,Mode=TwoWay}"
+                    <ctls:VariableBox VariableName="t" Value="{CompiledBinding Variables.T,Mode=TwoWay}"
                                       IsVisible="{CompiledBinding Variables.CharsReferenceCounter[19],Converter={StaticResource IntToBool},Mode=OneWay}" />
-                    <ctls:VariableBox ValueName="u" Value="{CompiledBinding Variables.U,Mode=TwoWay}"
+                    <ctls:VariableBox VariableName="u" Value="{CompiledBinding Variables.U,Mode=TwoWay}"
                                       IsVisible="{CompiledBinding Variables.CharsReferenceCounter[20],Converter={StaticResource IntToBool},Mode=OneWay}" />
-                    <ctls:VariableBox ValueName="v" Value="{CompiledBinding Variables.V,Mode=TwoWay}"
+                    <ctls:VariableBox VariableName="v" Value="{CompiledBinding Variables.V,Mode=TwoWay}"
                                       IsVisible="{CompiledBinding Variables.CharsReferenceCounter[21],Converter={StaticResource IntToBool},Mode=OneWay}" />
-                    <ctls:VariableBox ValueName="w" Value="{CompiledBinding Variables.W,Mode=TwoWay}"
+                    <ctls:VariableBox VariableName="w" Value="{CompiledBinding Variables.W,Mode=TwoWay}"
                                       IsVisible="{CompiledBinding Variables.CharsReferenceCounter[22],Converter={StaticResource IntToBool},Mode=OneWay}" />
                 </StackPanel>
             </ScrollViewer>

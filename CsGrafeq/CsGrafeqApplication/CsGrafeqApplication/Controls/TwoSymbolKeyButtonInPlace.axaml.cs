@@ -9,34 +9,34 @@ using CsGrafeq.CSharpMath.Editor;
 namespace CsGrafeqApplication.Controls;
 
 [PseudoClasses(":isfirst")]
-public class KeyButton : TemplatedControl
+public partial class TwoSymbolKeyButtonInPlace : UserControl
 {
-    public static readonly DirectProperty<KeyButton, string> FirstButtonProperty =
-        AvaloniaProperty.RegisterDirect<KeyButton, string>(
+    public static readonly DirectProperty<TwoSymbolKeyButtonInPlace, string> FirstButtonProperty =
+        AvaloniaProperty.RegisterDirect<TwoSymbolKeyButtonInPlace, string>(
             nameof(FirstButton), o => o.FirstButton, (o, v) => o.FirstButton = v);
 
-    public static readonly DirectProperty<KeyButton, string> SecondButtonProperty =
-        AvaloniaProperty.RegisterDirect<KeyButton, string>(
+    public static readonly DirectProperty<TwoSymbolKeyButtonInPlace, string> SecondButtonProperty =
+        AvaloniaProperty.RegisterDirect<TwoSymbolKeyButtonInPlace, string>(
             nameof(SecondButton), o => o.SecondButton, (o, v) => o.SecondButton = v);
 
-    public static readonly DirectProperty<KeyButton, CgMathKeyboardInput> FirstKeyboardInputProperty = AvaloniaProperty.RegisterDirect<KeyButton, CgMathKeyboardInput>(
+    public static readonly DirectProperty<TwoSymbolKeyButtonInPlace, CgMathKeyboardInput> FirstKeyboardInputProperty = AvaloniaProperty.RegisterDirect<TwoSymbolKeyButtonInPlace, CgMathKeyboardInput>(
         nameof(FirstKeyboardInput), o => o.FirstKeyboardInput, (o, v) => o.FirstKeyboardInput = v);
 
-    public static readonly DirectProperty<KeyButton, CgMathKeyboardInput> SecondKeyboardInputProperty = AvaloniaProperty.RegisterDirect<KeyButton, CgMathKeyboardInput>(
+    public static readonly DirectProperty<TwoSymbolKeyButtonInPlace, CgMathKeyboardInput> SecondKeyboardInputProperty = AvaloniaProperty.RegisterDirect<TwoSymbolKeyButtonInPlace, CgMathKeyboardInput>(
         nameof(SecondKeyboardInput), o => o.SecondKeyboardInput, (o, v) => o.SecondKeyboardInput = v);
     
 
     
 
-    public static readonly DirectProperty<KeyButton, bool> IsFirstProperty =
-        AvaloniaProperty.RegisterDirect<KeyButton, bool>(
+    public static readonly DirectProperty<TwoSymbolKeyButtonInPlace, bool> IsFirstProperty =
+        AvaloniaProperty.RegisterDirect<TwoSymbolKeyButtonInPlace, bool>(
             nameof(IsFirst), o => o.IsFirst, (o, v) => o.IsFirst = v);
 
-    public static readonly DirectProperty<KeyButton, string> CurrentButtonProperty =
-        AvaloniaProperty.RegisterDirect<KeyButton, string>(
+    public static readonly DirectProperty<TwoSymbolKeyButtonInPlace, string> CurrentButtonProperty =
+        AvaloniaProperty.RegisterDirect<TwoSymbolKeyButtonInPlace, string>(
             nameof(CurrentButton), o => o.CurrentButton, (o, v) => o.CurrentButton = v);
 
-    public KeyButton()
+    public TwoSymbolKeyButtonInPlace()
     {
         PropertyChanged += OnPropertyChanged;
         IsFirst = true;
@@ -96,7 +96,8 @@ public class KeyButton : TemplatedControl
             {
                 part_Button.Click += (s, e) =>
                 {
-                    if (fm.GetFocusedElement() is MathBox mb)
+                    var f = fm.GetFocusedElement();
+                    if (f is MathBox mb)
                     {
                         mb.PressKey(IsFirst?FirstKeyboardInput:SecondKeyboardInput);
                     }

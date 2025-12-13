@@ -72,7 +72,7 @@ public class DisplayControl : CartesianDisplayer
                         {
                             dc.Clear(AxisBackground);
                             RenderAxisLine(dc);
-                            if (!MovingOptimization || (LastZeroPos - Zero).Length > 100)
+                            if ((!MovingOptimization) || (LastZeroPos - Zero).Length > 50)
                             {
                                 foreach (var adn in Addons)
                                 foreach (var rt in adn.Layers)
@@ -109,7 +109,7 @@ public class DisplayControl : CartesianDisplayer
                                     if (!layer.IsActive)
                                         continue;
                                     layer.DrawBitmap(dc, (int)(Zero.X - LastZeroPos.X), (int)(Zero.Y - LastZeroPos.Y));
-                                    RenderMovedPlace(dc, layer.Render);
+                                    //RenderMovedPlace(dc, layer.Render);
                                 }
                             }
 

@@ -8,6 +8,7 @@
              xmlns:controls="clr-namespace:CsGrafeqApplication.Controls"
              xmlns:csgrafeqapp="clr-namespace:CsGrafeqApplication"
              xmlns:cmavalonia="clr-namespace:CSharpMath.Avalonia;assembly=CSharpMath.Avalonia"
+             xmlns:i18N="clr-namespace:CsGrafeq.I18N;assembly=CsGrafeq.I18N"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CsGrafeqApplication.Controls.DisplayerContainer"
              x:DataType="vm:DisplayerContainerViewModel" Foreground="{DynamicResource CgForegroundBrush}"
@@ -48,9 +49,9 @@
                         </Style>
                     </Style>
                 </Panel.Styles>
-                <Canvas ZIndex="5" Name="InfoCanvas">
-                    <geopad:GeoPadInfo DataContext="{CompiledBinding  Displayer.Addons[0].DataContext}" />
-                </Canvas>
+                <Panel ZIndex="5" IsHitTestVisible="False" Name="InfoCanvas" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                    <geopad:GeoPadInfo DataContext="{CompiledBinding  Displayer.Addons[0].DataContext}" HorizontalAlignment="Stretch" />
+                </Panel>
                 <Grid ZIndex="10" Name="PART_Grid">
                     <Grid.Resources>
                     </Grid.Resources>
@@ -290,7 +291,7 @@
                                     <Button.Flyout>
                                         <Flyout Placement="Left">
                                             <ComboBox
-                                                SelectedIndex="{x:Static csgrafeqapp:Languages.CurrentLanguageIndex}"
+                                                SelectedIndex="{x:Static i18N:Languages.CurrentLanguageIndex}"
                                                 SelectionChanged="LanguageSelectionChanged">
                                                 <ComboBoxItem>
                                                     <TextBlock Text="en-us (English)" />

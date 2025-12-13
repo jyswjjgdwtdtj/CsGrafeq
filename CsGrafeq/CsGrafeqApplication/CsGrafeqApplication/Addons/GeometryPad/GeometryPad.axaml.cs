@@ -242,10 +242,15 @@ public partial class GeometryPad : Addon
         if (sender is TextBox tb)
             if (e.Property == TextBox.TextProperty)
             {
-                if (tb.Text == "" || IntervalCompiler.TryCompile(tb.Text))
+                var re = IntervalCompiler.TryCompile(tb.Text);
+                if (tb.Text == "" || re.Success(out _))
                     DataValidationErrors.ClearErrors(tb);
                 else
-                    DataValidationErrors.SetError(tb, new Exception());
+                {
+                    re.Error(out var ex);
+                    DataValidationErrors.SetError(tb, ex);
+                    Static.Info(new TextBlock { Text = ex.Message },Static.InfoType.Error);
+                }
             }
     }
 
@@ -261,10 +266,15 @@ public partial class GeometryPad : Addon
             if (e.Property == TextBox.TextProperty)
                 if ((string)e.NewValue != (string)e.OldValue)
                 {
-                    if (tb.Text == "" || IntervalCompiler.TryCompile(tb.Text))
+                    var re = IntervalCompiler.TryCompile(tb.Text);
+                    if (tb.Text == "" || re.Success(out _))
                         DataValidationErrors.ClearErrors(tb);
                     else
-                        DataValidationErrors.SetError(tb, new Exception());
+                    {
+                        re.Error(out var ex);
+                        DataValidationErrors.SetError(tb, ex);
+                        Static.Info(new TextBlock { Text = ex.Message },Static.InfoType.Error);
+                    }
                     DoFuncTextChange(tb, (string)e.NewValue, (string)e.OldValue);
                 }
     }
@@ -639,14 +649,14 @@ public partial class GeometryPad : Addon
             var needplen = CurrentAction.Args.Count(i => i == ShapeArg.Point);
             var needllen = CurrentAction.Args.Count(i => i == ShapeArg.Line);
             var needclen = CurrentAction.Args.Count(i => i == ShapeArg.Circle);
-            var needpolen = CurrentAction.Args.Count(i => i == ShapeArg.Circle);
+            var needpolen = CurrentAction.Args.Count(i => i == ShapeArg.Polygon);
             if (CurrentAction.IsMultiPoint)
             {
                 if (plen > 2)
                     if (selectfirst)
                     {
                         var shape = GeometryActions.CreateShape(CurrentAction.Self,
-                            (Getter)CurrentAction.GetterConstructor.Invoke(SPoints.ToArray()));
+                            (Getter)CurrentAction.GetterConstructor.Invoke((object)SPoints.ToArray()));
                         AddShape(shape);
                         Shapes.ClearSelected();
                     }
@@ -666,38 +676,12 @@ public partial class GeometryPad : Addon
                 return Intercept;
             }
 
-            int GetIndex(GeometryShape s)
-            {
-                switch (s)
-                {
-                    case GeoPoint _:
-                        return 0;
-                    case GeoLine _:
-                        return 5;
-                    case GeoCircle _:
-                        return 10;
-                    case GeoPolygon _:
-                        return 15;
-                    default:
-                        Throw("");
-                        return 20;
-                }
-            }
+            
 
             if (needplen == plen && needclen == clen && needllen == llen && needpolen == polen)
             {
-                SAll.Sort((s1, s2) =>
-                {
-                    var i1 = GetIndex(s1);
-                    var i2 = GetIndex(s2);
-                    if (i1 < i2)
-                        return -1;
-                    if (i1 == i2)
-                        return 0;
-                    return 1;
-                });
                 var shape = GeometryActions.CreateShape(CurrentAction.Self,
-                    (Getter)CurrentAction.GetterConstructor.Invoke(SAll?.Select(o => (object?)o)?.ToArray() ?? []));
+                    (Getter)CurrentAction.GetterConstructor.Invoke(SAll?.SortShape().Select(o => (object?)o)?.ToArray() ?? []));
                 AddShape(shape);
                 Shapes.ClearSelected();
             }
@@ -1360,7 +1344,8 @@ public partial class GeometryPad : Addon
                 {
                     if (n.IsError)
                     {
-                        DataValidationErrors.SetError(tb, new Exception());
+                        DataValidationErrors.SetError(tb, n.Error);
+                        Static.Info(new TextBlock() { Text = n.Error.Message }, Static.InfoType.Error);
                     }
                     else
                     {
@@ -1419,12 +1404,6 @@ public partial class GeometryPad : Addon
         if (sender is TextBox box)
         {
             var parent = box.Parent;
-            if (e.KeyModifiers != KeyModifiers.None)
-            {
-                e.Handled = true;
-                return;
-            }
-
             if (parent != null)
             {
                 if (e.Key == Key.Left)
@@ -1437,6 +1416,7 @@ public partial class GeometryPad : Addon
                     if (index > 0)
                         ls[index - 1].Focus();
                     e.Handled = true;
+                    return;
                 }
                 else if (e.Key == Key.Right)
                 {
@@ -1448,27 +1428,42 @@ public partial class GeometryPad : Addon
                     if (index < ls.Count - 1)
                         ls[index + 1].Focus();
                     e.Handled = true;
-                }
-                else if (e.Key >= Key.D0 && e.Key <= Key.D9)
-                {
-                }
-                else if (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9)
-                {
-                }
-                else if (e.Key == Key.OemMinus || e.Key == Key.OemPeriod || e.Key == Key.Subtract ||
-                         e.Key == Key.Decimal || e.Key == Key.Add || e.Key == Key.Divide || e.Key == Key.Multiply ||
-                         e.Key == Key.OemPlus || e.Key == Key.OemQuestion)
-                {
-                }
-                else if (e.Key >= Key.A && e.Key <= Key.Z)
-                {
-                }
-                else
-                {
-                    e.Handled = true;
+                    return;
                 }
             }
+        if (e.KeySymbol?.Length == 1 && (e.KeySymbol?[0]??0)>=33 && (e.KeySymbol?[0]??0)<127)
+        {
+            char keyChar = e.KeySymbol[0];
+            switch (keyChar)
+            {
+                case >= 'a' and <= 'z':
+                case >= 'A' and <= 'Z':
+                case >= '0' and <= '9':
+                case '+':
+                case '-':
+                case '*':
+                case '/':
+                case '(':
+                case ')':
+                case '%':
+                    return;
+            }
         }
+
+        if (e.KeyModifiers == KeyModifiers.None)
+        {
+            switch (e.PhysicalKey)
+            {
+                case PhysicalKey.Backspace:
+                case PhysicalKey.Delete:
+                case PhysicalKey.ArrowLeft:
+                case PhysicalKey.ArrowRight:
+                    return;
+            }
+        }
+        }
+
+        e.Prevent();
     }
 
     /// <summary>
@@ -1478,7 +1473,9 @@ public partial class GeometryPad : Addon
     /// <param name="e"></param>
     public void TunnelTextBoxKeyDown(object? sender, KeyEventArgs e)
     {
-        if (e.KeyModifiers == KeyModifiers.Control)
+        if(e.KeyModifiers==KeyModifiers.None)
+            return;
+        if (e.KeyModifiers.HasFlag(KeyModifiers.Control))
         {
             if (e.Key == Key.A)
             {
@@ -1491,13 +1488,12 @@ public partial class GeometryPad : Addon
             }
             else
             {
-                e.Handled = true;
+                e.Prevent();
             }
+            return;
         }
-        else if (e.KeyModifiers != KeyModifiers.None)
-        {
-            e.Handled = true;
-        }
+        if (e.KeyModifiers.HasFlag(KeyModifiers.Alt))
+            e.Prevent();
     }
 
     /// <summary>
@@ -1515,17 +1511,6 @@ public partial class GeometryPad : Addon
             }
     }
 
-    #endregion
-
-    protected override void OnLoaded(RoutedEventArgs e)
-    {
-        base.OnLoaded(e);
-        foreach (var control in this.GetTemplateChildren().OfType<TextBox>())
-        {
-            control.Styles.Add(Static.FluentTheme);
-        }
-    }
-
     private void MathTextBoxKeyDown(object? sender, KeyEventArgs e)
     {
         var box = MathTextBox.InnerMathBox;
@@ -1539,6 +1524,17 @@ public partial class GeometryPad : Addon
     private void MathTextBoxMathInputted(object? sender, RoutedEventArgs e)
     {
         var s=(sender as MathBox)!;
-        MathTextBoxContainer.BorderBrush = (!s.HasText)||(s.IsCorrect&&IntervalCompiler.TryCompile(s.Expression)) ? Brushes.Blue : Brushes.Red;
+        MathTextBoxContainer.BorderBrush = (!s.HasText)||(s.IsCorrect&&IntervalCompiler.TryCompile(s.Expression).Success(out _)) ? Brushes.Blue : Brushes.Red;
+    }
+
+    #endregion
+
+    protected override void OnLoaded(RoutedEventArgs e)
+    {
+        base.OnLoaded(e);
+        foreach (var control in this.GetTemplateChildren().OfType<TextBox>())
+        {
+            control.Styles.Add(Static.FluentTheme);
+        }
     }
 }

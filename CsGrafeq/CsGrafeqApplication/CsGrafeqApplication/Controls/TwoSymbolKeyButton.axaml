@@ -3,12 +3,12 @@
         xmlns:controls="using:CsGrafeqApplication.Controls">
     <Design.PreviewWith>
         <Border Width="60" Height="60">
-            <controls:KeyButton Width="48" Height="48" FirstButton="G" SecondButton="Q"
+            <controls:TwoSymbolKeyButton Width="48" Height="48" FirstButton="G" SecondButton="Q"
                                 FontFamily="{StaticResource MapleMono}" IsFirst="False"/>
         </Border>
     </Design.PreviewWith>
 
-    <Style Selector="controls|KeyButton">
+    <Style Selector="controls|TwoSymbolKeyButton">
         <Setter Property="ClipToBounds" Value="False"></Setter>
         <Setter Property="FontFamily" Value="{StaticResource MapleMono}" />
         <Style Selector="^ /template/ RepeatButton">
@@ -20,7 +20,7 @@
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="Margin" Value="0"/>
             <Setter Property="Padding" Value="0"/>
-            <Setter Property="Height" Value="{CompiledBinding $parent[controls:KeyButton].Height}"/>
+            <Setter Property="Height" Value="{CompiledBinding $parent[controls:TwoSymbolKeyButton].Height}"/>
             <Style Selector="^ Panel">
                 <Setter Property="Focusable" Value="False"/>
                 <Setter Property="Margin" Value="0"></Setter>
@@ -39,8 +39,8 @@
                     <RepeatButton Name="PART_Button">
                         <Panel>
                             <TextBlock Text="{TemplateBinding FirstButton}"
-                                        Foreground="{DynamicResource CgForegroundBrush}" VerticalAlignment="Bottom"
-                                        HorizontalAlignment="Left" FontSize="30" />
+                                       Foreground="{DynamicResource CgForegroundBrush}" VerticalAlignment="Bottom"
+                                       HorizontalAlignment="Left" FontSize="30" />
                             <TextBlock Text="{TemplateBinding SecondButton}"
                                         Foreground="{DynamicResource CgHalfForegroundBrush}" VerticalAlignment="Top"
                                         HorizontalAlignment="Right" FontSize="20" />

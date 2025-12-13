@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Threading;
 
-namespace CsGrafeqApplication;
+namespace CsGrafeq.I18N;
 
 public class Languages
 {
@@ -21,5 +21,5 @@ public class Languages
         }
     }
 
-    public static event Action LanguageChanged;
+    public static event Action? LanguageChanged;
 }

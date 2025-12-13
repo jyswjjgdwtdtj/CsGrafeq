@@ -13,6 +13,9 @@ namespace CsGrafeqApplication.Controls;
 public class GlobalMathKeyBoard : ContentControl
 {
 
+    public GlobalMathKeyBoard()
+    {
+    }
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         var expander= e.NameScope.Find<Expander>("PART_Expander");

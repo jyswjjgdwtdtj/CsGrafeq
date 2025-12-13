@@ -56,22 +56,14 @@ public static class CsGrafeqMath
 
     /// <summary>
     ///     四舍五入至小数点
-    ///     此函数为从.NET Framework迁移的遗留函数
     /// </summary>
     /// <param name="num"></param>
     /// <param name="fix"></param>
     /// <returns></returns>
     public static double RoundTen(double num, int fix)
     {
-        if (fix == 0)
-            return num;
-        if (fix < 0)
-        {
-            double n = SpecialPow(10, -fix);
-            return Math.Round(num / n) * n;
-        }
-
-        return Math.Round(num, fix);
+        double n = SpecialPow(10d, -fix);
+        return Math.Round(num / n) * n;
     }
 
     /// <summary>
