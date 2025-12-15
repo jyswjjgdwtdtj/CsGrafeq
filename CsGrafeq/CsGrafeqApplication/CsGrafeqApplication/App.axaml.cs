@@ -1,10 +1,9 @@
-﻿using System;
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using CsGrafeq.Windows.IME;
 using CsGrafeqApplication.ViewModels;
 using CsGrafeqApplication.Views;
-using CsGrafeq.Windows.IME;
 
 namespace CsGrafeqApplication;
 
@@ -21,14 +20,16 @@ public class App : Application
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.MainWindow = new MainWindow();
-            desktop.MainWindow.DataContext=new MainWindowViewModel(desktop.MainWindow);
+            desktop.MainWindow.DataContext = new MainWindowViewModel(desktop.MainWindow);
             IME.DisableIme(desktop.MainWindow);
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
+        {
             singleViewPlatform.MainView = new MainView
             {
                 DataContext = new MainViewModel()
             };
+        }
 
         base.OnFrameworkInitializationCompleted();
     }

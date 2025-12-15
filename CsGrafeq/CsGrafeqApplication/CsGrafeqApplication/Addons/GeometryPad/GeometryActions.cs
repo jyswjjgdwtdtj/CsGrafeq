@@ -262,6 +262,17 @@ internal static class GeometryActions
                         .FirstOrDefault()!), // ctor(Point)
                 Args = [ShapeArg.Point],
                 Self = ShownShapeArg.Circle
+            },
+            new ActionData
+            {
+                Name = new MultiLanguageData { English = "Apollonius", Chinese = "阿波罗尼斯圆" },
+                Description = new MultiLanguageData
+                    { English = "Create a circle through Apollonius Circle", Chinese = "创建阿波罗尼斯圆" },
+                GetterConstructor =
+                    ConstructorInvoker.Create(typeof(CircleGetter_Apollonius).GetConstructors()
+                        .FirstOrDefault()!), // ctor(Point)
+                Args = [ShapeArg.Point, ShapeArg.Point],
+                Self = ShownShapeArg.Circle
             }
         },
 
@@ -299,7 +310,7 @@ internal static class GeometryActions
             case ShownShapeArg.Angle:
                 return new Angle((AngleGetter)getter);
             default:
-                return Throw<GeometryShape>("Shape not supported:"+target);
+                return Throw<GeometryShape>("Shape not supported:" + target);
         }
     }
 }

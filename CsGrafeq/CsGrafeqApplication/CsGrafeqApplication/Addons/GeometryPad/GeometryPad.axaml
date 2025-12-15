@@ -8,7 +8,8 @@
              xmlns:getter="clr-namespace:CsGrafeq.Shapes.ShapeGetter;assembly=CsGrafeq.Shapes"
              xmlns:shapes1="clr-namespace:CsGrafeq.Shapes"
              xmlns:cga="clr-namespace:CsGrafeqApplication"
-             xmlns:valueConverter="clr-namespace:CsGrafeqApplication.ValueConverter"
+             xmlns:csGrafeq="clr-namespace:CsGrafeq;assembly=CsGrafeq.Compiler"
+             xmlns:corecontrols="clr-namespace:CsGrafeqApplication.Core.Controls;assembly=CsGrafeqApplication.Core"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CsGrafeqApplication.Addons.GeometryPad.GeometryPad" x:DataType="geopad:GeometryPadViewModel">
     <UserControl.Styles>
@@ -61,7 +62,7 @@
             <Setter Property="Height" Value="30" />
             <Setter Property="HorizontalAlignment" Value="Center" />
             <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="HorizontalContentAlignment" Value="Center"></Setter>
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
         </Style>
         <Style Selector="TextBox.Big">
             <Setter Property="FontSize" Value="14" />
@@ -146,23 +147,29 @@
                      Css="{DynamicResource OppositeCssPathFillString}" />
             </TabItem.Header>
             <DockPanel ZIndex="1" LastChildFill="True">
-                <Border DockPanel.Dock="Top" Background="{StaticResource HTMedian}" CornerRadius="0,0,5,5" IsVisible="{x:Static cga:GlobalSetting.AllowExpression}">
-                    <DockPanel LastChildFill="True" HorizontalAlignment="Stretch" Margin="5" >
+                <Border DockPanel.Dock="Top" Background="{StaticResource HTMedian}" CornerRadius="0,0,5,5"
+                        IsVisible="{x:Static cga:GlobalSetting.AllowExpression}">
+                    <DockPanel LastChildFill="True" HorizontalAlignment="Stretch" Margin="5">
                         <Border Width="30" Height="30" DockPanel.Dock="Left">
                             <Svg Path="/Assets/add.svg" Width="25" Height="25" Margin="0" VerticalAlignment="Center"
                                  HorizontalAlignment="Center" Css="{DynamicResource OppositeCssPathFillString}" />
                         </Border>
                         <Button IsVisible="False" DockPanel.Dock="Right" Margin="0" Background="Transparent" Width="30"
                                 HorizontalContentAlignment="Center" VerticalAlignment="Center"
-                                Click="AddFuncQuestionsClicked" Content="?" FontFamily="{StaticResource MapleMono}" Padding="0" Height="30"/>
-                        
-                        <Border Tapped="EventHandledTrue" DoubleTapped="EventHandledTrue" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="{DynamicResource CgTranslucentBackgroundBrush}" Padding="10" CornerRadius="5"
+                                Click="AddFuncQuestionsClicked" Content="?" FontFamily="{StaticResource MapleMono}"
+                                Padding="0" Height="30" />
+
+                        <Border Tapped="EventHandledTrue" DoubleTapped="EventHandledTrue" HorizontalAlignment="Stretch"
+                                VerticalAlignment="Center" Background="{DynamicResource CgTranslucentBackgroundBrush}"
+                                Padding="10" CornerRadius="5"
                                 BorderThickness="2" Margin="5" Name="MathTextBoxContainer">
                             <!--<TextBox BorderThickness="0" Classes="NoDataValidation" AcceptsReturn="False"
                                      AcceptsTab="False" KeyUp="NewFuncOnClick" Name="NewFuncTextBox"
                                      TemplateApplied="NewFuncTextBoxTemplateApplied"
                                      PropertyChanged="NewFuncPropertyChanged" Margin="0,0,5,0" />-->
-                            <ctls:MathTextBox HorizontalAlignment="Stretch" Name="MathTextBox" KeyDown="MathTextBoxKeyDown" MathInputted="MathTextBoxMathInputted"/>
+                            <corecontrols:MathTextBox HorizontalAlignment="Stretch" Name="MathTextBox"
+                                                      KeyDown="MathTextBoxKeyDown"
+                                                      MathInputted="MathTextBoxMathInputted" />
                         </Border>
                     </DockPanel>
                 </Border>
@@ -182,12 +189,12 @@
                             <geopad:GeoShapeAndElseTemplate>
                                 <geopad:GeoShapeAndElseTemplate.IsGeometryShape>
                                     <DataTemplate DataType="shapes:GeometryShape">
-                                        <ctls:CheckedControl
+                                        <ctls:ToggleBox
                                             IsChecked="{CompiledBinding Selected, Mode=TwoWay}"
                                             IsOver="{CompiledBinding PointerOver, Mode=OneWayToSource}"
                                             Height="{CompiledBinding IsDeleted,Converter={StaticResource BoolToDouble},ConverterParameter='70',Mode=OneWay}"
                                             Color="{CompiledBinding Color}">
-                                            <ctls:CheckedControl.Flyout>
+                                            <ctls:ToggleBox.Flyout>
                                                 <Flyout ShowMode="Standard" Placement="BottomEdgeAlignedLeft">
                                                     <Grid ColumnDefinitions="80,120" RowDefinitions="Auto,Auto"
                                                           RowSpacing="3">
@@ -208,14 +215,17 @@
                                                                   HorizontalAlignment="Center" />
                                                     </Grid>
                                                 </Flyout>
-                                            </ctls:CheckedControl.Flyout>
+                                            </ctls:ToggleBox.Flyout>
                                             <DockPanel LastChildFill="True">
                                                 <CheckBox
                                                     IsChecked="{CompiledBinding Visible,Mode=TwoWay}"
                                                     Classes="VisibilityCheckBox"
-                                                    VerticalAlignment="Center" Margin="5" Tapped="EventHandledTrue" DoubleTapped="EventHandledTrue" />
-                                                <Button DockPanel.Dock="Right" VerticalAlignment="Center" BorderThickness="0"
-                                                        Tag="{CompiledBinding .}" Click="DeleteButtonClicked" Width="30" Height="30" Margin="4"
+                                                    VerticalAlignment="Center" Margin="5" Tapped="EventHandledTrue"
+                                                    DoubleTapped="EventHandledTrue" />
+                                                <Button DockPanel.Dock="Right" VerticalAlignment="Center"
+                                                        BorderThickness="0"
+                                                        Tag="{CompiledBinding .}" Click="DeleteButtonClicked"
+                                                        Width="30" Height="30" Margin="4"
                                                         Background="{DynamicResource HTMedianBrush}">
                                                     <Svg Path="/Assets/delete.svg" Width="20" Height="20" Margin="0"
                                                          Css="{DynamicResource OppositeCssPathFillString}" />
@@ -227,22 +237,18 @@
                                                             <geopad:ShapeTemplate.LocationPoint>
                                                                 <DataTemplate DataType="shapes:Point">
                                                                     <DockPanel LastChildFill="True">
-                                                                        <TextBox
+                                                                        <TextBlock
                                                                             Text="{CompiledBinding Name,Mode=TwoWay}"
                                                                             Classes="CommonTextBox Big"
                                                                             Height="20"
                                                                             Margin="0"
                                                                             DockPanel.Dock="Left"
-                                                                            Tapped="EventHandledTrue">
-                                                                            <TextBox.Styles>
-                                                                                <FluentTheme></FluentTheme>
-                                                                            </TextBox.Styles>
-                                                                        </TextBox>
+                                                                            Tapped="EventHandledTrue" />
                                                                         <StackPanel Orientation="Horizontal">
                                                                             <TextBlock Text="=Point("
                                                                                     TextAlignment="Left"
                                                                                     VerticalAlignment="Center"
-                                                                                    Classes="Big"/>
+                                                                                    Classes="Big" />
                                                                             <TextBox
                                                                                 Text="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointX.ValueStr,Mode=TwoWay}"
                                                                                 Classes="CommonTextBox Big"
@@ -252,10 +258,11 @@
                                                                                 Loaded="NumberTextBox_OnLoaded"
                                                                                 Tapped="EventHandledTrue"
                                                                                 Focusable="True"
-                                                                                IsReadOnly="{CompiledBinding IsUserEnabled,Converter={StaticResource Not}}" >
+                                                                                IsReadOnly="{CompiledBinding IsUserEnabled,Converter={StaticResource Not}}">
                                                                                 <TextBox.Styles>
-                                                                                    <FluentTheme></FluentTheme>
-                                                                                </TextBox.Styles></TextBox>
+                                                                                    <FluentTheme />
+                                                                                </TextBox.Styles>
+                                                                            </TextBox>
                                                                             <TextBlock Text="," TextAlignment="Left"
                                                                                     VerticalAlignment="Center"
                                                                                     Classes="Big" />
@@ -270,9 +277,11 @@
                                                                                 PropertyChanged="Number_OnPropertyChanged"
                                                                                 Tapped="EventHandledTrue"
                                                                                 Focusable="True"
-                                                                                IsReadOnly="{CompiledBinding !IsUserEnabled}" ><TextBox.Styles>
-                                                                                <FluentTheme></FluentTheme>
-                                                                            </TextBox.Styles></TextBox>
+                                                                                IsReadOnly="{CompiledBinding !IsUserEnabled}">
+                                                                                <TextBox.Styles>
+                                                                                    <FluentTheme />
+                                                                                </TextBox.Styles>
+                                                                            </TextBox>
                                                                             <TextBlock Text=")" TextAlignment="Left"
                                                                                     VerticalAlignment="Center"
                                                                                     Classes="Big" />
@@ -286,14 +295,12 @@
                                                                     <Grid ColumnDefinitions="Auto,*"
                                                                           RowDefinitions="Auto,Auto"
                                                                           VerticalAlignment="Center">
-                                                                        <TextBox
+                                                                        <TextBlock
                                                                             Text="{CompiledBinding Name,Mode=TwoWay}"
                                                                             Classes="CommonTextBox Big"
                                                                             Grid.Column="0" Grid.Row="0" Height="20"
                                                                             Margin="0"
-                                                                            Tapped="EventHandledTrue" ><TextBox.Styles>
-                                                                            <FluentTheme></FluentTheme>
-                                                                        </TextBox.Styles></TextBox>
+                                                                            Tapped="EventHandledTrue" />
                                                                         <DockPanel Grid.Column="1"
                                                                                 Grid.Row="0" LastChildFill="True">
                                                                             <StackPanel Orientation="Horizontal"
@@ -313,9 +320,11 @@
                                                                                     Tag="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointX}"
                                                                                     Tapped="EventHandledTrue"
                                                                                     Focusable="True"
-                                                                                    IsReadOnly="{CompiledBinding IsUserEnabled,Converter={StaticResource Not}}" ><TextBox.Styles>
-                                                                                    <FluentTheme></FluentTheme>
-                                                                                </TextBox.Styles></TextBox>
+                                                                                    IsReadOnly="{CompiledBinding IsUserEnabled,Converter={StaticResource Not}}">
+                                                                                    <TextBox.Styles>
+                                                                                        <FluentTheme />
+                                                                                    </TextBox.Styles>
+                                                                                </TextBox>
                                                                                 <TextBlock Text=","
                                                                                     TextAlignment="Left"
                                                                                     VerticalAlignment="Center"
@@ -329,9 +338,11 @@
                                                                                     Tag="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointX}"
                                                                                     Tapped="EventHandledTrue"
                                                                                     Focusable="True"
-                                                                                    IsReadOnly="{CompiledBinding IsUserEnabled,Converter={StaticResource Not}}" ><TextBox.Styles>
-                                                                                    <FluentTheme></FluentTheme>
-                                                                                </TextBox.Styles></TextBox>
+                                                                                    IsReadOnly="{CompiledBinding IsUserEnabled,Converter={StaticResource Not}}">
+                                                                                    <TextBox.Styles>
+                                                                                        <FluentTheme />
+                                                                                    </TextBox.Styles>
+                                                                                </TextBox>
                                                                                 <TextBlock Text=")"
                                                                                     TextAlignment="Left"
                                                                                     VerticalAlignment="Center"
@@ -353,7 +364,7 @@
                                                                             <TextBlock Text=" " TextAlignment="Left"
                                                                                     VerticalAlignment="Center"
                                                                                     Classes="Small" />
-                                                                            <ctls:CheckedControl
+                                                                            <ctls:ToggleBox
                                                                                 IsChecked="{CompiledBinding On.Selected, Mode=TwoWay,DataType=getter:PointGetter_Movable}"
                                                                                 IsOver="{CompiledBinding On.PointerOver, Mode=OneWayToSource,DataType=getter:PointGetter_Movable}"
                                                                                 Color="{CompiledBinding On.Color,DataType=getter:PointGetter_Movable}">
@@ -361,7 +372,7 @@
                                                                                     Text="{CompiledBinding On.Name,DataType=getter:PointGetter_Movable}"
                                                                                     VerticalAlignment="Center"
                                                                                     Classes="Small" />
-                                                                            </ctls:CheckedControl>
+                                                                            </ctls:ToggleBox>
                                                                         </StackPanel>
                                                                     </Grid>
                                                                 </DataTemplate>
@@ -372,13 +383,11 @@
                                                                     <Grid ColumnDefinitions="Auto,Auto"
                                                                           RowDefinitions="Auto,Auto"
                                                                           VerticalAlignment="Center">
-                                                                        <TextBox
+                                                                        <TextBlock
                                                                             Text="{CompiledBinding Name,Mode=TwoWay}"
                                                                             Classes="CommonTextBox Big"
                                                                             Grid.Column="0" Grid.Row="0" Height="20"
-                                                                            Margin="0" >
-                                                                            <TextBox.Styles><FluentTheme/></TextBox.Styles>
-                                                                        </TextBox>
+                                                                            Margin="0" />
                                                                         <StackPanel Orientation="Horizontal"
                                                                                 Background="Transparent" Margin="0,5"
                                                                                 VerticalAlignment="Center"
@@ -402,13 +411,13 @@
                                                                                         <geopad:ShapeShowCaseDataTemplate.ShapeShowcaseTemplate>
                                                                                             <DataTemplate
                                                                                                 DataType="shapes:GeometryShape">
-                                                                                                <ctls:CheckedControl
+                                                                                                <ctls:ToggleBox
                                                                                                     IsChecked="{CompiledBinding Selected, Mode=TwoWay}"
                                                                                                     IsOver="{CompiledBinding PointerOver, Mode=OneWayToSource}"
                                                                                                     Color="{DynamicResource MedianUint}">
                                                                                                     <TextBlock
                                                                                                         Text="{CompiledBinding Name}" />
-                                                                                                </ctls:CheckedControl>
+                                                                                                </ctls:ToggleBox>
                                                                                             </DataTemplate>
                                                                                         </geopad:ShapeShowCaseDataTemplate.ShapeShowcaseTemplate>
                                                                                     </geopad:ShapeShowCaseDataTemplate>
@@ -448,14 +457,12 @@
                                                                     <Grid ColumnDefinitions="Auto,Auto"
                                                                           RowDefinitions="Auto,Auto"
                                                                           VerticalAlignment="Center">
-                                                                        <TextBox
+                                                                        <TextBlock
                                                                             Text="{CompiledBinding Name,Mode=TwoWay}"
                                                                             Classes="CommonTextBox Big"
                                                                             Grid.Column="0" Grid.Row="0" Height="20"
                                                                             Margin="0"
-                                                                            Tapped="EventHandledTrue" >
-                                                                            <TextBox.Styles><FluentTheme/></TextBox.Styles>
-                                                                        </TextBox>
+                                                                            Tapped="EventHandledTrue" />
                                                                         <StackPanel Orientation="Horizontal"
                                                                                 Background="Transparent" Margin="0,5"
                                                                                 VerticalAlignment="Center"
@@ -473,22 +480,40 @@
                                                                                     VerticalAlignment="Center"
                                                                                     Classes="Big" />
                                                                             <ContentControl
-                                                                                Content="{CompiledBinding Getter.Parameters}">
+                                                                                Content="{CompiledBinding Getter}">
                                                                                 <ContentControl.ContentTemplate>
                                                                                     <geopad:ShapeShowCaseDataTemplate>
                                                                                         <geopad:ShapeShowCaseDataTemplate.ShapeShowcaseTemplate>
                                                                                             <DataTemplate
                                                                                                 DataType="shapes:GeometryShape">
-                                                                                                <ctls:CheckedControl
+                                                                                                <ctls:ToggleBox
                                                                                                     IsChecked="{CompiledBinding Selected, Mode=TwoWay}"
                                                                                                     IsOver="{CompiledBinding PointerOver, Mode=OneWayToSource}"
                                                                                                     Color="{CompiledBinding Color}">
                                                                                                     <TextBlock
-                                                                                                        Text="{CompiledBinding Name}" Classes="Big" />
-                                                                                                </ctls:CheckedControl>
+                                                                                                        Text="{CompiledBinding Name}"
+                                                                                                        Classes="Big" />
+                                                                                                </ctls:ToggleBox>
                                                                                             </DataTemplate>
                                                                                         </geopad:ShapeShowCaseDataTemplate.ShapeShowcaseTemplate>
+                                                                                        <geopad:ShapeShowCaseDataTemplate.ExpNumberTemplate>
+                                                                                            <DataTemplate
+                                                                                                DataType="csGrafeq:ExpNumber">
+                                                                                                <TextBox
+                                                                                                    Text="{CompiledBinding ValueStr,Mode=TwoWay}"
+                                                                                                    Classes="CommonTextBox Big"
+                                                                                                    Tag="{CompiledBinding .}"
+                                                                                                    PropertyChanged="Number_OnPropertyChanged"
+                                                                                                    Tapped="EventHandledTrue"
+                                                                                                    IsReadOnly="{CompiledBinding !((shapes:GeometryShape)DataContext).IsUserEnabled,RelativeSource={RelativeSource FindAncestor, AncestorType=Grid}}">
+                                                                                                    <TextBox.Styles>
+                                                                                                        <FluentTheme />
+                                                                                                    </TextBox.Styles>
+                                                                                                </TextBox>
+                                                                                            </DataTemplate>
+                                                                                        </geopad:ShapeShowCaseDataTemplate.ExpNumberTemplate>
                                                                                     </geopad:ShapeShowCaseDataTemplate>
+
                                                                                 </ContentControl.ContentTemplate>
                                                                             </ContentControl>
                                                                             <TextBlock Text=")" TextAlignment="Left"
@@ -501,60 +526,11 @@
                                                                     </Grid>
                                                                 </DataTemplate>
                                                             </geopad:ShapeTemplate.Common>
-                                                            <!---->
-                                                            <geopad:ShapeTemplate.RadiusCircle>
-                                                                <DataTemplate DataType="shapes:Circle">
-                                                                    <StackPanel Orientation="Horizontal">
-                                                                        <TextBox
-                                                                            Text="{CompiledBinding Name,Mode=TwoWay}"
-                                                                            Classes="CommonTextBox Big"
-                                                                            Height="20"
-                                                                            Margin="0"
-                                                                            Tapped="EventHandledTrue" >
-                                                                            <TextBox.Styles><FluentTheme/></TextBox.Styles>
-                                                                        </TextBox>
-                                                                        <StackPanel Orientation="Horizontal">
-                                                                            <TextBlock Text="=Circle("
-                                                                                    TextAlignment="Left"
-                                                                                    Classes="Big"
-                                                                                    VerticalAlignment="Center" />
-                                                                            <TextBlock Text="Center:" Classes="Prompt"
-                                                                                    VerticalAlignment="Center" />
-                                                                            <ctls:CheckedControl
-                                                                                IsChecked="{CompiledBinding Selected, Mode=TwoWay}"
-                                                                                IsOver="{CompiledBinding PointerOver, Mode=OneWayToSource}"
-                                                                                Color="{CompiledBinding Color}"
-                                                                                DataContext="{CompiledBinding ((getter:CircleGetter_FromCenterAndRadius)Getter).Center}"
-                                                                                VerticalAlignment="Center">
-                                                                                <TextBlock
-                                                                                    Text="{CompiledBinding Name}"
-                                                                                    VerticalAlignment="Center"
-                                                                                    Classes="Big" />
-                                                                            </ctls:CheckedControl>
-                                                                            <TextBlock Text="," TextAlignment="Left"
-                                                                                    VerticalAlignment="Center"
-                                                                                    Classes="Big" />
-                                                                            <TextBox
-                                                                                Text="{CompiledBinding ((getter:CircleGetter_FromCenterAndRadius)Getter).Radius.ValueStr,Mode=TwoWay}"
-                                                                                Classes="CommonTextBox Big"
-                                                                                Tag="{CompiledBinding Path=((getter:CircleGetter_FromCenterAndRadius)Getter).Radius}"
-                                                                                PropertyChanged="Number_OnPropertyChanged"
-                                                                                Tapped="EventHandledTrue"
-                                                                                IsReadOnly="{CompiledBinding !IsUserEnabled}" >
-                                                                                <TextBox.Styles><FluentTheme/></TextBox.Styles>
-                                                                            </TextBox>
-                                                                            <TextBlock Text=")" TextAlignment="Left"
-                                                                                    VerticalAlignment="Center"
-                                                                                    Classes="Big" />
-                                                                        </StackPanel>
-                                                                    </StackPanel>
-                                                                </DataTemplate>
-                                                            </geopad:ShapeTemplate.RadiusCircle>
                                                         </geopad:ShapeTemplate>
                                                     </ContentControl.ContentTemplate>
                                                 </ContentControl>
                                             </DockPanel>
-                                        </ctls:CheckedControl>
+                                        </ctls:ToggleBox>
                                     </DataTemplate>
                                 </geopad:GeoShapeAndElseTemplate.IsGeometryShape>
                                 <geopad:GeoShapeAndElseTemplate.IsElse>
@@ -572,7 +548,8 @@
                                                                    VerticalAlignment="Center">
                                                             Color:
                                                         </TextBlock>
-                                                        <ColorPicker HorizontalAlignment="Stretch" Grid.Column="1" Grid.Row="0"
+                                                        <ColorPicker HorizontalAlignment="Stretch" Grid.Column="1"
+                                                                     Grid.Row="0"
                                                                      Color="{CompiledBinding Color,Converter={StaticResource UIntToColor}}"
                                                                      IsAlphaVisible="False"
                                                                      IsAccentColorsVisible="False" />
@@ -599,22 +576,29 @@
                                                 <CheckBox
                                                     IsChecked="{CompiledBinding Visible,Mode=TwoWay}"
                                                     Classes="VisibilityCheckBox"
-                                                    VerticalAlignment="Center" Margin="5" Tapped="EventHandledTrue" DoubleTapped="EventHandledTrue"/>
-                                                <Button DockPanel.Dock="Right" VerticalAlignment="Center" Width="30" Height="30" Margin="4"
+                                                    VerticalAlignment="Center" Margin="5" Tapped="EventHandledTrue"
+                                                    DoubleTapped="EventHandledTrue" />
+                                                <Button DockPanel.Dock="Right" VerticalAlignment="Center" Width="30"
+                                                        Height="30" Margin="4"
                                                         Tag="{CompiledBinding .}" Click="DeleteButtonClicked"
                                                         Tapped="EventHandledTrue"
                                                         Background="{StaticResource HTMedianBrush}">
                                                     <Svg Path="/Assets/delete.svg" Width="20" Height="20" Margin="0"
                                                          Css="{DynamicResource OppositeCssPathFillString}" />
                                                 </Button>
-                                                <Border Tapped="EventHandledTrue" DoubleTapped="EventHandledTrue" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="{DynamicResource CgTranslucentBackgroundBrush}" Padding="10" CornerRadius="5"
+                                                <Border Tapped="EventHandledTrue" DoubleTapped="EventHandledTrue"
+                                                        HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                                                        Background="{DynamicResource CgTranslucentBackgroundBrush}"
+                                                        Padding="10" CornerRadius="5"
                                                         BorderThickness="2" BorderBrush="{CompiledBinding BorderBrush}">
-                                                    <ctls:MathBox
-                                                        MathList="{CompiledBinding MathList,Mode=OneTime}" PropertyToTransmitMathInputEvent="{CompiledBinding PropertyToReceiveMathListChanged,Mode=OneWayToSource}"
+                                                    <corecontrols:MathBox
+                                                        MathList="{CompiledBinding MathList,Mode=OneTime}"
+                                                        PropertyToTransmitMathInputEvent="{CompiledBinding PropertyToReceiveMathListChanged,Mode=OneWayToSource}"
                                                         DoubleTapped="EventHandledTrue"
-                                                        Tapped="EventHandledTrue" PropertyChanged="ImpFuncPropertyChanged"
+                                                        Tapped="EventHandledTrue"
+                                                        PropertyChanged="ImpFuncPropertyChanged"
                                                         Tag="{CompiledBinding .}"
-                                                        HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                                                        HorizontalAlignment="Stretch" VerticalAlignment="Center" />
                                                 </Border>
                                             </DockPanel>
                                         </Border>
@@ -635,13 +619,14 @@
                 <ScrollViewer.Resources>
                     <ResourceDictionary>
                         <ResourceDictionary.MergedDictionaries>
-                            <ResourceInclude Source="/Resources/ButtonTypeRadioButton.axaml"></ResourceInclude>
+                            <ResourceInclude
+                                Source="avares://CsGrafeqApplication.Core/Resources/ButtonTypeRadioButton.axaml" />
                         </ResourceDictionary.MergedDictionaries>
                     </ResourceDictionary>
                 </ScrollViewer.Resources>
                 <ScrollViewer.Styles>
                     <Style Selector="RadioButton">
-                        <Setter Property="Foreground" Value="{DynamicResource CgForegroundBrush}"></Setter>
+                        <Setter Property="Foreground" Value="{DynamicResource CgForegroundBrush}" />
                     </Style>
                 </ScrollViewer.Styles>
                 <ItemsControl ItemsSource="{CompiledBinding Actions}">
@@ -656,7 +641,8 @@
                                       TemplateApplied="Expander_TemplateApplied"
                                       IsExpanded="True" CornerRadius="0" HorizontalAlignment="Stretch"
                                       Width="{CompiledBinding $parent[StackPanel].Bounds.Width}"
-                                      Padding="0" Background="Transparent" Foreground="{DynamicResource CgForegroundBrush}">
+                                      Padding="0" Background="Transparent"
+                                      Foreground="{DynamicResource CgForegroundBrush}">
                                 <Expander.Header>
                                     <TextBlock Text="{CompiledBinding Name.Data }" Margin="0"
                                                Padding="0" Classes="Big" />
@@ -671,7 +657,9 @@
                                         </ItemsControl.ItemsPanel>
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <RadioButton Classes="GeoRadio" Theme="{StaticResource  CgMaterialRadioButton}" Padding="0" Margin="2"
+                                                <RadioButton Classes="GeoRadio"
+                                                             Theme="{StaticResource  CgMaterialRadioButton}"
+                                                             Padding="0" Margin="2"
                                                              IsCheckedChanged="RadioButtonChecked"
                                                              Tag="{CompiledBinding .}">
                                                     <TextBlock VerticalAlignment="Center"

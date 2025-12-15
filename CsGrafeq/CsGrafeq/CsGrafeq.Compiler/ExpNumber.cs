@@ -121,6 +121,7 @@ public class ExpNumber : ReactiveObject
             UserSetValueStr?.Invoke();
             return;
         }
+
         Func = None;
         SetValue(double.NaN);
         IsError = true;

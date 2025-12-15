@@ -63,11 +63,6 @@ public abstract class Shape : ReactiveObject, IDisposable
     public abstract string TypeName { get; }
 
     /// <summary>
-    ///     显示在UI上
-    /// </summary>
-    public string Type => TypeName + ":";
-
-    /// <summary>
     ///     简介
     /// </summary>
     public string Description

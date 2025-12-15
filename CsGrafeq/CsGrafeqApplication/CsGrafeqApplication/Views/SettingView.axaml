@@ -3,38 +3,88 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:CsGrafeqApplication.ViewModels"
+             xmlns:cga="clr-namespace:CsGrafeqApplication"
+             xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:controls1="clr-namespace:CsGrafeqApplication.Core.Controls;assembly=CsGrafeqApplication.Core"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             MinWidth="{CompiledBinding Width,RelativeSource={RelativeSource AncestorType=dialogHostAvalonia:DialogHost},Converter={StaticResource DoubleMinus},ConverterParameter=100}"
+             MinHeight="{CompiledBinding Height,RelativeSource={RelativeSource AncestorType=dialogHostAvalonia:DialogHost},Converter={StaticResource DoubleMinus},ConverterParameter=100}"
              x:DataType="vm:ViewModelBase"
              x:Class="CsGrafeqApplication.Views.SettingView">
-    <TabControl>
-        <TabItem Header="_General">
-            <TextBlock Text="Nothing currently..." />
+    <TabControl VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+        <TabItem Header="Setting">
+            <TabControl TabStripPlacement="Left" Margin="0,15">
+                <TabControl.Styles>
+                    <Style Selector="TabItem">
+                        <Setter Property="Height">20</Setter>
+                        <Setter Property="MinHeight">20</Setter>
+                    </Style>
+                </TabControl.Styles>
+                <TabItem Header="General">
+                    <TextBlock xml:space="preserve">Nothing currently...</TextBlock>
+                </TabItem>
+                <TabItem Header="Graph" IsVisible="{x:Static cga:GlobalSetting.AllowExpression}">
+                    <StackPanel>
+                        <CheckBox Name="MovingOp" IsCheckedChanged="MovingOp_OnIsCheckedChanged">
+                            <CheckBox.Styles>
+                                <Style Selector="Border#NormalRectangle">
+                                    <Setter Property="BorderBrush" Value="Black" />
+                                </Style>
+                            </CheckBox.Styles>
+                            <TextBlock Text="{CompiledBinding MultiLanguageResources.MovingOpText.Data}" />
+                        </CheckBox>
+                        <CheckBox Name="ZoomingOp" IsCheckedChanged="ZoomingOp_OnIsCheckedChanged">
+                            <CheckBox.Styles>
+                                <Style Selector="Border#NormalRectangle">
+                                    <Setter Property="BorderBrush" Value="Black" />
+                                </Style>
+                            </CheckBox.Styles>
+                            <TextBlock Text="{CompiledBinding MultiLanguageResources.ZoomingOpText.Data}" />
+                        </CheckBox>
+                    </StackPanel>
+                </TabItem>
+                <TabItem Header="Implicit Function" IsVisible="{x:Static cga:GlobalSetting.AllowExpression}">
+                    <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto">
+                        <TextBlock Grid.Row="0" Grid.Column="0">Default Opacity:</TextBlock>
+                        <TextBox Grid.Row="1" Grid.Column="0" Text="{CompiledBinding Static.DefaultOpacity}" />
+                    </Grid>
+                </TabItem>
+            </TabControl>
         </TabItem>
-        <TabItem Header="_Graph">
-            <StackPanel>
-                <CheckBox Name="MovingOp" IsCheckedChanged="MovingOp_OnIsCheckedChanged">
-                    <CheckBox.Styles>
-                        <Style Selector="Border#NormalRectangle">
-                            <Setter Property="BorderBrush" Value="Black" />
-                        </Style>
-                    </CheckBox.Styles>
-                    <TextBlock Text="{CompiledBinding MultiLanguageResources.MovingOpText.Data}" />
-                </CheckBox>
-                <CheckBox Name="ZoomingOp" IsCheckedChanged="ZoomingOp_OnIsCheckedChanged">
-                    <CheckBox.Styles>
-                        <Style Selector="Border#NormalRectangle">
-                            <Setter Property="BorderBrush" Value="Black" />
-                        </Style>
-                    </CheckBox.Styles>
-                    <TextBlock Text="{CompiledBinding MultiLanguageResources.ZoomingOpText.Data}" />
-                </CheckBox>
-            </StackPanel>
+        <TabItem Header="Description">
+            <ScrollViewer VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Hidden">
+                <controls1:Markdown xml:space="preserve">
+# CsGrafeq
+
+## Description
+
+CsGrafeq is a geometry sketchpad.
+
+For the sake of performance and multi-platform, implicit function plotting is only available in Desktop platform (where ReadyToRun or .NET JIT is supported) 
+
+## Features
+
+No .Net Runtime environment required.
+
+## Future
+1. More shapes
+2. Save
+
+
+Welcome to any programming enthusiasts who wish to collaborate on development. 
+
+You can put forward your opinions and suggestions in [Issues](https://github.com/jyswjjgdwtdtj/CsGrafeq/issues), I will
+reply as soon as possible. 
+
+Due to the pressure of high school academic studies, I will engage in development during the winter and summer holidays.
+Each of your stars🌟 is the motivation for my development. Thank you🙏😊.
+            </controls1:Markdown>
+            </ScrollViewer>
         </TabItem>
-        <TabItem Header="_Implicit Function">
-            <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto">
-                <TextBlock Grid.Row="0" Grid.Column="0">Default Opacity:</TextBlock>
-                <TextBox Grid.Row="1" Grid.Column="0" Text="{CompiledBinding Static.DefaultOpacity}" />
-            </Grid>
+        <TabItem Header="Usage">
+            <ScrollViewer VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Hidden">
+                <controls1:Markdown xml:space="preserve" />
+            </ScrollViewer>
         </TabItem>
     </TabControl>
 </UserControl>

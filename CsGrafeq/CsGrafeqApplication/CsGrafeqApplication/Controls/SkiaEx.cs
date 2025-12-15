@@ -59,7 +59,7 @@ public static class SkiaEx
         App.Current.Resources.TryGetResource("Median", null, out temp);
         Median = new SKColor(((Color)temp).ToUInt32());
 
-        
+
         FilledMedian.Color = Median;
         FilledMedian.ImageFilter = SKImageFilter.CreateDropShadow(
             0,

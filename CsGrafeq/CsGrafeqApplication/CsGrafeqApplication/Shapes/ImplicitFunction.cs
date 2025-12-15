@@ -19,13 +19,9 @@ public class ImplicitFunction : Shape
         PropertyChanged += (s, e) =>
         {
             RefreshIsActive();
-            if (e.PropertyName == nameof(PropertyToReceiveMathListChanged)||e.PropertyName==nameof(MathList))
-            {
+            if (e.PropertyName == nameof(PropertyToReceiveMathListChanged) || e.PropertyName == nameof(MathList))
                 RefreshExpression();
-            }else if (e.PropertyName == nameof(IsCorrect))
-            {
-                BorderBrush = IsCorrect ? Brushes.Blue : Brushes.Red;
-            }
+            else if (e.PropertyName == nameof(IsCorrect)) BorderBrush = IsCorrect ? Brushes.Blue : Brushes.Red;
         };
         Description = "ImplicitFunction";
         MathList = ml.Clone(false);
@@ -35,21 +31,12 @@ public class ImplicitFunction : Shape
         BorderBrush = IsCorrect ? Brushes.Blue : Brushes.Red;
     }
 
-    private void RefreshExpression()
+    public bool PropertyToReceiveMathListChanged
     {
-        var res = MathList.Parse();
-        res.Match(exp =>
-        {
-            Expression = exp;
-        }, ex =>
-        {
-            IsCorrect=false;
-        });
-    }
-    public bool PropertyToReceiveMathListChanged { 
         get;
         set => this.RaiseAndSetIfChanged(ref field, value);
     }
+
     public byte Opacity
     {
         get => field;
@@ -74,9 +61,9 @@ public class ImplicitFunction : Shape
 
     public IBrush BorderBrush
     {
-        get=>field;
-        private set=>this.RaiseAndSetIfChanged(ref field, value);
-    }=Brushes.Blue;
+        get => field;
+        private set => this.RaiseAndSetIfChanged(ref field, value);
+    } = Brushes.Blue;
 
     public HasReferenceIntervalSetFunc<IntervalSet> Function
     {
@@ -86,7 +73,7 @@ public class ImplicitFunction : Shape
 
     public MathList MathList
     {
-        get=>field;
+        get => field;
         set => this.RaiseAndSetIfChanged(ref field, value);
     }
 
@@ -114,6 +101,12 @@ public class ImplicitFunction : Shape
     }
 
     public override string TypeName => "ImplicitFunction";
+
+    private void RefreshExpression()
+    {
+        var res = MathList.Parse();
+        res.Match(exp => { Expression = exp; }, ex => { IsCorrect = false; });
+    }
 
     public void RefreshIsActive()
     {

@@ -62,7 +62,7 @@ public static class CsGrafeqMath
     /// <returns></returns>
     public static double RoundTen(double num, int fix)
     {
-        double n = SpecialPow(10d, -fix);
+        var n = SpecialPow(10d, -fix);
         return Math.Round(num / n) * n;
     }
 

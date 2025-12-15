@@ -72,7 +72,7 @@ public class DisplayControl : CartesianDisplayer
                         {
                             dc.Clear(AxisBackground);
                             RenderAxisLine(dc);
-                            if ((!MovingOptimization) || (LastZeroPos - Zero).Length > 50)
+                            if (!MovingOptimization || (LastZeroPos - Zero).Length > 50)
                             {
                                 foreach (var adn in Addons)
                                 foreach (var rt in adn.Layers)

@@ -12,6 +12,7 @@ using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using CsGrafeqApplication.Addons.GeometryPad;
 using CsGrafeqApplication.Controls.Displayers;
+using CsGrafeqApplication.Dialog;
 using CsGrafeqApplication.ViewModels;
 using CsGrafeqApplication.Views;
 using DialogHostAvalonia;
@@ -73,21 +74,15 @@ public partial class DisplayerContainer : UserControl
                 Splitter.IsVisible = true;
             }
         };
-        Static.Info = Info;
+        Dialogs.InfoHandler = Info;
     }
 
-    protected override void OnSizeChanged(SizeChangedEventArgs e)
-    {
-        base.OnSizeChanged(e);
-    }
-
-
-    private async void Info(Control content, Static.InfoType infotype)
+    private async void Info(Control content, InfoType infotype)
     {
         var color = infotype switch
         {
-            Static.InfoType.Warning => Colors.Yellow,
-            Static.InfoType.Error => Colors.Red,
+            InfoType.Warning => Colors.Yellow,
+            InfoType.Error => Colors.DarkRed,
             _ => Color.FromRgb(0x77, 0xcc, 0xbb)
         };
         InfoOuterContainer.Background = new SolidColorBrush(Color.FromArgb(128, color.R, color.G, color.B));

@@ -38,7 +38,7 @@ public class Renderable : IDisposable
     /// <summary>
     ///     指示是否需要被重新绘制
     /// </summary>
-    public bool Changed { get; set; } = false;
+    public bool Changed { get; set; }
 
     /// <summary>
     ///     删除

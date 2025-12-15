@@ -56,13 +56,14 @@ public class CircleGetter_FromThreePoint : CircleGetter
     }
 }
 
-public class CircleGetter_FromCenterAndRadius : CircleGetter
+public class CircleGetter_FromCenterAndRadius : CircleGetter, IHasExpNumberShapeGetter
 {
     public CircleGetter_FromCenterAndRadius(Point center)
     {
         Radius = new ExpNumber(1, this);
         Radius.ValueStr = "1";
         Center = center;
+        ExpNumbers = [new ExpNumberData { Description = "Radius", Number = Radius }];
     }
 
     public Point Center { get; init; }
@@ -70,6 +71,8 @@ public class CircleGetter_FromCenterAndRadius : CircleGetter
 
     public override string ActionName => "Circle";
     public override GeometryShape[] Parameters => [Center];
+
+    public IReadOnlyList<ExpNumberData> ExpNumbers { get; init; }
 
     public override CircleStruct GetCircle()
     {
@@ -124,21 +127,67 @@ public class CircleGetter_FromCenterAndPoint : CircleGetter
         Point.RemoveSubShape(subShape);
     }
 }
-/*public class CircleGetter_FromCenterAndDistance : CircleGetter
+
+public class CircleGetter_Apollonius : CircleGetter, IHasExpNumberShapeGetter
 {
-    Point Center;
-    NumberGetter Distance;
-    public CircleGetter_FromCenterAndDistance(Point center, NumberGetter NumberGetter)
+    private readonly Point PointA;
+    private readonly Point PointB;
+
+    public CircleGetter_Apollonius(Point a, Point b)
     {
-        Center = center;
-        Distance= NumberGetter;
+        PointA = a;
+        PointB = b;
+        Ratio = new ExpNumber(1, this);
+        Ratio.ValueStr = "1";
+        ExpNumbers = [new ExpNumberData { Description = "Ratio", Number = Ratio }];
     }
+
+    public ExpNumber Ratio { get; init; }
+
+    public override string ActionName => "Circle";
+    public override GeometryShape[] Parameters => [PointA, PointB];
+    public IReadOnlyList<ExpNumberData> ExpNumbers { get; init; }
+
     public override CircleStruct GetCircle()
     {
-        return new CircleStruct { Center = Center.Location, Radius = Distance.GetNumber() };
+        var x1 = PointA.Location.X;
+        var y1 = PointA.Location.Y;
+        var x2 = PointB.Location.X;
+        var y2 = PointB.Location.Y;
+        var k = Ratio.Value;
+
+        if (double.IsNaN(k) || k <= 0)
+            return new CircleStruct { Center = Vec.Invalid, Radius = double.PositiveInfinity };
+
+        var k2 = k * k;
+        var denom = 1 - k2;
+        // 当 denom 接近 0 时 (k==1) 退化为直线（非圆）
+        if (Math.Abs(denom) < 1e-12)
+            return new CircleStruct { Center = Vec.Invalid, Radius = double.PositiveInfinity };
+
+        var cx = (x1 - k2 * x2) / denom;
+        var cy = (y1 - k2 * y2) / denom;
+
+        var numerator = x1 * x1 + y1 * y1 - k2 * (x2 * x2 + y2 * y2);
+        var rSq = cx * cx + cy * cy - numerator / denom;
+        if (double.IsNaN(rSq) || rSq < 0)
+            rSq = 0;
+
+        var radius = Math.Sqrt(Math.Max(0, rSq));
+        return new CircleStruct { Center = new Vec(cx, cy), Radius = radius };
     }
+
     public override void Attach(GeometryShape subShape)
     {
-        Center.AddSubShape(subShape);
-        //Distance.Attach(handler);
-    }*/
+        PointA.AddSubShape(subShape);
+        PointB.AddSubShape(subShape);
+        Ratio.NumberChanged += subShape.RefreshValues;
+    }
+
+    public override void UnAttach(GeometryShape subShape)
+    {
+        PointA.RemoveSubShape(subShape);
+        PointB.RemoveSubShape(subShape);
+        Ratio.NumberChanged -= subShape.RefreshValues;
+    }
+}

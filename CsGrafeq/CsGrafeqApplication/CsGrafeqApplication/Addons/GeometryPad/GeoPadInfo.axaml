@@ -1,11 +1,11 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:controls="using:CsGrafeqApplication.Controls"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              xmlns:geopad="clr-namespace:CsGrafeqApplication.Addons.GeometryPad;assembly=CsGrafeqApplication"
              xmlns:shapes="clr-namespace:CsGrafeq.Shapes"
+             xmlns:corecontrols="clr-namespace:CsGrafeqApplication.Core.Controls;assembly=CsGrafeqApplication.Core"
              x:Class="CsGrafeqApplication.Addons.GeometryPad.GeoPadInfo" x:DataType="geopad:GeometryPadViewModel">
     <Border CornerRadius="5">
         <ItemsControl ItemsSource="{CompiledBinding Shapes}">
@@ -21,7 +21,7 @@
                                                        Fill="{CompiledBinding Color,Converter={StaticResource UIntColorToBrush},ConverterParameter='255',Mode=OneWay}"
                                                        Stroke="Black" Width="15" Height="15" StrokeThickness="1" />
                                         </Border>
-                                        <controls:MathBox MathList="{CompiledBinding MathList}" CanInput="False"/>
+                                        <corecontrols:MathBox MathList="{CompiledBinding MathList}" CanInput="False" />
                                     </DockPanel>
                                 </Border>
                             </Border>

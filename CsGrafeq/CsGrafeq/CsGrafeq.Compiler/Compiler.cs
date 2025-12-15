@@ -38,9 +38,8 @@ public static class Compiler
         catch (Exception e)
         {
             if (e is InvalidOperationException ioe && ioe.Message == "Stack empty.")
-            {
                 ex = new Exception("Incomplete expression");
-            }else
+            else
                 ex = e;
             expFunc = null;
             usedVars = EnglishCharEnum.None;
@@ -236,7 +235,7 @@ public static class Compiler
                 }
                     break;
                 default:
-                    throw new Exception("Unknown element:"+element.NameOrValue + " " + element.Type);
+                    throw new Exception("Unknown element:" + element.NameOrValue + " " + element.Type);
             }
 
         return expStack.Single();

@@ -1,0 +1,11 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:valueConverter="clr-namespace:CsGrafeqApplication.Core.ValueConverter">
+    <valueConverter:DoubleMinus x:Key="DoubleMinus" />
+    <valueConverter:Not x:Key="Not" />
+    <valueConverter:DoubleToString x:Key="DoubleToString" />
+    <valueConverter:IntToBool x:Key="IntToBool" />
+    <valueConverter:BoolToDouble x:Key="BoolToDouble" />
+    <valueConverter:IIfConverter x:Key="IIf" />
+    <valueConverter:AddConverter x:Key="Add" />
+</ResourceDictionary>

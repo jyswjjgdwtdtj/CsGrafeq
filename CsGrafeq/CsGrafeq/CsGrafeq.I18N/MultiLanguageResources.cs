@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace CsGrafeq.I18N;
 
 public class MultiLanguageResources

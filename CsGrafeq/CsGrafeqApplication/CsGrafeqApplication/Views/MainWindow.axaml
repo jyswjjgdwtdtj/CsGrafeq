@@ -12,7 +12,7 @@
         ExtendClientAreaToDecorationsHint="True"
         ExtendClientAreaChromeHints="NoChrome"
         TransparencyLevelHint="Transparent" Background="{DynamicResource CgBackgroundBrush}">
-    
+
     <Window.Styles>
         <Style Selector="Svg.F">
             <Setter Property="Css" Value="{DynamicResource OppositeCssPathFillString}" />
@@ -34,54 +34,56 @@
         </DockPanel.Resources>
         <Border DockPanel.Dock="Top" Height="30">
             <Canvas Name="Canvas">
-                <DockPanel LastChildFill="True" Canvas.Left="{CompiledBinding OffSet}" Canvas.Top="{CompiledBinding OffSet}">
+                <DockPanel LastChildFill="True" Canvas.Left="{CompiledBinding OffSet}"
+                           Canvas.Top="{CompiledBinding OffSet}">
                     <DockPanel.Width>
                         <MultiBinding Converter="{StaticResource Add}">
-                            <CompiledBinding Path="#Canvas.Bounds.Width"></CompiledBinding>
-                            <CompiledBinding Path="LengthContract"></CompiledBinding>
-                            <CompiledBinding Path="LengthContract"></CompiledBinding>
+                            <CompiledBinding Path="#Canvas.Bounds.Width" />
+                            <CompiledBinding Path="LengthContract" />
+                            <CompiledBinding Path="LengthContract" />
                         </MultiBinding>
                     </DockPanel.Width>
                     <DockPanel.Height>
                         <MultiBinding Converter="{StaticResource Add}">
-                            <CompiledBinding Path="#Canvas.Bounds.Height"></CompiledBinding>
-                            <CompiledBinding Path="LengthContract"></CompiledBinding>
+                            <CompiledBinding Path="#Canvas.Bounds.Height" />
+                            <CompiledBinding Path="LengthContract" />
                         </MultiBinding>
                     </DockPanel.Height>
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Left"
                                 Background="{StaticResource MedianLinearGradientBrush}">
-                    <Image Width="16" Height="16" Source="avares://CsGrafeqApplication/Assets/favicon.ico"
-                           VerticalAlignment="Center" Margin="8,5,5,5" />
-                    <TextBlock VerticalAlignment="Center" FontFamily="{StaticResource MapleMono}" Foreground="{DynamicResource CgForegroundBrush}">CsGrafeq</TextBlock>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
-                    <Button Padding="0" Width="45" CornerRadius="0" Background="{DynamicResource CgTranslucentBackgroundBrush}" Click="MinimizeClicked">
-                        <Svg Path="/Assets/minimize.svg" Classes="F" Height="18"></Svg>
-                    </Button>
-                    <ToggleButton Padding="0" Width="45" CornerRadius="0" Background="{DynamicResource CgTranslucentBackgroundBrush}" IsChecked="{CompiledBinding IsMaximized}">
-                        <ToggleButton.Styles>
-                            <Style Selector="ToggleButton:checked">
-                                <Setter Property="ContentTemplate">
-                                    <DataTemplate>
-                                        <Svg Path="/Assets/closefullscreen.svg" Classes="F" Height="18"></Svg>
-                                    </DataTemplate>
-                                </Setter>
-                            </Style>
-                            <Style Selector="ToggleButton:unchecked">
-                                <Setter Property="ContentTemplate">
-                                    <DataTemplate>
-                                        <Svg Path="/Assets/openfullscreen.svg" Classes="F" Height="18"></Svg>
-                                    </DataTemplate>
-                                </Setter>
-                            </Style>
-                        </ToggleButton.Styles>
-                    </ToggleButton>
-                    <Button Padding="0" Width="45" CornerRadius="0" Background="{DynamicResource CgTranslucentBackgroundBrush}" Click="CloseWindowClicked">
-                        <Svg Path="/Assets/close.svg" Classes="F" Height="18"></Svg>
-                    </Button>
-                </StackPanel>
-                <Border  IsHitTestVisible="False"></Border>
-            </DockPanel>
+                        <Image Width="16" Height="16" Source="avares://CsGrafeqApplication/Assets/favicon.ico"
+                               VerticalAlignment="Center" Margin="8,5,5,5" />
+                        <TextBlock VerticalAlignment="Center" FontFamily="{StaticResource MapleMono}"
+                                   Foreground="{DynamicResource CgForegroundBrush}">
+                            CsGrafeq
+                        </TextBlock>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                        <Button Padding="0" Width="45" CornerRadius="0"
+                                Background="{DynamicResource CgTranslucentBackgroundBrush}" Click="MinimizeClicked">
+                            <Svg Path="/Assets/minimize.svg" Classes="F" Height="18" />
+                        </Button>
+                        <ToggleButton Padding="0" Width="45" CornerRadius="0"
+                                      Background="{DynamicResource CgTranslucentBackgroundBrush}"
+                                      IsChecked="{CompiledBinding IsMaximized}">
+                            <ToggleButton.Styles>
+                                <Style Selector="ToggleButton:checked">
+                                    <Setter Property="ContentTemplate">
+                                    </Setter>
+                                </Style>
+                                <Style Selector="ToggleButton:unchecked">
+                                    <Setter Property="ContentTemplate">
+                                    </Setter>
+                                </Style>
+                            </ToggleButton.Styles>
+                        </ToggleButton>
+                        <Button Padding="0" Width="45" CornerRadius="0"
+                                Background="{DynamicResource CgTranslucentBackgroundBrush}" Click="CloseWindowClicked">
+                            <Svg Path="/Assets/close.svg" Classes="F" Height="18" />
+                        </Button>
+                    </StackPanel>
+                    <Border IsHitTestVisible="False" />
+                </DockPanel>
             </Canvas>
         </Border>
         <views:MainView />

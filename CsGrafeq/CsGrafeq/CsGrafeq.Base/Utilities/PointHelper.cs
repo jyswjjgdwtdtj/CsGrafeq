@@ -1,7 +1,8 @@
 ﻿using Avalonia;
-using sysPoint=System.Drawing.Point;
-using sysPointF=System.Drawing.PointF;
-using avaPoint=Avalonia.Point;
+using sysPoint = System.Drawing.Point;
+using sysPointF = System.Drawing.PointF;
+using avaPoint = Avalonia.Point;
+
 namespace CsGrafeq.Utilities;
 
 public static class PointHelper
@@ -23,11 +24,12 @@ public static class PointHelper
 
         public sysPointF Add(sysPointF p2)
         {
-            return new sysPointF(p.X + p2.X,p.Y + p2.Y);
+            return new sysPointF(p.X + p2.X, p.Y + p2.Y);
         }
+
         public sysPointF Add(float x, float y)
         {
-            return new sysPointF(p.X + x,p.Y + y);
+            return new sysPointF(p.X + x, p.Y + y);
         }
     }
 
@@ -37,6 +39,7 @@ public static class PointHelper
         {
             return new sysPoint((int)p.X, (int)p.Y);
         }
+
         public sysPointF ToSysPointF()
         {
             return new sysPointF((int)p.X, (int)p.Y);
@@ -55,7 +58,7 @@ public static class PointHelper
     {
         public Vector ToVector()
         {
-            return new(v.X, v.Y);
+            return new Vector(v.X, v.Y);
         }
     }
 }

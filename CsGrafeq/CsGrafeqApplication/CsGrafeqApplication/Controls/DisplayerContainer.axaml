@@ -6,9 +6,8 @@
              xmlns:addons="clr-namespace:CsGrafeqApplication.Addons"
              xmlns:geopad="clr-namespace:CsGrafeqApplication.Addons.GeometryPad"
              xmlns:controls="clr-namespace:CsGrafeqApplication.Controls"
-             xmlns:csgrafeqapp="clr-namespace:CsGrafeqApplication"
-             xmlns:cmavalonia="clr-namespace:CSharpMath.Avalonia;assembly=CSharpMath.Avalonia"
              xmlns:i18N="clr-namespace:CsGrafeq.I18N;assembly=CsGrafeq.I18N"
+             xmlns:controls1="clr-namespace:CsGrafeqApplication.Core.Controls;assembly=CsGrafeqApplication.Core"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CsGrafeqApplication.Controls.DisplayerContainer"
              x:DataType="vm:DisplayerContainerViewModel" Foreground="{DynamicResource CgForegroundBrush}"
@@ -21,11 +20,11 @@
             <Setter Property="Css" Value="{DynamicResource OppositeCssPathStrokeString}" />
         </Style>
     </UserControl.Styles>
-        <Panel>
-            <Border Name="DisplayerCon" ZIndex="0" BorderThickness="0">
-                <ContentPresenter Content="{CompiledBinding Displayer}" />
-            </Border>
-        <controls:GlobalMathKeyBoard>
+    <Panel>
+        <Border Name="DisplayerCon" ZIndex="0" BorderThickness="0">
+            <ContentPresenter Content="{CompiledBinding Displayer}" />
+        </Border>
+        <controls1:Keyboard>
             <Panel Name="PART_Container" IsTabStop="False">
                 <Panel.Styles>
                     <Style Selector="Control">
@@ -49,8 +48,10 @@
                         </Style>
                     </Style>
                 </Panel.Styles>
-                <Panel ZIndex="5" IsHitTestVisible="False" Name="InfoCanvas" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                    <geopad:GeoPadInfo DataContext="{CompiledBinding  Displayer.Addons[0].DataContext}" HorizontalAlignment="Stretch" />
+                <Panel ZIndex="5" IsHitTestVisible="False" Name="InfoCanvas" VerticalAlignment="Stretch"
+                       HorizontalAlignment="Stretch">
+                    <geopad:GeoPadInfo DataContext="{CompiledBinding  Displayer.Addons[0].DataContext}"
+                                       HorizontalAlignment="Stretch" />
                 </Panel>
                 <Grid ZIndex="10" Name="PART_Grid">
                     <Grid.Resources>
@@ -77,8 +78,11 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
                     </Border>
-                    <GridSplitter Grid.Column="1" ResizeDirection="Columns" Name="Splitter" ClipToBounds="False" Width="1" />
-                    <Border BorderThickness="0,0,0,1" BorderBrush="{DynamicResource CgOppositeTranslucentBackgroundBrush1}" Grid.Column="2" Grid.Row="0" Name="PART_CoverDisplayer">
+                    <GridSplitter Grid.Column="1" ResizeDirection="Columns" Name="Splitter" ClipToBounds="False"
+                                  Width="1" />
+                    <Border BorderThickness="0,0,0,1"
+                            BorderBrush="{DynamicResource CgOppositeTranslucentBackgroundBrush1}" Grid.Column="2"
+                            Grid.Row="0" Name="PART_CoverDisplayer">
                         <CheckBox Width="15" Height="40" VerticalAlignment="Center" HorizontalAlignment="Left"
                                   Name="Toggle" Foreground="{DynamicResource CgForegroundBrush}">
                             <CheckBox.Template>
@@ -165,16 +169,16 @@
                                         <Setter Property="Padding" Value="0" />
                                         <Setter Property="CornerRadius" Value="4" />
                                         <Setter Property="Margin" Value="0" />
-                                        <Setter Property="Height" Value="32"></Setter>
-                                        <Setter Property="Width" Value="32"></Setter>
+                                        <Setter Property="Height" Value="32" />
+                                        <Setter Property="Width" Value="32" />
                                     </Style>
                                     <Style Selector="RepeatButton">
                                         <Setter Property="Background" Value="{StaticResource HTMedianBrush}" />
                                         <Setter Property="Padding" Value="0" />
                                         <Setter Property="CornerRadius" Value="4" />
                                         <Setter Property="Margin" Value="0" />
-                                        <Setter Property="Height" Value="32"></Setter>
-                                        <Setter Property="Width" Value="32"></Setter>
+                                        <Setter Property="Height" Value="32" />
+                                        <Setter Property="Width" Value="32" />
                                     </Style>
                                 </StackPanel.Styles>
                                 <RepeatButton Click="StepBack_Clicked">
@@ -329,6 +333,6 @@
                     </Grid>
                 </Border>
             </Panel>
-        </controls:GlobalMathKeyBoard>
-        </Panel>
+        </controls1:Keyboard>
+    </Panel>
 </UserControl>

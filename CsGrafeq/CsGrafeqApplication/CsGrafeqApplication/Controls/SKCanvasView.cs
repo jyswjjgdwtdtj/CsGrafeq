@@ -1,18 +1,17 @@
-﻿#define  USE_FIRST
+﻿#define USE_FIRST
 using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Media.Immutable;
-using Avalonia.Platform;
 using Avalonia.Rendering.SceneGraph;
 using Avalonia.Skia;
 using Avalonia.Threading;
 using SkiaSharp;
 
 namespace CsGrafeqApplication.Controls;
-#if  USE_FIRST
+#if USE_FIRST
 /// <summary>
 ///     A Xaml canvas control that can be drawn on using SkiaSharp drawing commands
 ///     which facilitates porting from existing Xamarin Forms applications.
@@ -70,6 +69,12 @@ public class SKCanvasView : Control
         ValidRect = Bounds;
     }
 
+    protected override void OnSizeChanged(SizeChangedEventArgs e)
+    {
+        base.OnSizeChanged(e);
+        Dispatcher.UIThread.InvokeAsync(InvalidateVisual);
+    }
+
     private class CustomDrawOperation : ICustomDrawOperation
     {
         private readonly object BufferLock = new();
@@ -123,7 +128,7 @@ public class SKCanvasView : Control
 
         public void Render(ImmediateDrawingContext context)
         {
-            context.DrawRectangle(new ImmutableSolidColorBrush(Colors.Green),null, new Rect(Bounds.Size));
+            context.DrawRectangle(new ImmutableSolidColorBrush(Colors.Green), null, new Rect(Bounds.Size));
             lock (BufferLock)
             {
                 using (var lb = Buffer.Lock())
@@ -152,12 +157,6 @@ public class SKCanvasView : Control
         }
 
         public SKCanvas Canvas { get; init; }
-    }
-
-    protected override void OnSizeChanged(SizeChangedEventArgs e)
-    {
-        base.OnSizeChanged(e);
-        Dispatcher.UIThread.InvokeAsync(InvalidateVisual);
     }
 }
 #else

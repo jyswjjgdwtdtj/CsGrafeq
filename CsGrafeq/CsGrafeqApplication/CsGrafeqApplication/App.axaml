@@ -6,27 +6,25 @@
              RequestedThemeVariant="Default">
     <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
     <Application.Styles>
-        <themes:MaterialTheme BaseTheme="Light" PrimaryColor="Cyan" SecondaryColor="Cyan"></themes:MaterialTheme>
+        <themes:MaterialTheme BaseTheme="Light" PrimaryColor="Cyan" SecondaryColor="Cyan" />
         <dialogHostAvalonia:DialogHostStyles />
     </Application.Styles>
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceInclude Source="/Controls/CheckedControl.axaml" />
-                <ResourceInclude Source="/Resources/ColorResource.axaml" />
+                <ResourceInclude Source="/Controls/ToggleBox.axaml" />
                 <ResourceInclude Source="/Themes/BackgroundTheme.axaml" />
-                <ResourceInclude Source="/Resources/Resource.axaml" />
-                <ResourceInclude Source="/Controls/GlobalMathKeyBoard.axaml" />
+                <ResourceInclude Source="avares://CsGrafeqApplication.Core/Resources/ConverterResource.axaml" />
+                <ResourceInclude Source="avares://CsGrafeqApplication.Core/Resources/CustomColorResource.axaml" />
+                <ResourceInclude Source="/Themes/BackgroundTheme.axaml" />
+
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
         <FontFamily x:Key="MapleMono">avares://CsGrafeqApplication/Fonts/MapleMono-CN-Regular.ttf#Maple Mono CN</FontFamily>
     </Application.Resources>
     <Application.Styles>
         <StyleInclude Source="/Controls/ShownControl.axaml" />
-        <StyleInclude Source="/Controls/TwoSymbolKeyButton.axaml" />
-        <StyleInclude Source="/Controls/TwoSymbolKeyButtonInPlace.axaml" />
-        <StyleInclude Source="/Controls/MathTextBox.axaml"/>
-        <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml"/>
-        
+        <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" />
+        <StyleInclude Source="avares://LiveMarkdown.Avalonia/Styles.axaml" />
     </Application.Styles>
 </Application>

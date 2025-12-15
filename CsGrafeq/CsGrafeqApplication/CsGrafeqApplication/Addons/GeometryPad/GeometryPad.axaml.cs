@@ -2,27 +2,23 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Shapes;
 using Avalonia.Controls.Templates;
-using Avalonia.Data.Core;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.LogicalTree;
-using Avalonia.Markup.Xaml.MarkupExtensions;
-using Avalonia.Markup.Xaml.MarkupExtensions.CompiledBindings;
 using Avalonia.Media;
-using Avalonia.Themes.Fluent;
 using CsGrafeq.CSharpMath.Editor;
 using CsGrafeq.Interval;
 using CsGrafeq.Shapes;
 using CsGrafeq.Shapes.ShapeGetter;
-using CsGrafeqApplication.Controls;
 using CsGrafeqApplication.Controls.Displayers;
+using CsGrafeqApplication.Core.Controls;
+using CsGrafeqApplication.Dialog;
 using CSharpMath.Atom;
 using CSharpMath.Avalonia;
 using DialogHostAvalonia;
@@ -35,7 +31,6 @@ using AvaRect = Avalonia.Rect;
 using AvaSize = Avalonia.Size;
 using GeoHalf = CsGrafeq.Shapes.Half;
 using static CsGrafeqApplication.Extension;
-using static CsGrafeq.Utilities.ThrowHelper;
 using static CsGrafeqApplication.GlobalSetting;
 
 namespace CsGrafeqApplication.Addons.GeometryPad;
@@ -97,8 +92,9 @@ public partial class GeometryPad : Addon
         var s1 = AddShape(new Straight(new LineGetter_Connected(p1, p2)));
         var p3 = AddShape(new GeoPoint(new PointGetter_OnLine(s1, (0, 0))));
         var c1 = AddShape(new Circle(new CircleGetter_FromCenterAndRadius(p1)));
-        CgMathKeyboard kb = new(new());
-        kb.KeyPress(CgMathKeyboardInput.SmallS, CgMathKeyboardInput.SmallI, CgMathKeyboardInput.SmallN, CgMathKeyboardInput.SmallX);
+        CgMathKeyboard kb = new(new MathList());
+        kb.KeyPress(CgMathKeyboardInput.SmallS, CgMathKeyboardInput.SmallI, CgMathKeyboardInput.SmallN,
+            CgMathKeyboardInput.SmallX);
         var ip1 = AddShape(CreateImpFunc(kb.MathList));
 #endif
         InitializeComponent();
@@ -244,12 +240,14 @@ public partial class GeometryPad : Addon
             {
                 var re = IntervalCompiler.TryCompile(tb.Text);
                 if (tb.Text == "" || re.Success(out _))
+                {
                     DataValidationErrors.ClearErrors(tb);
+                }
                 else
                 {
                     re.Error(out var ex);
                     DataValidationErrors.SetError(tb, ex);
-                    Static.Info(new TextBlock { Text = ex.Message },Static.InfoType.Error);
+                    Dialogs.Info(new TextBlock { Text = ex.Message }, InfoType.Error);
                 }
             }
     }
@@ -268,13 +266,16 @@ public partial class GeometryPad : Addon
                 {
                     var re = IntervalCompiler.TryCompile(tb.Text);
                     if (tb.Text == "" || re.Success(out _))
+                    {
                         DataValidationErrors.ClearErrors(tb);
+                    }
                     else
                     {
                         re.Error(out var ex);
                         DataValidationErrors.SetError(tb, ex);
-                        Static.Info(new TextBlock { Text = ex.Message },Static.InfoType.Error);
+                        Dialogs.Info(new TextBlock { Text = ex.Message }, InfoType.Error);
                     }
+
                     DoFuncTextChange(tb, (string)e.NewValue, (string)e.OldValue);
                 }
     }
@@ -297,7 +298,6 @@ public partial class GeometryPad : Addon
     private void Expander_TemplateApplied(object? sender, TemplateAppliedEventArgs e)
     {
         if (sender is Expander expander)
-        {
             expander.TemplateApplied += (_, te) =>
             {
                 var togglebtn = te.NameScope.Find<ToggleButton>("PART_ToggleButton");
@@ -307,29 +307,10 @@ public partial class GeometryPad : Addon
                     path.Bind(Path.FillProperty, Resources.GetResourceObservable("CgForegroundBrush"));
                 };
             };
-        }
     }
 
-    private class LbDataTemplate : IDataTemplate
-    {
-        public bool Match(object? data)
-        {
-            return data is string;
-        }
-
-        public Control? Build(object? param)
-        {
-            if (param is string str)
-            {
-                return new MathView() { LaTeX = str,HorizontalAlignment = HorizontalAlignment.Left};
-            }
-
-            return null;
-        }
-    }
     private void AddFuncQuestionsClicked(object? sender, RoutedEventArgs e)
     {
-
         var tp = TopLevel.GetTopLevel(this);
         if (tp != null)
         {
@@ -353,6 +334,28 @@ public partial class GeometryPad : Addon
             };
             sv.Content = lb;
             DialogHost.Show(sv, "dialog");
+        }
+    }
+
+    protected override void OnLoaded(RoutedEventArgs e)
+    {
+        base.OnLoaded(e);
+        foreach (var control in this.GetTemplateChildren().OfType<TextBox>()) control.Styles.Add(Static.FluentTheme);
+    }
+
+    private class LbDataTemplate : IDataTemplate
+    {
+        public bool Match(object? data)
+        {
+            return data is string;
+        }
+
+        public Control? Build(object? param)
+        {
+            if (param is string str)
+                return new MathView { LaTeX = str, HorizontalAlignment = HorizontalAlignment.Left };
+
+            return null;
         }
     }
 
@@ -417,15 +420,15 @@ public partial class GeometryPad : Addon
         switch (e.Key)
         {
             case Key.Tab:
-                {
-                    foreach (var shape in Shapes.GetSelectedShapes<GeometryShape>().ToArray())
-                        if (shape.Selected)
-                        {
-                            res = Intercept;
-                            shape.Selected = false;
-                            foreach (var subshape in shape.SubShapes) subshape.Selected = true;
-                        }
-                }
+            {
+                foreach (var shape in Shapes.GetSelectedShapes<GeometryShape>().ToArray())
+                    if (shape.Selected)
+                    {
+                        res = Intercept;
+                        shape.Selected = false;
+                        foreach (var subshape in shape.SubShapes) subshape.Selected = true;
+                    }
+            }
                 break;
         }
 
@@ -656,7 +659,7 @@ public partial class GeometryPad : Addon
                     if (selectfirst)
                     {
                         var shape = GeometryActions.CreateShape(CurrentAction.Self,
-                            (Getter)CurrentAction.GetterConstructor.Invoke((object)SPoints.ToArray()));
+                            (Getter)CurrentAction.GetterConstructor.Invoke(SPoints.ToArray()));
                         AddShape(shape);
                         Shapes.ClearSelected();
                     }
@@ -676,12 +679,12 @@ public partial class GeometryPad : Addon
                 return Intercept;
             }
 
-            
 
             if (needplen == plen && needclen == clen && needllen == llen && needpolen == polen)
             {
                 var shape = GeometryActions.CreateShape(CurrentAction.Self,
-                    (Getter)CurrentAction.GetterConstructor.Invoke(SAll?.SortShape().Select(o => (object?)o)?.ToArray() ?? []));
+                    (Getter)CurrentAction.GetterConstructor.Invoke(
+                        SAll?.SortShape().Select(o => (object?)o)?.ToArray() ?? []));
                 AddShape(shape);
                 Shapes.ClearSelected();
             }
@@ -744,148 +747,148 @@ public partial class GeometryPad : Addon
                 switch (shape)
                 {
                     case Straight s:
-                        {
-                            var v1 = s.Current.Point1;
-                            var v2 = s.Current.Point2;
-                            var vs = GetValidVec(
-                                GetIntersectionOfSegmentAndLine(LT, RT, v1, v2),
-                                GetIntersectionOfSegmentAndLine(RT, RB, v1, v2),
-                                GetIntersectionOfSegmentAndLine(RB, LB, v1, v2),
-                                GetIntersectionOfSegmentAndLine(LB, LT, v1, v2)
-                            );
-                            if (s.Selected)
-                                dc.DrawLine(MathToPixelSK(vs.Item1), MathToPixelSK(vs.Item2), StrokePaint);
-                            else
-                                dc.DrawLine(MathToPixelSK(vs.Item1), MathToPixelSK(vs.Item2), StrokePaintMain);
+                    {
+                        var v1 = s.Current.Point1;
+                        var v2 = s.Current.Point2;
+                        var vs = GetValidVec(
+                            GetIntersectionOfSegmentAndLine(LT, RT, v1, v2),
+                            GetIntersectionOfSegmentAndLine(RT, RB, v1, v2),
+                            GetIntersectionOfSegmentAndLine(RB, LB, v1, v2),
+                            GetIntersectionOfSegmentAndLine(LB, LT, v1, v2)
+                        );
+                        if (s.Selected)
+                            dc.DrawLine(MathToPixelSK(vs.Item1), MathToPixelSK(vs.Item2), StrokePaint);
+                        else
+                            dc.DrawLine(MathToPixelSK(vs.Item1), MathToPixelSK(vs.Item2), StrokePaintMain);
 
-                            dc.DrawBubble($"{Properties.Resources.StraightText}:{s.Name}",
-                                MathToPixelSK((s.Current.Point1 + s.Current.Point2) / 2),
-                                BubbleBack, PaintMain);
-                        }
+                        dc.DrawBubble($"{Properties.Resources.StraightText}:{s.Name}",
+                            MathToPixelSK((s.Current.Point1 + s.Current.Point2) / 2),
+                            BubbleBack, PaintMain);
+                    }
                         break;
                     case GeoSegment s:
-                        {
-                            var v1 = s.Current.Point1;
-                            var v2 = s.Current.Point2;
-                            if (s.Selected)
-                                dc.DrawLine(MathToPixelSK(v1), MathToPixelSK(v2), StrokePaint);
-                            else
-                                dc.DrawLine(MathToPixelSK(v1), MathToPixelSK(v2), StrokePaintMain);
+                    {
+                        var v1 = s.Current.Point1;
+                        var v2 = s.Current.Point2;
+                        if (s.Selected)
+                            dc.DrawLine(MathToPixelSK(v1), MathToPixelSK(v2), StrokePaint);
+                        else
+                            dc.DrawLine(MathToPixelSK(v1), MathToPixelSK(v2), StrokePaintMain);
 
-                            dc.DrawBubble($"{MultiLanguageResources.Instance.SegmentText}:{s.Name}",
-                                MathToPixelSK((s.Current.Point1 + s.Current.Point2) / 2),
-                                BubbleBack, PaintMain);
-                        }
+                        dc.DrawBubble($"{MultiLanguageResources.Instance.SegmentText}:{s.Name}",
+                            MathToPixelSK((s.Current.Point1 + s.Current.Point2) / 2),
+                            BubbleBack, PaintMain);
+                    }
                         break;
                     case GeoHalf h:
+                    {
+                        var v1 = h.Current.Point1;
+                        var v2 = h.Current.Point2;
+                        var vs = GetValidVec(
+                            GetIntersectionOfSegmentAndLine(LT, RT, v1, v2),
+                            GetIntersectionOfSegmentAndLine(RT, RB, v1, v2),
+                            GetIntersectionOfSegmentAndLine(RB, LB, v1, v2),
+                            GetIntersectionOfSegmentAndLine(LB, LT, v1, v2)
+                        );
+                        Vec p;
+                        if (v1.X == v2.X)
                         {
-                            var v1 = h.Current.Point1;
-                            var v2 = h.Current.Point2;
-                            var vs = GetValidVec(
-                                GetIntersectionOfSegmentAndLine(LT, RT, v1, v2),
-                                GetIntersectionOfSegmentAndLine(RT, RB, v1, v2),
-                                GetIntersectionOfSegmentAndLine(RB, LB, v1, v2),
-                                GetIntersectionOfSegmentAndLine(LB, LT, v1, v2)
-                            );
-                            Vec p;
-                            if (v1.X == v2.X)
-                            {
-                                if ((vs.Item1.Y - v1.Y) / Sign(v2.Y - v1.Y) > (vs.Item2.Y - v1.Y) / Sign(v2.Y - v1.Y))
-                                    p = vs.Item1;
-                                else
-                                    p = vs.Item2;
-                            }
+                            if ((vs.Item1.Y - v1.Y) / Sign(v2.Y - v1.Y) > (vs.Item2.Y - v1.Y) / Sign(v2.Y - v1.Y))
+                                p = vs.Item1;
                             else
-                            {
-                                if ((vs.Item1.X - v1.X) / Sign(v2.X - v1.X) > (vs.Item2.X - v1.X) / Sign(v2.X - v1.X))
-                                    p = vs.Item1;
-                                else
-                                    p = vs.Item2;
-                            }
-
-                            if (h.Selected)
-                                dc.DrawLine(MathToPixelSK(v1), MathToPixelSK(p), StrokePaint);
-                            else
-                                dc.DrawLine(MathToPixelSK(v1), MathToPixelSK(p), StrokePaintMain);
-
-                            dc.DrawBubble($"{MultiLanguageResources.Instance.HalfLineText}:{h.Name}",
-                                MathToPixelSK((h.Current.Point1 + h.Current.Point2) / 2),
-                                BubbleBack, PaintMain);
+                                p = vs.Item2;
                         }
+                        else
+                        {
+                            if ((vs.Item1.X - v1.X) / Sign(v2.X - v1.X) > (vs.Item2.X - v1.X) / Sign(v2.X - v1.X))
+                                p = vs.Item1;
+                            else
+                                p = vs.Item2;
+                        }
+
+                        if (h.Selected)
+                            dc.DrawLine(MathToPixelSK(v1), MathToPixelSK(p), StrokePaint);
+                        else
+                            dc.DrawLine(MathToPixelSK(v1), MathToPixelSK(p), StrokePaintMain);
+
+                        dc.DrawBubble($"{MultiLanguageResources.Instance.HalfLineText}:{h.Name}",
+                            MathToPixelSK((h.Current.Point1 + h.Current.Point2) / 2),
+                            BubbleBack, PaintMain);
+                    }
                         break;
                     case GeoPolygon polygon:
-                        {
-                            var ps = new SKPoint[polygon.Locations.Length + 1];
-                            for (var j = 0; j < ps.Length - 1; j++) ps[j] = MathToPixelSK(polygon.Locations[j]);
+                    {
+                        var ps = new SKPoint[polygon.Locations.Length + 1];
+                        for (var j = 0; j < ps.Length - 1; j++) ps[j] = MathToPixelSK(polygon.Locations[j]);
 
-                            ps[polygon.Locations.Length] = ps[0];
-                            var path = new SKPath();
-                            path.AddPoly(ps);
-                            if (polygon.Filled)
+                        ps[polygon.Locations.Length] = ps[0];
+                        var path = new SKPath();
+                        path.AddPoly(ps);
+                        if (polygon.Filled)
+                        {
+                            if (polygon.Selected)
                             {
-                                if (polygon.Selected)
-                                {
-                                    dc.DrawPath(path, TPFilledPaint);
-                                    dc.DrawPath(path, StrokePaint);
-                                }
-                                else
-                                {
-                                    dc.DrawPath(path, FilledTranparentGrey);
-                                    dc.DrawPath(path, StrokeMain);
-                                }
+                                dc.DrawPath(path, TPFilledPaint);
+                                dc.DrawPath(path, StrokePaint);
                             }
                             else
                             {
-                                if (polygon.Selected)
-                                    dc.DrawPath(path, StrokePaint);
-                                else
-                                    dc.DrawPath(path, StrokeMain);
+                                dc.DrawPath(path, FilledTranparentGrey);
+                                dc.DrawPath(path, StrokeMain);
                             }
-
-                            dc.DrawBubble($"{MultiLanguageResources.Instance.PolygonText}:{polygon.Name}",
-                                MathToPixelSK((polygon.Locations[0] + polygon.Locations[1]) / 2) - new SKPoint(0, 20),
-                                BubbleBack, PaintMain);
                         }
+                        else
+                        {
+                            if (polygon.Selected)
+                                dc.DrawPath(path, StrokePaint);
+                            else
+                                dc.DrawPath(path, StrokeMain);
+                        }
+
+                        dc.DrawBubble($"{MultiLanguageResources.Instance.PolygonText}:{polygon.Name}",
+                            MathToPixelSK((polygon.Locations[0] + polygon.Locations[1]) / 2) - new SKPoint(0, 20),
+                            BubbleBack, PaintMain);
+                    }
                         break;
                     case GeoCircle circle:
-                        {
-                            var cs = circle.InnerCircle;
-                            var pf = MathToPixelSK(cs.Center);
-                            var s = new SKSize((float)(cs.Radius * UnitLength), (float)(cs.Radius * UnitLength));
-                            if (circle.Selected)
-                                dc.DrawOval(pf, s, StrokePaint);
-                            else
-                                dc.DrawOval(pf, s, StrokeMain);
+                    {
+                        var cs = circle.InnerCircle;
+                        var pf = MathToPixelSK(cs.Center);
+                        var s = new SKSize((float)(cs.Radius * UnitLength), (float)(cs.Radius * UnitLength));
+                        if (circle.Selected)
+                            dc.DrawOval(pf, s, StrokePaint);
+                        else
+                            dc.DrawOval(pf, s, StrokeMain);
 
-                            var r2 = cs.Radius * Sqrt(2) / 2;
-                            dc.DrawBubble($"{MultiLanguageResources.Instance.CircleText}:{circle.Name}",
-                                MathToPixelSK(circle.InnerCircle.Center + new Vec(-r2, r2)), BubbleBack, PaintMain);
-                        }
+                        var r2 = cs.Radius * Sqrt(2) / 2;
+                        dc.DrawBubble($"{MultiLanguageResources.Instance.CircleText}:{circle.Name}",
+                            MathToPixelSK(circle.InnerCircle.Center + new Vec(-r2, r2)), BubbleBack, PaintMain);
+                    }
                         break;
                     case Angle ang:
-                        {
-                            var angle = ang.AngleData;
-                            var pf = MathToPixelSK(angle.AnglePoint);
-                            var arg1 =
-                                CustomMod(MathToPixel(angle.Point1).Sub(MathToPixel(angle.AnglePoint)).Arg() / PI * 180,
-                                    360);
-                            var arg2 =
-                                CustomMod(MathToPixel(angle.Point2).Sub(MathToPixel(angle.AnglePoint)).Arg() / PI * 180,
-                                    360);
-                            var aa = angle.Angle;
-                            var a = arg2 - arg1;
-                            a = CustomMod(a, 360);
-                            if (a > 180)
-                                a -= 360;
-                            if (ang.Selected)
-                                dc.DrawArc(CreateSKRectWH(pf.X - 20, pf.Y - 20, 40, 40), (float)arg1, (float)a, true,
-                                    StrokePaint);
-                            else
-                                dc.DrawArc(CreateSKRectWH(pf.X - 20, pf.Y - 20, 40, 40), (float)arg1, (float)a, true,
-                                    StrokeMain);
-                            dc.DrawBubble($"{Abs(aa).ToString("0.00")}°", pf.OffSetBy(2, 2 - 20), BubbleBack,
-                                PaintMain);
-                        }
+                    {
+                        var angle = ang.AngleData;
+                        var pf = MathToPixelSK(angle.AnglePoint);
+                        var arg1 =
+                            CustomMod(MathToPixel(angle.Point1).Sub(MathToPixel(angle.AnglePoint)).Arg() / PI * 180,
+                                360);
+                        var arg2 =
+                            CustomMod(MathToPixel(angle.Point2).Sub(MathToPixel(angle.AnglePoint)).Arg() / PI * 180,
+                                360);
+                        var aa = angle.Angle;
+                        var a = arg2 - arg1;
+                        a = CustomMod(a, 360);
+                        if (a > 180)
+                            a -= 360;
+                        if (ang.Selected)
+                            dc.DrawArc(CreateSKRectWH(pf.X - 20, pf.Y - 20, 40, 40), (float)arg1, (float)a, true,
+                                StrokePaint);
+                        else
+                            dc.DrawArc(CreateSKRectWH(pf.X - 20, pf.Y - 20, 40, 40), (float)arg1, (float)a, true,
+                                StrokeMain);
+                        dc.DrawBubble($"{Abs(aa).ToString("0.00")}°", pf.OffSetBy(2, 2 - 20), BubbleBack,
+                            PaintMain);
+                    }
                         break;
                 }
             }
@@ -1261,6 +1264,10 @@ public partial class GeometryPad : Addon
     private void DoGeoShapesDelete(IEnumerable<GeometryShape> shapes)
     {
         var ss = shapes.Select(s => ShapeList.GetAllChildren(s)).SelectMany(o => o).Distinct().ToArray();
+        if (ss.Length > 1)
+        {
+        }
+
         CmdManager.Do(
             ss,
             o =>
@@ -1345,7 +1352,7 @@ public partial class GeometryPad : Addon
                     if (n.IsError)
                     {
                         DataValidationErrors.SetError(tb, n.Error);
-                        Static.Info(new TextBlock() { Text = n.Error.Message }, Static.InfoType.Error);
+                        Dialogs.Info(new TextBlock { Text = n.Error.Message }, InfoType.Error);
                     }
                     else
                     {
@@ -1418,7 +1425,8 @@ public partial class GeometryPad : Addon
                     e.Handled = true;
                     return;
                 }
-                else if (e.Key == Key.Right)
+
+                if (e.Key == Key.Right)
                 {
                     var ls = new List<TextBox>();
                     foreach (var i in parent.GetLogicalChildren())
@@ -1431,36 +1439,35 @@ public partial class GeometryPad : Addon
                     return;
                 }
             }
-        if (e.KeySymbol?.Length == 1 && (e.KeySymbol?[0]??0)>=33 && (e.KeySymbol?[0]??0)<127)
-        {
-            char keyChar = e.KeySymbol[0];
-            switch (keyChar)
-            {
-                case >= 'a' and <= 'z':
-                case >= 'A' and <= 'Z':
-                case >= '0' and <= '9':
-                case '+':
-                case '-':
-                case '*':
-                case '/':
-                case '(':
-                case ')':
-                case '%':
-                    return;
-            }
-        }
 
-        if (e.KeyModifiers == KeyModifiers.None)
-        {
-            switch (e.PhysicalKey)
+            if (e.KeySymbol?.Length == 1 && (e.KeySymbol?[0] ?? 0) >= 33 && (e.KeySymbol?[0] ?? 0) < 127)
             {
-                case PhysicalKey.Backspace:
-                case PhysicalKey.Delete:
-                case PhysicalKey.ArrowLeft:
-                case PhysicalKey.ArrowRight:
-                    return;
+                var keyChar = e.KeySymbol[0];
+                switch (keyChar)
+                {
+                    case >= 'a' and <= 'z':
+                    case >= 'A' and <= 'Z':
+                    case >= '0' and <= '9':
+                    case '+':
+                    case '-':
+                    case '*':
+                    case '/':
+                    case '(':
+                    case ')':
+                    case '%':
+                        return;
+                }
             }
-        }
+
+            if (e.KeyModifiers == KeyModifiers.None)
+                switch (e.PhysicalKey)
+                {
+                    case PhysicalKey.Backspace:
+                    case PhysicalKey.Delete:
+                    case PhysicalKey.ArrowLeft:
+                    case PhysicalKey.ArrowRight:
+                        return;
+                }
         }
 
         e.Prevent();
@@ -1473,7 +1480,7 @@ public partial class GeometryPad : Addon
     /// <param name="e"></param>
     public void TunnelTextBoxKeyDown(object? sender, KeyEventArgs e)
     {
-        if(e.KeyModifiers==KeyModifiers.None)
+        if (e.KeyModifiers == KeyModifiers.None)
             return;
         if (e.KeyModifiers.HasFlag(KeyModifiers.Control))
         {
@@ -1490,8 +1497,10 @@ public partial class GeometryPad : Addon
             {
                 e.Prevent();
             }
+
             return;
         }
+
         if (e.KeyModifiers.HasFlag(KeyModifiers.Alt))
             e.Prevent();
     }
@@ -1507,7 +1516,7 @@ public partial class GeometryPad : Addon
             if (rb.IsChecked == true && rb.Tag is ActionData ad)
             {
                 SetAction(ad);
-                Static.Info(new TextBlock { Text = CurrentAction.Description.Data }, Static.InfoType.Information);
+                Dialogs.Info(new TextBlock { Text = CurrentAction.Description.Data }, InfoType.Information);
             }
     }
 
@@ -1523,18 +1532,12 @@ public partial class GeometryPad : Addon
 
     private void MathTextBoxMathInputted(object? sender, RoutedEventArgs e)
     {
-        var s=(sender as MathBox)!;
-        MathTextBoxContainer.BorderBrush = (!s.HasText)||(s.IsCorrect&&IntervalCompiler.TryCompile(s.Expression).Success(out _)) ? Brushes.Blue : Brushes.Red;
+        var s = (sender as MathBox)!;
+        MathTextBoxContainer.BorderBrush =
+            !s.HasText || (s.IsCorrect && IntervalCompiler.TryCompile(s.Expression).Success(out _))
+                ? Brushes.Blue
+                : Brushes.Red;
     }
 
     #endregion
-
-    protected override void OnLoaded(RoutedEventArgs e)
-    {
-        base.OnLoaded(e);
-        foreach (var control in this.GetTemplateChildren().OfType<TextBox>())
-        {
-            control.Styles.Add(Static.FluentTheme);
-        }
-    }
 }

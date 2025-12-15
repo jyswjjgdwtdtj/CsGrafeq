@@ -10,7 +10,6 @@ public class ShapeTemplate : IDataTemplate
     public required IDataTemplate? LocationPoint { get; set; }
     public required IDataTemplate? ControlledPoint { get; set; }
     public required IDataTemplate? CommonPoint { get; set; }
-    public required IDataTemplate? RadiusCircle { get; set; }
     public required IDataTemplate? Common { get; set; }
 
     public Control? Build(object? param)
@@ -32,8 +31,6 @@ public class ShapeTemplate : IDataTemplate
                 }
                 case GeoCircle circle:
                 {
-                    if (circle.Getter is CircleGetter_FromCenterAndRadius circleGetter)
-                        return RadiusCircle?.Build(circle);
                     return Common?.Build(param);
                 }
                 case GeoLine _:

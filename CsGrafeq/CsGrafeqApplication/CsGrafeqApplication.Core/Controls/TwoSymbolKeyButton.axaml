@@ -1,0 +1,55 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:CsGrafeqApplication.Core.Controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="CsGrafeqApplication.Core.Controls.TwoSymbolKeyButton" x:Name="UC">
+    <Design.PreviewWith>
+        <Border Width="60" Height="60">
+            <controls:TwoSymbolKeyButtonInPlace Width="48" Height="48" FirstButton="G" SecondButton="Q"
+                                                FontFamily="{StaticResource MapleMono}" />
+        </Border>
+    </Design.PreviewWith>
+    <UserControl.Styles>
+        <Styles>
+            <Style Selector="controls|TwoSymbolKeyButtonInPlace">
+                <Setter Property="ClipToBounds" Value="False" />
+                <Setter Property="FontFamily" Value="{StaticResource MapleMono}" />
+                <Style Selector="^ RepeatButton">
+                    <Setter Property="Background" Value="{DynamicResource CgBackgroundBrush}" />
+                    <Setter Property="CornerRadius" Value="4" />
+                    <Setter Property="Focusable" Value="False" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource CgForegroundBrush}" />
+                    <Setter Property="BorderThickness" Value="1" />
+                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                    <Setter Property="Margin" Value="0" />
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="Height" Value="46" />
+                    <Setter Property="Width" Value="46" />
+                    <Style Selector="^ TextBlock">
+                        <Setter Property="Focusable" Value="False" />
+                        <Setter Property="Margin" Value="5,0" />
+                    </Style>
+
+                </Style>
+            </Style>
+        </Styles>
+    </UserControl.Styles>
+    <RepeatButton Name="PART_Button">
+        <Panel>
+            <TextBlock Text="{CompiledBinding #UC.FirstButton}" IsVisible="{CompiledBinding #UC.IsChecked}"
+                       Foreground="{DynamicResource CgForegroundBrush}" VerticalAlignment="Bottom"
+                       HorizontalAlignment="Left" FontSize="30" />
+            <TextBlock Text="{CompiledBinding #UC.SecondButton}" IsVisible="{CompiledBinding !#UC.IsChecked}"
+                       Foreground="{DynamicResource CgHalfForegroundBrush}" VerticalAlignment="Top"
+                       HorizontalAlignment="Right" FontSize="20" />
+            <TextBlock Text="{CompiledBinding #UC.SecondButton}" IsVisible="{CompiledBinding !#UC.IsChecked}"
+                       Foreground="{DynamicResource CgForegroundBrush}" VerticalAlignment="Bottom"
+                       HorizontalAlignment="Left" FontSize="30" />
+            <TextBlock Text="{CompiledBinding #UC.FirstButton}" IsVisible="{CompiledBinding #UC.IsChecked}"
+                       Foreground="{DynamicResource CgHalfForegroundBrush}" VerticalAlignment="Top"
+                       HorizontalAlignment="Right" FontSize="20" />
+        </Panel>
+    </RepeatButton>
+</UserControl>

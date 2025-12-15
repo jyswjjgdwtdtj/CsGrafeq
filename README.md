@@ -7,7 +7,7 @@
 CsGrafeq is a geometry sketchpad. For the sake of performance and multi-platform, implicit function plotting is
 temporarily not supported in CsGrafeq. \
 [Project](./OldVersion/README.md) in old version folder is for implicit function plotting. Implicit function plotting
-will be added to CsGrafeq in future.\
+will be added to CsGrafeq in future. \
 ![image](Example/1.jpg)
 ![image](Example/2.jpg)
 ![image](Example/3.jpg)
