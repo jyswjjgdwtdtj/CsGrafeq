@@ -1,11 +1,13 @@
-using Avalonia;
+﻿using Avalonia;
+using CsGrafeq;
 using SkiaSharp;
+using static System.Math;
 
-namespace CsGrafeqApplication;
+namespace CsGrafeqApplication.Core.Utils;
 
-public static class AvaloniaMath
+public static class PointRectHelper
 {
-    public static Rect RegulateRectangle(Rect rectangle)
+    public static Rect RegulateRectangle(this Rect rectangle)
     {
         var x = rectangle.Position.X;
         var y = rectangle.Position.Y;
@@ -43,5 +45,27 @@ public static class AvaloniaMath
     public static Point ToAvaPoint(this Vec v)
     {
         return new Point(v.X, v.Y);
+    }
+
+
+    public static SKPoint OffSetBy(this SKPoint point, float dx, float dy)
+    {
+        return new SKPoint(point.X + dx, point.Y + dy);
+    }
+
+    public static SKRect CreateSKRectWH(float x, float y, float width, float height)
+    {
+        return new SKRect(x, y, x + width, y + height);
+    }
+
+    public static SKRect CreateSKRectWH(double x, double y, double width, double height)
+    {
+        return new SKRect((float)x, (float)y, (float)(x + width), (float)(y + height));
+    }
+
+
+    public static bool ContainsPoint(this SKRect rect, SKPoint point)
+    {
+        return rect.Top < point.Y && point.Y < rect.Bottom && rect.Left < point.X && point.X < rect.Right;
     }
 }

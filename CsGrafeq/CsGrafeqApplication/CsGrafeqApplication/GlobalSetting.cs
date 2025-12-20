@@ -2,6 +2,7 @@
 
 global using CsGrafeq;
 global using CsGrafeq.I18N;
+global using CsGrafeqApplication.Core.Utils;
 
 namespace CsGrafeqApplication;
 

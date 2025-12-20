@@ -30,7 +30,7 @@ public abstract class Shape : ReactiveObject, IDisposable
         get => field;
         set
         {
-            this.RaiseAndSetIfChanged(ref field, value);
+            this.RaiseAndSetIfChanged(ref field, value | 0xff000000);
             InvokeShapeChanged();
         }
     } = GetRandomColor();

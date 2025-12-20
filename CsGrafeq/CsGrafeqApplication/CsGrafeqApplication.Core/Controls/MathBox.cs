@@ -26,53 +26,6 @@ namespace CsGrafeqApplication.Core.Controls;
 
 public class MathBox : Control
 {
-    public event EventHandler? MathInputted;
-    private RectangleF CurrentMeasuredRect
-    {
-        get => field;
-        set
-        {
-            if (field != value)
-            {
-                InvalidateMeasure();
-                InvalidateArrange();
-                field = value;
-            }
-        }
-    } = new(Vector4.NaN);
-#if RECORD_INSTANCE
-    private static readonly List<MathBox> Instances = new();
-
-    static MathBox()
-    {
-    }
-
-    private static MathBox? FocusedInstance
-    {
-        get => field;
-        set
-        {
-            field = value;
-            foreach (var it in Instances)
-            {
-                SetMathBoxIsFocused(it,false);
-            }
-            if(field != null)   
-                SetMathBoxIsFocused(field, true);
-        }
-    }
-
-    private static readonly AttachedProperty<bool> MathBoxIsFocusedProperty =
-        AvaloniaProperty.RegisterAttached<MathBox, MathBox, bool>("MathBoxIsFocused");
-
-    private static void SetMathBoxIsFocused(MathBox obj, bool value) => obj.SetValue(MathBoxIsFocusedProperty, value);
-    private static bool GetMathBoxIsFocused(MathBox obj) => obj.GetValue(MathBoxIsFocusedProperty);
-#endif
-
-    private readonly float Scale = 1;
-    private CgMathKeyboard Keyboard { get; set; } = new(new MathList());
-    private MathPainter Painter { get; } = new();
-
     public static readonly DirectProperty<MathBox, float> FontSizeProperty =
         AvaloniaProperty.RegisterDirect<MathBox, float>(
             nameof(FontSize), o => o.FontSize, (o, v) => o.FontSize = v);
@@ -97,10 +50,79 @@ public class MathBox : Control
 
     public static readonly DirectProperty<MathBox, bool> HasTextProperty =
         AvaloniaProperty.RegisterDirect<MathBox, bool>(
-            nameof(HasText), o => o.HasText, (o, v) => o.HasText = v);
+            nameof(HasText), o => o.HasText);
 
     public static readonly StyledProperty<bool> CanInputProperty = AvaloniaProperty.Register<MathBox, bool>(
         nameof(CanInput), true);
+
+    public static readonly StyledProperty<IBrush?> BackgroundProperty = AvaloniaProperty.Register<MathBox, IBrush?>(
+        nameof(Background), Brushes.Transparent);
+
+    public static readonly StyledProperty<SolidColorBrush?> ForegroundProperty =
+        AvaloniaProperty.Register<MathBox, SolidColorBrush?>(
+            nameof(Foreground));
+
+    private readonly float Scale = 1;
+
+    static MathBox()
+    {
+        AffectsRender<MathBox>(BackgroundProperty, ForegroundProperty);
+        AffectsArrange<MathBox>(MathListProperty);
+    }
+
+    //private Fonts Fonts;
+    public MathBox() : this(1)
+    {
+    }
+
+    public MathBox(float scale = 1)
+    {
+        Scale = scale;
+        ClipToBounds = false;
+        MathList = new MathList();
+        //var reader = new OpenFontReader();
+        //Typography.OpenFont.Typeface? typeface = null;// reader.Read(SkiaSharp.SKData.Create(SkiaEx.MapleMono.Typeface.OpenStream()).AsStream());
+        //Fonts =new Fonts(typeface==null?Fonts.GlobalTypefaces:[typeface],Scale*FontSize);
+        //Instances.Add(this);
+        RenderOptions.SetEdgeMode(this, EdgeMode.Antialias);
+        RenderOptions.SetTextRenderingMode(this, TextRenderingMode.Antialias);
+        RenderOptions.SetBitmapInterpolationMode(this, BitmapInterpolationMode.HighQuality);
+        VerticalAlignment = VerticalAlignment.Center;
+        Focusable = true;
+        Painter.FontSize = FontSize * Scale;
+        Painter.LocalTypefaces = new Fonts(Keyboard.Font, Scale * FontSize);
+        //PressKey(CgMathKeyboardInput.Sine,CgMathKeyboardInput.SmallX,CgMathKeyboardInput.Slash,CgMathKeyboardInput.Cosine,CgMathKeyboardInput.SmallX);
+        InvalidateArrange();
+    }
+
+    private RectangleF CurrentMeasuredRect
+    {
+        get => field;
+        set
+        {
+            if (field != value)
+            {
+                InvalidateMeasure();
+                InvalidateArrange();
+                field = value;
+            }
+        }
+    } = new(Vector4.NaN);
+
+    private CgMathKeyboard Keyboard { get; set; } = new(new MathList());
+    private MathPainter Painter { get; } = new();
+
+    public IBrush? Background
+    {
+        get => GetValue(BackgroundProperty);
+        set => SetValue(BackgroundProperty, value);
+    }
+
+    public SolidColorBrush? Foreground
+    {
+        get => GetValue(ForegroundProperty);
+        set => SetValue(ForegroundProperty, value);
+    }
 
     public bool CanInput
     {
@@ -146,48 +168,11 @@ public class MathBox : Control
         private set => SetAndRaise(IsCorrectProperty, ref field, value);
     } = false;
 
-    private void InvokeAsyncInvalidateVisual(object? sender, EventArgs e)
-    {
-        Dispatcher.UIThread.InvokeAsync(InvalidateVisual);
-    }
-
     public string Expression
     {
         get => field;
         private set => SetAndRaise(ExpressionProperty, ref field, value);
     } = "";
-
-    //private Fonts Fonts;
-    public MathBox() : this(1)
-    {
-    }
-
-    public MathBox(float scale = 1)
-    {
-        Scale = scale;
-        ClipToBounds = false;
-        MathList = new MathList();
-        //var reader = new OpenFontReader();
-        //Typography.OpenFont.Typeface? typeface = null;// reader.Read(SkiaSharp.SKData.Create(SkiaEx.MapleMono.Typeface.OpenStream()).AsStream());
-        //Fonts =new Fonts(typeface==null?Fonts.GlobalTypefaces:[typeface],Scale*FontSize);
-        //Instances.Add(this);
-        RenderOptions.SetEdgeMode(this, EdgeMode.Antialias);
-        RenderOptions.SetTextRenderingMode(this, TextRenderingMode.Antialias);
-        RenderOptions.SetBitmapInterpolationMode(this, BitmapInterpolationMode.HighQuality);
-        VerticalAlignment = VerticalAlignment.Center;
-        Focusable = true;
-        Painter.FontSize = FontSize * Scale;
-        Painter.LocalTypefaces = new Fonts(Keyboard.Font, Scale * FontSize);
-        //PressKey(CgMathKeyboardInput.Sine,CgMathKeyboardInput.SmallX,CgMathKeyboardInput.Slash,CgMathKeyboardInput.Cosine,CgMathKeyboardInput.SmallX);
-        InvalidateArrange();
-    }
-
-    ~MathBox()
-    {
-#if RECORD_INSTANCE
-        Instances.Remove(this);
-#endif
-    }
 
     public float FontSize
     {
@@ -195,10 +180,28 @@ public class MathBox : Control
         set => SetAndRaise(FontSizeProperty, ref field, value);
     } = 15;
 
+    public float CaretPosition =>
+        ((Keyboard.Display?.PointForIndex(TypesettingContext.Instance, Keyboard.InsertionIndex) ??
+          Keyboard.Display?.Position) ?? new PointF(0, 0)).X;
+
+    public float MeasuredWidth => CurrentMeasuredRect.Width;
+    public event EventHandler? MathInputted;
+
+    private void InvokeAsyncInvalidateVisual(object? sender, EventArgs e)
+    {
+        Dispatcher.UIThread.InvokeAsync(InvalidateVisual);
+    }
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        if (change.Property == ForegroundProperty) Painter.TextColor = Foreground?.Color ?? Colors.Transparent;
+    }
+
     public override void Render(DrawingContext e)
     {
+        e.DrawRectangle(Background, null, Bounds);
         CurrentMeasuredRect = Keyboard.Measure;
-        e.DrawRectangle(new SolidColorBrush(0x00000000), null, Bounds);
         if (!Keyboard.HasText)
             if (Keyboard.ShouldDrawCaret && IsFocused)
             {
@@ -218,12 +221,6 @@ public class MathBox : Control
         if (Keyboard.ShouldDrawCaret && IsFocused && CanInput) Keyboard.DrawCaret(c, Color.Black, CaretShape.IBeam);
         c.Restore();
     }
-
-    public float CaretPosition =>
-        ((Keyboard.Display?.PointForIndex(TypesettingContext.Instance, Keyboard.InsertionIndex) ??
-          Keyboard.Display?.Position) ?? new PointF(0, 0)).X;
-
-    public float MeasuredWidth => CurrentMeasuredRect.Width;
 
     public void PressKey(params CgMathKeyboardInput[] keyboardInputs)
     {

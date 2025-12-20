@@ -1,10 +1,11 @@
 ﻿<ToggleButton xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:controls="clr-namespace:CsGrafeqApplication.Core.Controls"
-             mc:Ignorable="d" d:DesignWidth="50" d:DesignHeight="50" ClipToBounds="False" FontFamily="{StaticResource MaplyMono}"
-             x:Class="CsGrafeqApplication.Core.Controls.TwoSymbolKeyButton" x:Name="UC">
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+              xmlns:controls="clr-namespace:CsGrafeqApplication.Core.Controls"
+              mc:Ignorable="d" d:DesignWidth="50" d:DesignHeight="50" ClipToBounds="False"
+              FontFamily="{StaticResource MaplyMono}"
+              x:Class="CsGrafeqApplication.Core.Controls.TwoSymbolKeyButton" x:Name="UC">
     <Design.PreviewWith>
         <Border Width="50" Height="50">
             <controls:TwoSymbolKeyButtonInPlace Width="48" Height="48" FirstButton="G" SecondButton="Q"
@@ -21,22 +22,23 @@
     <ToggleButton.Styles>
         <Styles>
             <Style Selector="TextBlock">
-                <Setter Property="Margin" Value="2"></Setter>
+                <Setter Property="Margin" Value="2" />
             </Style>
             <Style Selector="RepeatButton">
-                    <Setter Property="HorizontalAlignment" Value="Stretch" />
-                    <Setter Property="Margin" Value="0" />
-                    <Setter Property="Padding" Value="0" />
-                    <Setter Property="Height" Value="46" />
-                    <Setter Property="Width" Value="46" />
-                    <Style Selector="^ TextBlock">
-                        <Setter Property="Focusable" Value="False" />
-                        <Setter Property="Margin" Value="5,0" />
-                    </Style>
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                <Setter Property="Margin" Value="0" />
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="Height" Value="46" />
+                <Setter Property="Width" Value="46" />
+                <Style Selector="^ TextBlock">
+                    <Setter Property="Focusable" Value="False" />
+                    <Setter Property="Margin" Value="5,0" />
                 </Style>
+            </Style>
         </Styles>
     </ToggleButton.Styles>
-    <RepeatButton Name="PART_Button" Background="{DynamicResource CgBackgroundBrush}" CornerRadius="4" Focusable="False" BorderBrush="{DynamicResource CgForegroundBrush}" BorderThickness="1" Padding="0" >
+    <RepeatButton Name="PART_Button" Background="{DynamicResource CgBackgroundBrush}" CornerRadius="4"
+                  Focusable="False" BorderBrush="{DynamicResource CgForegroundBrush}" BorderThickness="1" Padding="0">
         <Panel Width="48" Height="48" HorizontalAlignment="Center" VerticalAlignment="Center">
             <TextBlock Text="{CompiledBinding #UC.FirstButton}" IsVisible="{CompiledBinding #UC.IsChecked}"
                        Foreground="{DynamicResource CgForegroundBrush}" VerticalAlignment="Bottom"

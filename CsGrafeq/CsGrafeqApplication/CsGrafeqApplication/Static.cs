@@ -7,16 +7,17 @@ namespace CsGrafeqApplication;
 
 public class Static : ReactiveObject
 {
-    public static MaterialThemeBase Theme { get;}
     static Static()
     {
         Instance = new Static();
-        Theme=Application.Current.LocateMaterialTheme<MaterialThemeBase>();
+        Theme = Application.Current.LocateMaterialTheme<MaterialThemeBase>();
     }
 
     private Static()
     {
     }
+
+    public static MaterialThemeBase Theme { get; }
 
     public static Static Instance { get; }
 

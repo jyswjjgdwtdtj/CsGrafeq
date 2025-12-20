@@ -39,9 +39,9 @@
         <Setter Property="Template">
             <ControlTemplate>
                 <Panel>
-                    <Border Name="BackgroundShower" CornerRadius="5"
-                            Background="{TemplateBinding Color, Converter={StaticResource UIntColorToBrush},ConverterParameter=255}" />
-                    <Border Name="Container" CornerRadius="5" Padding="{TemplateBinding}">
+                    <Border Name="BackgroundShower" CornerRadius="{TemplateBinding CornerRadius}"
+                            Background="{TemplateBinding Background}" />
+                    <Border Name="Container" CornerRadius="{TemplateBinding CornerRadius}" Padding="{TemplateBinding}">
                         <ContentPresenter Content="{TemplateBinding Content}" />
                     </Border>
                 </Panel>

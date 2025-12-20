@@ -9,11 +9,15 @@
              xmlns:shapes1="clr-namespace:CsGrafeq.Shapes"
              xmlns:cga="clr-namespace:CsGrafeqApplication"
              xmlns:csGrafeq="clr-namespace:CsGrafeq;assembly=CsGrafeq.Compiler"
-             xmlns:svg="clr-namespace:Avalonia.Svg;assembly=Svg.Controls.Avalonia"
              xmlns:corecontrols="clr-namespace:CsGrafeqApplication.Core.Controls;assembly=CsGrafeqApplication.Core"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CsGrafeqApplication.Addons.GeometryPad.GeometryPad" x:DataType="geopad:GeometryPadViewModel">
     <UserControl.Styles>
+        <Style Selector="Viewbox">
+            <Setter Property="Width" Value="25" />
+            <Setter Property="Height" Value="25" />
+            <Setter Property="Stretch" Value="Uniform" />
+        </Style>
         <Style Selector="Expander.NoBorderExpander">
             <Style Selector="^ /template/ ToggleButton#ExpanderHeader">
                 <Setter Property="BorderThickness" Value="0,1,0,0" />
@@ -139,21 +143,23 @@
                 <Setter Property="Margin" Value="5,0" />
             </Style>
         </Style>
-        <StyleInclude Source="avares://CsGrafeqApplication.Core/Styles/PathStyles.axaml"></StyleInclude>
-        <Style Selector="Path">
-            <Setter Property="Width" Value="25"></Setter>
-            <Setter Property="Height" Value="25"></Setter>
+        <StyleInclude Source="avares://CsGrafeqApplication.Core/Styles/PathStyles.axaml" />
+        <Style Selector="Path.Icon">
+            <Setter Property="Width" Value="25" />
+            <Setter Property="Height" Value="25" />
         </Style>
     </UserControl.Styles>
     <TabControl TabStripPlacement="Left" Name="TabControl" Margin="0" Padding="0"
                 Background="Transparent" VerticalAlignment="Stretch">
         <TabItem>
             <TabItem.Header>
-                <Viewbox Width="32" Height="32" Stretch="Uniform">
+                <Viewbox>
                     <Canvas Width="32" Height="32">
-                        <Rectangle Canvas.Left="5" Canvas.Top="4" Width="22" Height="25" Fill="{DynamicResource MaterialPrimaryMidBrush}"></Rectangle>
-                        <Path Stretch="None" Fill="{DynamicResource CgForegroundBrush}" Data="M26 30H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h20a2 2 0 0 1 2 2v24a2 2 0 0 1-2 2M6 4v24h20V4Z"></Path>
-                        <Path Stretch="None" Fill="{DynamicResource CgForegroundBrush}" Data="M9 7h11v2H9zm0 5h7v2H9z"></Path>
+                        <Rectangle Canvas.Left="5" Canvas.Top="4" Width="22" Height="25"
+                                   Fill="{DynamicResource MaterialPrimaryMidBrush}" />
+                        <Path Stretch="None" Fill="{DynamicResource CgForegroundBrush}"
+                              Data="M26 30H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h20a2 2 0 0 1 2 2v24a2 2 0 0 1-2 2M6 4v24h20V4Z" />
+                        <Path Stretch="None" Fill="{DynamicResource CgForegroundBrush}" Data="M9 7h11v2H9zm0 5h7v2H9z" />
                     </Canvas>
                 </Viewbox>
             </TabItem.Header>
@@ -162,7 +168,8 @@
                         IsVisible="{x:Static cga:GlobalSetting.AllowExpression}">
                     <DockPanel LastChildFill="True" HorizontalAlignment="Stretch" Margin="5">
                         <Border Width="30" Height="30" DockPanel.Dock="Left">
-                            <Path Name="AddPathIcon" Classes="Icon Fill" Data="M16 2.75c.69 0 1.25.56 1.25 1.25v10.75H28a1.25 1.25 0 1 1 0 2.5H17.25V28a1.25 1.25 0 1 1-2.5 0V17.25H4a1.25 1.25 0 1 1 0-2.5h10.75V4c0-.69.56-1.25 1.25-1.25"/>
+                            <Path Name="AddPathIcon" Classes="Icon Fill"
+                                  Data="M16 2.75c.69 0 1.25.56 1.25 1.25v10.75H28a1.25 1.25 0 1 1 0 2.5H17.25V28a1.25 1.25 0 1 1-2.5 0V17.25H4a1.25 1.25 0 1 1 0-2.5h10.75V4c0-.69.56-1.25 1.25-1.25" />
                         </Border>
                         <Button IsVisible="False" DockPanel.Dock="Right" Margin="0" Background="Transparent" Width="30"
                                 HorizontalContentAlignment="Center" VerticalAlignment="Center"
@@ -203,7 +210,7 @@
                                             IsChecked="{CompiledBinding Selected, Mode=TwoWay}"
                                             IsOver="{CompiledBinding PointerOver, Mode=OneWayToSource}"
                                             Height="{CompiledBinding IsDeleted,Converter={StaticResource BoolToDouble},ConverterParameter='70',Mode=OneWay}"
-                                            Color="{CompiledBinding Color}">
+                                            Background="{CompiledBinding Color,Converter={StaticResource UIntColorToBrush},ConverterParameter=160}">
                                             <ctls:ToggleBox.Flyout>
                                                 <Flyout ShowMode="Standard" Placement="BottomEdgeAlignedLeft">
                                                     <Grid ColumnDefinitions="80,120" RowDefinitions="Auto,Auto"
@@ -237,7 +244,9 @@
                                                         Tag="{CompiledBinding .}" Click="DeleteButtonClicked"
                                                         Width="30" Height="30" Margin="4"
                                                         Background="{DynamicResource MaterialPrimaryMidBrush}">
-                                                    <Path Classes="Icon Fill" Width="15" Height="15" Margin="0" Name="DeletePathIcon" Data="m12.12 10l3.53 3.53l-2.12 2.12L10 12.12l-3.54 3.54l-2.12-2.12L7.88 10L4.34 6.46l2.12-2.12L10 7.88l3.54-3.53l2.12 2.12z"></Path>
+                                                    <Path Classes="Icon Fill" Width="15" Height="15" Margin="0"
+                                                          Name="DeletePathIcon"
+                                                          Data="m12.12 10l3.53 3.53l-2.12 2.12L10 12.12l-3.54 3.54l-2.12-2.12L7.88 10L4.34 6.46l2.12-2.12L10 7.88l3.54-3.53l2.12 2.12z" />
                                                 </Button>
                                                 <ContentControl Content="{CompiledBinding .}">
                                                     <ContentControl.ContentTemplate>
@@ -376,7 +385,7 @@
                                                                             <ctls:ToggleBox
                                                                                 IsChecked="{CompiledBinding On.Selected, Mode=TwoWay,DataType=getter:PointGetter_Movable}"
                                                                                 IsOver="{CompiledBinding On.PointerOver, Mode=OneWayToSource,DataType=getter:PointGetter_Movable}"
-                                                                                Color="{CompiledBinding On.Color,DataType=getter:PointGetter_Movable}">
+                                                                                Background="{CompiledBinding On.Color,Converter={StaticResource UIntColorToBrush},ConverterParameter=160,DataType=getter:PointGetter_Movable}">
                                                                                 <TextBlock
                                                                                     Text="{CompiledBinding On.Name,DataType=getter:PointGetter_Movable}"
                                                                                     VerticalAlignment="Center"
@@ -423,7 +432,7 @@
                                                                                                 <ctls:ToggleBox
                                                                                                     IsChecked="{CompiledBinding Selected, Mode=TwoWay}"
                                                                                                     IsOver="{CompiledBinding PointerOver, Mode=OneWayToSource}"
-                                                                                                    Color="{DynamicResource MedianUint}">
+                                                                                                    Background="{CompiledBinding Color,Converter={StaticResource UIntColorToBrush},ConverterParameter=160}">
                                                                                                     <TextBlock
                                                                                                         Text="{CompiledBinding Name}" />
                                                                                                 </ctls:ToggleBox>
@@ -498,7 +507,7 @@
                                                                                                 <ctls:ToggleBox
                                                                                                     IsChecked="{CompiledBinding Selected, Mode=TwoWay}"
                                                                                                     IsOver="{CompiledBinding PointerOver, Mode=OneWayToSource}"
-                                                                                                    Color="{CompiledBinding Color}">
+                                                                                                    Background="{CompiledBinding Color,Converter={StaticResource UIntColorToBrush},ConverterParameter=160}">
                                                                                                     <TextBlock
                                                                                                         Text="{CompiledBinding Name}"
                                                                                                         Classes="Big" />
@@ -592,7 +601,9 @@
                                                         Tag="{CompiledBinding .}" Click="DeleteButtonClicked"
                                                         Tapped="EventHandledTrue"
                                                         Background="{StaticResource MaterialPrimaryMidBrush}">
-                                                    <Path Classes="Icon Fill" Width="15" Height="15" Margin="0" Name="DeletePathIcon" Data="m12.12 10l3.53 3.53l-2.12 2.12L10 12.12l-3.54 3.54l-2.12-2.12L7.88 10L4.34 6.46l2.12-2.12L10 7.88l3.54-3.53l2.12 2.12z"></Path>
+                                                    <Path Classes="Icon Fill" Width="15" Height="15" Margin="0"
+                                                          Name="DeletePathIcon"
+                                                          Data="m12.12 10l3.53 3.53l-2.12 2.12L10 12.12l-3.54 3.54l-2.12-2.12L7.88 10L4.34 6.46l2.12-2.12L10 7.88l3.54-3.53l2.12 2.12z" />
                                                 </Button>
                                                 <Border Tapped="EventHandledTrue" DoubleTapped="EventHandledTrue"
                                                         HorizontalAlignment="Stretch" VerticalAlignment="Center"
@@ -600,6 +611,7 @@
                                                         Padding="10" CornerRadius="5"
                                                         BorderThickness="2" BorderBrush="{CompiledBinding BorderBrush}">
                                                     <corecontrols:MathBox
+                                                        Foreground="{DynamicResource CgForegroundBrush}"
                                                         MathList="{CompiledBinding MathList,Mode=OneTime}"
                                                         PropertyToTransmitMathInputEvent="{CompiledBinding PropertyToReceiveMathListChanged,Mode=OneWayToSource}"
                                                         DoubleTapped="EventHandledTrue"
@@ -620,10 +632,12 @@
         </TabItem>
         <TabItem>
             <TabItem.Header>
-                <Viewbox Width="32" Height="32" Stretch="Uniform">
+                <Viewbox>
                     <Canvas Width="24" Height="24">
-                        <Ellipse Fill="{DynamicResource MaterialPrimaryMidBrush}" Canvas.Left="4" Canvas.Top="4" Width="10" Height="10"></Ellipse>
-                        <Path Stretch="None" Fill="{DynamicResource CgForegroundBrush}" Data="M8 17.95q.25.025.488.038T9 18t.513-.012t.487-.038V20h10V10h-2.05q.025-.25.038-.488T18 9t-.012-.513T17.95 8H20q.825 0 1.413.588T22 10v10q0 .825-.587 1.413T20 22H10q-.825 0-1.412-.587T8 20zM9 16q-2.925 0-4.962-2.037T2 9t2.038-4.962T9 2t4.963 2.038T16 9t-2.037 4.963T9 16m0-2q2.075 0 3.538-1.463T14 9t-1.463-3.537T9 4T5.463 5.463T4 9t1.463 3.538T9 14m0-5"></Path>
+                        <Ellipse Fill="{DynamicResource MaterialPrimaryMidBrush}" Canvas.Left="4" Canvas.Top="4"
+                                 Width="10" Height="10" />
+                        <Path Stretch="None" Fill="{DynamicResource CgForegroundBrush}"
+                              Data="M8 17.95q.25.025.488.038T9 18t.513-.012t.487-.038V20h10V10h-2.05q.025-.25.038-.488T18 9t-.012-.513T17.95 8H20q.825 0 1.413.588T22 10v10q0 .825-.587 1.413T20 22H10q-.825 0-1.412-.587T8 20zM9 16q-2.925 0-4.962-2.037T2 9t2.038-4.962T9 2t4.963 2.038T16 9t-2.037 4.963T9 16m0-2q2.075 0 3.538-1.463T14 9t-1.463-3.537T9 4T5.463 5.463T4 9t1.463 3.538T9 14m0-5" />
                     </Canvas>
                 </Viewbox>
             </TabItem.Header>
@@ -692,11 +706,14 @@
         </TabItem>
         <TabItem>
             <TabItem.Header>
-                <Viewbox Stretch="Uniform" Width="32" Height="32">
+                <Viewbox>
                     <Canvas Width="56" Height="56">
-                        <Rectangle Canvas.Left="8" Canvas.Top="8" Width="40" Height="25" Fill="{DynamicResource MaterialPrimaryMidBrush}"></Rectangle>
-                        <Rectangle Canvas.Left="32" Canvas.Top="41" Width="8" Height="7" Fill="{DynamicResource MaterialPrimaryMidBrush}"></Rectangle>
-                        <Path Stretch="None" Fill="{DynamicResource CgForegroundBrush}" Data="M12.625 35.5H43.4c4.546 0 6.96-2.32 6.96-6.867v-15.82c0-4.547-2.414-6.868-6.96-6.868H12.624c-4.336 0-6.984 2.32-6.984 6.868v15.82c0 4.547 2.414 6.867 6.984 6.867m-.047-3.516c-2.086 0-3.164-1.101-3.164-3.164V12.625c0-2.062 1.078-3.14 3.164-3.14h30.867c2.063 0 3.141 1.078 3.141 3.14V28.82c0 2.063-1.078 3.164-3.14 3.164Zm23.578 18.07c2.438 0 4.524-1.57 5.297-3.75h7.125c.961 0 1.781-.82 1.781-1.874c0-1.078-.82-1.899-1.781-1.899h-7.125a5.62 5.62 0 0 0-5.297-3.726a5.67 5.67 0 0 0-5.32 3.726H7.539c-1.055 0-1.898.82-1.898 1.899c0 1.054.843 1.875 1.898 1.875h23.297a5.67 5.67 0 0 0 5.32 3.75m0-2.882a2.716 2.716 0 0 1-2.742-2.742c0-1.57 1.195-2.766 2.742-2.766s2.742 1.195 2.742 2.766a2.716 2.716 0 0 1-2.742 2.742"></Path>
+                        <Rectangle Canvas.Left="8" Canvas.Top="8" Width="40" Height="25"
+                                   Fill="{DynamicResource MaterialPrimaryMidBrush}" />
+                        <Rectangle Canvas.Left="32" Canvas.Top="41" Width="8" Height="7"
+                                   Fill="{DynamicResource MaterialPrimaryMidBrush}" />
+                        <Path Stretch="None" Fill="{DynamicResource CgForegroundBrush}"
+                              Data="M12.625 35.5H43.4c4.546 0 6.96-2.32 6.96-6.867v-15.82c0-4.547-2.414-6.868-6.96-6.868H12.624c-4.336 0-6.984 2.32-6.984 6.868v15.82c0 4.547 2.414 6.867 6.984 6.867m-.047-3.516c-2.086 0-3.164-1.101-3.164-3.164V12.625c0-2.062 1.078-3.14 3.164-3.14h30.867c2.063 0 3.141 1.078 3.141 3.14V28.82c0 2.063-1.078 3.164-3.14 3.164Zm23.578 18.07c2.438 0 4.524-1.57 5.297-3.75h7.125c.961 0 1.781-.82 1.781-1.874c0-1.078-.82-1.899-1.781-1.899h-7.125a5.62 5.62 0 0 0-5.297-3.726a5.67 5.67 0 0 0-5.32 3.726H7.539c-1.055 0-1.898.82-1.898 1.899c0 1.054.843 1.875 1.898 1.875h23.297a5.67 5.67 0 0 0 5.32 3.75m0-2.882a2.716 2.716 0 0 1-2.742-2.742c0-1.57 1.195-2.766 2.742-2.766s2.742 1.195 2.742 2.766a2.716 2.716 0 0 1-2.742 2.742" />
                     </Canvas>
                 </Viewbox>
             </TabItem.Header>

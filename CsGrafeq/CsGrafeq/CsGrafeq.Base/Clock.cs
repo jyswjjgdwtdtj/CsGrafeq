@@ -11,7 +11,6 @@ namespace CsGrafeq;
 public class Clock
 {
     private readonly TTimer Timer = new();
-    private DateTime LastTime;
     private bool Running;
 
     public Clock(uint interval = 50)
@@ -25,7 +24,6 @@ public class Clock
 
     public void Touch()
     {
-        LastTime = DateTime.Now;
         Running = true;
     }
 
@@ -36,8 +34,9 @@ public class Clock
 
     private void Do()
     {
-        if (Running && (DateTime.Now - LastTime).TotalMilliseconds > Timer.Interval)
+        if (Running)
         {
+            Console.WriteLine("Do");
             Running = false;
             OnElapsed?.Invoke();
         }

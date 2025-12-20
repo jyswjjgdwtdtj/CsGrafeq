@@ -10,6 +10,7 @@
         <ScrollViewer Margin="3,0" Name="PART_ScrollViewer" HorizontalScrollBarVisibility="Hidden"
                       VerticalScrollBarVisibility="Disabled" HorizontalAlignment="Stretch">
             <controls:MathBox MathInputted="PART_MathBox_OnMathInputted" Name="PART_MathBox"
+                              Foreground="{DynamicResource CgForegroundBrush}"
                               HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
         </ScrollViewer>
     </Border>

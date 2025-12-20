@@ -18,7 +18,7 @@
                 <ResourceInclude Source="/Themes/Theme.axaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
-        <FontFamily x:Key="MapleMono">avares://CsGrafeqApplication/Fonts/MapleMono-CN-Regular.ttf#Maple Mono CN</FontFamily>
+        <FontFamily x:Key="MapleMono">avares://CsGrafeqApplication.Core/Fonts/MapleMono-CN-Regular.ttf#Maple Mono CN</FontFamily>
     </Application.Resources>
     <Application.Styles>
         <StyleInclude Source="/Controls/ShownControl.axaml" />

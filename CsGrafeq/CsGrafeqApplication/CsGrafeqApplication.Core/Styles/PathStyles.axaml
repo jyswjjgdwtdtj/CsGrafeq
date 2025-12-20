@@ -6,17 +6,16 @@
         </Border>
     </Design.PreviewWith>
     <Style Selector="Path.Icon">
-        <Setter Property="VerticalAlignment" Value="Center"></Setter>
-        <Setter Property="HorizontalAlignment" Value="Center"></Setter>
-        <Setter Property="Stretch" Value="Fill"></Setter>
-        <Setter Property="Margin" Value="5"></Setter>
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="Stretch" Value="Fill" />
         <Style Selector="^.Fill">
-            <Setter Property="Fill" Value="{DynamicResource CgForegroundBrush}"></Setter>
-            <Setter Property="Stroke" Value="Transparent"></Setter>
+            <Setter Property="Fill" Value="{DynamicResource CgForegroundBrush}" />
+            <Setter Property="Stroke" Value="Transparent" />
         </Style>
         <Style Selector="^.Stroke">
-            <Setter Property="Stroke" Value="{DynamicResource CgForegroundBrush}"></Setter>
-            <Setter Property="Fill" Value="Transparent"></Setter>
+            <Setter Property="Stroke" Value="{DynamicResource CgForegroundBrush}" />
+            <Setter Property="Fill" Value="Transparent" />
         </Style>
     </Style>
 </Styles>

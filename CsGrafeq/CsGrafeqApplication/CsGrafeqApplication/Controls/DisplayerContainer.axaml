@@ -8,10 +8,20 @@
              xmlns:controls="clr-namespace:CsGrafeqApplication.Controls"
              xmlns:i18N="clr-namespace:CsGrafeq.I18N;assembly=CsGrafeq.I18N"
              xmlns:controls1="clr-namespace:CsGrafeqApplication.Core.Controls;assembly=CsGrafeqApplication.Core"
+             xmlns:material="clr-namespace:CsGrafeqApplication.Core.Material;assembly=CsGrafeqApplication.Core"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CsGrafeqApplication.Controls.DisplayerContainer"
              x:DataType="vm:DisplayerContainerViewModel" Foreground="{DynamicResource CgForegroundBrush}"
              Focusable="False">
+    <UserControl.Styles>
+        <Styles>
+            <StyleInclude Source="avares://CsGrafeqApplication.Core/Styles/PathStyles.axaml" />
+            <Style Selector="Path.Icon">
+                <Setter Property="Width" Value="22" />
+                <Setter Property="Height" Value="22" />
+            </Style>
+        </Styles>
+    </UserControl.Styles>
     <Panel>
         <Border Name="DisplayerCon" ZIndex="0" BorderThickness="0">
             <ContentPresenter Content="{CompiledBinding Displayer}" />
@@ -126,7 +136,6 @@
                                 <Setter Property="Width" Value="32" />
                                 <Setter Property="Height" Value="32" />
                             </Style>
-                            <StyleInclude Source="avares://CsGrafeqApplication.Core/Styles/PathStyles.axaml" />
                         </Styles>
                     </Grid.Styles>
                     <Border Grid.Column="1" Grid.Row="1">
@@ -140,7 +149,8 @@
                                                 <Border CornerRadius="{TemplateBinding CornerRadius}"
                                                         Background="{TemplateBinding Background}">
 
-                                                    <Path Fill="{DynamicResource CgForegroundBrush}" Name="LineUp"
+                                                    <Path Stretch="Uniform" Fill="{DynamicResource CgForegroundBrush}"
+                                                          Name="LineUp" Width="22" Height="22"
                                                           Data="M13 14.25a.75.75 0 0 1-1.5 0V3.56l-.72.72a.75.75 0 1 1-1.06-1.06l2-2a.75.75 0 0 1 1.06 0l2 2a.75.75 0 0 1-1.06 1.06L13 3.56zM2.75 13.5a.75.75 0 0 1 0-1.5h6.5a.75.75 0 0 1 0 1.5zm2-3a.75.75 0 0 1 0-1.5h4.5a.75.75 0 0 1 0 1.5zM6 6.75c0 .414.336.75.75.75h2.5a.75.75 0 0 0 0-1.5h-2.5a.75.75 0 0 0-.75.75" />
 
                                                 </Border>
@@ -153,6 +163,7 @@
                                                 <Border CornerRadius="{TemplateBinding CornerRadius}"
                                                         Background="{TemplateBinding Background}">
                                                     <Path Fill="{DynamicResource CgForegroundBrush}" Name="LineDown"
+                                                          Width="22" Height="22" Stretch="Uniform"
                                                           Data="M13 1.75a.75.75 0 0 0-1.5 0v10.69l-.72-.72a.75.75 0 1 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0l2-2a.75.75 0 1 0-1.06-1.06l-.72.72zM2.75 2.5a.75.75 0 0 0 0 1.5h6.5a.75.75 0 0 0 0-1.5zm2 3a.75.75 0 0 0 0 1.5h4.5a.75.75 0 0 0 0-1.5zM6 9.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5A.75.75 0 0 1 6 9.25" />
 
                                                 </Border>
@@ -309,8 +320,107 @@
                                     <ToolTip.Tip>
                                         <TextBlock Text="{CompiledBinding MultiLanguageResources.ThemeText.Data}" />
                                     </ToolTip.Tip>
-                                    <Path Name="Theme" Classes="Icon Fill"
+                                    <Path Name="ThemePathIcon" Classes="Icon Fill"
                                           Data="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2S2 6.477 2 12s4.477 10 10 10m0-1.5v-17a8.5 8.5 0 0 1 0 17" />
+                                </Button>
+                                <Button>
+                                    <Button.Flyout>
+                                        <Flyout Placement="Left">
+                                            <ComboBox SelectionChanged="ColorSelectedItemChanged" SelectedIndex="0"
+                                                      AutoScrollToSelectedItem="True">
+                                                <ComboBox.Styles>
+                                                    <Style Selector="ComboBox /template/ ScrollViewer">
+                                                        <Setter Property="VerticalScrollBarVisibility" Value="Hidden" />
+                                                    </Style>
+                                                    <Style Selector="TextBlock">
+                                                        <Setter Property="Foreground"
+                                                                Value="{DynamicResource CgForegroundBrush}" />
+                                                    </Style>
+                                                </ComboBox.Styles>
+                                                <ComboBoxItem Background="{material:PrimaryColorExt Red}">
+                                                    <TextBlock
+                                                        Text="{CompiledBinding MultiLanguageResources.RedText.Data}" />
+                                                </ComboBoxItem>
+                                                <ComboBoxItem Background="{material:PrimaryColorExt Pink}">
+                                                    <TextBlock
+                                                        Text="{CompiledBinding MultiLanguageResources.PinkText.Data}" />
+                                                </ComboBoxItem>
+                                                <ComboBoxItem Background="{material:PrimaryColorExt Purple}">
+                                                    <TextBlock
+                                                        Text="{CompiledBinding MultiLanguageResources.PurpleText.Data}" />
+                                                </ComboBoxItem>
+                                                <ComboBoxItem Background="{material:PrimaryColorExt DeepPurple}">
+                                                    <TextBlock
+                                                        Text="{CompiledBinding MultiLanguageResources.DeepPurpleText.Data}" />
+                                                </ComboBoxItem>
+                                                <ComboBoxItem Background="{material:PrimaryColorExt Indigo}">
+                                                    <TextBlock
+                                                        Text="{CompiledBinding MultiLanguageResources.IndigoText.Data}" />
+                                                </ComboBoxItem>
+                                                <ComboBoxItem Background="{material:PrimaryColorExt Blue}">
+                                                    <TextBlock
+                                                        Text="{CompiledBinding MultiLanguageResources.BlueText.Data}" />
+                                                </ComboBoxItem>
+                                                <ComboBoxItem Background="{material:PrimaryColorExt Red}">
+                                                    <TextBlock
+                                                        Text="{CompiledBinding MultiLanguageResources.LightBlueText.Data}" />
+                                                </ComboBoxItem>
+                                                <ComboBoxItem Background="{material:PrimaryColorExt Cyan}">
+                                                    <TextBlock
+                                                        Text="{CompiledBinding MultiLanguageResources.CyanText.Data}" />
+                                                </ComboBoxItem>
+                                                <ComboBoxItem Background="{material:PrimaryColorExt Teal}">
+                                                    <TextBlock
+                                                        Text="{CompiledBinding MultiLanguageResources.TealText.Data}" />
+                                                </ComboBoxItem>
+                                                <ComboBoxItem Background="{material:PrimaryColorExt Green}">
+                                                    <TextBlock
+                                                        Text="{CompiledBinding MultiLanguageResources.GreenText.Data}" />
+                                                </ComboBoxItem>
+                                                <ComboBoxItem Background="{material:PrimaryColorExt LightGreen}">
+                                                    <TextBlock
+                                                        Text="{CompiledBinding MultiLanguageResources.LightGreenText.Data}" />
+                                                </ComboBoxItem>
+                                                <ComboBoxItem Background="{material:PrimaryColorExt Lime}">
+                                                    <TextBlock
+                                                        Text="{CompiledBinding MultiLanguageResources.LimeText.Data}" />
+                                                </ComboBoxItem>
+                                                <ComboBoxItem Background="{material:PrimaryColorExt Yellow}">
+                                                    <TextBlock
+                                                        Text="{CompiledBinding MultiLanguageResources.YellowText.Data}" />
+                                                </ComboBoxItem>
+                                                <ComboBoxItem Background="{material:PrimaryColorExt Amber}">
+                                                    <TextBlock
+                                                        Text="{CompiledBinding MultiLanguageResources.AmberText.Data}" />
+                                                </ComboBoxItem>
+                                                <ComboBoxItem Background="{material:PrimaryColorExt Orange}">
+                                                    <TextBlock
+                                                        Text="{CompiledBinding MultiLanguageResources.OrangeText.Data}" />
+                                                </ComboBoxItem>
+                                                <ComboBoxItem Background="{material:PrimaryColorExt DeepOrange}">
+                                                    <TextBlock
+                                                        Text="{CompiledBinding MultiLanguageResources.DeepOrangeText.Data}" />
+                                                </ComboBoxItem>
+                                                <ComboBoxItem Background="{material:PrimaryColorExt Brown}">
+                                                    <TextBlock
+                                                        Text="{CompiledBinding MultiLanguageResources.BrownText.Data}" />
+                                                </ComboBoxItem>
+                                                <ComboBoxItem Background="{material:PrimaryColorExt Grey}">
+                                                    <TextBlock
+                                                        Text="{CompiledBinding MultiLanguageResources.GreyText.Data}" />
+                                                </ComboBoxItem>
+                                                <ComboBoxItem Background="{material:PrimaryColorExt BlueGrey}">
+                                                    <TextBlock
+                                                        Text="{CompiledBinding MultiLanguageResources.BlueGreyText.Data}" />
+                                                </ComboBoxItem>
+                                            </ComboBox>
+                                        </Flyout>
+                                    </Button.Flyout>
+                                    <ToolTip.Tip>
+                                        <TextBlock Text="{CompiledBinding MultiLanguageResources.ColorText.Data}" />
+                                    </ToolTip.Tip>
+                                    <Path Name="ColorPathIcon" Classes="Icon Fill"
+                                          Data="M3.839 5.858c2.94-3.916 9.03-5.055 13.364-2.36c4.28 2.66 5.854 7.777 4.1 12.577c-1.655 4.533-6.016 6.328-9.159 4.048c-1.177-.854-1.634-1.925-1.854-3.664l-.106-.987l-.045-.398c-.123-.934-.311-1.352-.705-1.572c-.535-.298-.892-.305-1.595-.033l-.351.146l-.179.078c-1.014.44-1.688.595-2.541.416l-.2-.047l-.164-.047c-2.789-.864-3.202-4.647-.565-8.157m.984 6.716l.123.037l.134.03c.439.087.814.015 1.437-.242l.602-.257c1.202-.493 1.985-.54 3.046.05c.917.512 1.275 1.298 1.457 2.66l.053.459l.055.532l.047.422c.172 1.361.485 2.09 1.248 2.644c2.275 1.65 5.534.309 6.87-3.349c1.516-4.152.174-8.514-3.484-10.789c-3.675-2.284-8.899-1.306-11.373 1.987c-2.075 2.763-1.82 5.28-.215 5.816m11.225-1.994a1.25 1.25 0 1 1 2.414-.647a1.25 1.25 0 0 1-2.414.647m.494 3.488a1.25 1.25 0 1 1 2.415-.647a1.25 1.25 0 0 1-2.415.647M14.07 7.577a1.25 1.25 0 1 1 2.415-.647a1.25 1.25 0 0 1-2.415.647m-.028 8.998a1.25 1.25 0 1 1 2.414-.647a1.25 1.25 0 0 1-2.414.647m-3.497-9.97a1.25 1.25 0 1 1 2.415-.646a1.25 1.25 0 0 1-2.415.646" />
                                 </Button>
                                 <Button Click="Setting_Clicked">
                                     <ToolTip.Tip>

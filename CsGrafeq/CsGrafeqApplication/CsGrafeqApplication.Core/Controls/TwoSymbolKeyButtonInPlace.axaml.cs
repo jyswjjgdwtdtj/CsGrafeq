@@ -30,7 +30,6 @@ public partial class TwoSymbolKeyButtonInPlace : ToggleButton
 
     public TwoSymbolKeyButtonInPlace()
     {
-        
         InitializeComponent();
         PropertyChanged += OnPropertyChanged;
         IsChecked = true;

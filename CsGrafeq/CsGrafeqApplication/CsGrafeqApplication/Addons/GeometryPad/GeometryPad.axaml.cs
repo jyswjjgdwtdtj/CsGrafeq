@@ -24,14 +24,15 @@ using CSharpMath.Avalonia;
 using DialogHostAvalonia;
 using SkiaSharp;
 using static CsGrafeq.Shapes.GeometryMath;
-using static CsGrafeqApplication.AvaloniaMath;
-using static CsGrafeqApplication.Controls.SkiaEx;
+using static CsGrafeqApplication.Core.Utils.PointRectHelper;
+using static CsGrafeqApplication.SkiaHelper;
 using AvaPoint = Avalonia.Point;
 using AvaRect = Avalonia.Rect;
 using AvaSize = Avalonia.Size;
 using GeoHalf = CsGrafeq.Shapes.Half;
 using static CsGrafeqApplication.Extension;
 using static CsGrafeqApplication.GlobalSetting;
+using static CsGrafeqApplication.Core.Utils.StaticSkiaResources;
 
 namespace CsGrafeqApplication.Addons.GeometryPad;
 
@@ -558,9 +559,9 @@ public partial class GeometryPad : Addon
         var disp = (Owner as DisplayControl)!;
         if (CurrentAction.Name.English == "Select")
         {
-            var rect = RegulateRectangle(new AvaRect(PointerPressedPosition,
+            var rect = new AvaRect(PointerPressedPosition,
                 new AvaSize(PointerReleasedPosition.X - PointerPressedPosition.X,
-                    PointerReleasedPosition.Y - PointerPressedPosition.Y)));
+                    PointerReleasedPosition.Y - PointerPressedPosition.Y)).RegulateRectangle();
             var mathrect = new CgRectangle(Owner.PixelToMath(new AvaPoint(rect.Left, rect.Top + rect.Height)),
                 new Vec(rect.Width, rect.Height) / disp.UnitLength);
             foreach (var s in Shapes.GetShapes<GeometryShape>())
@@ -705,9 +706,9 @@ public partial class GeometryPad : Addon
         RenderShapes(dc, rect, Shapes.GetShapes<GeometryShape>());
         if (CurrentAction.Name.English == "Select" && LastPointerProperties.IsLeftButtonPressed)
         {
-            var selrect = RegulateRectangle(new AvaRect(PointerPressedPosition,
+            var selrect = new AvaRect(PointerPressedPosition,
                 new AvaSize(PointerMovedPosition.X - PointerPressedPosition.X,
-                    PointerMovedPosition.Y - PointerPressedPosition.Y)));
+                    PointerMovedPosition.Y - PointerPressedPosition.Y)).RegulateRectangle();
             dc.DrawRect(selrect.ToSKRect(), StrokeMid);
         }
 

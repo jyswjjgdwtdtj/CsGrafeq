@@ -13,6 +13,7 @@ public class App : Application
     {
         Languages.SetLanguage("zh-hans");
         AvaloniaXamlLoader.Load(this);
+        var _ = SkiaHelper.FilledMid;
     }
 
     public override void OnFrameworkInitializationCompleted()

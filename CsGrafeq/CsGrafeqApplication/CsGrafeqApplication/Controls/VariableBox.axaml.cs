@@ -24,7 +24,7 @@ public partial class VariableBox : UserControl
 
     public static readonly DirectProperty<VariableBox, bool> ShowOnAxisProperty =
         AvaloniaProperty.RegisterDirect<VariableBox, bool>(
-            nameof(ShowOnAxis), o => o.ShowOnAxis, (o, v) => o.ShowOnAxis = v, false);
+            nameof(ShowOnAxis), o => o.ShowOnAxis, (o, v) => o.ShowOnAxis = v);
 
     public static readonly StyledProperty<double> MaxProperty = AvaloniaProperty.Register<VariableBox, double>(
         nameof(Max), defaultBindingMode: BindingMode.TwoWay, defaultValue: 10);

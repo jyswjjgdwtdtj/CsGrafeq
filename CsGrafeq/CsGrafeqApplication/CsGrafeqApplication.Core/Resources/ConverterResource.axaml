@@ -8,4 +8,5 @@
     <valueConverter:BoolToDouble x:Key="BoolToDouble" />
     <valueConverter:IIfConverter x:Key="IIf" />
     <valueConverter:AddConverter x:Key="Add" />
+    <valueConverter:SolidColorBrushToColorConverter x:Key="SolidColorBrushToColor" />
 </ResourceDictionary>

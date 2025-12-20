@@ -51,7 +51,7 @@
         <PackageReference Include="CSharpMath.SkiaSharp"/>
         <PackageReference Include="HarfBuzzSharp"/>
         <PackageReference Include="LiveMarkdown.Avalonia"/>
-        <PackageReference Include="Material.Avalonia" />
+        <PackageReference Include="Material.Avalonia"/>
         <PackageReference Include="SkiaSharp"/>
         <PackageReference Include="Sylinko.CSharpMath.Avalonia"/>
     </ItemGroup>
@@ -66,7 +66,13 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Inherits\" />
+        <Folder Include="Inherits\"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <AvaloniaResource Include="Fonts\MapleMono-CN-Regular.ttf">
+            <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+        </AvaloniaResource>
     </ItemGroup>
 
 </Project>

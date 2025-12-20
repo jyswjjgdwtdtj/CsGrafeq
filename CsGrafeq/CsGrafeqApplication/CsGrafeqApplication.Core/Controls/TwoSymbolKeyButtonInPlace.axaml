@@ -1,10 +1,11 @@
 ﻿<ToggleButton xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:controls="clr-namespace:CsGrafeqApplication.Core.Controls"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450" ClipToBounds="False" FontFamily="{StaticResource MaplyMono}"
-             x:Class="CsGrafeqApplication.Core.Controls.TwoSymbolKeyButtonInPlace" x:Name="UC">
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+              xmlns:controls="clr-namespace:CsGrafeqApplication.Core.Controls"
+              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450" ClipToBounds="False"
+              FontFamily="{StaticResource MaplyMono}"
+              x:Class="CsGrafeqApplication.Core.Controls.TwoSymbolKeyButtonInPlace" x:Name="UC">
     <Design.PreviewWith>
         <Border Width="60" Height="60">
             <controls:TwoSymbolKeyButtonInPlace Width="48" Height="48" FirstButton="G" SecondButton="Q"
@@ -35,12 +36,13 @@
             </Style>
         </Styles>
     </ToggleButton.Styles>
-    <RepeatButton Name="PART_Button"  Background="{DynamicResource CgBackgroundBrush}" CornerRadius="4" Focusable="False" BorderBrush="{DynamicResource CgForegroundBrush}">
+    <RepeatButton Name="PART_Button" Background="{DynamicResource CgBackgroundBrush}" CornerRadius="4"
+                  Focusable="False" BorderBrush="{DynamicResource CgForegroundBrush}">
         <Panel Width="{CompiledBinding #PART_Button.Width}" Height="{CompiledBinding #PART_Button.Height}">
             <TextBlock
-                       Text="{CompiledBinding #UC.FirstButton}" IsVisible="{CompiledBinding #UC.IsChecked}"
-                       Foreground="{DynamicResource CgForegroundBrush}" VerticalAlignment="Center"
-                       HorizontalAlignment="Center" FontSize="30" />
+                Text="{CompiledBinding #UC.FirstButton}" IsVisible="{CompiledBinding #UC.IsChecked}"
+                Foreground="{DynamicResource CgForegroundBrush}" VerticalAlignment="Center"
+                HorizontalAlignment="Center" FontSize="30" />
             <TextBlock Text="{CompiledBinding #UC.SecondButton}" IsVisible="{CompiledBinding !#UC.IsChecked}"
                        Foreground="{DynamicResource CgForegroundBrush}" VerticalAlignment="Center"
                        HorizontalAlignment="Center" FontSize="30" />

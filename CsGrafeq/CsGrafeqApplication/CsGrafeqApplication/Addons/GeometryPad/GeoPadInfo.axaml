@@ -18,10 +18,12 @@
                                     <DockPanel LastChildFill="True">
                                         <Border Width="40" Height="40" DockPanel.Dock="Left">
                                             <Rectangle VerticalAlignment="Center"
-                                                       Fill="{CompiledBinding Color,Converter={StaticResource UIntColorToBrush},ConverterParameter='255',Mode=OneWay}"
-                                                       Stroke="Black" Width="15" Height="15" StrokeThickness="1" />
+                                                       Fill="{CompiledBinding Color,Converter={StaticResource UIntColorToBrush},ConverterParameter=255}"
+                                                       Stroke="{DynamicResource CgForegroundBrush}" Width="15"
+                                                       Height="15" StrokeThickness="1" />
                                         </Border>
-                                        <corecontrols:MathBox MathList="{CompiledBinding MathList}" CanInput="False" />
+                                        <corecontrols:MathBox MathList="{CompiledBinding MathList}" CanInput="False"
+                                                              Foreground="{DynamicResource CgForegroundBrush}" />
                                     </DockPanel>
                                 </Border>
                             </Border>

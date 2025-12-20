@@ -4,7 +4,6 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:views="clr-namespace:CsGrafeqApplication.Views"
         xmlns:vm="clr-namespace:CsGrafeqApplication.ViewModels"
-        xmlns:svg="clr-namespace:Avalonia.Svg;assembly=Svg.Controls.Avalonia"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="CsGrafeqApplication.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -14,24 +13,15 @@
         ExtendClientAreaChromeHints="NoChrome"
         TransparencyLevelHint="Transparent" Background="{DynamicResource CgBackgroundBrush}">
     <Window.Styles>
-        <StyleInclude Source="avares://CsGrafeqApplication.Core/Styles/PathStyles.axaml"></StyleInclude>
-        <Style Selector="Path">
-            <Setter Property="Stretch" Value="Uniform"></Setter>
-            <Setter Property="Height" Value="13"></Setter>
-            <Setter Property="Width" Value="13"></Setter>
-            <Setter Property="VerticalAlignment" Value="Center"></Setter>
+        <StyleInclude Source="avares://CsGrafeqApplication.Core/Styles/PathStyles.axaml" />
+        <Style Selector="Path.BarIcon">
+            <Setter Property="Stretch" Value="Uniform" />
+            <Setter Property="Height" Value="13" />
+            <Setter Property="Width" Value="13" />
+            <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
     </Window.Styles>
     <DockPanel LastChildFill="True">
-        <DockPanel.Resources>
-            <ResourceDictionary>
-                <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%" x:Key="MedianLinearGradientBrush">
-                    <GradientStop Color="{DynamicResource MaterialPrimaryMidColor}" Offset="0.0" />
-                    <GradientStop Color="{DynamicResource MaterialPrimaryMidColor}" Offset="0.2" />
-                    <GradientStop Color="{DynamicResource CgTransparentColor}" Offset="1.0" />
-                </LinearGradientBrush>
-            </ResourceDictionary>
-        </DockPanel.Resources>
         <Border DockPanel.Dock="Top" Height="30">
             <Canvas Name="Canvas">
                 <DockPanel LastChildFill="True" Canvas.Left="{CompiledBinding OffSet}"
@@ -49,8 +39,27 @@
                             <CompiledBinding Path="LengthContract" />
                         </MultiBinding>
                     </DockPanel.Height>
-                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left"
-                                Background="{StaticResource MedianLinearGradientBrush}">
+                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                        <!--会诡异的延迟一个颜色
+                        <StackPanel.Background>
+                            <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                                <GradientStop Offset="0.0" >
+                                    <GradientStop.Color>
+                                        <MultiBinding Converter="{StaticResource SolidColorBrushToColor}" >
+                                            <DynamicResource ResourceKey="MaterialPrimaryMidBrush"></DynamicResource>
+                                        </MultiBinding>
+                                    </GradientStop.Color>
+                                </GradientStop>
+                                <GradientStop Offset="0.2" >
+                                    <GradientStop.Color>
+                                        <MultiBinding Converter="{StaticResource SolidColorBrushToColor}">
+                                            <DynamicResource ResourceKey="MaterialPrimaryMidBrush"></DynamicResource>
+                                        </MultiBinding>
+                                    </GradientStop.Color>
+                                </GradientStop>
+                                <GradientStop Color="{DynamicResource CgTransparentColor}" Offset="1.0" />
+                            </LinearGradientBrush>
+                        </StackPanel.Background>-->
                         <Image Width="16" Height="16" Source="avares://CsGrafeqApplication/Assets/favicon.ico"
                                VerticalAlignment="Center" Margin="8,5,5,5" />
                         <TextBlock VerticalAlignment="Center" FontFamily="{StaticResource MapleMono}"
@@ -61,7 +70,8 @@
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
                         <Button Padding="0" Width="45" CornerRadius="0"
                                 Background="{DynamicResource CgTranslucentBackgroundBrush}" Click="MinimizeClicked">
-                            <Path Height="4" Classes="Icon Fill" Name="MinimizeWindow" Data="M7 13q-.425 0-.712-.288T6 12t.288-.712T7 11h10q.425 0 .713.288T18 12t-.288.713T17 13z"/>
+                            <Path Height="4" Stretch="Uniform" Classes="Icon Fill BarIcon" Name="MinimizeWindow"
+                                  Data="M7 13q-.425 0-.712-.288T6 12t.288-.712T7 11h10q.425 0 .713.288T18 12t-.288.713T17 13z" />
                         </Button>
                         <ToggleButton Padding="0" Width="45" CornerRadius="0"
                                       Background="{DynamicResource CgTranslucentBackgroundBrush}"
@@ -69,23 +79,18 @@
                             <ToggleButton.Styles>
                                 <Style Selector="ToggleButton:checked">
                                     <Setter Property="ContentTemplate">
-                                        <DataTemplate>
-                                            <Path Classes="Icon Fill" Name="OpenFullScreen" Data="M4 21q-.425 0-.712-.288T3 20v-6q0-.425.288-.712T4 13t.713.288T5 14v3.6L17.6 5H14q-.425 0-.712-.288T13 4t.288-.712T14 3h6q.425 0 .713.288T21 4v6q0 .425-.288.713T20 11t-.712-.288T19 10V6.4L6.4 19H10q.425 0 .713.288T11 20t-.288.713T10 21z"/>
-                                        </DataTemplate>
                                     </Setter>
                                 </Style>
                                 <Style Selector="ToggleButton:unchecked">
                                     <Setter Property="ContentTemplate">
-                                        <DataTemplate>
-                                            <Path Classes="Icon Fill" Name="CloseFullScreen" Data="m10 15.4l-5.9 5.9q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7L8.6 14H5q-.425 0-.712-.288T4 13t.288-.712T5 12h6q.425 0 .713.288T12 13v6q0 .425-.288.713T11 20t-.712-.288T10 19zm5.4-5.4H19q.425 0 .713.288T20 11t-.288.713T19 12h-6q-.425 0-.712-.288T12 11V5q0-.425.288-.712T13 4t.713.288T14 5v3.6l5.9-5.9q.275-.275.7-.275t.7.275t.275.7t-.275.7z"/>
-                                        </DataTemplate>
                                     </Setter>
                                 </Style>
                             </ToggleButton.Styles>
                         </ToggleButton>
                         <Button Padding="0" Width="45" CornerRadius="0"
                                 Background="{DynamicResource CgTranslucentBackgroundBrush}" Click="CloseWindowClicked">
-                            <Path Classes="Icon Fill" Name="CloseWindow" Data="m12 13.4l-4.9 4.9q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7l4.9-4.9l-4.9-4.9q-.275-.275-.275-.7t.275-.7t.7-.275t.7.275l4.9 4.9l4.9-4.9q.275-.275.7-.275t.7.275t.275.7t-.275.7L13.4 12l4.9 4.9q.275.275.275.7t-.275.7t-.7.275t-.7-.275z"></Path>
+                            <Path Classes="Icon Fill BarIcon" Name="CloseWindow"
+                                  Data="m12 13.4l-4.9 4.9q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7l4.9-4.9l-4.9-4.9q-.275-.275-.275-.7t.275-.7t.7-.275t.7.275l4.9 4.9l4.9-4.9q.275-.275.7-.275t.7.275t.275.7t-.275.7L13.4 12l4.9 4.9q.275.275.275.7t-.275.7t-.7.275t-.7-.275z" />
                         </Button>
                     </StackPanel>
                     <Border IsHitTestVisible="False" />

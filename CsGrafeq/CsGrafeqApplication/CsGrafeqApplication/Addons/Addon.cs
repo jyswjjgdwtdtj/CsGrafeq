@@ -35,63 +35,63 @@ public abstract class Addon : UserControl
 
     public Control? Setting { get; init; }
 
-    internal void CallAddonRender(SKCanvas dc, SKRect rect)
+    internal void CallRender(SKCanvas dc, SKRect rect)
     {
         if (IsAddonLoaded.Value)
             foreach (var layer in Layers)
                 layer.Render(dc, rect);
     }
 
-    internal bool CallAddonKeyDown(KeyEventArgs e)
+    internal bool CallKeyDown(KeyEventArgs e)
     {
         if (!IsAddonLoaded.Value || !IsAddonEnabled || Owner == null)
             return DoNext;
         return AddonKeyDown(e);
     }
 
-    internal bool CallAddonKeyUp(KeyEventArgs e)
+    internal bool CallKeyUp(KeyEventArgs e)
     {
         if (!IsAddonLoaded.Value || !IsAddonEnabled || Owner == null)
             return DoNext;
         return AddonKeyUp(e);
     }
 
-    internal bool CallAddonPointerMoved(AddonPointerEventArgs e)
+    internal bool CallPointerMoved(AddonPointerEventArgs e)
     {
         if (!IsAddonLoaded.Value || !IsAddonEnabled || Owner == null)
             return DoNext;
         return AddonPointerMoved(e);
     }
 
-    internal bool CallAddonPointerPressed(AddonPointerEventArgs e)
+    internal bool CallPointerPressed(AddonPointerEventArgs e)
     {
         if (!IsAddonLoaded.Value || !IsAddonEnabled || Owner == null)
             return DoNext;
         return AddonPointerPressed(e);
     }
 
-    internal bool CallAddonPointerReleased(AddonPointerEventArgs e)
+    internal bool CallPointerReleased(AddonPointerEventArgs e)
     {
         if (!IsAddonLoaded.Value || !IsAddonEnabled || Owner == null)
             return DoNext;
         return AddonPointerReleased(e);
     }
 
-    internal bool CallAddonPointerWheeled(AddonPointerWheelEventArgs e)
+    internal bool CallPointerWheeled(AddonPointerWheelEventArgs e)
     {
         if (!IsAddonLoaded.Value || !IsAddonEnabled || Owner == null)
             return DoNext;
         return AddonPointerWheeled(e);
     }
 
-    internal bool CallAddonPointerTapped(AddonPointerEventArgsBase e)
+    internal bool CallPointerTapped(AddonPointerEventArgsBase e)
     {
         if (!IsAddonLoaded.Value || !IsAddonEnabled || Owner == null)
             return DoNext;
         return AddonPointerTapped(e);
     }
 
-    internal bool CallAddonPointerDoubleTapped(AddonPointerEventArgsBase e)
+    internal bool CallPointerDoubleTapped(AddonPointerEventArgsBase e)
     {
         if (!IsAddonLoaded.Value || !IsAddonEnabled || Owner == null)
             return DoNext;

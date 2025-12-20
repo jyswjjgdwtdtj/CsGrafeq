@@ -45,7 +45,6 @@
         <None Remove="Assets\folder.svg"/>
         <AvaloniaResource Include="Assets\folder.svg"/>
         <None Remove="Assets\keyboard.svg"/>
-        <AvaloniaResource Include="Assets\keyboard.svg"/>
         <None Remove="Assets\language.svg"/>
         <None Remove="Assets\linedown.svg"/>
         <None Remove="Assets\setting.svg"/>
@@ -57,14 +56,9 @@
         <None Remove="Assets\trash.svg"/>
         <None Remove="Assets\selectall.svg"/>
         <None Remove="Assets\deselectall.svg"/>
-        <AvaloniaResource Include="Fonts\MapleMono-CN-Regular.ttf">
-            <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-        </AvaloniaResource>
         <None Remove="Assets\add.svg"/>
-        <AvaloniaResource Include="Assets\add.svg"/>
         <None Remove="Assets\theme.svg"/>
         <None Remove="Assets\save.svg"/>
-        <AvaloniaResource Include="Assets\save.svg"/>
         <None Remove="Assets\close.svg"/>
         <None Remove="Assets\closefullscreen.svg"/>
         <None Remove="Assets\openfullscreen.svg"/>
@@ -139,8 +133,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Fluent\"/>
-        <Folder Include="Keyboard\"/>
-        <Folder Include="Styles\" />
+        <Folder Include="Fonts\"/>
     </ItemGroup>
 </Project>

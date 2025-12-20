@@ -4,15 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="clr-namespace:CsGrafeqApplication.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="CsGrafeqApplication.Controls.VariableBox" Name="UserControl">
-    <UserControl.Styles>
-
-        <Style Selector="controls|VariableBox">
-            <Setter Property="Margin" Value="5" />
-            <Setter Property="ClipToBounds" Value="False" />
-        </Style>
-    </UserControl.Styles>
-    <controls:ToggleBox IsChecked="{CompiledBinding #UserControl.ShowOnAxis}" Color="{StaticResource MedianUint}">
+             x:Class="CsGrafeqApplication.Controls.VariableBox" Name="UserControl" Margin="5" ClipToBounds="False">
+    <controls:ToggleBox IsChecked="{CompiledBinding #UserControl.ShowOnAxis}">
         <StackPanel Orientation="Vertical" Spacing="5" ClipToBounds="False" Margin="10" Tapped="EventHandleTrue">
             <StackPanel Orientation="Horizontal" ClipToBounds="False">
                 <TextBlock Text="{CompiledBinding #UserControl.VariableName}" VerticalAlignment="Center" />

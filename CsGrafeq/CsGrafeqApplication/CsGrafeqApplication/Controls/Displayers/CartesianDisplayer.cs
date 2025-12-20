@@ -8,7 +8,9 @@ using Avalonia.Input;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using SkiaSharp;
-using static CsGrafeqApplication.Controls.SkiaEx;
+using static CsGrafeqApplication.Core.Utils.StaticSkiaResources;
+using static CsGrafeqApplication.Core.Utils.PointRectHelper;
+
 
 namespace CsGrafeqApplication.Controls.Displayers;
 

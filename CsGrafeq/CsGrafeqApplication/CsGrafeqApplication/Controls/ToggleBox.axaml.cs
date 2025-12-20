@@ -20,9 +20,6 @@ public class ToggleBox : TemplatedControl
         AvaloniaProperty.RegisterDirect<ToggleBox, Control?>(nameof(Content), o => o.Content,
             (o, v) => o.Content = v);
 
-    public static readonly StyledProperty<uint> ColorProperty =
-        AvaloniaProperty.Register<ToggleBox, uint>(nameof(Color));
-
     public static readonly StyledProperty<Flyout?> FlyoutProperty =
         AvaloniaProperty.Register<ToggleBox, Flyout?>(nameof(Flyout));
 
@@ -45,19 +42,13 @@ public class ToggleBox : TemplatedControl
             if (e.Property == IsPointerOverProperty) IsOver = IsPointerOver;
             if (e.Property == IsOverProperty) PseudoClasses.Set(":over", IsOver);
         };
-        Color = 0x050505;
+        CornerRadius = new CornerRadius(5);
     }
 
     public Flyout? Flyout
     {
         get => GetValue(FlyoutProperty);
         set => SetValue(FlyoutProperty, value);
-    }
-
-    public uint Color
-    {
-        get => GetValue(ColorProperty);
-        set => SetValue(ColorProperty, value);
     }
 
     public bool IsChecked

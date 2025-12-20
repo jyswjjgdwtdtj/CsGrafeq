@@ -74,7 +74,7 @@ public partial class TwoSymbolKeyButton : ToggleButton
     {
         if (e.Property == IsCheckedProperty) CurrentButton = IsChecked ?? false ? FirstButton : SecondButton;
     }
-    
+
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
     }
