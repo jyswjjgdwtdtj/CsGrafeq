@@ -51,6 +51,7 @@
         <PackageReference Include="CSharpMath.SkiaSharp"/>
         <PackageReference Include="HarfBuzzSharp"/>
         <PackageReference Include="LiveMarkdown.Avalonia"/>
+        <PackageReference Include="Material.Avalonia" />
         <PackageReference Include="SkiaSharp"/>
         <PackageReference Include="Sylinko.CSharpMath.Avalonia"/>
     </ItemGroup>
@@ -62,6 +63,10 @@
     <ItemGroup>
         <AdditionalFiles Include="Resources\ButtonTypeRadioButton.axaml"/>
         <AdditionalFiles Include="Resources\ConverterResource.axaml"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Inherits\" />
     </ItemGroup>
 
 </Project>

@@ -1,5 +1,5 @@
 namespace CsGrafeq.I18N;
-
+/*
 public class MultiLanguageResources
 {
     public MultiLanguageResources()
@@ -70,4 +70,4 @@ public class MultiLanguageResources
     public MultiLanguageData OnText { get; } = new() { English = "On", Chinese = "位于" };
 
     public IReadOnlyDictionary<string, MultiLanguageData> All { get; init; }
-}
+}*/

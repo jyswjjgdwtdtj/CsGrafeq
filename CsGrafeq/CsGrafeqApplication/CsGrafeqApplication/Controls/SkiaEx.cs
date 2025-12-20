@@ -2,6 +2,8 @@
 using Avalonia;
 using Avalonia.Media;
 using Avalonia.Platform;
+using Avalonia.Skia;
+using Material.Styles.Themes;
 using SkiaSharp;
 
 namespace CsGrafeqApplication.Controls;
@@ -9,29 +11,33 @@ namespace CsGrafeqApplication.Controls;
 public static class SkiaEx
 {
     public static SKColor Light;
-    public static SKColor Median;
-    public static SKPaint FilledBlack = new() { IsAntialias = true, Color = SKColors.Black };
-    public static SKPaint FilledRed = new() { IsAntialias = true, Color = SKColors.Red };
-    public static SKPaint StrokeBlack = new() { IsAntialias = true, Color = SKColors.Black, IsStroke = true };
-    public static SKPaint StrokeRed = new() { IsAntialias = true, Color = SKColors.Red, IsStroke = true };
-    public static SKPaint FilledBlue = new() { IsAntialias = true, Color = SKColors.Blue };
-    public static SKPaint FilledWhite = new() { IsAntialias = true, Color = SKColors.White };
+    public static SKColor Mid;
+    public static SKPaint FilledBlack { get; } = new() { IsAntialias = true, Color = SKColors.Black };
+    public static SKPaint FilledRed { get; }= new() { IsAntialias = true, Color = SKColors.Red };
+    public static SKPaint StrokeBlack{ get; } = new() { IsAntialias = true, Color = SKColors.Black, IsStroke = true };
+    public static SKPaint StrokeRed{ get; } = new() { IsAntialias = true, Color = SKColors.Red, IsStroke = true };
+    public static SKPaint FilledBlue{ get; } = new() { IsAntialias = true, Color = SKColors.Blue };
+    public static SKPaint FilledWhite{ get; } = new() { IsAntialias = true, Color = SKColors.White };
 
-    public static SKPaint FilledTranparentGrey =
+    public static SKPaint FilledTranparentGrey{ get; } =
         new() { IsAntialias = true, Color = new SKColor(0x80, 0x80, 0x80, 70) };
 
-    public static SKFont MapleMono;
-    public static SKPaint ShadowFilledBlack = new() { IsAntialias = true, Color = SKColors.Black };
-    public static SKPaint ShadowStrokeBlack = new() { IsAntialias = true, Color = SKColors.Black };
-    public static SKPaint FilledMedian = new() { IsAntialias = true };
-    public static SKPaint ShadowFilledMedian = new() { IsAntialias = true };
-    public static SKPaint StrokeMedian = new() { IsAntialias = true, IsStroke = true };
-    public static SKPaint ShadowStrokeMedian = new() { IsAntialias = true, IsStroke = true };
-    public static SKPaint FilledTpMedian = new() { IsAntialias = true };
-    public static SKPaint AntiAlias = new() { IsAntialias = true };
+    public static SKFont MapleMono{ get; }
+    public static SKPaint ShadowFilledBlack{ get; } = new() { IsAntialias = true, Color = SKColors.Black };
+    public static SKPaint ShadowStrokeBlack{ get; } = new() { IsAntialias = true, Color = SKColors.Black };
+    public static SKPaint FilledMid{ get; } = new() { IsAntialias = true };
+    public static SKPaint ShadowFilledMid{ get; } = new() { IsAntialias = true };
+    public static SKPaint StrokeMid{ get; } = new() { IsAntialias = true, IsStroke = true };
+    public static SKPaint ShadowStrokeMid{ get; } = new() { IsAntialias = true, IsStroke = true };
+    public static SKPaint FilledTpMid{ get; } = new() { IsAntialias = true };
+    public static SKPaint AntiAlias{ get; } = new() { IsAntialias = true };
 
     static SkiaEx()
     {
+        Static.Theme.CurrentThemeChanged.Subscribe((t) =>
+        {
+            Refresh();
+        });
         ShadowFilledBlack.ImageFilter = SKImageFilter.CreateDropShadow(
             0,
             0,
@@ -55,44 +61,41 @@ public static class SkiaEx
 
     public static void Refresh()
     {
-        object? temp;
-        App.Current.Resources.TryGetResource("Median", null, out temp);
-        Median = new SKColor(((Color)temp).ToUInt32());
-
-
-        FilledMedian.Color = Median;
-        FilledMedian.ImageFilter = SKImageFilter.CreateDropShadow(
+        Light = Static.Theme.CurrentTheme.PrimaryLight.ForegroundColor.ToSKColor();
+        Mid = Static.Theme.CurrentTheme.PrimaryMid.ForegroundColor.ToSKColor();
+        FilledMid.Color = Mid;
+        FilledMid.ImageFilter = SKImageFilter.CreateDropShadow(
             0,
             0,
             2,
             2,
             Light
         );
-        StrokeMedian.Color = Median;
-        StrokeMedian.ImageFilter = SKImageFilter.CreateDropShadow(
+        StrokeMid.Color = Mid;
+        StrokeMid.ImageFilter = SKImageFilter.CreateDropShadow(
             0,
             0,
             2,
             2,
             Light
         );
-        ShadowFilledMedian.Color = Median;
-        ShadowFilledMedian.ImageFilter = SKImageFilter.CreateDropShadow(
+        ShadowFilledMid.Color = Mid;
+        ShadowFilledMid.ImageFilter = SKImageFilter.CreateDropShadow(
             0,
             0,
             2,
             2,
             Light
         );
-        ShadowStrokeMedian.Color = Median;
-        ShadowStrokeMedian.ImageFilter = SKImageFilter.CreateDropShadow(
+        ShadowStrokeMid.Color = Mid;
+        ShadowStrokeMid.ImageFilter = SKImageFilter.CreateDropShadow(
             0,
             0,
             2,
             2,
             Light
         );
-        FilledTpMedian.Color = Median.WithAlpha(90);
+        FilledTpMid.Color = Mid.WithAlpha(90);
     }
 
     public static void DrawBubble(this SKCanvas dc, string s, SKPoint point, SKPaint back, SKPaint fore)

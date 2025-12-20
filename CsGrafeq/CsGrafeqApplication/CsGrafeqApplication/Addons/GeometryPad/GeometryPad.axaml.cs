@@ -708,7 +708,7 @@ public partial class GeometryPad : Addon
             var selrect = RegulateRectangle(new AvaRect(PointerPressedPosition,
                 new AvaSize(PointerMovedPosition.X - PointerPressedPosition.X,
                     PointerMovedPosition.Y - PointerPressedPosition.Y)));
-            dc.DrawRect(selrect.ToSKRect(), StrokeMedian);
+            dc.DrawRect(selrect.ToSKRect(), StrokeMid);
         }
 
         dc.Restore();
@@ -852,7 +852,7 @@ public partial class GeometryPad : Addon
                         break;
                     case GeoCircle circle:
                     {
-                        var cs = circle.InnerCircle;
+                        var cs = circle.Current;
                         var pf = MathToPixelSK(cs.Center);
                         var s = new SKSize((float)(cs.Radius * UnitLength), (float)(cs.Radius * UnitLength));
                         if (circle.Selected)
@@ -862,7 +862,7 @@ public partial class GeometryPad : Addon
 
                         var r2 = cs.Radius * Sqrt(2) / 2;
                         dc.DrawBubble($"{MultiLanguageResources.Instance.CircleText}:{circle.Name}",
-                            MathToPixelSK(circle.InnerCircle.Center + new Vec(-r2, r2)), BubbleBack, PaintMain);
+                            MathToPixelSK(circle.Current.Center + new Vec(-r2, r2)), BubbleBack, PaintMain);
                     }
                         break;
                     case Angle ang:
@@ -910,8 +910,8 @@ public partial class GeometryPad : Addon
                     loc.OffSetBy(2, 2 + 20 * index++), BubbleBack, PaintMain);
                 if (p == MovingPoint)
                 {
-                    dc.DrawOval(loc, new SKSize(4, 4), FilledMedian);
-                    dc.DrawOval(loc, new SKSize(7, 7), StrokeMedian);
+                    dc.DrawOval(loc, new SKSize(4, 4), FilledMid);
+                    dc.DrawOval(loc, new SKSize(7, 7), StrokeMid);
                     dc.DrawBubble(
                         $"({Round(MovingPoint.Location.X, 8)},{Round(MovingPoint.Location.Y, 8)}) {(MovingPoint.PointGetter is PointGetter_Movable && MovingPoint.IsUserEnabled ? "" : MultiLanguageResources.Instance.CantBeMovedText)}",
                         loc.OffSetBy(2, 2 + 20 * index++), BubbleBack, PaintMain);
@@ -1071,7 +1071,7 @@ public partial class GeometryPad : Addon
         if (s1 is Circle c2 && s2 is GeoLine l2)
         {
             Vec v1, v2;
-            (v1, v2) = IntersectionMath.FromLineAndCircle(l2.Current, c2.InnerCircle);
+            (v1, v2) = IntersectionMath.FromLineAndCircle(l2.Current, c2.Current);
             return new PointGetter_FromLineAndCircle(l2, c2,
                 (MathToPixel(v1) - Location).GetLength() < (MathToPixel(v2) - Location).GetLength());
         }
@@ -1079,7 +1079,7 @@ public partial class GeometryPad : Addon
         if (s1 is Circle c3 && s2 is Circle c4)
         {
             Vec v1, v2;
-            (v1, v2) = IntersectionMath.FromTwoCircle(c3.InnerCircle, c4.InnerCircle);
+            (v1, v2) = IntersectionMath.FromTwoCircle(c3.Current, c4.Current);
             return new PointGetter_FromTwoCircle((Circle)s1, (Circle)s2,
                 (MathToPixel(v1) - Location).GetLength() < (MathToPixel(v2) - Location).GetLength());
         }

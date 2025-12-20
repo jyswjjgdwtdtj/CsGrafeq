@@ -37,12 +37,7 @@
         <AvaloniaResource Include="Assets\avalonia-logo.ico"/>
         <AvaloniaResource Include="Assets\calc.svg"/>
         <AvaloniaResource Include="Assets\camera.svg"/>
-        <AvaloniaResource Include="Assets\delete.svg"/>
         <AvaloniaResource Include="Assets\favicon.ico"/>
-        <AvaloniaResource Include="Assets\Github.svg"/>
-        <AvaloniaResource Include="Assets\input.svg"/>
-        <AvaloniaResource Include="Assets\shape.svg"/>
-        <AvaloniaResource Include="Assets\slider.svg"/>
         <None Remove="Assets\csharp.svg"/>
         <AvaloniaResource Include="Assets\csharp.svg"/>
         <None Remove="Assets\error.svg"/>
@@ -52,44 +47,28 @@
         <None Remove="Assets\keyboard.svg"/>
         <AvaloniaResource Include="Assets\keyboard.svg"/>
         <None Remove="Assets\language.svg"/>
-        <AvaloniaResource Include="Assets\language.svg"/>
         <None Remove="Assets\linedown.svg"/>
-        <AvaloniaResource Include="Assets\linedown.svg"/>
         <None Remove="Assets\setting.svg"/>
-        <AvaloniaResource Include="Assets\setting.svg"/>
         <None Remove="Assets\stepback.svg"/>
-        <AvaloniaResource Include="Assets\stepback.svg"/>
         <None Remove="Assets\stepover.svg"/>
-        <AvaloniaResource Include="Assets\stepover.svg"/>
         <None Remove="Assets\lineup.svg"/>
-        <AvaloniaResource Include="Assets\lineup.svg"/>
         <None Remove="Assets\zoomin.svg"/>
-        <AvaloniaResource Include="Assets\zoomin.svg"/>
         <None Remove="Assets\zoomout.svg"/>
-        <AvaloniaResource Include="Assets\zoomout.svg"/>
         <None Remove="Assets\trash.svg"/>
-        <AvaloniaResource Include="Assets\trash.svg"/>
         <None Remove="Assets\selectall.svg"/>
-        <AvaloniaResource Include="Assets\selectall.svg"/>
         <None Remove="Assets\deselectall.svg"/>
-        <AvaloniaResource Include="Assets\deselectall.svg"/>
         <AvaloniaResource Include="Fonts\MapleMono-CN-Regular.ttf">
             <CopyToOutputDirectory>Never</CopyToOutputDirectory>
         </AvaloniaResource>
         <None Remove="Assets\add.svg"/>
         <AvaloniaResource Include="Assets\add.svg"/>
         <None Remove="Assets\theme.svg"/>
-        <AvaloniaResource Include="Assets\theme.svg"/>
         <None Remove="Assets\save.svg"/>
         <AvaloniaResource Include="Assets\save.svg"/>
         <None Remove="Assets\close.svg"/>
-        <AvaloniaResource Include="Assets\close.svg"/>
         <None Remove="Assets\closefullscreen.svg"/>
-        <AvaloniaResource Include="Assets\closefullscreen.svg"/>
         <None Remove="Assets\openfullscreen.svg"/>
-        <AvaloniaResource Include="Assets\openfullscreen.svg"/>
         <None Remove="Assets\minimize.svg"/>
-        <AvaloniaResource Include="Assets\minimize.svg"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -162,5 +141,6 @@
     <ItemGroup>
         <Folder Include="Fluent\"/>
         <Folder Include="Keyboard\"/>
+        <Folder Include="Styles\" />
     </ItemGroup>
 </Project>

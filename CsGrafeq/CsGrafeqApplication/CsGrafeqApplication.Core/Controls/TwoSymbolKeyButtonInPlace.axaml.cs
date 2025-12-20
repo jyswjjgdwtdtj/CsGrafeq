@@ -30,13 +30,14 @@ public partial class TwoSymbolKeyButtonInPlace : ToggleButton
 
     public TwoSymbolKeyButtonInPlace()
     {
+        
+        InitializeComponent();
         PropertyChanged += OnPropertyChanged;
         IsChecked = true;
         CurrentButton = FirstButton;
-        var toplevel = TopLevel.GetTopLevel(this);
         PART_Button.Click += (s, e) =>
         {
-            toplevel?.Input(IsChecked ?? false ? FirstKeyboardInput : SecondKeyboardInput);
+            TopLevel.GetTopLevel(this)?.Input(IsChecked ?? false ? FirstKeyboardInput : SecondKeyboardInput);
         };
     }
 
@@ -73,5 +74,9 @@ public partial class TwoSymbolKeyButtonInPlace : ToggleButton
     private void OnPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
     {
         if (e.Property == IsCheckedProperty) CurrentButton = IsChecked ?? false ? FirstButton : SecondButton;
+    }
+
+    protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
+    {
     }
 }

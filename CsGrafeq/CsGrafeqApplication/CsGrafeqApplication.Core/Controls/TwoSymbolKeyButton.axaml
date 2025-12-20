@@ -1,27 +1,29 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+﻿<ToggleButton xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="clr-namespace:CsGrafeqApplication.Core.Controls"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="50" d:DesignHeight="50" ClipToBounds="False" FontFamily="{StaticResource MaplyMono}"
              x:Class="CsGrafeqApplication.Core.Controls.TwoSymbolKeyButton" x:Name="UC">
     <Design.PreviewWith>
-        <Border Width="60" Height="60">
+        <Border Width="50" Height="50">
             <controls:TwoSymbolKeyButtonInPlace Width="48" Height="48" FirstButton="G" SecondButton="Q"
                                                 FontFamily="{StaticResource MapleMono}" />
         </Border>
     </Design.PreviewWith>
-    <UserControl.Styles>
+    <ToggleButton.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="/Resources/CustomColorResource.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </ToggleButton.Resources>
+    <ToggleButton.Styles>
         <Styles>
-            <Style Selector="controls|TwoSymbolKeyButtonInPlace">
-                <Setter Property="ClipToBounds" Value="False" />
-                <Setter Property="FontFamily" Value="{StaticResource MapleMono}" />
-                <Style Selector="^ RepeatButton">
-                    <Setter Property="Background" Value="{DynamicResource CgBackgroundBrush}" />
-                    <Setter Property="CornerRadius" Value="4" />
-                    <Setter Property="Focusable" Value="False" />
-                    <Setter Property="BorderBrush" Value="{DynamicResource CgForegroundBrush}" />
-                    <Setter Property="BorderThickness" Value="1" />
+            <Style Selector="TextBlock">
+                <Setter Property="Margin" Value="2"></Setter>
+            </Style>
+            <Style Selector="RepeatButton">
                     <Setter Property="HorizontalAlignment" Value="Stretch" />
                     <Setter Property="Margin" Value="0" />
                     <Setter Property="Padding" Value="0" />
@@ -31,13 +33,11 @@
                         <Setter Property="Focusable" Value="False" />
                         <Setter Property="Margin" Value="5,0" />
                     </Style>
-
                 </Style>
-            </Style>
         </Styles>
-    </UserControl.Styles>
-    <RepeatButton Name="PART_Button">
-        <Panel>
+    </ToggleButton.Styles>
+    <RepeatButton Name="PART_Button" Background="{DynamicResource CgBackgroundBrush}" CornerRadius="4" Focusable="False" BorderBrush="{DynamicResource CgForegroundBrush}" BorderThickness="1" Padding="0" >
+        <Panel Width="48" Height="48" HorizontalAlignment="Center" VerticalAlignment="Center">
             <TextBlock Text="{CompiledBinding #UC.FirstButton}" IsVisible="{CompiledBinding #UC.IsChecked}"
                        Foreground="{DynamicResource CgForegroundBrush}" VerticalAlignment="Bottom"
                        HorizontalAlignment="Left" FontSize="30" />
@@ -52,4 +52,4 @@
                        HorizontalAlignment="Right" FontSize="20" />
         </Panel>
     </RepeatButton>
-</UserControl>
+</ToggleButton>

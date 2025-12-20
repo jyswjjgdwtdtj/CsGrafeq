@@ -1,4 +1,4 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+﻿<controls:Keyboard xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -7,43 +7,35 @@
              x:Class="CsGrafeqApplication.Core.Controls.Keyboard" x:Name="UC">
     <Design.PreviewWith>
         <controls:Keyboard Width="600" Height="400">
-            <controls:Keyboard.Styles>
-                <Style Selector="controls|Keyboard /template/ Expander#PART_Expander" />
-            </controls:Keyboard.Styles>
-            <Panel />
         </controls:Keyboard>
     </Design.PreviewWith>
-    <UserControl.Resources>
+    <controls:Keyboard.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceInclude Source="/Resources/CustomColorResource.axaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
-    </UserControl.Resources>
-    <UserControl.Styles>
+    </controls:Keyboard.Resources>
+    <controls:Keyboard.Styles>
         <Style Selector="controls|Keyboard">
             <Setter Property="Foreground" Value="{DynamicResource CgForegroundBrush}" />
             <Setter Property="VerticalAlignment" Value="Stretch" />
             <Setter Property="HorizontalAlignment" Value="Stretch" />
             <Setter Property="Template">
-                <ControlTemplate />
-            </Setter>
-        </Style>
-    </UserControl.Styles>
-    <UserControl.Template>
-        <ControlTemplate>
-            
+                <ControlTemplate>
         <DockPanel LastChildFill="True">
             <Expander DockPanel.Dock="Bottom" Name="PART_Expander"
                       Background="{DynamicResource CgTranslucentBackgroundBrush}" ExpandDirection="Down"
                       VerticalAlignment="Bottom" IsExpanded="False" Focusable="False">
                 <Expander.Styles>
                     <Style Selector="Expander /template/ ToggleButton">
-                        <Style Selector="^ /template/ Path">
+                        <Style Selector="^ /template/ Grid Border">
                             <Setter Property="RenderTransform">
                                 <RotateTransform Angle="180" />
                             </Setter>
-                            <Setter Property="Fill" Value="{DynamicResource CgForegroundBrush}" />
+                            <Style Selector="^ Path">
+                                <Setter Property="Fill" Value="{DynamicResource CgForegroundBrush}" />
+                            </Style>
                         </Style>
                         <Setter Property="Focusable" Value="False" />
                     </Style>
@@ -221,5 +213,7 @@
             <ContentPresenter Content="{TemplateBinding Content}" />
         </DockPanel>
         </ControlTemplate>
-    </UserControl.Template>
-</UserControl>
+            </Setter>
+        </Style>
+    </controls:Keyboard.Styles>
+</controls:Keyboard>

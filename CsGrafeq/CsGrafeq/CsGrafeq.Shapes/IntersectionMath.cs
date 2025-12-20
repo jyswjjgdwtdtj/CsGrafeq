@@ -31,7 +31,7 @@ public static class IntersectionMath
             }
             else if (ss[1] is Circle c1)
             {
-                vs = FromLineAndCircle(l1.Current, c1.InnerCircle);
+                vs = FromLineAndCircle(l1.Current, c1.Current);
                 return 1;
             }
             else
@@ -41,7 +41,7 @@ public static class IntersectionMath
 
         if (ss[0] is Circle circle1 && ss[1] is Circle circle2)
         {
-            vs = FromTwoCircle(circle1.InnerCircle, circle2.InnerCircle);
+            vs = FromTwoCircle(circle1.Current, circle2.Current);
             return 2;
         }
 
