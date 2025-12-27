@@ -52,21 +52,19 @@
         <PackageReference Include="HarfBuzzSharp"/>
         <PackageReference Include="LiveMarkdown.Avalonia"/>
         <PackageReference Include="Material.Avalonia"/>
+        <PackageReference Include="MessageBox.Avalonia" />
         <PackageReference Include="SkiaSharp"/>
         <PackageReference Include="Sylinko.CSharpMath.Avalonia"/>
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.CSharpMath.Editor\CsGrafeq.CSharpMath.Editor.csproj"/>
+        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.I18N\CsGrafeq.I18N.csproj" />
     </ItemGroup>
 
     <ItemGroup>
         <AdditionalFiles Include="Resources\ButtonTypeRadioButton.axaml"/>
         <AdditionalFiles Include="Resources\ConverterResource.axaml"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Folder Include="Inherits\"/>
     </ItemGroup>
 
     <ItemGroup>

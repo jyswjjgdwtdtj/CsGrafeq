@@ -82,6 +82,7 @@
         <PackageReference Include="LiveMarkdown.Avalonia"/>
         <PackageReference Include="Material.Avalonia"/>
         <PackageReference Include="Material.Avalonia.Dialogs"/>
+        <PackageReference Include="MessageBox.Avalonia" />
         <PackageReference Include="SkiaSharp"/>
         <PackageReference Include="SkiaSharp.HarfBuzz"/>
         <PackageReference Include="Svg.Controls.Skia.Avalonia"/>

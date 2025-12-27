@@ -1,9 +1,9 @@
-﻿using ReactiveUI;
+﻿using CsGrafeq.I18N;
+using ReactiveUI;
 
-namespace CsGrafeqApplication.ViewModels;
+namespace CsGrafeqApplication.Core.ViewModel;
 
 public class ViewModelBase : ReactiveObject
 {
     public MultiLanguageResources MultiLanguageResources { get; } = MultiLanguageResources.Instance;
-    public Static Static { get; } = Static.Instance;
 }

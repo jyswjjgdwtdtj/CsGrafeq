@@ -1,4 +1,5 @@
 ﻿using CsGrafeqApplication.Controls.Displayers;
+using CsGrafeqApplication.Core.ViewModel;
 
 namespace CsGrafeqApplication.ViewModels;
 

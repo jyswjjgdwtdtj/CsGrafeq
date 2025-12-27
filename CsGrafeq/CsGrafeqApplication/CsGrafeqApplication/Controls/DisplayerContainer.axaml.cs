@@ -12,6 +12,7 @@ using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using CsGrafeqApplication.Addons.GeometryPad;
 using CsGrafeqApplication.Controls.Displayers;
+using CsGrafeqApplication.Core.Dialogs;
 using CsGrafeqApplication.Dialog;
 using CsGrafeqApplication.ViewModels;
 using CsGrafeqApplication.Views;
@@ -348,24 +349,15 @@ public partial class DisplayerContainer : UserControl
             }
         }
     }
-
-    private void ColorSelectedItemChanged(object? sender, SelectionChangedEventArgs e)
+    private void TestClicked(object? sender, RoutedEventArgs e)
     {
-        if (sender is ComboBox cb)
-        {
-            var si = cb.SelectedItem;
-            if (si is ComboBoxItem cbi && cbi.Content is TextBlock tb)
-            {
-                var text = tb.Text;
-                foreach (var kvpair in MultiLanguageResources.Instance.All)
-                    if (kvpair.Value.Data == text)
-                        if (PrimaryColor.TryParse(kvpair.Key.Replace("Text", ""), out PrimaryColor color))
-                        {
-                            var newtheme = Material.Styles.Themes.Theme.Create(Static.Theme.CurrentTheme);
-                            newtheme.SetPrimaryColor(SwatchHelper.Lookup[(MaterialColor)color]);
-                            Static.Theme.CurrentTheme = newtheme;
-                        }
-            }
-        }
+        DialogHost.Show(new MessageBoxPresenter(){Title = "123"}, "dialog");
+    }
+
+    private void ColorSettingColorChanged(object? sender, ColorChangedEventArgs e)
+    {
+        var newtheme = Material.Styles.Themes.Theme.Create(Static.Theme.CurrentTheme);
+        newtheme.SetPrimaryColor(e.NewColor);
+        Static.Theme.CurrentTheme = newtheme;
     }
 }

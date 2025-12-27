@@ -2,12 +2,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:themes="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
+             xmlns:msbox="clr-namespace:MsBox.Avalonia;assembly=MsBox.Avalonia"
              x:Class="CsGrafeqApplication.App"
              RequestedThemeVariant="Default">
     <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
     <Application.Styles>
-        <themes:MaterialTheme BaseTheme="Light" PrimaryColor="Red" SecondaryColor="Cyan" />
-        <dialogHostAvalonia:DialogHostStyles />
+        <themes:MaterialTheme BaseTheme="Light" PrimaryColor="Cyan" SecondaryColor="Cyan" />
+        <StyleInclude Source="avares://MsBox.Avalonia.Markdown/Controls/MarkdownView.axaml" />
     </Application.Styles>
     <Application.Resources>
         <ResourceDictionary>
@@ -24,5 +25,6 @@
         <StyleInclude Source="/Controls/ShownControl.axaml" />
         <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" />
         <StyleInclude Source="avares://LiveMarkdown.Avalonia/Styles.axaml" />
+        <StyleInclude Source="avares://CsGrafeqApplication.Core/Styles/ControlsStyles.axaml"></StyleInclude>
     </Application.Styles>
 </Application>
