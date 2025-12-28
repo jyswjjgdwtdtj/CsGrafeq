@@ -52,7 +52,6 @@
         <PackageReference Include="HarfBuzzSharp"/>
         <PackageReference Include="LiveMarkdown.Avalonia"/>
         <PackageReference Include="Material.Avalonia"/>
-        <PackageReference Include="MessageBox.Avalonia" />
         <PackageReference Include="SkiaSharp"/>
         <PackageReference Include="Sylinko.CSharpMath.Avalonia"/>
     </ItemGroup>

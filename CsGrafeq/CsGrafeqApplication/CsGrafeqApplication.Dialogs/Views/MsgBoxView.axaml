@@ -1,0 +1,68 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:dialogs="clr-namespace:CsGrafeqApplication.Dialogs"
+             xmlns:models="clr-namespace:CsGrafeqApplication.Dialogs.Models"
+             xmlns:params="clr-namespace:CsGrafeqApplication.Dialogs.Params"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="CsGrafeqApplication.Dialogs.Views.MsgBoxView" 
+             MinWidth="{Binding MinWidth}"
+             x:DataType="params:MsgBoxParams"
+             MaxWidth="{Binding MaxWidth}"
+             Width="{Binding Width}"
+             MinHeight="{Binding MinHeight}"
+             MaxHeight="{Binding MaxHeight}"
+             Height="{Binding Height}"
+             FontFamily="{StaticResource MapleMono}"
+             Padding="0" Margin="0" >
+    <UserControl.Styles>
+        <Style Selector="Button">
+            <Setter Property="Margin" Value="15 0 0 0" />
+            <Setter Property="MinHeight" Value="24" />
+            <Setter Property="MinWidth" Value="75" />
+        </Style>
+        <Style Selector="Border#Border">
+            <Setter Property="BorderBrush" Value="{DynamicResource MaterialPrimaryMidBrush}"></Setter>
+        </Style>
+    </UserControl.Styles>
+    <Border Name="Border" BorderThickness="1" CornerRadius="5">
+    <DockPanel LastChildFill="True" Name="DockPanel">
+        <DockPanel DockPanel.Dock="Top" Height="30" LastChildFill="False" ClipToBounds="True">
+            <TextBlock DockPanel.Dock="Left" Text="{CompiledBinding Title}" VerticalAlignment="Center" Margin="4 0 0 0"/>
+            <Button CornerRadius="0" DockPanel.Dock="Right" Click="CloseClicked" Width="45" Height="30" Background="{DynamicResource CgTranslucentBackgroundBrush}">
+                <Path VerticalAlignment="Center" HorizontalAlignment="Center" Stretch="Uniform" Fill="{DynamicResource CgForegroundBrush}" Data="m12 13.4l-4.9 4.9q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7l4.9-4.9l-4.9-4.9q-.275-.275-.275-.7t.275-.7t.7-.275t.7.275l4.9 4.9l4.9-4.9q.275-.275.7-.275t.7.275t.275.7t-.275.7L13.4 12l4.9 4.9q.275.275.275.7t-.275.7t-.7.275t-.7-.275z" />
+            </Button>
+        </DockPanel>
+        <Border DockPanel.Dock="Bottom" ClipToBounds="False">
+            <ItemsControl Name="ButtonItemsPresenter" Margin="5" ClipToBounds="False"
+                          ItemsSource="{CompiledBinding ButtonDefinitions.BtnDefs}"
+                          HorizontalAlignment="Right">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Spacing="5" Orientation="Horizontal"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="models:ButtonDefinition">
+                        <Button Name="Btn"
+                                HorizontalContentAlignment="Center"
+                                Classes.buttons="true"
+                                Classes.default="{Binding IsDefault}"
+                                Classes.cancel="{Binding IsCancel}"
+                                Content="{Binding Name}"
+                                Margin="0"
+                                IsDefault="{Binding IsDefault}"
+                                IsCancel="{Binding IsCancel}"
+                                Tag="{Binding Name}"
+                                Click="ButtonClicked"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Border>
+        <ContentPresenter Content="{CompiledBinding Content}" MinHeight="40"/>
+    </DockPanel>
+    </Border>
+</UserControl>

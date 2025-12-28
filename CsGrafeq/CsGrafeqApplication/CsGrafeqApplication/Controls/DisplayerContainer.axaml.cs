@@ -12,12 +12,8 @@ using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using CsGrafeqApplication.Addons.GeometryPad;
 using CsGrafeqApplication.Controls.Displayers;
-using CsGrafeqApplication.Core.Dialogs;
 using CsGrafeqApplication.Dialog;
 using CsGrafeqApplication.ViewModels;
-using CsGrafeqApplication.Views;
-using DialogHostAvalonia;
-using Material.Colors;
 using Material.Styles.Themes;
 using Microsoft.Win32;
 
@@ -77,7 +73,7 @@ public partial class DisplayerContainer : UserControl
                 Splitter.IsVisible = true;
             }
         };
-        Dialogs.InfoHandler = Info;
+        Dialog.Dialogs.InfoHandler = Info;
     }
 
     private async void Info(Control content, InfoType infotype)
@@ -123,15 +119,6 @@ public partial class DisplayerContainer : UserControl
                 if (e.KeyModifiers == KeyModifiers.Control)
                 {
                     SaveClicked(sender, e);
-                    e.Handled = true;
-                }
-            }
-                break;
-            case Key.OemComma: // Ctrl + ,
-            {
-                if (e.KeyModifiers == KeyModifiers.Control)
-                {
-                    Setting_Clicked(sender, e);
                     e.Handled = true;
                 }
             }
@@ -199,11 +186,6 @@ public partial class DisplayerContainer : UserControl
             }
                 break;
         }
-    }
-
-    private void Setting_Clicked(object? sender, RoutedEventArgs e)
-    {
-        DialogHost.Show(new SettingView(VM.Displayer as DisplayControl));
     }
 
     private void StepBack_Clicked(object? sender, RoutedEventArgs e)
@@ -348,10 +330,6 @@ public partial class DisplayerContainer : UserControl
                 rr.Save(file.Path.AbsolutePath);
             }
         }
-    }
-    private void TestClicked(object? sender, RoutedEventArgs e)
-    {
-        DialogHost.Show(new MessageBoxPresenter(){Title = "123"}, "dialog");
     }
 
     private void ColorSettingColorChanged(object? sender, ColorChangedEventArgs e)

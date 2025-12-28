@@ -19,10 +19,15 @@
 
     <ItemGroup>
       <PackageReference Include="Avalonia" />
+      <PackageReference Include="ReactiveUI" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\CsGrafeqApplication.Core\CsGrafeqApplication.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="ViewModels\" />
     </ItemGroup>
 
 </Project>

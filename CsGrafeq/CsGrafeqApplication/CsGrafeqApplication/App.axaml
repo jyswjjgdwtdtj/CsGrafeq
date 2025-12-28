@@ -8,7 +8,7 @@
     <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
     <Application.Styles>
         <themes:MaterialTheme BaseTheme="Light" PrimaryColor="Cyan" SecondaryColor="Cyan" />
-        <StyleInclude Source="avares://MsBox.Avalonia.Markdown/Controls/MarkdownView.axaml" />
+        <StyleInclude Source="avares://CsGrafeqApplication.Dialogs/Views/MsgBoxButton.axaml" />
     </Application.Styles>
     <Application.Resources>
         <ResourceDictionary>
@@ -26,5 +26,6 @@
         <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" />
         <StyleInclude Source="avares://LiveMarkdown.Avalonia/Styles.axaml" />
         <StyleInclude Source="avares://CsGrafeqApplication.Core/Styles/ControlsStyles.axaml"></StyleInclude>
+        <StyleInclude Source="avares://MsBox.Avalonia.Markdown/Controls/MarkdownView.axaml" />
     </Application.Styles>
 </Application>

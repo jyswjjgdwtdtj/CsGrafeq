@@ -11,6 +11,7 @@
         Title="{CompiledBinding MultiLanguageResources.CsGrafeqText.Data}"
         ExtendClientAreaToDecorationsHint="True"
         ExtendClientAreaChromeHints="NoChrome"
+        SystemDecorations="Full"
         TransparencyLevelHint="Transparent" Background="{DynamicResource CgBackgroundBrush}">
     <Window.Styles>
         <StyleInclude Source="avares://CsGrafeqApplication.Core/Styles/PathStyles.axaml" />

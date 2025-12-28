@@ -5,5 +5,4 @@
             <!-- Add Controls for Previewer Here -->
         </Border>
     </Design.PreviewWith>
-    <StyleInclude Source="../Controls/MsgBoxButton.axaml"/>
 </Styles>

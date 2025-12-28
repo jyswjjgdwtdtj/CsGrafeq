@@ -1,5 +1,6 @@
 using Avalonia.Collections;
 using CsGrafeq.Shapes;
+using CsGrafeqApplication.Core.ViewModel;
 using CsGrafeqApplication.ViewModels;
 
 namespace CsGrafeqApplication.Addons.GeometryPad;

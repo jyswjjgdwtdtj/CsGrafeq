@@ -82,7 +82,7 @@
         <PackageReference Include="LiveMarkdown.Avalonia"/>
         <PackageReference Include="Material.Avalonia"/>
         <PackageReference Include="Material.Avalonia.Dialogs"/>
-        <PackageReference Include="MessageBox.Avalonia" />
+        <PackageReference Include="MessageBox.Avalonia.Markdown" />
         <PackageReference Include="SkiaSharp"/>
         <PackageReference Include="SkiaSharp.HarfBuzz"/>
         <PackageReference Include="Svg.Controls.Skia.Avalonia"/>
@@ -99,6 +99,7 @@
         <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Shapes\CsGrafeq.Shapes.csproj"/>
         <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Windows\CsGrafeq.Windows.csproj"/>
         <ProjectReference Include="..\CsGrafeqApplication.Core\CsGrafeqApplication.Core.csproj"/>
+        <ProjectReference Include="..\CsGrafeqApplication.Dialogs\CsGrafeqApplication.Dialogs.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -109,9 +110,6 @@
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
             <DependentUpon>Resources.resx</DependentUpon>
-        </Compile>
-        <Compile Update="Views\SettingView.axaml.cs">
-            <DependentUpon>SettingView.axaml</DependentUpon>
         </Compile>
         <Compile Update="Controls\ShownControl.cs">
             <DependentUpon>ShownControl.axaml</DependentUpon>

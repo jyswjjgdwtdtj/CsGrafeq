@@ -8,7 +8,8 @@
              xmlns:controls="clr-namespace:CsGrafeqApplication.Controls"
              xmlns:i18N="clr-namespace:CsGrafeq.I18N;assembly=CsGrafeq.I18N"
              xmlns:controls1="clr-namespace:CsGrafeqApplication.Core.Controls;assembly=CsGrafeqApplication.Core"
-             xmlns:material="clr-namespace:CsGrafeqApplication.Core.Material;assembly=CsGrafeqApplication.Core"
+             xmlns:views="clr-namespace:CsGrafeqApplication.Dialogs.Views;assembly=CsGrafeqApplication.Dialogs"
+             xmlns:cga="clr-namespace:CsGrafeqApplication"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CsGrafeqApplication.Controls.DisplayerContainer"
              x:DataType="vm:DisplayerContainerViewModel" Foreground="{DynamicResource CgForegroundBrush}"
@@ -149,7 +150,8 @@
                                                 <Border CornerRadius="{TemplateBinding CornerRadius}"
                                                         Background="{TemplateBinding Background}">
 
-                                                    <Path Stretch="Uniform" Fill="{DynamicResource MaterialPrimaryMidForegroundBrush}"
+                                                    <Path Stretch="Uniform"
+                                                          Fill="{DynamicResource MaterialPrimaryMidForegroundBrush}"
                                                           Name="LineUp" Width="22" Height="22"
                                                           Data="M13 14.25a.75.75 0 0 1-1.5 0V3.56l-.72.72a.75.75 0 1 1-1.06-1.06l2-2a.75.75 0 0 1 1.06 0l2 2a.75.75 0 0 1-1.06 1.06L13 3.56zM2.75 13.5a.75.75 0 0 1 0-1.5h6.5a.75.75 0 0 1 0 1.5zm2-3a.75.75 0 0 1 0-1.5h4.5a.75.75 0 0 1 0 1.5zM6 6.75c0 .414.336.75.75.75h2.5a.75.75 0 0 0 0-1.5h-2.5a.75.75 0 0 0-.75.75" />
 
@@ -162,7 +164,8 @@
                                             <ControlTemplate>
                                                 <Border CornerRadius="{TemplateBinding CornerRadius}"
                                                         Background="{TemplateBinding Background}">
-                                                    <Path Fill="{DynamicResource MaterialPrimaryMidForegroundBrush}" Name="LineDown"
+                                                    <Path Fill="{DynamicResource MaterialPrimaryMidForegroundBrush}"
+                                                          Name="LineDown"
                                                           Width="22" Height="22" Stretch="Uniform"
                                                           Data="M13 1.75a.75.75 0 0 0-1.5 0v10.69l-.72-.72a.75.75 0 1 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0l2-2a.75.75 0 1 0-1.06-1.06l-.72.72zM2.75 2.5a.75.75 0 0 0 0 1.5h6.5a.75.75 0 0 0 0-1.5zm2 3a.75.75 0 0 0 0 1.5h4.5a.75.75 0 0 0 0-1.5zM6 9.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5A.75.75 0 0 1 6 9.25" />
 
@@ -191,6 +194,14 @@
                                         <Setter Property="Width" Value="32" />
                                     </Style>
                                     <Style Selector="RepeatButton">
+                                        <Setter Property="Background" Value="{StaticResource MaterialPrimaryMidBrush}" />
+                                        <Setter Property="Padding" Value="0" />
+                                        <Setter Property="CornerRadius" Value="4" />
+                                        <Setter Property="Margin" Value="0" />
+                                        <Setter Property="Height" Value="32" />
+                                        <Setter Property="Width" Value="32" />
+                                    </Style>
+                                    <Style Selector="views|MsgBoxButton">
                                         <Setter Property="Background" Value="{StaticResource MaterialPrimaryMidBrush}" />
                                         <Setter Property="Padding" Value="0" />
                                         <Setter Property="CornerRadius" Value="4" />
@@ -240,7 +251,8 @@
                                         <TextBlock Text="{CompiledBinding MultiLanguageResources.DeleteText.Data}" />
                                     </ToolTip.Tip>
                                     <Path Stretch="Fill" Margin="5" Classes="Icon Fill" Name="Trash" Fill="Transparent"
-                                          Stroke="{DynamicResource MaterialPrimaryMidForegroundBrush}" StrokeThickness="2"
+                                          Stroke="{DynamicResource MaterialPrimaryMidForegroundBrush}"
+                                          StrokeThickness="2"
                                           Data="M4 7h16M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3m-5 5l4 4m0-4l-4 4" />
                                 </Button>
                                 <Button Click="SelectAll_Clicked">
@@ -282,6 +294,14 @@
                                         <Setter Property="Padding" Value="0" />
                                         <Setter Property="CornerRadius" Value="4" />
                                         <Setter Property="Margin" Value="0" />
+                                    </Style>
+                                    <Style Selector="views|MsgBoxButton">
+                                        <Setter Property="Background" Value="{StaticResource MaterialPrimaryMidBrush}" />
+                                        <Setter Property="Padding" Value="0" />
+                                        <Setter Property="CornerRadius" Value="4" />
+                                        <Setter Property="Margin" Value="0" />
+                                        <Setter Property="Height" Value="32" />
+                                        <Setter Property="Width" Value="32" />
                                     </Style>
                                 </StackPanel.Styles>
                                 <Button Click="SaveClicked">
@@ -326,7 +346,8 @@
                                 <Button>
                                     <Button.Flyout>
                                         <Flyout Placement="Left">
-                                            <ColorPicker IsAlphaVisible="False" IsAlphaEnabled="False" ColorChanged="ColorSettingColorChanged"></ColorPicker>
+                                            <ColorPicker IsAlphaVisible="False" IsAlphaEnabled="False"
+                                                         ColorChanged="ColorSettingColorChanged" />
                                         </Flyout>
                                     </Button.Flyout>
                                     <ToolTip.Tip>
@@ -335,16 +356,117 @@
                                     <Path Name="ColorPathIcon" Classes="Icon Fill"
                                           Data="M3.839 5.858c2.94-3.916 9.03-5.055 13.364-2.36c4.28 2.66 5.854 7.777 4.1 12.577c-1.655 4.533-6.016 6.328-9.159 4.048c-1.177-.854-1.634-1.925-1.854-3.664l-.106-.987l-.045-.398c-.123-.934-.311-1.352-.705-1.572c-.535-.298-.892-.305-1.595-.033l-.351.146l-.179.078c-1.014.44-1.688.595-2.541.416l-.2-.047l-.164-.047c-2.789-.864-3.202-4.647-.565-8.157m.984 6.716l.123.037l.134.03c.439.087.814.015 1.437-.242l.602-.257c1.202-.493 1.985-.54 3.046.05c.917.512 1.275 1.298 1.457 2.66l.053.459l.055.532l.047.422c.172 1.361.485 2.09 1.248 2.644c2.275 1.65 5.534.309 6.87-3.349c1.516-4.152.174-8.514-3.484-10.789c-3.675-2.284-8.899-1.306-11.373 1.987c-2.075 2.763-1.82 5.28-.215 5.816m11.225-1.994a1.25 1.25 0 1 1 2.414-.647a1.25 1.25 0 0 1-2.414.647m.494 3.488a1.25 1.25 0 1 1 2.415-.647a1.25 1.25 0 0 1-2.415.647M14.07 7.577a1.25 1.25 0 1 1 2.415-.647a1.25 1.25 0 0 1-2.415.647m-.028 8.998a1.25 1.25 0 1 1 2.414-.647a1.25 1.25 0 0 1-2.414.647m-3.497-9.97a1.25 1.25 0 1 1 2.415-.646a1.25 1.25 0 0 1-2.415.646" />
                                 </Button>
-                                <Button Click="Setting_Clicked">
+                                <views:MsgBoxButton ButtonDefinitions="OK" MsgBoxMinWidth="600" MsgBoxMaxWidth="600">
                                     <ToolTip.Tip>
                                         <TextBlock Text="{CompiledBinding MultiLanguageResources.SettingText.Data}" />
                                     </ToolTip.Tip>
                                     <Path Name="Setting" Classes="Icon Fill"
                                           Data="M2.5 2A1.5 1.5 0 0 0 1 3.5v1a1.5 1.5 0 0 0 1 1.415V11.5A2.5 2.5 0 0 0 4.5 14h2.1a5.5 5.5 0 0 1-.393-1H4.5A1.5 1.5 0 0 1 3 11.5V6h10.5A1.5 1.5 0 0 0 15 4.5v-1A1.5 1.5 0 0 0 13.5 2zM2 3.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5zm7.067 4.943a2 2 0 0 1-1.431 2.478l-.461.118a4.7 4.7 0 0 0 .01 1.016l.35.083a2 2 0 0 1 1.456 2.519l-.127.422q.387.307.835.518l.325-.344a2 2 0 0 1 2.91.002l.337.358q.44-.204.822-.498l-.156-.556a2 2 0 0 1 1.43-2.478l.46-.118a4.7 4.7 0 0 0-.01-1.017l-.348-.082a2 2 0 0 1-1.456-2.52l.126-.422a4.3 4.3 0 0 0-.835-.518l-.325.344a2 2 0 0 1-2.91-.001l-.337-.358a4.3 4.3 0 0 0-.821.497zM11.5 12.5a1 1 0 1 1 0-2a1 1 0 0 1 0 2" />
-                                </Button>
+                                    <views:MsgBoxButton.MsgBoxContent>
+                                        <TabControl VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                                            <TabItem Header="Setting">
+                                                <TabControl TabStripPlacement="Left" Margin="0,15">
+                                                    <TabControl.Styles>
+                                                        <Style Selector="TabItem">
+                                                            <Setter Property="Height">20</Setter>
+                                                            <Setter Property="MinHeight">20</Setter>
+                                                        </Style>
+                                                    </TabControl.Styles>
+                                                    <TabItem Header="General">
+                                                        <TextBlock xml:space="preserve">Nothing currently...</TextBlock>
+                                                    </TabItem>
+                                                    <TabItem Header="Graph"
+                                                             IsVisible="{x:Static cga:GlobalSetting.AllowExpression}">
+                                                        <StackPanel>
+                                                            <CheckBox Name="MovingOp" IsChecked="{CompiledBinding Displayer.MovingOptimization}">
+                                                                <CheckBox.Styles>
+                                                                    <Style Selector="Border#NormalRectangle">
+                                                                        <Setter Property="BorderBrush" Value="Black" />
+                                                                    </Style>
+                                                                </CheckBox.Styles>
+                                                                <TextBlock
+                                                                    Text="{CompiledBinding MultiLanguageResources.MovingOpText.Data}" />
+                                                            </CheckBox>
+                                                            <CheckBox Name="ZoomingOp"  IsChecked="{CompiledBinding Displayer.ZoomingOptimization}">
+                                                                <CheckBox.Styles>
+                                                                    <Style Selector="Border#NormalRectangle">
+                                                                        <Setter Property="BorderBrush" Value="Black" />
+                                                                    </Style>
+                                                                </CheckBox.Styles>
+                                                                <TextBlock
+                                                                    Text="{CompiledBinding MultiLanguageResources.ZoomingOpText.Data}" />
+                                                            </CheckBox>
+                                                        </StackPanel>
+                                                    </TabItem>
+                                                    <TabItem Header="Implicit Function"
+                                                             IsVisible="{x:Static cga:GlobalSetting.AllowExpression}">
+                                                        <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto"
+                                                              DataContext="{x:Static cga:Static.Instance}">
+                                                            <TextBlock Grid.Row="0" Grid.Column="0">Default Opacity:</TextBlock>
+                                                            <TextBox Grid.Row="1" Grid.Column="0"
+                                                                     Text="{CompiledBinding DefaultOpacity}"
+                                                                     x:DataType="cga:Static" />
+                                                        </Grid>
+                                                    </TabItem>
+                                                </TabControl>
+                                            </TabItem>
+                                            <TabItem Header="Description">
+                                                <ScrollViewer VerticalScrollBarVisibility="Visible"
+                                                              HorizontalScrollBarVisibility="Hidden">
+                                                    <controls1:Markdown xml:space="preserve">
+[Avalk(README.md)|[中文](README_ZH.md)
+
+# CsGrafeq
+
+## Description
+
+CsGrafeq is a geometry sketchpad. It's made by Avalonia and use Material.Avalonia as its theme. For the sake that JIT is unavailable in mobile platforms and browser, CsGrafeq now only support Desktop (now only Windows). 
+
+Project in old version folder is for stably implicit function plotting, which is made by .NET Framework. The function of Implicit function plotting
+is being made now.
+
+## Features
+
+- ReadyToRun compiled, no .Net Runtime environment required.
+- High quality function image plotting.
+- Beautiful UI
+
+
+## Future and Plan
+
+### Short term plan
+
+1. Add implicit function supports
+2. Add text block supports
+3. Implement custom msgbox/inputbox
+4. Implement mathematical calculation (e.g. 0.5->1/2, 1.414->√2)
+
+### Long term plan
+
+1. Add more shapes supports
+2. Fix bugs
+
+Welcome to any programming enthusiasts who wish to collaborate on development. \
+You can put forward your opinions and suggestions in [Issues](https://github.com/jyswjjgdwtdtj/CsGrafeq/issues), I will
+reply as soon as possible. \
+Due to the pressure of high school academic studies, I will engage in development during the winter and summer holidays.
+Each of your stars🌟 is the motivation for my development. Thank you🙏😊.
+
+                                                    </controls1:Markdown>
+                                                </ScrollViewer>
+                                            </TabItem>
+                                            <TabItem Header="Usage">
+                                                <ScrollViewer VerticalScrollBarVisibility="Visible"
+                                                              HorizontalScrollBarVisibility="Hidden">
+                                                    <controls1:Markdown xml:space="preserve" />
+                                                </ScrollViewer>
+                                            </TabItem>
+                                        </TabControl>
+                                    </views:MsgBoxButton.MsgBoxContent>
+                                </views:MsgBoxButton>
                                 <Button>
                                     <ToolTip.Tip>
-                                     <TextBlock Text="{CompiledBinding MultiLanguageResources.LanguageText.Data}" />
+                                        <TextBlock Text="{CompiledBinding MultiLanguageResources.LanguageText.Data}" />
                                     </ToolTip.Tip>
                                     <Button.Flyout>
                                         <Flyout Placement="Left">
@@ -363,9 +485,14 @@
                                     <Path Name="Language" Classes="Icon Fill"
                                           Data="M17.25 1a.75.75 0 0 1 .75.75V3h4.5a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0V4.5h-9.5v.75a.75.75 0 0 1-1.5 0v-1.5A.75.75 0 0 1 11.5 3h5V1.75a.75.75 0 0 1 .75-.75zm-3.5 5a.75.75 0 0 0 0 1.5h4.428L16.77 8.674a.75.75 0 0 0-.27.576v.25h-4.75a.75.75 0 0 0 0 1.5h4.75v2.734a.75.75 0 0 1-.966.718l-.569-.17a.75.75 0 0 0-.43 1.436l.569.171A2.25 2.25 0 0 0 18 13.734V11h4.25a.75.75 0 0 0 0-1.5h-4.128l2.608-2.174A.75.75 0 0 0 20.25 6h-6.5zm-5.361.477l-.049-.104a.73.73 0 0 0-1.315.087l-5.964 14.5l-.032.096a.754.754 0 0 0 .426.886a.73.73 0 0 0 .963-.402l1.547-3.76l.094.006h7.087l1.433 3.737l.042.092a.73.73 0 0 0 .91.334a.755.755 0 0 0 .418-.972l-5.56-14.5zm-3.74 9.809L7.81 8.747l2.947 7.539h-6.11z" />
                                 </Button>
-                                <Button Click="TestClicked">
-                                    T
-                                </Button>
+                                <views:MsgBoxButton ButtonDefinitions="Yes|No" MsgBoxTitle="456">
+                                    <views:MsgBoxButton.Content>
+                                        123
+                                    </views:MsgBoxButton.Content>
+                                    <views:MsgBoxButton.MsgBoxContent>
+                                        123
+                                    </views:MsgBoxButton.MsgBoxContent>
+                                </views:MsgBoxButton>
                             </StackPanel>
                         </controls:ShownControl>
                     </Border>
@@ -387,7 +514,8 @@
                                 Background="{DynamicResource MaterialPrimaryMidBrush}" Padding="15" Opacity="0"
                                 CornerRadius="4"
                                 Name="InfoOuterContainer">
-                            <ContentPresenter Name="InfoPresenter" Foreground="{DynamicResource MaterialPrimaryMidForegroundBrush}" />
+                            <ContentPresenter Name="InfoPresenter"
+                                              Foreground="{DynamicResource MaterialPrimaryMidForegroundBrush}" />
                         </Border>
                     </Grid>
                 </Border>

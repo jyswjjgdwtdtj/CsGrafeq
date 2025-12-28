@@ -248,7 +248,7 @@ public partial class GeometryPad : Addon
                 {
                     re.Error(out var ex);
                     DataValidationErrors.SetError(tb, ex);
-                    Dialogs.Info(new TextBlock { Text = ex.Message }, InfoType.Error);
+                    CsGrafeqApplication.Dialog.Dialogs.Info(new TextBlock { Text = ex.Message }, InfoType.Error);
                 }
             }
     }
@@ -274,7 +274,7 @@ public partial class GeometryPad : Addon
                     {
                         re.Error(out var ex);
                         DataValidationErrors.SetError(tb, ex);
-                        Dialogs.Info(new TextBlock { Text = ex.Message }, InfoType.Error);
+                        CsGrafeqApplication.Dialog.Dialogs.Info(new TextBlock { Text = ex.Message }, InfoType.Error);
                     }
 
                     DoFuncTextChange(tb, (string)e.NewValue, (string)e.OldValue);
@@ -1353,7 +1353,7 @@ public partial class GeometryPad : Addon
                     if (n.IsError)
                     {
                         DataValidationErrors.SetError(tb, n.Error);
-                        Dialogs.Info(new TextBlock { Text = n.Error.Message }, InfoType.Error);
+                        CsGrafeqApplication.Dialog.Dialogs.Info(new TextBlock { Text = n.Error.Message }, InfoType.Error);
                     }
                     else
                     {
@@ -1517,7 +1517,7 @@ public partial class GeometryPad : Addon
             if (rb.IsChecked == true && rb.Tag is ActionData ad)
             {
                 SetAction(ad);
-                Dialogs.Info(new TextBlock { Text = CurrentAction.Description.Data }, InfoType.Information);
+                CsGrafeqApplication.Dialog.Dialogs.Info(new TextBlock { Text = CurrentAction.Description.Data }, InfoType.Information);
             }
     }
 
