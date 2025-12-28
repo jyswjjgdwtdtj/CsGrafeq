@@ -14,10 +14,10 @@ public class ImpFuncShowDataTemplate : IDataTemplate
         return true;
     }
 
-    public Control Build(object? data)
+    public Control? Build(object? data)
     {
-        if (data is ImplicitFunction impf && impf.IsCorrect && !impf.IsDeleted && impf.ShowFormula)
-            return ImpFuncDataTemplate?.Build(impf) ?? new Control();
-        return new Control();
+        if (data is ImplicitFunction impf)
+            return ImpFuncDataTemplate?.Build(impf) ?? null;
+        return null;
     }
 }

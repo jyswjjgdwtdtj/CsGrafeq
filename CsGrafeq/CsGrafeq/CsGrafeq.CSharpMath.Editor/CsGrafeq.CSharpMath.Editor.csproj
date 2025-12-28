@@ -7,17 +7,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Avalonia" Version="11.3.7" />
-      <PackageReference Include="CSharpMath" Version="0.5.1" />
-      <PackageReference Include="CSharpMath.Editor" Version="0.5.1" />
-      <PackageReference Include="CSharpMath.Evaluation" Version="0.5.1" />
-      <PackageReference Include="CSharpMath.Rendering" Version="0.5.1" />
-      <PackageReference Include="Material.Avalonia" Version="3.13.3" />
-      <PackageReference Include="Material.Avalonia.Dialogs" Version="3.13.3" />
+        <PackageReference Include="CSharpMath" Version="0.5.1"/>
+        <PackageReference Include="CSharpMath.Editor" Version="0.5.1"/>
+        <PackageReference Include="CSharpMath.Evaluation" Version="0.5.1"/>
+        <PackageReference Include="CSharpMath.Rendering" Version="0.5.1"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\CsGrafeq.Base\CsGrafeq.Base.csproj" />
+        <ProjectReference Include="..\CsGrafeq.Base\CsGrafeq.Base.csproj"/>
     </ItemGroup>
 
 </Project>

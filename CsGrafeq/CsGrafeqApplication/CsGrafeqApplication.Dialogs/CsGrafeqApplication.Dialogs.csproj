@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Compile Update="View\MsgBoxButton.axaml.cs">
+        <DependentUpon>MsgBoxButton.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="View\MsgBoxView.axaml.cs">
+        <DependentUpon>MsgBoxView.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Avalonia" />
+      <PackageReference Include="ReactiveUI" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\CsGrafeqApplication.Core\CsGrafeqApplication.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="ViewModels\" />
+    </ItemGroup>
+
+</Project>

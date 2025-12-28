@@ -358,17 +358,17 @@ public class PointGetter_OnCircle(Circle circle, Vec InitialPoint) : PointGetter
 
     protected override Vec GetPointWithoutExpression()
     {
-        return new Vec(Circle.InnerCircle.Center.X + Cos(theta) * Circle.InnerCircle.Radius,
-            Circle.InnerCircle.Center.Y + Sin(theta) * Circle.InnerCircle.Radius);
+        return new Vec(Circle.Current.Center.X + Cos(theta) * Circle.Current.Radius,
+            Circle.Current.Center.Y + Sin(theta) * Circle.Current.Radius);
     }
 
     public override void SetPoint(Vec controlPoint)
     {
         UseExpression = false;
-        if ((controlPoint - Circle.InnerCircle.Center).GetLength() == 0)
+        if ((controlPoint - Circle.Current.Center).GetLength() == 0)
             theta = 0;
         else
-            theta = (controlPoint - Circle.InnerCircle.Center).Arg2();
+            theta = (controlPoint - Circle.Current.Center).Arg2();
         var vec = GetPointWithoutExpression();
         PointX.SetNumber(vec.X);
         PointY.SetNumber(vec.Y);
@@ -377,18 +377,18 @@ public class PointGetter_OnCircle(Circle circle, Vec InitialPoint) : PointGetter
     private double GetTheta(Vec controlPoint)
     {
         double theta;
-        if ((controlPoint - Circle.InnerCircle.Center).GetLength() == 0)
+        if ((controlPoint - Circle.Current.Center).GetLength() == 0)
             theta = 0;
         else
-            theta = (controlPoint - Circle.InnerCircle.Center).Arg2();
+            theta = (controlPoint - Circle.Current.Center).Arg2();
         return theta;
     }
 
     protected override double YFromX(double x)
     {
-        var r = Circle.InnerCircle.Radius;
-        var cx = Circle.InnerCircle.Center.X;
-        var cy = Circle.InnerCircle.Center.Y;
+        var r = Circle.Current.Radius;
+        var cx = Circle.Current.Center.X;
+        var cy = Circle.Current.Center.Y;
         var val = r * r - (x - cx) * (x - cx);
         if (val < 0) return double.NaN;
         val = Sqrt(val);
@@ -399,9 +399,9 @@ public class PointGetter_OnCircle(Circle circle, Vec InitialPoint) : PointGetter
 
     protected override double XFromY(double y)
     {
-        var r = Circle.InnerCircle.Radius;
-        var cx = Circle.InnerCircle.Center.X;
-        var cy = Circle.InnerCircle.Center.Y;
+        var r = Circle.Current.Radius;
+        var cx = Circle.Current.Center.X;
+        var cy = Circle.Current.Center.Y;
         var val = r * r - (y - cy) * (y - cy);
         if (val < 0) return double.NaN;
         val = Sqrt(val);
@@ -735,7 +735,7 @@ public class PointGetter_FromLineAndCircle(Line line, Circle circle, bool isFirs
 
     public override Vec GetPoint()
     {
-        var vs = IntersectionMath.FromLineAndCircle(line.Current, circle.InnerCircle);
+        var vs = IntersectionMath.FromLineAndCircle(line.Current, circle.Current);
         var v = IsFirst ? vs.v1 : vs.v2;
         return line.CheckIsValid(v) ? v : Vec.Invalid;
     }
@@ -748,7 +748,7 @@ public class PointGetter_FromTwoCircle(Circle shape1, Circle shape2, bool isFirs
 
     public sealed override Vec GetPoint()
     {
-        var vs = IntersectionMath.FromTwoCircle(shape1.InnerCircle, shape2.InnerCircle);
+        var vs = IntersectionMath.FromTwoCircle(shape1.Current, shape2.Current);
         return IsFirst ? vs.v1 : vs.v2;
     }
 }

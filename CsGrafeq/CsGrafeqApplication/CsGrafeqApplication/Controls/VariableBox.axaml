@@ -1,41 +1,43 @@
-﻿<Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:controls="using:CsGrafeqApplication.Controls">
-    <Design.PreviewWith>
-        <controls:VariableBox Width="200" ValueName="a"></controls:VariableBox>
-    </Design.PreviewWith>
-    <Style Selector="controls|VariableBox">
-        <Setter Property="Margin" Value="5" />
-        <Setter Property="ClipToBounds" Value="False"></Setter>
-        <Setter Property="Height" Value="70"></Setter>
-        <Setter Property="Template">
-            <ControlTemplate>
-                <StackPanel Orientation="Vertical" Spacing="5" ClipToBounds="False">
-                    <StackPanel Orientation="Horizontal" DataContext="{TemplateBinding MySliderData}" ClipToBounds="False">
-                        <TextBlock Text="{TemplateBinding ValueName}" VerticalAlignment="Center" />
-                        <TextBlock Text=" = " VerticalAlignment="Center" />
-                        <TextBox VerticalAlignment="Center" Text="{CompiledBinding Value}" Name="ValueTextBlock"
-                                 HorizontalContentAlignment="Center" x:DataType="controls:SliderData" Width="NaN" >
-                            <TextBox.Styles><FluentTheme/></TextBox.Styles>
-                        </TextBox>
-                    </StackPanel>
-                    <DockPanel LastChildFill="True" DataContext="{TemplateBinding MySliderData}">
-                        <TextBox Text="{CompiledBinding Min}" Width="NaN" DockPanel.Dock="Left" AcceptsReturn="False"
-                                 AcceptsTab="False" MinWidth="0"
-                                 VerticalAlignment="Center" Name="RangeMinimum" x:DataType="controls:SliderData" >
-                            <TextBox.Styles><FluentTheme/></TextBox.Styles>
-                        </TextBox>
-                        <TextBox Text="{CompiledBinding Max}" Width="NaN" DockPanel.Dock="Right" AcceptsReturn="False"
-                                 AcceptsTab="False" MinWidth="0"
-                                 VerticalAlignment="Center" Name="RangeMaximum" x:DataType="controls:SliderData" >
-                            <TextBox.Styles><FluentTheme/></TextBox.Styles>
-                        </TextBox>
-                        <Slider Name="PART_Slider" Minimum="{CompiledBinding Min}" Maximum="{CompiledBinding Max}"
-                                Orientation="Horizontal" Value="{CompiledBinding Value,Mode=TwoWay}" Margin="5,0"
-                                x:DataType="controls:SliderData" />
-                    </DockPanel>
-                </StackPanel>
-            </ControlTemplate>
-        </Setter>
-    </Style>
-</Styles>
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:CsGrafeqApplication.Controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="CsGrafeqApplication.Controls.VariableBox" Name="UserControl" Margin="5" ClipToBounds="False">
+    <controls:ToggleBox IsChecked="{CompiledBinding #UserControl.ShowOnAxis}">
+        <StackPanel Orientation="Vertical" Spacing="5" ClipToBounds="False" Margin="10" Tapped="EventHandleTrue">
+            <StackPanel Orientation="Horizontal" ClipToBounds="False">
+                <TextBlock Text="{CompiledBinding #UserControl.VariableName}" VerticalAlignment="Center" />
+                <TextBlock Text=" = " VerticalAlignment="Center" />
+                <TextBox VerticalAlignment="Center" Text="{CompiledBinding #UserControl.Value}" Name="ValueTextBox"
+                         HorizontalContentAlignment="Center" Width="NaN" TemplateApplied="TemplateAppliedHandler">
+                    <TextBox.Styles>
+                        <FluentTheme />
+                    </TextBox.Styles>
+                </TextBox>
+            </StackPanel>
+            <DockPanel LastChildFill="True">
+                <TextBox Text="{CompiledBinding #UserControl.Min}" Width="NaN" DockPanel.Dock="Left"
+                         AcceptsReturn="False"
+                         AcceptsTab="False" MinWidth="0"
+                         VerticalAlignment="Center" Name="RangeMinimum" TemplateApplied="TemplateAppliedHandler">
+                    <TextBox.Styles>
+                        <FluentTheme />
+                    </TextBox.Styles>
+                </TextBox>
+                <TextBox Text="{CompiledBinding #UserControl.Max}" Width="NaN" DockPanel.Dock="Right"
+                         AcceptsReturn="False"
+                         AcceptsTab="False" MinWidth="0"
+                         VerticalAlignment="Center" Name="RangeMaximum" TemplateApplied="TemplateAppliedHandler">
+                    <TextBox.Styles>
+                        <FluentTheme />
+                    </TextBox.Styles>
+                </TextBox>
+                <Slider Name="PART_Slider" Minimum="{CompiledBinding #UserControl.Min}"
+                        Maximum="{CompiledBinding #UserControl.Max}"
+                        Orientation="Horizontal" Value="{CompiledBinding #UserControl.Value}" Margin="20,0" />
+            </DockPanel>
+        </StackPanel>
+    </controls:ToggleBox>
+</UserControl>

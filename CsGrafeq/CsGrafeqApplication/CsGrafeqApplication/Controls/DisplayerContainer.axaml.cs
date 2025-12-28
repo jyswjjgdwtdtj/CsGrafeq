@@ -12,9 +12,9 @@ using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using CsGrafeqApplication.Addons.GeometryPad;
 using CsGrafeqApplication.Controls.Displayers;
+using CsGrafeqApplication.Dialog;
 using CsGrafeqApplication.ViewModels;
-using CsGrafeqApplication.Views;
-using DialogHostAvalonia;
+using Material.Styles.Themes;
 using Microsoft.Win32;
 
 namespace CsGrafeqApplication.Controls;
@@ -73,21 +73,15 @@ public partial class DisplayerContainer : UserControl
                 Splitter.IsVisible = true;
             }
         };
-        Static.Info = Info;
+        Dialog.Dialogs.InfoHandler = Info;
     }
 
-    protected override void OnSizeChanged(SizeChangedEventArgs e)
-    {
-        base.OnSizeChanged(e);
-    }
-
-
-    private async void Info(Control content, Static.InfoType infotype)
+    private async void Info(Control content, InfoType infotype)
     {
         var color = infotype switch
         {
-            Static.InfoType.Warning => Colors.Yellow,
-            Static.InfoType.Error => Colors.Red,
+            InfoType.Warning => Colors.Yellow,
+            InfoType.Error => Colors.DarkRed,
             _ => Color.FromRgb(0x77, 0xcc, 0xbb)
         };
         InfoOuterContainer.Background = new SolidColorBrush(Color.FromArgb(128, color.R, color.G, color.B));
@@ -125,15 +119,6 @@ public partial class DisplayerContainer : UserControl
                 if (e.KeyModifiers == KeyModifiers.Control)
                 {
                     SaveClicked(sender, e);
-                    e.Handled = true;
-                }
-            }
-                break;
-            case Key.OemComma: // Ctrl + ,
-            {
-                if (e.KeyModifiers == KeyModifiers.Control)
-                {
-                    Setting_Clicked(sender, e);
                     e.Handled = true;
                 }
             }
@@ -201,11 +186,6 @@ public partial class DisplayerContainer : UserControl
             }
                 break;
         }
-    }
-
-    private void Setting_Clicked(object? sender, RoutedEventArgs e)
-    {
-        DialogHost.Show(new SettingView(VM.Displayer as DisplayControl));
     }
 
     private void StepBack_Clicked(object? sender, RoutedEventArgs e)
@@ -350,5 +330,12 @@ public partial class DisplayerContainer : UserControl
                 rr.Save(file.Path.AbsolutePath);
             }
         }
+    }
+
+    private void ColorSettingColorChanged(object? sender, ColorChangedEventArgs e)
+    {
+        var newtheme = Material.Styles.Themes.Theme.Create(Static.Theme.CurrentTheme);
+        newtheme.SetPrimaryColor(e.NewColor);
+        Static.Theme.CurrentTheme = newtheme;
     }
 }

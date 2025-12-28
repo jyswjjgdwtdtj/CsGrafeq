@@ -37,7 +37,10 @@ public static class Compiler
         }
         catch (Exception e)
         {
-            ex = e;
+            if (e is InvalidOperationException ioe && ioe.Message == "Stack empty.")
+                ex = new Exception("Incomplete expression");
+            else
+                ex = e;
             expFunc = null;
             usedVars = EnglishCharEnum.None;
             return false;
@@ -49,7 +52,7 @@ public static class Compiler
         out EnglishCharEnum usedVars) where T : IComputableNumber<T>
     {
         if (string.IsNullOrWhiteSpace(expression))
-            throw new ArgumentException("Expression cannot be empty", nameof(expression));
+            throw new Exception("Expression cannot be empty");
         usedVars = EnglishCharEnum.None;
         var elements = expression.GetTokens().ParseTokens();
         var expStack = new Stack<Expression>();
@@ -65,7 +68,7 @@ public static class Compiler
                 case ElementType.Number:
                 {
                     if (!double.TryParse(element.NameOrValue, out var d))
-                        throw new Exception("无法解析数字: " + element.NameOrValue);
+                        throw new Exception("Number can not be parsed: " + element.NameOrValue);
                     expStack.Push(Expression.Call(GetInfo(T.CreateFromDouble), Expression.Constant(d)));
                 }
                     break;
@@ -159,7 +162,7 @@ public static class Compiler
                         }
                             break;
                         default:
-                            throw new Exception();
+                            throw new Exception("Unknown operator");
                     }
                 }
                     break;
@@ -176,17 +179,17 @@ public static class Compiler
                     }
                     else if (name == "x")
                     {
-                        if (argsLength < 1) throw new Exception("不可使用变量x");
+                        if (argsLength < 1) throw new Exception("Variable 'X' is unavailable");
                         expStack.Push(needClone ? Expression.Call(cloneMethod, xVar) : xVar);
                     }
                     else if (name == "y")
                     {
-                        if (argsLength < 2) throw new Exception("不可使用变量y");
+                        if (argsLength < 2) throw new Exception("Variable 'Y' is unavailable");
                         expStack.Push(needClone ? Expression.Call(cloneMethod, yVar) : yVar);
                     }
                     else if (name == "z")
                     {
-                        if (argsLength < 3) throw new Exception("不可使用变量z");
+                        if (argsLength < 3) throw new Exception("Variable 'Y' is unavailable");
                         expStack.Push(needClone ? Expression.Call(cloneMethod, zVar) : zVar);
                     }
                     else if (name.Length == 1 && 'a' <= name[0] && name[0] <= 'z')
@@ -198,7 +201,7 @@ public static class Compiler
                     }
                     else
                     {
-                        throw new Exception("未知变量 " + element.NameOrValue);
+                        throw new Exception("Unknown variable:" + element.NameOrValue);
                     }
                 }
                     break;
@@ -232,7 +235,7 @@ public static class Compiler
                 }
                     break;
                 default:
-                    throw new Exception(element.NameOrValue + " " + element.Type);
+                    throw new Exception("Unknown element:" + element.NameOrValue + " " + element.Type);
             }
 
         return expStack.Single();
@@ -254,7 +257,7 @@ public static class Compiler
                 case -3: //var|func
                     if (Previous == ElementType.Number || Previous == ElementType.Variable ||
                         Previous == ElementType.Function)
-                        throw new Exception("缺少运算符:" + Tokens[loc - 1] + "与" + Tokens[loc] + "之间");
+                        throw new Exception("Missing operator between " + Tokens[loc - 1] + " and " + Tokens[loc]);
                     var Tokenname = Tokens[loc].NameOrValue;
                     if (Tokens[sysMath.Min(loc + 1, len)].Type == TokenType.LeftBracket)
                     {
@@ -311,14 +314,14 @@ public static class Compiler
                     }
                     else
                     {
-                        throw new Exception("未知变量:" + Tokens[loc].NameOrValue);
+                        throw new Exception("Unknown variable:" + Tokens[loc].NameOrValue);
                     }
 
                     break;
                 case -4: //num
                     if (Previous == ElementType.Number || Previous == ElementType.Variable ||
                         Previous == ElementType.Function)
-                        throw new Exception("缺少运算符:" + Tokens[loc - 1] + "与" + Tokens[loc] + "之间");
+                        throw new Exception("Missing operator between " + Tokens[loc - 1] + " and " + Tokens[loc]);
                     Previous = ElementType.Number;
                     exp.Push(new Element(ElementType.Number, Tokens[loc].NameOrValue, 0));
                     loc++;
@@ -327,14 +330,14 @@ public static class Compiler
                     if (Tokens[loc].Type == TokenType.LeftBracket)
                     {
                         if (Previous == ElementType.Number || Previous == ElementType.Variable)
-                            throw new Exception("缺少运算符:" + Tokens[loc - 1] + "与" + Tokens[loc] + "之间");
+                            throw new Exception("Missing operator between " + Tokens[loc - 1] + " and " + Tokens[loc]);
                         op.Push(OperatorType.LeftBracket);
                         Previous = ElementType.Operator;
                     }
                     else if (Tokens[loc].Type == TokenType.RightBracket)
                     {
                         if (Previous == ElementType.Function || Previous == ElementType.Operator)
-                            throw new Exception("缺少运算符:" + Tokens[loc - 1] + "与" + Tokens[loc] + "之间");
+                            throw new Exception("Missing operator between " + Tokens[loc - 1] + " and " + Tokens[loc]);
                         Previous = ElementType.Variable;
                         MoveOperatorTo(op, exp, OperatorType.LeftBracket);
                     }
@@ -349,7 +352,7 @@ public static class Compiler
                     }
 
                     if (Previous == ElementType.Function || Previous == ElementType.Operator)
-                        throw new Exception("缺少运算符:" + Tokens[loc - 1] + "与" + Tokens[loc] + "之间" + Previous);
+                        throw new Exception("Missing operator between " + Tokens[loc - 1] + " and " + Tokens[loc]);
                     jt:
                     Previous = ElementType.Operator;
                     JudgeOperator(op, exp, Tokens[loc].ToOper());
@@ -454,7 +457,7 @@ public static class Compiler
                     case ',':
                         t.Type = TokenType.Comma; break;
                     default:
-                        throw new Exception("未知符号:" + t.NameOrValue);
+                        throw new Exception("Unknown character:" + t.NameOrValue);
                 }
 
                 loc++;
@@ -466,7 +469,7 @@ public static class Compiler
             }
             else
             {
-                throw new Exception("未知字符" + script[loc]);
+                throw new Exception("Unknown character:" + script[loc]);
             }
 
             Tokens.Add(t);

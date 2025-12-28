@@ -1,12 +1,12 @@
 ﻿namespace CsGrafeq;
 
-public class Result<T,E> where E:Exception
+public class Result<T, E> where E : Exception
 {
-    public static Result<T, E> Success(T okValue)=> new Result<T, E>(okValue);
-    public static Result<T, E> Error(E exception) => new Result<T, E>(exception);
+    private readonly E? _exception;
+
     private readonly bool _isSuccessful;
-    private readonly E? _exception=null;
     private readonly T? _value;
+
     protected Result(T value)
     {
         _isSuccessful = true;
@@ -17,6 +17,16 @@ public class Result<T,E> where E:Exception
     {
         _isSuccessful = false;
         _exception = exception;
+    }
+
+    public static Result<T, E> Success(T okValue)
+    {
+        return new Result<T, E>(okValue);
+    }
+
+    public static Result<T, E> Error(E exception)
+    {
+        return new Result<T, E>(exception);
     }
 
     public bool Success(out T okValue)
@@ -30,6 +40,7 @@ public class Result<T,E> where E:Exception
         exception = _exception!;
         return !_isSuccessful;
     }
+
     public void Match(Action<T> successAction, Action<E> errorAction)
     {
         if (_isSuccessful)
@@ -59,9 +70,26 @@ public class Result<T,E> where E:Exception
 
 public class Result<T> : Result<T, Exception>
 {
-    public new static Result<T> Success(T okValue)=> new Result<T>(okValue);
-    public static Result<T> Error(string error) => new Result<T>(new Exception(error));
-    public new static Result<T> Error(Exception exception) => new Result<T>(exception);
-    protected Result(T value) : base(value) { }
-    protected Result(Exception error) : base(error) { }
+    protected Result(T value) : base(value)
+    {
+    }
+
+    protected Result(Exception error) : base(error)
+    {
+    }
+
+    public new static Result<T> Success(T okValue)
+    {
+        return new Result<T>(okValue);
+    }
+
+    public static Result<T> Error(string error)
+    {
+        return new Result<T>(new Exception(error));
+    }
+
+    public new static Result<T> Error(Exception exception)
+    {
+        return new Result<T>(exception);
+    }
 }

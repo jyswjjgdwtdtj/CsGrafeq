@@ -1,28 +1,21 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Linq.Expressions;
-using System.Text;
-using CsGrafeq;
+﻿using System.Text;
 using CSharpMath;
 using CSharpMath.Atom;
 using CSharpMath.Atom.Atoms;
-using CSharpMath.Rendering.Text;
 using CSharpMath.Structures;
-using DynamicData;
-using StrResult=CsGrafeq.Result<string>;
-using Space = CSharpMath.Atom.Atoms.Space;
+using StrResult = CsGrafeq.Result<string>;
 
 namespace CsGrafeq.CSharpMath.Editor;
 
 public static class ExpressionParser
 {
-    private static Dictionary<string, string> SymbolToReplace = new Dictionary<string, string>()
+    private static readonly Dictionary<string, string> SymbolToReplace = new()
     {
-        {"≤","<="},
-        {"≥",">="},
-        {"∧","|"},
-        {"∨","&"},
-        {"×","*"},
-        
+        { "≤", "<=" },
+        { "≥", ">=" },
+        { "∧", "|" },
+        { "∨", "&" },
+        { "×", "*" }
     };
 
     public static StrResult Parse(this MathList mathList)
@@ -36,8 +29,10 @@ public static class ExpressionParser
         {
             return StrResult.Error(e);
         }
+
         return StrResult.Success(builder.ToString().ForEachReplace(SymbolToReplace));
     }
+
 /*
     internal static MathAtom PreProcessMathAtom(MathAtom source)
     {
@@ -48,7 +43,7 @@ public static class ExpressionParser
                 res= new Inner(new("("), PreProcessMathList(inner.InnerList), new(")"));
                 break;
             default:
-                
+
                 break;
         }
         res.Superscript.Append(source.Superscript);
@@ -113,22 +108,21 @@ public static class ExpressionParser
     private static void MathListToExpression
         (MathList mathList, CursorStringBuilder builder)
     {
-        if (mathList is null)
-        {
-            throw(new ArgumentNullException(nameof(mathList)));
-        }
+        if (mathList is null) throw new ArgumentNullException(nameof(mathList));
 
         if (mathList.IsEmpty())
             throw new Exception("Mathlist is empty");
-        for(var i=0;i<mathList.Count;i++)
+        for (var i = 0; i < mathList.Count; i++)
         {
             var atom = mathList[i];
+
             MathAtom? ScanNext()
             {
                 var j = i + 1;
                 if (j < mathList.Count) return mathList[j];
                 return null;
             }
+
             switch (atom)
             {
                 case Fraction fraction:
@@ -139,17 +133,17 @@ public static class ExpressionParser
                     builder.Insert(")");
                     goto NextShouldBeMultiply;
                 case Radical radical:
-                    if (radical.Degree.IsNonEmpty())//非二次开方
+                    if (radical.Degree.IsNonEmpty()) //非二次开方
                     {
                         var degree = radical.Degree;
                         var first = degree[0];
-                        if (degree.Count == 1 && first.EqualsAtom(new Number("3")))//开三次方
+                        if (degree.Count == 1 && first.EqualsAtom(new Number("3"))) //开三次方
                         {
                             builder.Insert("cbrt(");
                             MathListToExpression(radical.Radicand, builder);
                             builder.Insert(")");
                         }
-                        else//其他开方
+                        else //其他开方
                         {
                             builder.Insert("(");
                             MathListToExpression(radical.Radicand, builder);
@@ -164,6 +158,7 @@ public static class ExpressionParser
                         MathListToExpression(radical.Radicand, builder);
                         builder.Insert(")");
                     }
+
                     goto NextShouldBeMultiply;
                 case Inner { LeftBoundary: { Nucleus: null }, InnerList: var list, RightBoundary: { Nucleus: null } }:
                     MathListToExpression(list, builder);
@@ -175,17 +170,20 @@ public static class ExpressionParser
                         builder.Insert(@"(");
                         MathListToExpression(list, builder);
                         builder.Insert(@")");
-                    }else if (left.Nucleus == "|" && right.Nucleus == "|")
+                    }
+                    else if (left.Nucleus == "|" && right.Nucleus == "|")
                     {
                         builder.Insert(@"abs(");
                         MathListToExpression(list, builder);
                         builder.Insert(@")");
-                    }else if (left.Nucleus == Symbols.LeftCeiling&& right.Nucleus == Symbols.RightCeiling)
+                    }
+                    else if (left.Nucleus == Symbols.LeftCeiling && right.Nucleus == Symbols.RightCeiling)
                     {
                         builder.Insert(@"ceiling(");
                         MathListToExpression(list, builder);
                         builder.Insert(@")");
-                    }else if (left.Nucleus == Symbols.LeftFloor&& right.Nucleus == Symbols.RightFloor)
+                    }
+                    else if (left.Nucleus == Symbols.LeftFloor && right.Nucleus == Symbols.RightFloor)
                     {
                         builder.Insert(@"floor(");
                         MathListToExpression(list, builder);
@@ -204,33 +202,31 @@ public static class ExpressionParser
                         if (!(LaTeXSettings.AtomForCommand(command) is LargeOperator originalOperator))
                             throw new InvalidCodePathException("original operator not found!");
                         var next = ScanNext();
-                        if (next == null)
-                        {
-                            throw new Exception("next not found!");
-                        }
+                        if (next == null) throw new Exception("next not found!");
 
                         var oppower = op.Superscript;
                         if (next is Inner inner && inner.LeftBoundary.Nucleus == "(" &&
                             inner.RightBoundary.Nucleus == ")")
                         {
                             var inpower = inner.Superscript;
-                            if(oppower.IsNonEmpty()&&inpower.IsNonEmpty())
+                            if (oppower.IsNonEmpty() && inpower.IsNonEmpty())
                                 throw new Exception("Power can not be placed on both function and brackets");
-                            inpower=inpower.IsNonEmpty()?inpower:oppower;
+                            inpower = inpower.IsNonEmpty() ? inpower : oppower;
                             builder.Insert("(");
                             builder.Insert(originalOperator.Nucleus);
                             builder.Insert(@"(");
                             MathListToExpression(inner.InnerList, builder);
                             builder.Insert(@")");
                             builder.Insert(")");
-                            AppendPowScript(builder,inpower);
+                            AppendPowScript(builder, inpower);
                             i++;
                             goto NextShouldBeMultiply;
                         }
+
                         if (next is Open)
                         {
-                            List<MathAtom> ms=new();
-                            i+=2;
+                            List<MathAtom> ms = new();
+                            i += 2;
                             var bracket = 0;
                             while (true)
                             {
@@ -240,38 +236,37 @@ public static class ExpressionParser
                                 if (current is Open)
                                 {
                                     bracket++;
-                                }else if (current is Close)
+                                }
+                                else if (current is Close)
                                 {
                                     bracket--;
                                     if (bracket == 0)
-                                    {
                                         //此时游标在Close上
-                                        break;   
-                                    }
+                                        break;
                                 }
+
                                 ms.Add(current);
                                 i++;
                             }
 
                             var inpower = mathList[i].Superscript;
-                            if(oppower.IsNonEmpty()&&inpower.IsNonEmpty())
+                            if (oppower.IsNonEmpty() && inpower.IsNonEmpty())
                                 throw new Exception("Power can not be placed on both function and brackets");
-                            inpower=inpower.IsNonEmpty()?inpower:oppower;
+                            inpower = inpower.IsNonEmpty() ? inpower : oppower;
                             builder.Insert("(");
                             builder.Insert(originalOperator.Nucleus);
                             builder.Insert(@"(");
                             MathListToExpression(new MathList(ms), builder);
                             builder.Insert(@")");
                             builder.Insert(")");
-                            AppendPowScript(builder,inpower);
+                            AppendPowScript(builder, inpower);
                             goto NextShouldBeMultiply;
                         }
+
                         throw new InvalidCodePathException("inner not found!");
                     }
-                    else
-                    {
-                        throw new Exception("");
-                    }
+
+                    throw new Exception("");
                     break;
                 case Variable:
                 case Close:
@@ -282,43 +277,39 @@ public static class ExpressionParser
                 case BinaryOperator:
                 case UnaryOperator:
                 case Relation:
-                case Open: 
+                case Open:
                 {
                     builder.Insert(atom.Nucleus);
                 }
-                 break;
+                    break;
                 case Number:
                 {
-                    StringBuilder numstr=new StringBuilder(atom.Nucleus);
+                    var numstr = new StringBuilder(atom.Nucleus);
                     while (true)
                     {
                         var next = ScanNext();
                         if (next is Number)
-                        {
-                            numstr.Append(next.Nucleus);   
-                        }
+                            numstr.Append(next.Nucleus);
                         else
-                        {
                             break;
-                        }
                         i++;
                     }
+
                     builder.Insert(numstr.ToString());
                 }
                     goto NextShouldBeMultiply;
                 case Placeholder:
-                    builder.ForceToBeEmpty=true;
+                    builder.ForceToBeEmpty = true;
                     break;
-                case Punctuation punc when punc.Nucleus==",":
+                case Punctuation punc when punc.Nucleus == ",":
                     builder.Insert(",");
                     break;
                 default:
-                    throw new Exception(atom.ToString() + "|" + atom.Nucleus + "|" + atom.GetType()); 
-                NextShouldBeMultiply: //在两个多项式见添加乘号
+                    throw new Exception(atom + "|" + atom.Nucleus + "|" + atom.GetType());
+                    NextShouldBeMultiply: //在两个多项式见添加乘号
                 {
                     var next = ScanNext();
                     if (next != null)
-                    {
                         switch (next)
                         {
                             case Inner:
@@ -331,7 +322,6 @@ public static class ExpressionParser
                                 builder.Insert("*");
                                 break;
                         }
-                    }
                 }
                     break;
             }
@@ -339,41 +329,40 @@ public static class ExpressionParser
             AppendPowScript(builder, atom.Superscript);
         }
     }
-    
 
-    static void AppendPowScript
+
+    private static void AppendPowScript
         (CursorStringBuilder builder, MathList script)
     {
         if (script.IsNonEmpty())
         {
             builder.Insert(@"^(");
-            MathListToExpression(script,builder);
+            MathListToExpression(script, builder);
             builder.Insert(")");
         }
     }
 
     private static string ForEachReplace(this string input, IDictionary<string, string> toReplace)
     {
-        foreach (var kvpair in toReplace)
-        {
-            input=input.Replace(kvpair.Key, kvpair.Value);
-        }
+        foreach (var kvpair in toReplace) input = input.Replace(kvpair.Key, kvpair.Value);
 
         return input;
     }
 
-    private class TempMathAtom: MathAtom
+    private class TempMathAtom : MathAtom
     {
         public int Identifier;
-        public override bool ScriptsAllowed { get; } = true;
-        protected override MathAtom CloneInside(bool finalize)
-        {
-            throw new NotSupportedException();
-        }
 
         public TempMathAtom(int identifier)
         {
             Identifier = identifier;
+        }
+
+        public override bool ScriptsAllowed { get; } = true;
+
+        protected override MathAtom CloneInside(bool finalize)
+        {
+            throw new NotSupportedException();
         }
     }
 }

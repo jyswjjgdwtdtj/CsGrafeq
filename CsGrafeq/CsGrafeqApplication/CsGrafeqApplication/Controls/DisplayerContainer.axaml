@@ -6,25 +6,28 @@
              xmlns:addons="clr-namespace:CsGrafeqApplication.Addons"
              xmlns:geopad="clr-namespace:CsGrafeqApplication.Addons.GeometryPad"
              xmlns:controls="clr-namespace:CsGrafeqApplication.Controls"
-             xmlns:csgrafeqapp="clr-namespace:CsGrafeqApplication"
-             xmlns:cmavalonia="clr-namespace:CSharpMath.Avalonia;assembly=CSharpMath.Avalonia"
+             xmlns:i18N="clr-namespace:CsGrafeq.I18N;assembly=CsGrafeq.I18N"
+             xmlns:controls1="clr-namespace:CsGrafeqApplication.Core.Controls;assembly=CsGrafeqApplication.Core"
+             xmlns:views="clr-namespace:CsGrafeqApplication.Dialogs.Views;assembly=CsGrafeqApplication.Dialogs"
+             xmlns:cga="clr-namespace:CsGrafeqApplication"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CsGrafeqApplication.Controls.DisplayerContainer"
              x:DataType="vm:DisplayerContainerViewModel" Foreground="{DynamicResource CgForegroundBrush}"
              Focusable="False">
     <UserControl.Styles>
-        <Style Selector="Svg.F">
-            <Setter Property="Css" Value="{DynamicResource OppositeCssPathFillString}" />
-        </Style>
-        <Style Selector="Svg.S">
-            <Setter Property="Css" Value="{DynamicResource OppositeCssPathStrokeString}" />
-        </Style>
+        <Styles>
+            <StyleInclude Source="avares://CsGrafeqApplication.Core/Styles/PathStyles.axaml" />
+            <Style Selector="Path.Icon">
+                <Setter Property="Width" Value="22" />
+                <Setter Property="Height" Value="22" />
+            </Style>
+        </Styles>
     </UserControl.Styles>
-        <Panel>
-            <Border Name="DisplayerCon" ZIndex="0" BorderThickness="0">
-                <ContentPresenter Content="{CompiledBinding Displayer}" />
-            </Border>
-        <controls:GlobalMathKeyBoard>
+    <Panel>
+        <Border Name="DisplayerCon" ZIndex="0" BorderThickness="0">
+            <ContentPresenter Content="{CompiledBinding Displayer}" />
+        </Border>
+        <controls1:Keyboard>
             <Panel Name="PART_Container" IsTabStop="False">
                 <Panel.Styles>
                     <Style Selector="Control">
@@ -48,12 +51,12 @@
                         </Style>
                     </Style>
                 </Panel.Styles>
-                <Canvas ZIndex="5" Name="InfoCanvas">
-                    <geopad:GeoPadInfo DataContext="{CompiledBinding  Displayer.Addons[0].DataContext}" />
-                </Canvas>
+                <Panel ZIndex="5" IsHitTestVisible="False" Name="InfoCanvas" VerticalAlignment="Stretch"
+                       HorizontalAlignment="Stretch">
+                    <geopad:GeoPadInfo DataContext="{CompiledBinding  Displayer.Addons[0].DataContext}"
+                                       HorizontalAlignment="Stretch" />
+                </Panel>
                 <Grid ZIndex="10" Name="PART_Grid">
-                    <Grid.Resources>
-                    </Grid.Resources>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="300" />
                         <ColumnDefinition Width="6" />
@@ -76,15 +79,18 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
                     </Border>
-                    <GridSplitter Grid.Column="1" ResizeDirection="Columns" Name="Splitter" ClipToBounds="False" Width="1" />
-                    <Border BorderThickness="0,0,0,1" BorderBrush="{DynamicResource CgOppositeTranslucentBackgroundBrush1}" Grid.Column="2" Grid.Row="0" Name="PART_CoverDisplayer">
+                    <GridSplitter Grid.Column="1" ResizeDirection="Columns" Name="Splitter" ClipToBounds="False"
+                                  Width="1" />
+                    <Border BorderThickness="0,0,0,1"
+                            BorderBrush="{DynamicResource CgOppositeTranslucentBackgroundBrush1}" Grid.Column="2"
+                            Grid.Row="0" Name="PART_CoverDisplayer">
                         <CheckBox Width="15" Height="40" VerticalAlignment="Center" HorizontalAlignment="Left"
-                                  Name="Toggle" Foreground="{DynamicResource CgForegroundBrush}">
+                                  Name="Toggle" Foreground="{DynamicResource MaterialPrimaryMidForegroundBrush}">
                             <CheckBox.Template>
                                 <ControlTemplate>
                                     <Border>
                                         <Border Name="Border" CornerRadius="4" BorderThickness="0"
-                                                Background="{DynamicResource HTMedianBrush}"
+                                                Background="{DynamicResource MaterialPrimaryMidBrush}"
                                                 VerticalAlignment="Center" HorizontalAlignment="Center">
                                             <TextBlock Name="TextBlock" MinWidth="0" MinHeight="0"
                                                        VerticalAlignment="Center" HorizontalAlignment="Center" />
@@ -121,17 +127,34 @@
                 </Grid>
                 <Grid ColumnDefinitions="*,52" RowDefinitions="*,52" ZIndex="15" Name="SettingDockPanel"
                       VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                    <Grid.Styles>
+                        <Styles>
+                            <Style Selector="Button">
+                                <Setter Property="Width" Value="32" />
+                                <Setter Property="Height" Value="32" />
+                            </Style>
+                            <Style Selector="RepeatButton">
+                                <Setter Property="Width" Value="32" />
+                                <Setter Property="Height" Value="32" />
+                            </Style>
+                        </Styles>
+                    </Grid.Styles>
                     <Border Grid.Column="1" Grid.Row="1">
-                        <ToggleButton Name="SettingToggle">
+                        <ToggleButton Name="SettingToggle" Background="{DynamicResource MaterialPrimaryMidBrush}"
+                                      Width="32" Height="32" CornerRadius="4">
                             <ToggleButton.Styles>
                                 <Style Selector="ToggleButton">
                                     <Style Selector="^:checked">
                                         <Setter Property="Template">
                                             <ControlTemplate>
-                                                <Border Margin="10" CornerRadius="5"
-                                                        Background="{StaticResource HTMedianBrush}">
-                                                    <Svg Path="/Assets/lineup.svg" Width="32" Height="32" Margin="0"
-                                                         Classes="F" />
+                                                <Border CornerRadius="{TemplateBinding CornerRadius}"
+                                                        Background="{TemplateBinding Background}">
+
+                                                    <Path Stretch="Uniform"
+                                                          Fill="{DynamicResource MaterialPrimaryMidForegroundBrush}"
+                                                          Name="LineUp" Width="22" Height="22"
+                                                          Data="M13 14.25a.75.75 0 0 1-1.5 0V3.56l-.72.72a.75.75 0 1 1-1.06-1.06l2-2a.75.75 0 0 1 1.06 0l2 2a.75.75 0 0 1-1.06 1.06L13 3.56zM2.75 13.5a.75.75 0 0 1 0-1.5h6.5a.75.75 0 0 1 0 1.5zm2-3a.75.75 0 0 1 0-1.5h4.5a.75.75 0 0 1 0 1.5zM6 6.75c0 .414.336.75.75.75h2.5a.75.75 0 0 0 0-1.5h-2.5a.75.75 0 0 0-.75.75" />
+
                                                 </Border>
                                             </ControlTemplate>
                                         </Setter>
@@ -139,10 +162,13 @@
                                     <Style Selector="^:unchecked">
                                         <Setter Property="Template">
                                             <ControlTemplate>
-                                                <Border Margin="10" CornerRadius="5"
-                                                        Background="{StaticResource HTMedianBrush}">
-                                                    <Svg Path="/Assets/linedown.svg" Width="32" Height="32" Margin="0"
-                                                         Classes="F" />
+                                                <Border CornerRadius="{TemplateBinding CornerRadius}"
+                                                        Background="{TemplateBinding Background}">
+                                                    <Path Fill="{DynamicResource MaterialPrimaryMidForegroundBrush}"
+                                                          Name="LineDown"
+                                                          Width="22" Height="22" Stretch="Uniform"
+                                                          Data="M13 1.75a.75.75 0 0 0-1.5 0v10.69l-.72-.72a.75.75 0 1 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0l2-2a.75.75 0 1 0-1.06-1.06l-.72.72zM2.75 2.5a.75.75 0 0 0 0 1.5h6.5a.75.75 0 0 0 0-1.5zm2 3a.75.75 0 0 0 0 1.5h4.5a.75.75 0 0 0 0-1.5zM6 9.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5A.75.75 0 0 1 6 9.25" />
+
                                                 </Border>
                                             </ControlTemplate>
                                         </Setter>
@@ -160,63 +186,92 @@
                                         Spacing="5" Margin="0" HorizontalAlignment="Stretch">
                                 <StackPanel.Styles>
                                     <Style Selector="Button">
-                                        <Setter Property="Background" Value="{StaticResource HTMedianBrush}" />
+                                        <Setter Property="Background" Value="{DynamicResource MaterialPrimaryMidBrush}" />
                                         <Setter Property="Padding" Value="0" />
                                         <Setter Property="CornerRadius" Value="4" />
                                         <Setter Property="Margin" Value="0" />
-                                        <Setter Property="Height" Value="32"></Setter>
-                                        <Setter Property="Width" Value="32"></Setter>
+                                        <Setter Property="Height" Value="32" />
+                                        <Setter Property="Width" Value="32" />
                                     </Style>
                                     <Style Selector="RepeatButton">
-                                        <Setter Property="Background" Value="{StaticResource HTMedianBrush}" />
+                                        <Setter Property="Background" Value="{StaticResource MaterialPrimaryMidBrush}" />
                                         <Setter Property="Padding" Value="0" />
                                         <Setter Property="CornerRadius" Value="4" />
                                         <Setter Property="Margin" Value="0" />
-                                        <Setter Property="Height" Value="32"></Setter>
-                                        <Setter Property="Width" Value="32"></Setter>
+                                        <Setter Property="Height" Value="32" />
+                                        <Setter Property="Width" Value="32" />
+                                    </Style>
+                                    <Style Selector="views|MsgBoxButton">
+                                        <Setter Property="Background" Value="{StaticResource MaterialPrimaryMidBrush}" />
+                                        <Setter Property="Padding" Value="0" />
+                                        <Setter Property="CornerRadius" Value="4" />
+                                        <Setter Property="Margin" Value="0" />
+                                        <Setter Property="Height" Value="32" />
+                                        <Setter Property="Width" Value="32" />
                                     </Style>
                                 </StackPanel.Styles>
                                 <RepeatButton Click="StepBack_Clicked">
                                     <ToolTip.Tip>
                                         <TextBlock Text="{CompiledBinding MultiLanguageResources.UndoText.Data}" />
                                     </ToolTip.Tip>
-                                    <Svg Path="/Assets/stepback.svg" Width="32" Height="32" Margin="0" Classes="F" />
+
+                                    <Path Name="StepBack" Classes="Icon Fill"
+                                          Data="M5.854 2.146a.5.5 0 0 1 0 .708L3.707 5h2.336c1.468 0 2.905 0 4.226.396c1.365.41 2.585 1.234 3.647 2.827a.5.5 0 0 1-.832.554c-.938-1.407-1.968-2.083-3.103-2.423C8.815 6.004 7.517 6 6 6H3.707l2.147 2.146a.5.5 0 1 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 0 1 .708 0M8 14a2 2 0 1 0 0-4a2 2 0 0 0 0 4" />
+
                                 </RepeatButton>
                                 <RepeatButton Click="StepOver_Clicked">
                                     <ToolTip.Tip>
                                         <TextBlock Text="{CompiledBinding MultiLanguageResources.RedoText.Data}" />
                                     </ToolTip.Tip>
-                                    <Svg Path="/Assets/stepover.svg" Width="32" Height="32" Margin="0" Classes="F" />
+
+                                    <Path Name="StepOver" Classes="Icon Fill"
+                                          Data="M10.147 2.146a.5.5 0 0 0 0 .708L12.293 5H9.957c-1.468 0-2.905 0-4.226.396c-1.365.41-2.585 1.234-3.647 2.827a.5.5 0 0 0 .832.554C3.854 7.37 4.884 6.694 6.02 6.354C7.185 6.004 8.483 6 10 6h2.293l-2.146 2.146a.5.5 0 1 0 .707.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.707 0M8 15a2 2 0 1 0 0-4a2 2 0 0 0 0 4" />
+
                                 </RepeatButton>
                                 <RepeatButton Click="ZoomOut_Clicked">
                                     <ToolTip.Tip>
                                         <TextBlock Text="{CompiledBinding MultiLanguageResources.ZoomOutText.Data}" />
                                     </ToolTip.Tip>
-                                    <Svg Path="/Assets/zoomout.svg" Width="32" Height="32" Margin="0" Classes="S" />
+
+                                    <Path Name="ZoomOut" Classes="Icon Fill"
+                                          Data="M8.5 6a.5.5 0 0 1 0 1h-4a.5.5 0 0 1 0-1zm-2-5a5.5 5.5 0 0 1 4.227 9.02l3.127 3.127a.5.5 0 1 1-.707.707l-3.127-3.127A5.5 5.5 0 1 1 6.5 1m0 1a4.5 4.5 0 1 0 0 9a4.5 4.5 0 0 0 0-9" />
+
                                 </RepeatButton>
                                 <RepeatButton Click="ZoomIn_Clicked">
                                     <ToolTip.Tip>
                                         <TextBlock Text="{CompiledBinding MultiLanguageResources.ZoomInText.Data}" />
                                     </ToolTip.Tip>
-                                    <Svg Path="/Assets/zoomin.svg" Width="32" Height="32" Margin="0" Classes="S" />
+
+                                    <Path Name="ZoomIn" Classes="Icon Fill"
+                                          Data="M6.5 4a.5.5 0 0 1 .5.5V6h1.5a.5.5 0 0 1 0 1H7v1.5a.5.5 0 0 1-1 0V7H4.5a.5.5 0 0 1 0-1H6V4.5a.5.5 0 0 1 .5-.5m0-3a5.5 5.5 0 0 1 4.227 9.02l3.127 3.127a.5.5 0 1 1-.707.707l-3.127-3.127A5.5 5.5 0 1 1 6.5 1m0 1a4.5 4.5 0 1 0 0 9a4.5 4.5 0 0 0 0-9" />
+
                                 </RepeatButton>
                                 <Button Click="Delete_Clicked">
                                     <ToolTip.Tip>
                                         <TextBlock Text="{CompiledBinding MultiLanguageResources.DeleteText.Data}" />
                                     </ToolTip.Tip>
-                                    <Svg Path="/Assets/trash.svg" Width="32" Height="32" Margin="0" Classes="S" />
+                                    <Path Stretch="Fill" Margin="5" Classes="Icon Fill" Name="Trash" Fill="Transparent"
+                                          Stroke="{DynamicResource MaterialPrimaryMidForegroundBrush}"
+                                          StrokeThickness="2"
+                                          Data="M4 7h16M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3m-5 5l4 4m0-4l-4 4" />
                                 </Button>
                                 <Button Click="SelectAll_Clicked">
                                     <ToolTip.Tip>
                                         <TextBlock Text="{CompiledBinding MultiLanguageResources.SelectAllText.Data}" />
                                     </ToolTip.Tip>
-                                    <Svg Path="/Assets/selectall.svg" Width="32" Height="32" Margin="0" Classes="F" />
+
+                                    <Path Classes="Icon Fill" Name="SelectAll"
+                                          Data="M15.28 9.03a.75.75 0 0 0-1.06-1.06L10 12.19l-1.97-1.97a.75.75 0 1 0-1.06 1.06l2.5 2.5a.75.75 0 0 0 1.06 0zM3 6.25A3.25 3.25 0 0 1 6.25 3h9.5A3.25 3.25 0 0 1 19 6.25v9.5A3.25 3.25 0 0 1 15.75 19h-9.5A3.25 3.25 0 0 1 3 15.75zM6.25 4.5A1.75 1.75 0 0 0 4.5 6.25v9.5c0 .966.784 1.75 1.75 1.75h9.5a1.75 1.75 0 0 0 1.75-1.75v-9.5a1.75 1.75 0 0 0-1.75-1.75zm2.991 17A3.25 3.25 0 0 1 6.5 19.999h9.746A3.753 3.753 0 0 0 20 16.246V6.5a3.25 3.25 0 0 1 1.5 2.741v7.005a5.254 5.254 0 0 1-5.254 5.254z" />
+
                                 </Button>
                                 <Button Click="DeSelectAll_Clicked">
                                     <ToolTip.Tip>
                                         <TextBlock Text="{CompiledBinding MultiLanguageResources.DeselectAllText.Data}" />
                                     </ToolTip.Tip>
-                                    <Svg Path="/Assets/deselectall.svg" Width="32" Height="32" Margin="0" Classes="F" />
+
+                                    <Path Classes="Icon Fill" Name="DeselectAll"
+                                          Data="M6.25 3A3.25 3.25 0 0 0 3 6.25v9a3.25 3.25 0 0 0 3.25 3.25h9a3.25 3.25 0 0 0 3.25-3.25v-9A3.25 3.25 0 0 0 15.25 3zM4.5 6.25c0-.966.784-1.75 1.75-1.75h9c.966 0 1.75.784 1.75 1.75v9A1.75 1.75 0 0 1 15.25 17h-9a1.75 1.75 0 0 1-1.75-1.75zM6.01 19.5A3.25 3.25 0 0 0 8.75 21h7c2.9 0 5.25-2.35 5.25-5.25v-7c0-1.15-.598-2.161-1.5-2.739v9.74a3.75 3.75 0 0 1-3.75 3.75h-7l-.026-.001z" />
+
                                 </Button>
                             </StackPanel>
                         </controls:ShownControl>
@@ -229,29 +284,39 @@
                                         Spacing="5" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Stretch">
                                 <StackPanel.Styles>
                                     <Style Selector="Button">
-                                        <Setter Property="Background" Value="{StaticResource HTMedianBrush}" />
+                                        <Setter Property="Background" Value="{StaticResource MaterialPrimaryMidBrush}" />
                                         <Setter Property="Padding" Value="0" />
                                         <Setter Property="CornerRadius" Value="4" />
                                         <Setter Property="Margin" Value="0" />
                                     </Style>
                                     <Style Selector="RepeatButton">
-                                        <Setter Property="Background" Value="{StaticResource HTMedianBrush}" />
+                                        <Setter Property="Background" Value="{StaticResource MaterialPrimaryMidBrush}" />
                                         <Setter Property="Padding" Value="0" />
                                         <Setter Property="CornerRadius" Value="4" />
                                         <Setter Property="Margin" Value="0" />
+                                    </Style>
+                                    <Style Selector="views|MsgBoxButton">
+                                        <Setter Property="Background" Value="{StaticResource MaterialPrimaryMidBrush}" />
+                                        <Setter Property="Padding" Value="0" />
+                                        <Setter Property="CornerRadius" Value="4" />
+                                        <Setter Property="Margin" Value="0" />
+                                        <Setter Property="Height" Value="32" />
+                                        <Setter Property="Width" Value="32" />
                                     </Style>
                                 </StackPanel.Styles>
                                 <Button Click="SaveClicked">
                                     <ToolTip.Tip>
                                         <TextBlock Text="Save" />
                                     </ToolTip.Tip>
-                                    <Svg Path="/Assets/save.svg" Width="32" Height="32" Margin="0" Classes="F" />
+                                    <Path Name="Save" Classes="Icon Fill"
+                                          Data="M13 14a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2zM3 6a3 3 0 0 1 3-3h20a3 3 0 0 1 3 3v2a3 3 0 0 1-1 2.236V23.5a5.5 5.5 0 0 1-5.5 5.5h-13A5.5 5.5 0 0 1 4 23.5V10.236C3.386 9.686 3 8.888 3 8zm3 5v12.5A3.5 3.5 0 0 0 9.5 27h13a3.5 3.5 0 0 0 3.5-3.5V11zm0-6a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h20a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1z" />
                                 </Button>
                                 <Button Click="Github_Clicked">
                                     <ToolTip.Tip>
                                         <TextBlock Text="Open Github Site" />
                                     </ToolTip.Tip>
-                                    <Svg Path="/Assets/Github.svg" Width="32" Height="32" Margin="0" Classes="F" />
+                                    <Path Name="Github" Classes="Icon Fill"
+                                          Data="M448 96c0-35.3-28.7-64-64-64H64C28.7 32 0 60.7 0 96v320c0 35.3 28.7 64 64 64h320c35.3 0 64-28.7 64-64zM265.8 407.7c0-1.8 0-6 .1-11.6c.1-11.4.1-28.8.1-43.7c0-15.6-5.2-25.5-11.3-30.7c37-4.1 76-9.2 76-73.1c0-18.2-6.5-27.3-17.1-39c1.7-4.3 7.4-22-1.7-45c-13.9-4.3-45.7 17.9-45.7 17.9c-26.6-7.5-56.6-7.5-83.2 0c0 0-31.8-22.2-45.7-17.9c-9.1 22.9-3.5 40.6-1.7 45c-10.6 11.7-15.6 20.8-15.6 39c0 63.6 37.3 69 74.3 73.1c-4.8 4.3-9.1 11.7-10.6 22.3c-9.5 4.3-33.8 11.7-48.3-13.9c-9.1-15.8-25.5-17.1-25.5-17.1c-16.2-.2-1.1 10.2-1.1 10.2c10.8 5 18.4 24.2 18.4 24.2c9.7 29.7 56.1 19.7 56.1 19.7c0 9 .1 21.7.1 30.6c0 4.8.1 8.6.1 10c0 4.3-3 9.5-11.5 8c-66-22.1-112.2-84.9-112.2-158.3c0-91.8 70.2-161.5 162-161.5S388 165.6 388 257.4c.1 73.4-44.7 136.3-110.7 158.3c-8.4 1.5-11.5-3.7-11.5-8m-90.5-54.8c-.2-1.5 1.1-2.8 3-3.2c1.9-.2 3.7.6 3.9 1.9c.3 1.3-1 2.6-3 3c-1.9.4-3.7-.4-3.9-1.7m-9.1 3.2c-2.2.2-3.7-.9-3.7-2.4c0-1.3 1.5-2.4 3.5-2.4c1.9-.2 3.7.9 3.7 2.4c0 1.3-1.5 2.4-3.5 2.4m-14.3-2.2c-1.9-.4-3.2-1.9-2.8-3.2s2.4-1.9 4.1-1.5c2 .6 3.3 2.1 2.8 3.4c-.4 1.3-2.4 1.9-4.1 1.3m-12.5-7.3c-1.5-1.3-1.9-3.2-.9-4.1c.9-1.1 2.8-.9 4.3.6c1.3 1.3 1.8 3.3.9 4.1c-.9 1.1-2.8.9-4.3-.6m-8.5-10c-1.1-1.5-1.1-3.2 0-3.9c1.1-.9 2.8-.2 3.7 1.3c1.1 1.5 1.1 3.3 0 4.1c-.9.6-2.6 0-3.7-1.5m-6.3-8.8c-1.1-1.3-1.3-2.8-.4-3.5c.9-.9 2.4-.4 3.5.6c1.1 1.3 1.3 2.8.4 3.5c-.9.9-2.4.4-3.5-.6m-6-6.4c-1.3-.6-1.9-1.7-1.5-2.6c.4-.6 1.5-.9 2.8-.4c1.3.7 1.9 1.8 1.5 2.6c-.4.9-1.7 1.1-2.8.4" />
                                 </Button>
                                 <Button>
                                     <Button.Flyout>
@@ -275,14 +340,130 @@
                                     <ToolTip.Tip>
                                         <TextBlock Text="{CompiledBinding MultiLanguageResources.ThemeText.Data}" />
                                     </ToolTip.Tip>
-                                    <Svg Path="/Assets/theme.svg" Width="32" Height="32" Margin="0" Classes="F" />
+                                    <Path Name="ThemePathIcon" Classes="Icon Fill"
+                                          Data="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2S2 6.477 2 12s4.477 10 10 10m0-1.5v-17a8.5 8.5 0 0 1 0 17" />
                                 </Button>
-                                <Button Click="Setting_Clicked">
+                                <Button>
+                                    <Button.Flyout>
+                                        <Flyout Placement="Left">
+                                            <ColorPicker IsAlphaVisible="False" IsAlphaEnabled="False"
+                                                         ColorChanged="ColorSettingColorChanged" />
+                                        </Flyout>
+                                    </Button.Flyout>
+                                    <ToolTip.Tip>
+                                        <TextBlock Text="{CompiledBinding MultiLanguageResources.ColorText.Data}" />
+                                    </ToolTip.Tip>
+                                    <Path Name="ColorPathIcon" Classes="Icon Fill"
+                                          Data="M3.839 5.858c2.94-3.916 9.03-5.055 13.364-2.36c4.28 2.66 5.854 7.777 4.1 12.577c-1.655 4.533-6.016 6.328-9.159 4.048c-1.177-.854-1.634-1.925-1.854-3.664l-.106-.987l-.045-.398c-.123-.934-.311-1.352-.705-1.572c-.535-.298-.892-.305-1.595-.033l-.351.146l-.179.078c-1.014.44-1.688.595-2.541.416l-.2-.047l-.164-.047c-2.789-.864-3.202-4.647-.565-8.157m.984 6.716l.123.037l.134.03c.439.087.814.015 1.437-.242l.602-.257c1.202-.493 1.985-.54 3.046.05c.917.512 1.275 1.298 1.457 2.66l.053.459l.055.532l.047.422c.172 1.361.485 2.09 1.248 2.644c2.275 1.65 5.534.309 6.87-3.349c1.516-4.152.174-8.514-3.484-10.789c-3.675-2.284-8.899-1.306-11.373 1.987c-2.075 2.763-1.82 5.28-.215 5.816m11.225-1.994a1.25 1.25 0 1 1 2.414-.647a1.25 1.25 0 0 1-2.414.647m.494 3.488a1.25 1.25 0 1 1 2.415-.647a1.25 1.25 0 0 1-2.415.647M14.07 7.577a1.25 1.25 0 1 1 2.415-.647a1.25 1.25 0 0 1-2.415.647m-.028 8.998a1.25 1.25 0 1 1 2.414-.647a1.25 1.25 0 0 1-2.414.647m-3.497-9.97a1.25 1.25 0 1 1 2.415-.646a1.25 1.25 0 0 1-2.415.646" />
+                                </Button>
+                                <views:MsgBoxButton ButtonDefinitions="OK" MsgBoxMinWidth="600" MsgBoxMaxWidth="600">
                                     <ToolTip.Tip>
                                         <TextBlock Text="{CompiledBinding MultiLanguageResources.SettingText.Data}" />
                                     </ToolTip.Tip>
-                                    <Svg Path="/Assets/setting.svg" Width="32" Height="32" Margin="0" Classes="F" />
-                                </Button>
+                                    <Path Name="Setting" Classes="Icon Fill"
+                                          Data="M2.5 2A1.5 1.5 0 0 0 1 3.5v1a1.5 1.5 0 0 0 1 1.415V11.5A2.5 2.5 0 0 0 4.5 14h2.1a5.5 5.5 0 0 1-.393-1H4.5A1.5 1.5 0 0 1 3 11.5V6h10.5A1.5 1.5 0 0 0 15 4.5v-1A1.5 1.5 0 0 0 13.5 2zM2 3.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5zm7.067 4.943a2 2 0 0 1-1.431 2.478l-.461.118a4.7 4.7 0 0 0 .01 1.016l.35.083a2 2 0 0 1 1.456 2.519l-.127.422q.387.307.835.518l.325-.344a2 2 0 0 1 2.91.002l.337.358q.44-.204.822-.498l-.156-.556a2 2 0 0 1 1.43-2.478l.46-.118a4.7 4.7 0 0 0-.01-1.017l-.348-.082a2 2 0 0 1-1.456-2.52l.126-.422a4.3 4.3 0 0 0-.835-.518l-.325.344a2 2 0 0 1-2.91-.001l-.337-.358a4.3 4.3 0 0 0-.821.497zM11.5 12.5a1 1 0 1 1 0-2a1 1 0 0 1 0 2" />
+                                    <views:MsgBoxButton.MsgBoxContent>
+                                        <TabControl VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                                            <TabItem Header="Setting">
+                                                <TabControl TabStripPlacement="Left" Margin="0,15">
+                                                    <TabControl.Styles>
+                                                        <Style Selector="TabItem">
+                                                            <Setter Property="Height">20</Setter>
+                                                            <Setter Property="MinHeight">20</Setter>
+                                                        </Style>
+                                                    </TabControl.Styles>
+                                                    <TabItem Header="General">
+                                                        <TextBlock xml:space="preserve">Nothing currently...</TextBlock>
+                                                    </TabItem>
+                                                    <TabItem Header="Graph"
+                                                             IsVisible="{x:Static cga:GlobalSetting.AllowExpression}">
+                                                        <StackPanel>
+                                                            <CheckBox Name="MovingOp" IsChecked="{CompiledBinding Displayer.MovingOptimization}">
+                                                                <CheckBox.Styles>
+                                                                    <Style Selector="Border#NormalRectangle">
+                                                                        <Setter Property="BorderBrush" Value="Black" />
+                                                                    </Style>
+                                                                </CheckBox.Styles>
+                                                                <TextBlock
+                                                                    Text="{CompiledBinding MultiLanguageResources.MovingOpText.Data}" />
+                                                            </CheckBox>
+                                                            <CheckBox Name="ZoomingOp"  IsChecked="{CompiledBinding Displayer.ZoomingOptimization}">
+                                                                <CheckBox.Styles>
+                                                                    <Style Selector="Border#NormalRectangle">
+                                                                        <Setter Property="BorderBrush" Value="Black" />
+                                                                    </Style>
+                                                                </CheckBox.Styles>
+                                                                <TextBlock
+                                                                    Text="{CompiledBinding MultiLanguageResources.ZoomingOpText.Data}" />
+                                                            </CheckBox>
+                                                        </StackPanel>
+                                                    </TabItem>
+                                                    <TabItem Header="Implicit Function"
+                                                             IsVisible="{x:Static cga:GlobalSetting.AllowExpression}">
+                                                        <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto"
+                                                              DataContext="{x:Static cga:Static.Instance}">
+                                                            <TextBlock Grid.Row="0" Grid.Column="0">Default Opacity:</TextBlock>
+                                                            <TextBox Grid.Row="1" Grid.Column="0"
+                                                                     Text="{CompiledBinding DefaultOpacity}"
+                                                                     x:DataType="cga:Static" />
+                                                        </Grid>
+                                                    </TabItem>
+                                                </TabControl>
+                                            </TabItem>
+                                            <TabItem Header="Description">
+                                                <ScrollViewer VerticalScrollBarVisibility="Visible"
+                                                              HorizontalScrollBarVisibility="Hidden">
+                                                    <controls1:Markdown xml:space="preserve">
+[Avalk(README.md)|[中文](README_ZH.md)
+
+# CsGrafeq
+
+## Description
+
+CsGrafeq is a geometry sketchpad. It's made by Avalonia and use Material.Avalonia as its theme. For the sake that JIT is unavailable in mobile platforms and browser, CsGrafeq now only support Desktop (now only Windows). 
+
+Project in old version folder is for stably implicit function plotting, which is made by .NET Framework. The function of Implicit function plotting
+is being made now.
+
+## Features
+
+- ReadyToRun compiled, no .Net Runtime environment required.
+- High quality function image plotting.
+- Beautiful UI
+
+
+## Future and Plan
+
+### Short term plan
+
+1. Add implicit function supports
+2. Add text block supports
+3. Implement custom msgbox/inputbox
+4. Implement mathematical calculation (e.g. 0.5->1/2, 1.414->√2)
+
+### Long term plan
+
+1. Add more shapes supports
+2. Fix bugs
+
+Welcome to any programming enthusiasts who wish to collaborate on development. \
+You can put forward your opinions and suggestions in [Issues](https://github.com/jyswjjgdwtdtj/CsGrafeq/issues), I will
+reply as soon as possible. \
+Due to the pressure of high school academic studies, I will engage in development during the winter and summer holidays.
+Each of your stars🌟 is the motivation for my development. Thank you🙏😊.
+
+                                                    </controls1:Markdown>
+                                                </ScrollViewer>
+                                            </TabItem>
+                                            <TabItem Header="Usage">
+                                                <ScrollViewer VerticalScrollBarVisibility="Visible"
+                                                              HorizontalScrollBarVisibility="Hidden">
+                                                    <controls1:Markdown xml:space="preserve" />
+                                                </ScrollViewer>
+                                            </TabItem>
+                                        </TabControl>
+                                    </views:MsgBoxButton.MsgBoxContent>
+                                </views:MsgBoxButton>
                                 <Button>
                                     <ToolTip.Tip>
                                         <TextBlock Text="{CompiledBinding MultiLanguageResources.LanguageText.Data}" />
@@ -290,7 +471,7 @@
                                     <Button.Flyout>
                                         <Flyout Placement="Left">
                                             <ComboBox
-                                                SelectedIndex="{x:Static csgrafeqapp:Languages.CurrentLanguageIndex}"
+                                                SelectedIndex="{x:Static i18N:Languages.CurrentLanguageIndex}"
                                                 SelectionChanged="LanguageSelectionChanged">
                                                 <ComboBoxItem>
                                                     <TextBlock Text="en-us (English)" />
@@ -301,8 +482,17 @@
                                             </ComboBox>
                                         </Flyout>
                                     </Button.Flyout>
-                                    <Svg Path="/Assets/language.svg" Width="32" Height="32" Margin="0" Classes="F" />
+                                    <Path Name="Language" Classes="Icon Fill"
+                                          Data="M17.25 1a.75.75 0 0 1 .75.75V3h4.5a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0V4.5h-9.5v.75a.75.75 0 0 1-1.5 0v-1.5A.75.75 0 0 1 11.5 3h5V1.75a.75.75 0 0 1 .75-.75zm-3.5 5a.75.75 0 0 0 0 1.5h4.428L16.77 8.674a.75.75 0 0 0-.27.576v.25h-4.75a.75.75 0 0 0 0 1.5h4.75v2.734a.75.75 0 0 1-.966.718l-.569-.17a.75.75 0 0 0-.43 1.436l.569.171A2.25 2.25 0 0 0 18 13.734V11h4.25a.75.75 0 0 0 0-1.5h-4.128l2.608-2.174A.75.75 0 0 0 20.25 6h-6.5zm-5.361.477l-.049-.104a.73.73 0 0 0-1.315.087l-5.964 14.5l-.032.096a.754.754 0 0 0 .426.886a.73.73 0 0 0 .963-.402l1.547-3.76l.094.006h7.087l1.433 3.737l.042.092a.73.73 0 0 0 .91.334a.755.755 0 0 0 .418-.972l-5.56-14.5zm-3.74 9.809L7.81 8.747l2.947 7.539h-6.11z" />
                                 </Button>
+                                <views:MsgBoxButton ButtonDefinitions="Yes|No" MsgBoxTitle="456">
+                                    <views:MsgBoxButton.Content>
+                                        123
+                                    </views:MsgBoxButton.Content>
+                                    <views:MsgBoxButton.MsgBoxContent>
+                                        123
+                                    </views:MsgBoxButton.MsgBoxContent>
+                                </views:MsgBoxButton>
                             </StackPanel>
                         </controls:ShownControl>
                     </Border>
@@ -321,13 +511,15 @@
                         </Grid.RowDefinitions>
                         <Border Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center"
                                 Focusable="False" IsEnabled="False"
-                                Background="{DynamicResource HTMedianBrush}" Padding="15" Opacity="0" CornerRadius="4"
+                                Background="{DynamicResource MaterialPrimaryMidBrush}" Padding="15" Opacity="0"
+                                CornerRadius="4"
                                 Name="InfoOuterContainer">
-                            <ContentPresenter Name="InfoPresenter" Foreground="{DynamicResource CgForegroundBrush}" />
+                            <ContentPresenter Name="InfoPresenter"
+                                              Foreground="{DynamicResource MaterialPrimaryMidForegroundBrush}" />
                         </Border>
                     </Grid>
                 </Border>
             </Panel>
-        </controls:GlobalMathKeyBoard>
-        </Panel>
+        </controls1:Keyboard>
+    </Panel>
 </UserControl>

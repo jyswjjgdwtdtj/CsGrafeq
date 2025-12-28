@@ -30,7 +30,7 @@ public abstract class Shape : ReactiveObject, IDisposable
         get => field;
         set
         {
-            this.RaiseAndSetIfChanged(ref field, value);
+            this.RaiseAndSetIfChanged(ref field, value | 0xff000000);
             InvokeShapeChanged();
         }
     } = GetRandomColor();
@@ -61,11 +61,6 @@ public abstract class Shape : ReactiveObject, IDisposable
     ///     当前图形名称
     /// </summary>
     public abstract string TypeName { get; }
-
-    /// <summary>
-    ///     显示在UI上
-    /// </summary>
-    public string Type => TypeName + ":";
 
     /// <summary>
     ///     简介

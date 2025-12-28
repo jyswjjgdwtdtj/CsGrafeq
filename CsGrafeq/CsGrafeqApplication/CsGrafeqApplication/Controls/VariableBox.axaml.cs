@@ -1,113 +1,91 @@
-﻿using System;
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Data;
+using Avalonia.Interactivity;
+using Avalonia.Markup.Xaml;
 using Avalonia.Media;
-using Avalonia.Themes.Fluent;
-using ReactiveUI;
 
 namespace CsGrafeqApplication.Controls;
 
-/// <summary>
-///     逻辑上来说这应该是一个UserControl 但是UserControl属性绑定不上去 不知道为什么
-/// </summary>
-public class VariableBox : UserControl
+public partial class VariableBox : UserControl
 {
-    public static readonly DirectProperty<VariableBox, string> ValueNameProperty =
+    public static readonly DirectProperty<VariableBox, string> VariableNameProperty =
         AvaloniaProperty.RegisterDirect<VariableBox, string>(
-            nameof(ValueName), o => o.ValueName, (o, v) => o.ValueName = v);
+            nameof(VariableName), o => o.VariableName, (o, v) => o.VariableName = v);
 
     public static readonly DirectProperty<VariableBox, double> ValueProperty =
         AvaloniaProperty.RegisterDirect<VariableBox, double>(
-            nameof(Value), o => o.Value, (o, v) => o.Value = v);
+            nameof(Value), o => o.Value, (o, v) => o.Value = v, defaultBindingMode: BindingMode.TwoWay, unsetValue: 0);
 
-    public static readonly DirectProperty<VariableBox, SliderData> MySliderDataProperty =
-        AvaloniaProperty.RegisterDirect<VariableBox, SliderData>(
-            nameof(MySliderData), o => o.MySliderData);
+    public static readonly StyledProperty<double> MinProperty = AvaloniaProperty.Register<VariableBox, double>(
+        nameof(Min), defaultBindingMode: BindingMode.TwoWay, defaultValue: 0);
+
+
+    public static readonly DirectProperty<VariableBox, bool> ShowOnAxisProperty =
+        AvaloniaProperty.RegisterDirect<VariableBox, bool>(
+            nameof(ShowOnAxis), o => o.ShowOnAxis, (o, v) => o.ShowOnAxis = v);
+
+    public static readonly StyledProperty<double> MaxProperty = AvaloniaProperty.Register<VariableBox, double>(
+        nameof(Max), defaultBindingMode: BindingMode.TwoWay, defaultValue: 10);
 
     public VariableBox()
     {
-        MySliderData.Min = -10;
-        MySliderData.Max = 10;
-        PropertyChanged += (s, e) => { };
-        MySliderData.PropertyChanged += (s, e) =>
-        {
-            switch (e.PropertyName)
-            {
-                case nameof(MySliderData.Value):
-                    Value = MySliderData.Value;
-                    break;
-            }
-        };
+        AvaloniaXamlLoader.Load(this);
     }
 
-    public SliderData MySliderData { get; } = new();
-
-    public double Value
-    {
-        get => MySliderData.Value;
-        set
-        {
-            var old = MySliderData.Value;
-            MySliderData.Value = value;
-            RaisePropertyChanged(ValueProperty, old, value);
-        }
-    }
-
-    public string ValueName
+    public bool ShowOnAxis
     {
         get => field;
-        set => SetAndRaise(ValueNameProperty, ref field, value);
+        set => SetAndRaise(ShowOnAxisProperty, ref field, value);
     }
 
-    protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
-    {
-        base.OnApplyTemplate(e);
-        var min = e.NameScope.Find<TextBox>("RangeMinimum");
-        var max = e.NameScope.Find<TextBox>("RangeMaximum");
-        var value = e.NameScope.Find<TextBox>("ValueTextBlock");
-        EventHandler<TemplateAppliedEventArgs> tbt = (s, te) =>
-        {
-            var tb = s as TextBox;
-            var borderelement = te.NameScope.Find<Border>("PART_BorderElement");
-            borderelement.CornerRadius = new CornerRadius(0);
-            borderelement.BorderThickness = new Thickness(0, 0, 0, 2);
-            borderelement.Background = Brushes.Transparent;
-            borderelement.IsVisible = true;
-            tb.LostFocus += (s, e) =>
-            {
-                borderelement.IsVisible = true;
-                borderelement.Background = Brushes.Transparent;
-            };
-            tb.GotFocus += (s, e) =>
-            {
-                borderelement.IsVisible = true;
-                borderelement.Background = Brushes.Transparent;
-            };
-        };
-        min.TemplateApplied += tbt;
-        max.TemplateApplied += tbt;
-        value.TemplateApplied += tbt;
-    }
-}
-
-public class SliderData : ReactiveObject
-{
     public double Min
     {
-        get => field;
-        set => this.RaiseAndSetIfChanged(ref field, value);
+        get => GetValue(MinProperty);
+        set => SetValue(MinProperty, value);
     }
 
     public double Max
     {
-        get;
-        set => this.RaiseAndSetIfChanged(ref field, value);
+        get => GetValue(MaxProperty);
+        set => SetValue(MaxProperty, value);
     }
 
     public double Value
     {
         get => field;
-        set => this.RaiseAndSetIfChanged(ref field, value);
+        set => SetAndRaise(ValueProperty, ref field, value);
+    }
+
+    public string VariableName
+    {
+        get => field;
+        set => SetAndRaise(VariableNameProperty, ref field, value);
+    }
+
+    private void TemplateAppliedHandler(object? s, TemplateAppliedEventArgs e)
+    {
+        var tb = s as TextBox;
+        var borderelement = e.NameScope.Find<Border>("PART_BorderElement");
+        borderelement.CornerRadius = new CornerRadius(0);
+        borderelement.BorderThickness = new Thickness(0, 0, 0, 2);
+        borderelement.Background = Brushes.Transparent;
+        borderelement.IsVisible = true;
+        tb.LostFocus += (s, e) =>
+        {
+            borderelement.IsVisible = true;
+            borderelement.Background = Brushes.Transparent;
+        };
+        tb.GotFocus += (s, e) =>
+        {
+            borderelement.IsVisible = true;
+            borderelement.Background = Brushes.Transparent;
+        };
+    }
+
+    public void EventHandleTrue(object sender, RoutedEventArgs e)
+    {
+        e.Handled = true;
     }
 }

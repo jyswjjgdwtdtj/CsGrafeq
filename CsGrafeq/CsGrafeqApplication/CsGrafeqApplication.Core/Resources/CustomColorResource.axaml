@@ -1,0 +1,6 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:converter="clr-namespace:CsGrafeqApplication.Core.ValueConverter">
+    <converter:UIntColorToBrush x:Key="UIntColorToBrush" />
+    <converter:UIntToColor x:Key="UIntToColor" />
+</ResourceDictionary>

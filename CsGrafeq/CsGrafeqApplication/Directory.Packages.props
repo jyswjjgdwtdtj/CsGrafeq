@@ -6,21 +6,21 @@
   <ItemGroup>
     <!-- Avalonia packages -->
     <!-- Important: keep version in sync! -->
-    <PackageVersion Include="Avalonia" Version="11.3.9" />
+    <PackageVersion Include="Avalonia" Version="11.3.7" />
     <PackageVersion Include="Avalonia.Browser.Blazor" Version="11.3.7" />
-    <PackageVersion Include="Avalonia.Controls.ColorPicker" Version="11.3.9" />
+    <PackageVersion Include="Avalonia.Controls.ColorPicker" Version="11.3.7" />
     <PackageVersion Include="Avalonia.Controls.DataGrid" Version="11.3.9" />
     <PackageVersion Include="Avalonia.Controls.ItemsRepeater" Version="11.1.5" />
     <PackageVersion Include="Avalonia.Controls.TreeDataGrid" Version="11.2.3" />
-    <PackageVersion Include="Avalonia.Skia" Version="11.3.9" />
+    <PackageVersion Include="Avalonia.Skia" Version="11.3.7" />
     <PackageVersion Include="Avalonia.Svg.Skia" Version="11.3.0" />
     <PackageVersion Include="Avalonia.Themes.Fluent" Version="11.3.7" />
-    <PackageVersion Include="Avalonia.Fonts.Inter" Version="11.3.9" />
+    <PackageVersion Include="Avalonia.Fonts.Inter" Version="11.3.7" />
     <PackageVersion Include="Avalonia.Diagnostics" Version="11.3.7" />
-    <PackageVersion Include="Avalonia.Desktop" Version="11.3.9" />
+    <PackageVersion Include="Avalonia.Desktop" Version="11.3.7" />
     <PackageVersion Include="Avalonia.iOS" Version="11.3.9" />
-    <PackageVersion Include="Avalonia.Browser" Version="11.3.9" />
-    <PackageVersion Include="Avalonia.Android" Version="11.3.9" />
+    <PackageVersion Include="Avalonia.Browser" Version="11.3.7" />
+    <PackageVersion Include="Avalonia.Android" Version="11.3.7" />
     <PackageVersion Include="Avalonia.ReactiveUI" Version="11.3.7" />
     <PackageVersion Include="CSharpMath" Version="0.5.1" />
     <PackageVersion Include="CSharpMath.Avalonia" Version="0.5.1" />
@@ -31,10 +31,13 @@
     <PackageVersion Include="DialogHost.Avalonia" Version="0.10.0" />
     <PackageVersion Include="HarfBuzzSharp" Version="8.3.1.2" />
     <PackageVersion Include="HarfBuzzSharp.NativeAssets.WebAssembly" Version="8.3.1.2" />
+    <PackageVersion Include="LiveMarkdown.Avalonia" Version="1.5.3" />
     <PackageVersion Include="Material.Avalonia" Version="3.13.3" />
     <PackageVersion Include="Material.Avalonia.Dialogs" Version="3.13.3" />
+    <PackageVersion Include="MessageBox.Avalonia.Markdown" Version="3.2.0" />
     <PackageVersion Include="Microsoft.NET.Runtime.WebAssembly.Sdk" Version="9.0.10" />
     <PackageVersion Include="PublishAotCompressed" Version="1.0.5" />
+    <PackageVersion Include="ReactiveUI" Version="22.3.1" />
     <PackageVersion Include="SkiaSharp" Version="3.119.1" />
     <PackageVersion Include="SkiaSharp.HarfBuzz" Version="3.119.1" />
     <PackageVersion Include="SkiaSharp.NativeAssets.Android" Version="3.119.1" />

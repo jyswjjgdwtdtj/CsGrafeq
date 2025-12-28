@@ -1,0 +1,13 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:CsGrafeqApplication.Core.Controls"
+        xmlns:views="clr-namespace:CsGrafeqApplication.Dialogs.Views">
+    <Design.PreviewWith>
+        <views:MsgBoxButton />
+    </Design.PreviewWith>
+
+    <Style Selector="views|MsgBoxButton">
+        <!-- Set Defaults -->
+        <Setter Property="Theme" Value="{StaticResource MaterialButtonBase}" />
+    </Style>
+</Styles>

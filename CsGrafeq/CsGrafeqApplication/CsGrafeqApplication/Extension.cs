@@ -12,6 +12,7 @@ global using CsGrafeq;
 global using static CsGrafeq.Utilities.CsGrafeqMath;
 global using static System.Math;
 using System.Runtime.CompilerServices;
+using Avalonia.Interactivity;
 
 namespace CsGrafeqApplication;
 
@@ -25,5 +26,10 @@ internal static class Extension
     public static TOutput VoidFunc<TInput, TOutput>(TInput d) where TOutput : struct
     {
         return default;
+    }
+
+    public static void Prevent(this RoutedEventArgs e)
+    {
+        e.Handled = true;
     }
 }

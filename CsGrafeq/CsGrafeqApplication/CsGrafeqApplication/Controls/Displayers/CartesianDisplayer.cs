@@ -8,7 +8,9 @@ using Avalonia.Input;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using SkiaSharp;
-using static CsGrafeqApplication.Controls.SkiaEx;
+using static CsGrafeqApplication.Core.Utils.StaticSkiaResources;
+using static CsGrafeqApplication.Core.Utils.PointRectHelper;
+
 
 namespace CsGrafeqApplication.Controls.Displayers;
 
@@ -235,8 +237,8 @@ public class CartesianDisplayer : Displayer
             return;
         var zsX = (int)Floor(Log(350 / UnitLength, 10));
         var zsY = (int)Floor(Log(350 / UnitLength, 10));
-        var addnumX = Pow(10D, zsX);
-        var addnumY = Pow(10D, zsY);
+        var addnumX = SpecialPow(10D, zsX);
+        var addnumY = SpecialPow(10D, zsY);
         var addnumDX = SpecialPow(10M, zsX);
         var addnumDY = SpecialPow(10M, zsY);
         SKPaint targetPen;
@@ -326,8 +328,8 @@ public class CartesianDisplayer : Displayer
         var height = Bounds.Height;
         var zsX = (int)Floor(Log(350 / UnitLength, 10));
         var zsY = (int)Floor(Log(350 / UnitLength, 10));
-        var addnumX = Pow(10D, zsX);
-        var addnumY = Pow(10D, zsY);
+        var addnumX = SpecialPow(10D, zsX);
+        var addnumY = SpecialPow(10D, zsY);
         var addnumDX = SpecialPow(10M, zsX);
         var addnumDY = SpecialPow(10M, zsY);
         var p = RangeTo(1, height - TextFont.Size - 2, Zero.Y);

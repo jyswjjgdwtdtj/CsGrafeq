@@ -1,29 +1,23 @@
-using System;
-using Avalonia.Controls;
+using Avalonia;
 using Avalonia.Themes.Fluent;
+using Material.Styles.Themes;
 using ReactiveUI;
 
 namespace CsGrafeqApplication;
 
 public class Static : ReactiveObject
 {
-    public enum InfoType
-    {
-        Information,
-        Warning,
-        Error
-    }
-
-    public static Action<Control, InfoType> Info;
-
     static Static()
     {
         Instance = new Static();
+        Theme = Application.Current.LocateMaterialTheme<MaterialThemeBase>();
     }
 
     private Static()
     {
     }
+
+    public static MaterialThemeBase Theme { get; }
 
     public static Static Instance { get; }
 

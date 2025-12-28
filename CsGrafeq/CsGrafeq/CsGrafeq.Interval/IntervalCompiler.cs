@@ -154,17 +154,15 @@ public static class IntervalCompiler
             ilGenerator.Emit(OpCodes.Call, mi);
     }
 
-    public static bool TryCompile(string expression)
+    public static Result<HasReferenceIntervalSetFunc<IntervalSet>> TryCompile(string expression)
     {
         try
         {
-            Compile(expression);
-            return true;
+            return Result<HasReferenceIntervalSetFunc<IntervalSet>>.Success(Compile(expression));
         }
         catch (Exception e)
         {
-            Debug.Debug.LogError(e.ToString());
-            return false;
+            return Result<HasReferenceIntervalSetFunc<IntervalSet>>.Error(e);
         }
     }
 }

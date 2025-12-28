@@ -52,6 +52,12 @@ public class ExpNumber : ReactiveObject
         private set => this.RaiseAndSetIfChanged(ref field, value);
     } = false;
 
+    public Exception Error
+    {
+        get => field;
+        private set => this.RaiseAndSetIfChanged(ref field, value);
+    } = new();
+
     public event Action NumberChanged;
     public event Action UserSetValueStr;
 
@@ -107,7 +113,7 @@ public class ExpNumber : ReactiveObject
 
         Func.Dispose();
         IsExpression = true;
-        if (Compiler.Compiler.TryCompile<DoubleNumber>(expression, 0, out var expFunc, out var usedVars, out _))
+        if (Compiler.Compiler.TryCompile<DoubleNumber>(expression, 0, out var expFunc, out var usedVars, out var ex))
         {
             Func = new HasReferenceFunction<Func<DoubleNumber>>((Func<DoubleNumber>)expFunc, usedVars);
             IsError = false;
@@ -119,6 +125,7 @@ public class ExpNumber : ReactiveObject
         Func = None;
         SetValue(double.NaN);
         IsError = true;
+        Error = ex;
         UserSetValueStr?.Invoke();
     }
 

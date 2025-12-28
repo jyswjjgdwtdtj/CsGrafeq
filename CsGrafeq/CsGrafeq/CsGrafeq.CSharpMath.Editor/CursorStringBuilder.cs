@@ -1,13 +1,12 @@
-﻿namespace CsGrafeq.CSharpMath.Editor;
+﻿using System.Text;
 
-using System;
-using System.Text;
+namespace CsGrafeq.CSharpMath.Editor;
 
 public class CursorStringBuilder
 {
-    public bool ForceToBeEmpty = false;
-    private StringBuilder _sb;
+    private readonly StringBuilder _sb;
     private int _cursor;
+    public bool ForceToBeEmpty = false;
 
     public CursorStringBuilder(string text = "")
     {
@@ -16,12 +15,12 @@ public class CursorStringBuilder
     }
 
     /// <summary>
-    /// 获取当前文本内容
+    ///     获取当前文本内容
     /// </summary>
     public string Text => _sb.ToString();
 
     /// <summary>
-    /// 当前游标位置
+    ///     当前游标位置
     /// </summary>
     public int Cursor
     {
@@ -48,7 +47,7 @@ public class CursorStringBuilder
     }
 
     /// <summary>
-    /// 在游标处插入文本
+    ///     在游标处插入文本
     /// </summary>
     public CursorStringBuilder Insert(string content)
     {
@@ -58,7 +57,7 @@ public class CursorStringBuilder
     }
 
     /// <summary>
-    /// 移动游标
+    ///     移动游标
     /// </summary>
     public CursorStringBuilder MoveCursor(int offset)
     {
@@ -68,6 +67,6 @@ public class CursorStringBuilder
 
     public override string ToString()
     {
-        return ForceToBeEmpty?"":_sb.ToString();
+        return ForceToBeEmpty ? "" : _sb.ToString();
     }
 }

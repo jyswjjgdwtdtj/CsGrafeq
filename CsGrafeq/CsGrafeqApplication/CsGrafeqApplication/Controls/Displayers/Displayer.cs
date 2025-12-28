@@ -110,7 +110,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
         var loc = LastPoint;
         var args = new AddonPointerEventArgs(loc.X, loc.Y, e.Properties, e.KeyModifiers);
         foreach (var addon in Addons)
-            if (addon.CallAddonPointerPressed(args) == Intercept)
+            if (addon.CallPointerPressed(args) == Intercept)
                 return Intercept;
         return DoNext;
     }
@@ -122,7 +122,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
         var loc = LastPoint;
         var args = new AddonPointerEventArgs(loc.X, loc.Y, e.Properties, e.KeyModifiers);
         foreach (var addon in Addons)
-            if (addon.CallAddonPointerMoved(args) == Intercept)
+            if (addon.CallPointerMoved(args) == Intercept)
                 return Intercept;
         return DoNext;
     }
@@ -134,7 +134,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
         var loc = LastPoint;
         var args = new AddonPointerEventArgs(loc.X, loc.Y, e.Properties, e.KeyModifiers);
         foreach (var addon in Addons)
-            if (addon.CallAddonPointerReleased(args) == Intercept)
+            if (addon.CallPointerReleased(args) == Intercept)
                 return Intercept;
         return DoNext;
     }
@@ -147,7 +147,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
         var args = new AddonPointerWheelEventArgs(loc.X, loc.Y, e.Properties, e.KeyModifiers,
             new Vec(e.Delta.X, e.Delta.Y));
         foreach (var addon in Addons)
-            if (addon.CallAddonPointerWheeled(args) == Intercept)
+            if (addon.CallPointerWheeled(args) == Intercept)
                 return Intercept;
         return DoNext;
     }
@@ -159,7 +159,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
         var loc = e.GetPosition(this);
         var args = new AddonPointerEventArgsBase(loc.X, loc.Y, e.KeyModifiers);
         foreach (var addon in Addons)
-            if (addon.CallAddonPointerTapped(args) == Intercept)
+            if (addon.CallPointerTapped(args) == Intercept)
                 return Intercept;
         return DoNext;
     }
@@ -169,7 +169,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
         var loc = e.GetPosition(this);
         var args = new AddonPointerEventArgsBase(loc.X, loc.Y, e.KeyModifiers);
         foreach (var addon in Addons)
-            if (addon.CallAddonPointerDoubleTapped(args) == Intercept)
+            if (addon.CallPointerDoubleTapped(args) == Intercept)
                 return Intercept;
         return DoNext;
     }
@@ -177,7 +177,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
     protected bool CallAddonKeyDown(KeyEventArgs e)
     {
         foreach (var addon in Addons)
-            if (addon.CallAddonKeyDown(e) == Intercept)
+            if (addon.CallKeyDown(e) == Intercept)
                 return Intercept;
         return DoNext;
     }
@@ -185,7 +185,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
     protected bool CallAddonKeyUp(KeyEventArgs e)
     {
         foreach (var addon in Addons)
-            if (addon.CallAddonKeyUp(e) == Intercept)
+            if (addon.CallKeyUp(e) == Intercept)
                 return Intercept;
         return DoNext;
     }

@@ -11,77 +11,91 @@
         Title="{CompiledBinding MultiLanguageResources.CsGrafeqText.Data}"
         ExtendClientAreaToDecorationsHint="True"
         ExtendClientAreaChromeHints="NoChrome"
+        SystemDecorations="Full"
         TransparencyLevelHint="Transparent" Background="{DynamicResource CgBackgroundBrush}">
-    
     <Window.Styles>
-        <Style Selector="Svg.F">
-            <Setter Property="Css" Value="{DynamicResource OppositeCssPathFillString}" />
-        </Style>
-        <Style Selector="Svg.S">
-            <Setter Property="Css" Value="{DynamicResource OppositeCssPathStrokeString}" />
+        <StyleInclude Source="avares://CsGrafeqApplication.Core/Styles/PathStyles.axaml" />
+        <Style Selector="Path.BarIcon">
+            <Setter Property="Stretch" Value="Uniform" />
+            <Setter Property="Height" Value="13" />
+            <Setter Property="Width" Value="13" />
+            <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
     </Window.Styles>
     <DockPanel LastChildFill="True">
-        <DockPanel.Resources>
-            <ResourceDictionary>
-                <Color x:Key="Cyan">#aa77ccbb</Color>
-                <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%" x:Key="MedianLinearGradientBrush">
-                    <GradientStop Color="{StaticResource Cyan}" Offset="0.0" />
-                    <GradientStop Color="{StaticResource Cyan}" Offset="0.2" />
-                    <GradientStop Color="{DynamicResource CgTransparentColor}" Offset="1.0" />
-                </LinearGradientBrush>
-            </ResourceDictionary>
-        </DockPanel.Resources>
         <Border DockPanel.Dock="Top" Height="30">
             <Canvas Name="Canvas">
-                <DockPanel LastChildFill="True" Canvas.Left="{CompiledBinding OffSet}" Canvas.Top="{CompiledBinding OffSet}">
+                <DockPanel LastChildFill="True" Canvas.Left="{CompiledBinding OffSet}"
+                           Canvas.Top="{CompiledBinding OffSet}">
                     <DockPanel.Width>
                         <MultiBinding Converter="{StaticResource Add}">
-                            <CompiledBinding Path="#Canvas.Bounds.Width"></CompiledBinding>
-                            <CompiledBinding Path="LengthContract"></CompiledBinding>
-                            <CompiledBinding Path="LengthContract"></CompiledBinding>
+                            <CompiledBinding Path="#Canvas.Bounds.Width" />
+                            <CompiledBinding Path="LengthContract" />
+                            <CompiledBinding Path="LengthContract" />
                         </MultiBinding>
                     </DockPanel.Width>
                     <DockPanel.Height>
                         <MultiBinding Converter="{StaticResource Add}">
-                            <CompiledBinding Path="#Canvas.Bounds.Height"></CompiledBinding>
-                            <CompiledBinding Path="LengthContract"></CompiledBinding>
+                            <CompiledBinding Path="#Canvas.Bounds.Height" />
+                            <CompiledBinding Path="LengthContract" />
                         </MultiBinding>
                     </DockPanel.Height>
-                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left"
-                                Background="{StaticResource MedianLinearGradientBrush}">
-                    <Image Width="16" Height="16" Source="avares://CsGrafeqApplication/Assets/favicon.ico"
-                           VerticalAlignment="Center" Margin="8,5,5,5" />
-                    <TextBlock VerticalAlignment="Center" FontFamily="{StaticResource MapleMono}" Foreground="{DynamicResource CgForegroundBrush}">CsGrafeq</TextBlock>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
-                    <Button Padding="0" Width="45" CornerRadius="0" Background="{DynamicResource CgTranslucentBackgroundBrush}" Click="MinimizeClicked">
-                        <Svg Path="/Assets/minimize.svg" Classes="F" Height="18"></Svg>
-                    </Button>
-                    <ToggleButton Padding="0" Width="45" CornerRadius="0" Background="{DynamicResource CgTranslucentBackgroundBrush}" IsChecked="{CompiledBinding IsMaximized}">
-                        <ToggleButton.Styles>
-                            <Style Selector="ToggleButton:checked">
-                                <Setter Property="ContentTemplate">
-                                    <DataTemplate>
-                                        <Svg Path="/Assets/closefullscreen.svg" Classes="F" Height="18"></Svg>
-                                    </DataTemplate>
-                                </Setter>
-                            </Style>
-                            <Style Selector="ToggleButton:unchecked">
-                                <Setter Property="ContentTemplate">
-                                    <DataTemplate>
-                                        <Svg Path="/Assets/openfullscreen.svg" Classes="F" Height="18"></Svg>
-                                    </DataTemplate>
-                                </Setter>
-                            </Style>
-                        </ToggleButton.Styles>
-                    </ToggleButton>
-                    <Button Padding="0" Width="45" CornerRadius="0" Background="{DynamicResource CgTranslucentBackgroundBrush}" Click="CloseWindowClicked">
-                        <Svg Path="/Assets/close.svg" Classes="F" Height="18"></Svg>
-                    </Button>
-                </StackPanel>
-                <Border  IsHitTestVisible="False"></Border>
-            </DockPanel>
+                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                        <!--会诡异的延迟一个颜色
+                        <StackPanel.Background>
+                            <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                                <GradientStop Offset="0.0" >
+                                    <GradientStop.Color>
+                                        <MultiBinding Converter="{StaticResource SolidColorBrushToColor}" >
+                                            <DynamicResource ResourceKey="MaterialPrimaryMidBrush"></DynamicResource>
+                                        </MultiBinding>
+                                    </GradientStop.Color>
+                                </GradientStop>
+                                <GradientStop Offset="0.2" >
+                                    <GradientStop.Color>
+                                        <MultiBinding Converter="{StaticResource SolidColorBrushToColor}">
+                                            <DynamicResource ResourceKey="MaterialPrimaryMidBrush"></DynamicResource>
+                                        </MultiBinding>
+                                    </GradientStop.Color>
+                                </GradientStop>
+                                <GradientStop Color="{DynamicResource CgTransparentColor}" Offset="1.0" />
+                            </LinearGradientBrush>
+                        </StackPanel.Background>-->
+                        <Image Width="16" Height="16" Source="avares://CsGrafeqApplication/Assets/favicon.ico"
+                               VerticalAlignment="Center" Margin="8,5,5,5" />
+                        <TextBlock VerticalAlignment="Center" FontFamily="{StaticResource MapleMono}"
+                                   Foreground="{DynamicResource CgForegroundBrush}">
+                            CsGrafeq
+                        </TextBlock>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                        <Button Padding="0" Width="45" CornerRadius="0"
+                                Background="{DynamicResource CgTranslucentBackgroundBrush}" Click="MinimizeClicked">
+                            <Path Height="4" Stretch="Uniform" Classes="Icon Fill BarIcon" Name="MinimizeWindow"
+                                  Data="M7 13q-.425 0-.712-.288T6 12t.288-.712T7 11h10q.425 0 .713.288T18 12t-.288.713T17 13z" />
+                        </Button>
+                        <ToggleButton Padding="0" Width="45" CornerRadius="0"
+                                      Background="{DynamicResource CgTranslucentBackgroundBrush}"
+                                      IsChecked="{CompiledBinding IsMaximized}">
+                            <ToggleButton.Styles>
+                                <Style Selector="ToggleButton:checked">
+                                    <Setter Property="ContentTemplate">
+                                    </Setter>
+                                </Style>
+                                <Style Selector="ToggleButton:unchecked">
+                                    <Setter Property="ContentTemplate">
+                                    </Setter>
+                                </Style>
+                            </ToggleButton.Styles>
+                        </ToggleButton>
+                        <Button Padding="0" Width="45" CornerRadius="0"
+                                Background="{DynamicResource CgTranslucentBackgroundBrush}" Click="CloseWindowClicked">
+                            <Path Classes="Icon Fill BarIcon" Name="CloseWindow"
+                                  Data="m12 13.4l-4.9 4.9q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7l4.9-4.9l-4.9-4.9q-.275-.275-.275-.7t.275-.7t.7-.275t.7.275l4.9 4.9l4.9-4.9q.275-.275.7-.275t.7.275t.275.7t-.275.7L13.4 12l4.9 4.9q.275.275.275.7t-.275.7t-.7.275t-.7-.275z" />
+                        </Button>
+                    </StackPanel>
+                    <Border IsHitTestVisible="False" />
+                </DockPanel>
             </Canvas>
         </Border>
         <views:MainView />

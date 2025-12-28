@@ -1,0 +1,21 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Design.PreviewWith>
+        <Border Padding="20">
+            <!-- Add Controls for Previewer Here -->
+        </Border>
+    </Design.PreviewWith>
+    <Style Selector="Path.Icon">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="Stretch" Value="Fill" />
+        <Style Selector="^.Fill">
+            <Setter Property="Fill" Value="{DynamicResource CgForegroundBrush}" />
+            <Setter Property="Stroke" Value="Transparent" />
+        </Style>
+        <Style Selector="^.Stroke">
+            <Setter Property="Stroke" Value="{DynamicResource CgForegroundBrush}" />
+            <Setter Property="Fill" Value="Transparent" />
+        </Style>
+    </Style>
+</Styles>

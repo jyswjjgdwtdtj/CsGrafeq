@@ -14,11 +14,11 @@ public partial class MainWindow : Window
 
     private void MinimizeClicked(object? sender, RoutedEventArgs e)
     {
-        this.WindowState= WindowState.Minimized;
+        WindowState = WindowState.Minimized;
     }
 
     private void CloseWindowClicked(object? sender, RoutedEventArgs e)
     {
-        this.Close();
+        Close();
     }
 }

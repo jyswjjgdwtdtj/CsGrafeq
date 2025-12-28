@@ -1,0 +1,75 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+
+    <ItemGroup>
+        <Compile Update="Controls\Markdown.axaml.cs">
+            <DependentUpon>Markdown.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Controls\MathTextBox.axaml.cs">
+            <DependentUpon>MathTextBox.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Controls\Keyboard.axaml">
+            <DependentUpon>Keyboard.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Controls\Keyboard.axaml.cs">
+            <DependentUpon>Keyboard.axaml.axaml</DependentUpon>
+        </Compile>
+        <Compile Update="Controls\OneSymbolKeyButton.axaml.cs">
+            <DependentUpon>OneSymbolKeyButton.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Controls\TwoSymbolKeyButton.axaml.cs">
+            <DependentUpon>TwoSymbolKeyButton.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Controls\TwoSymbolKeyButtonInPlace.axaml.cs">
+            <DependentUpon>TwoSymbolKeyButtonInPlace.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Reference Include="Avalonia.Controls">
+            <HintPath>C:\Users\bryan\.nuget\packages\avalonia\11.3.7\ref\net8.0\Avalonia.Controls.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia"/>
+        <PackageReference Include="CSharpMath"/>
+        <PackageReference Include="CSharpMath.Evaluation"/>
+        <PackageReference Include="CSharpMath.Rendering"/>
+        <PackageReference Include="CSharpMath.SkiaSharp"/>
+        <PackageReference Include="HarfBuzzSharp"/>
+        <PackageReference Include="LiveMarkdown.Avalonia"/>
+        <PackageReference Include="Material.Avalonia"/>
+        <PackageReference Include="SkiaSharp"/>
+        <PackageReference Include="Sylinko.CSharpMath.Avalonia"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.CSharpMath.Editor\CsGrafeq.CSharpMath.Editor.csproj"/>
+        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.I18N\CsGrafeq.I18N.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <AdditionalFiles Include="Resources\ButtonTypeRadioButton.axaml"/>
+        <AdditionalFiles Include="Resources\ConverterResource.axaml"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <AvaloniaResource Include="Fonts\MapleMono-CN-Regular.ttf">
+            <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+        </AvaloniaResource>
+    </ItemGroup>
+
+</Project>

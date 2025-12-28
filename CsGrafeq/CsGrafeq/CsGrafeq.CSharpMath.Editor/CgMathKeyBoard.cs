@@ -1,4 +1,5 @@
-﻿using CSharpMath;
+﻿using System.Drawing;
+using CSharpMath;
 using CSharpMath.Atom;
 using CSharpMath.Atom.Atoms;
 using CSharpMath.Display;
@@ -8,27 +9,27 @@ using CSharpMath.Editor;
 using CSharpMath.Rendering.BackEnd;
 using CSharpMath.Rendering.FrontEnd;
 using CSharpMath.Structures;
-using System.Drawing;
 using Typography.OpenFont;
-using Atoms = CSharpMath.Atom.Atoms;
 using Glyph = CSharpMath.Rendering.BackEnd.Glyph;
 using Timer = System.Timers.Timer;
 
 namespace CsGrafeq.CSharpMath.Editor;
+
 /// <summary>
-/// 原作者不写注释 写了一大堆类似于LevelUp之类的函数名 都不知道是干啥的
-/// 遂勉强用吧。。。。。
+///     原作者不写注释 写了一大堆类似于LevelUp之类的函数名 都不知道是干啥的
+///     遂勉强用吧。。。。。
 /// </summary>
 public sealed class CgMathKeyboard : IDisposable
 {
     public const double DefaultBlinkMilliseconds = 800;
+    private readonly Timer blinkTimer;
     private MathListIndex _insertionIndex = MathListIndex.Level0Index(0);
     private bool _insertionPositionHighlighted;
-    private readonly Timer blinkTimer;
+    private bool blinking;
 
     static CgMathKeyboard()
     {
-        LaTeXSettings.CommandSymbols.Add("\\lcm",new LargeOperator("lcm", false, true));
+        LaTeXSettings.CommandSymbols.Add("\\lcm", new LargeOperator("lcm", false, true));
     }
 
     public CgMathKeyboard(MathList ml)
@@ -37,15 +38,28 @@ public sealed class CgMathKeyboard : IDisposable
         Context = TypesettingContext.Instance;
         Font = new Fonts(Array.Empty<Typeface>(), PainterConstants.DefaultFontSize);
         blinkTimer = new Timer(DefaultBlinkMilliseconds);
+        var lastCount = -1;
+        var lastHash = -1;
         blinkTimer.Elapsed += (sender, e) =>
         {
-            InsertionPositionHighlighted = !InsertionPositionHighlighted;
+            if (blinking)
+            {
+                InsertionPositionHighlighted = !InsertionPositionHighlighted;
+            }
+            else
+            {
+                if (lastCount != MathList.Count || lastHash != MathList.GetHashCode())
+                    RedrawRequested?.Invoke(this, EventArgs.Empty);
+            }
+
+            lastCount = MathList.Count;
+            lastHash = MathList.GetHashCode();
         };
         blinkTimer.Start();
     }
 
     public bool ShouldDrawCaret =>
-        InsertionPositionHighlighted && !(MathList.AtomAt(_insertionIndex) is Atoms.Placeholder);
+        InsertionPositionHighlighted && !(MathList.AtomAt(_insertionIndex) is Placeholder);
 
     private TypesettingContext<Fonts, Glyph> Context { get; }
 
@@ -57,7 +71,7 @@ public sealed class CgMathKeyboard : IDisposable
             blinkTimer.Stop();
             blinkTimer.Start();
             _insertionPositionHighlighted = value;
-            if (MathList.AtomAt(_insertionIndex) is Atoms.Placeholder placeholder)
+            if (MathList.AtomAt(_insertionIndex) is Placeholder placeholder)
                 (placeholder.Nucleus, placeholder.Color) =
                     _insertionPositionHighlighted
                         ? (LaTeXSettings.PlaceholderActiveNucleus, LaTeXSettings.PlaceholderActiveColor)
@@ -99,12 +113,12 @@ public sealed class CgMathKeyboard : IDisposable
 
     public void StartBlinking()
     {
-        blinkTimer.Start();
+        blinking = true;
     }
 
     public void StopBlinking()
     {
-        blinkTimer.Stop();
+        blinking = false;
     }
 
     private static void ResetPlaceholders(MathList mathList)
@@ -115,7 +129,7 @@ public sealed class CgMathKeyboard : IDisposable
             ResetPlaceholders(mathAtom.Subscript);
             switch (mathAtom)
             {
-                case Atoms.Placeholder placeholder:
+                case Placeholder placeholder:
                     placeholder.Color = LaTeXSettings.PlaceholderRestingColor;
                     placeholder.Nucleus = LaTeXSettings.PlaceholderRestingNucleus;
                     break;
@@ -186,11 +200,11 @@ public sealed class CgMathKeyboard : IDisposable
             {
                 return mathAtom switch
                 {
-                    Atoms.BinaryOperator _ => true,
-                    Atoms.UnaryOperator _ => true,
-                    Atoms.Relation _ => true,
-                    Atoms.Open _ => true,
-                    Atoms.Punctuation _ => true,
+                    BinaryOperator _ => true,
+                    UnaryOperator _ => true,
+                    Relation _ => true,
+                    Open _ => true,
+                    Punctuation _ => true,
                     _ => false
                 };
             }
@@ -238,16 +252,16 @@ public sealed class CgMathKeyboard : IDisposable
                 {
                     case (null, _): throw new InvalidCodePathException("Invalid _insertionIndex");
                     // Stop looking behind upon encountering these atoms unparenthesized
-                    case (Atoms.Open _, _) when --parenDepth < 0: goto stop;
-                    case (Atoms.Close a, _):
+                    case (Open _, _) when --parenDepth < 0: goto stop;
+                    case (Close a, _):
                         parenDepth++;
                         numerator.Push(a);
                         break;
-                    case (Atoms.UnaryOperator _, 0): goto stop;
-                    case (Atoms.BinaryOperator _, 0): goto stop;
-                    case (Atoms.Relation _, 0): goto stop;
-                    case (Atoms.Fraction _, 0): goto stop;
-                    case (Atoms.Open _, _) when parenDepth < 0: goto stop;
+                    case (UnaryOperator _, 0): goto stop;
+                    case (BinaryOperator _, 0): goto stop;
+                    case (Relation _, 0): goto stop;
+                    case (Fraction _, 0): goto stop;
+                    case (Open _, _) when parenDepth < 0: goto stop;
                     // We don't put this atom on the fraction
                     case var (a, _): numerator.Push(a); break;
                 }
@@ -256,11 +270,11 @@ public sealed class CgMathKeyboard : IDisposable
             MathList.RemoveAtoms(new MathListRange(_insertionIndex, numerator.Count));
             if (numerator.Count == 0)
                 // so we didn't really find any numbers before this, so make the numerator 1
-                numerator.Push(new Atoms.Number("1"));
-            if (MathList.AtomAt(_insertionIndex.Previous) is Atoms.Fraction)
+                numerator.Push(new Number("1"));
+            if (MathList.AtomAt(_insertionIndex.Previous) is Fraction)
                 // Add a times symbol
                 MathList.InsertAndAdvance(ref _insertionIndex, LaTeXSettings.Times, MathListSubIndexType.None);
-            MathList.InsertAndAdvance(ref _insertionIndex, new Atoms.Fraction(
+            MathList.InsertAndAdvance(ref _insertionIndex, new Fraction(
                 new MathList(numerator),
                 LaTeXSettings.PlaceholderList
             ), MathListSubIndexType.Denominator);
@@ -269,7 +283,7 @@ public sealed class CgMathKeyboard : IDisposable
         void InsertInner(string left, string right)
         {
             MathList.InsertAndAdvance(ref _insertionIndex,
-                new Atoms.Inner(new Boundary(left), LaTeXSettings.PlaceholderList, new Boundary(right)),
+                new Inner(new Boundary(left), LaTeXSettings.PlaceholderList, new Boundary(right)),
                 MathListSubIndexType.Inner);
         }
 
@@ -303,29 +317,29 @@ public sealed class CgMathKeyboard : IDisposable
                                 (MathListSubIndexType.BetweenBaseAndScripts, MathListIndex.Level0Index(1));
                             break;
                         case MathListSubIndexType.BetweenBaseAndScripts:
-                            if (MathList.AtomAt(levelDown) is Atoms.Radical rad && rad.Radicand.IsNonEmpty())
+                            if (MathList.AtomAt(levelDown) is Radical rad && rad.Radicand.IsNonEmpty())
                                 _insertionIndex = levelDown.LevelUpWithSubIndex
                                 (MathListSubIndexType.Radicand,
                                     MathListIndex.Level0Index(rad.Radicand.Count));
-                            else if (MathList.AtomAt(levelDown) is Atoms.Fraction frac && frac.Denominator.IsNonEmpty())
+                            else if (MathList.AtomAt(levelDown) is Fraction frac && frac.Denominator.IsNonEmpty())
                                 _insertionIndex = levelDown.LevelUpWithSubIndex
                                 (MathListSubIndexType.Denominator,
                                     MathListIndex.Level0Index(frac.Denominator.Count));
-                            else if (MathList.AtomAt(levelDown) is Atoms.Inner inner && inner.InnerList.IsNonEmpty())
+                            else if (MathList.AtomAt(levelDown) is Inner inner && inner.InnerList.IsNonEmpty())
                                 _insertionIndex = levelDown.LevelUpWithSubIndex
                                 (MathListSubIndexType.Inner,
                                     MathListIndex.Level0Index(inner.InnerList.Count));
                             else goto case MathListSubIndexType.Radicand;
                             break;
                         case MathListSubIndexType.Radicand:
-                            if (MathList.AtomAt(levelDown) is Atoms.Radical radDeg && radDeg.Degree.IsNonEmpty())
+                            if (MathList.AtomAt(levelDown) is Radical radDeg && radDeg.Degree.IsNonEmpty())
                                 _insertionIndex = levelDown.LevelUpWithSubIndex
                                     (MathListSubIndexType.Degree, MathListIndex.Level0Index(radDeg.Degree.Count));
                             else
                                 goto case MathListSubIndexType.Denominator;
                             break;
                         case MathListSubIndexType.Denominator:
-                            if (MathList.AtomAt(levelDown) is Atoms.Fraction fracNum && fracNum.Numerator.IsNonEmpty())
+                            if (MathList.AtomAt(levelDown) is Fraction fracNum && fracNum.Numerator.IsNonEmpty())
                                 _insertionIndex = levelDown.LevelUpWithSubIndex
                                 (MathListSubIndexType.Numerator,
                                     MathListIndex.Level0Index(fracNum.Numerator.Count));
@@ -349,15 +363,15 @@ public sealed class CgMathKeyboard : IDisposable
                     _insertionIndex = prev.LevelUpWithSubIndex
                         (MathListSubIndexType.Subscript, MathListIndex.Level0Index(s.Count));
                     break;
-                case Atoms.Inner { InnerList: var l }:
+                case Inner { InnerList: var l }:
                     _insertionIndex = prev.LevelUpWithSubIndex
                         (MathListSubIndexType.Inner, MathListIndex.Level0Index(l.Count));
                     break;
-                case Atoms.Radical { Radicand: var r }:
+                case Radical { Radicand: var r }:
                     _insertionIndex = prev.LevelUpWithSubIndex
                         (MathListSubIndexType.Radicand, MathListIndex.Level0Index(r.Count));
                     break;
-                case Atoms.Fraction { Denominator: var d }:
+                case Fraction { Denominator: var d }:
                     _insertionIndex = prev.LevelUpWithSubIndex
                         (MathListSubIndexType.Denominator, MathListIndex.Level0Index(d.Count));
                     break;
@@ -371,13 +385,13 @@ public sealed class CgMathKeyboard : IDisposable
             if (_insertionIndex.FinalSubIndexType is MathListSubIndexType.BetweenBaseAndScripts)
             {
                 var prevInd = _insertionIndex.LevelDown();
-                if (prevInd != null && MathList.AtomAt(prevInd) is Atoms.Placeholder)
+                if (prevInd != null && MathList.AtomAt(prevInd) is Placeholder)
                     _insertionIndex = prevInd;
             }
             else if (MathList.AtomAt(_insertionIndex) is null
                      && _insertionIndex?.Previous is MathListIndex previous)
             {
-                if (MathList.AtomAt(previous) is Atoms.Placeholder p && p.Superscript.IsEmpty() &&
+                if (MathList.AtomAt(previous) is Placeholder p && p.Superscript.IsEmpty() &&
                     p.Subscript.IsEmpty())
                     _insertionIndex = previous; // Skip right side of placeholders when end of line
             }
@@ -401,18 +415,18 @@ public sealed class CgMathKeyboard : IDisposable
                         case var _ when levelDownAtom is null:
                             throw new InvalidCodePathException("Invalid levelDown");
                         case MathListSubIndexType.Degree:
-                            if (levelDownAtom is Atoms.Radical)
+                            if (levelDownAtom is Radical)
                                 _insertionIndex = levelDown.LevelUpWithSubIndex
                                     (MathListSubIndexType.Radicand, MathListIndex.Level0Index(0));
                             else
-                                throw new SubIndexTypeMismatchException(typeof(Atoms.Radical), levelDown);
+                                throw new SubIndexTypeMismatchException(typeof(Radical), levelDown);
                             break;
                         case MathListSubIndexType.Numerator:
-                            if (levelDownAtom is Atoms.Fraction)
+                            if (levelDownAtom is Fraction)
                                 _insertionIndex = levelDown.LevelUpWithSubIndex
                                     (MathListSubIndexType.Denominator, MathListIndex.Level0Index(0));
                             else
-                                throw new SubIndexTypeMismatchException(typeof(Atoms.Fraction), levelDown);
+                                throw new SubIndexTypeMismatchException(typeof(Fraction), levelDown);
                             break;
                         case MathListSubIndexType.Radicand:
                         case MathListSubIndexType.Denominator:
@@ -453,15 +467,15 @@ public sealed class CgMathKeyboard : IDisposable
                         a.Subscript.IsNonEmpty() ? MathListSubIndexType.Subscript : MathListSubIndexType.Superscript,
                         MathListIndex.Level0Index(0));
                     break;
-                case Atoms.Inner _:
+                case Inner _:
                     _insertionIndex =
                         _insertionIndex.LevelUpWithSubIndex(MathListSubIndexType.Inner, MathListIndex.Level0Index(0));
                     break;
-                case Atoms.Fraction _:
+                case Fraction _:
                     _insertionIndex = _insertionIndex.LevelUpWithSubIndex
                         (MathListSubIndexType.Numerator, MathListIndex.Level0Index(0));
                     break;
-                case Atoms.Radical rad:
+                case Radical rad:
                     _insertionIndex = _insertionIndex.LevelUpWithSubIndex(
                         rad.Degree.IsNonEmpty() ? MathListSubIndexType.Degree : MathListSubIndexType.Radicand,
                         MathListIndex.Level0Index(0));
@@ -470,7 +484,7 @@ public sealed class CgMathKeyboard : IDisposable
                     _insertionIndex = _insertionIndex.LevelUpWithSubIndex
                         (MathListSubIndexType.BetweenBaseAndScripts, MathListIndex.Level0Index(1));
                     break;
-                case Atoms.Placeholder _ when MathList.AtomAt(_insertionIndex.Next) is null:
+                case Placeholder _ when MathList.AtomAt(_insertionIndex.Next) is null:
                     // Skip right side of placeholders when end of line
                     goto case null;
                 default:
@@ -481,7 +495,7 @@ public sealed class CgMathKeyboard : IDisposable
             if (_insertionIndex is null)
                 throw new InvalidOperationException($"{nameof(_insertionIndex)} is null.");
             if (_insertionIndex.FinalSubIndexType is MathListSubIndexType.BetweenBaseAndScripts
-                && MathList.AtomAt(_insertionIndex.LevelDown()) is Atoms.Placeholder)
+                && MathList.AtomAt(_insertionIndex.LevelDown()) is Placeholder)
                 MoveCursorRight();
         }
 
@@ -491,22 +505,23 @@ public sealed class CgMathKeyboard : IDisposable
             if (!HasText) return false;
             if (_insertionIndex.Previous is MathListIndex previous)
             {
-                Console.WriteLine(previous.FinalSubIndexType);
                 _insertionIndex = previous;
                 MathList.RemoveAt(ref _insertionIndex);
                 return true;
             }
-            if(ifNullThenMoveLeft)
+
+            if (ifNullThenMoveLeft)
             {
                 MoveCursorLeft();
                 return false;
             }
+
             return false;
         }
 
         static bool IsPlaceholderList(MathList ml)
         {
-            return ml.Count == 1 && ml[0] is Atoms.Placeholder;
+            return ml.Count == 1 && ml[0] is Placeholder;
         }
 
         void InsertAtom(MathAtom a)
@@ -514,15 +529,12 @@ public sealed class CgMathKeyboard : IDisposable
             MathList.InsertAndAdvance(ref _insertionIndex, a,
                 a switch
                 {
-                    Atoms.Fraction _ => MathListSubIndexType.Numerator,
-                    Atoms.Radical { Degree: { } d } when IsPlaceholderList(d) => MathListSubIndexType.Degree,
-                    Atoms.Radical _ => MathListSubIndexType.Radicand,
+                    Fraction _ => MathListSubIndexType.Numerator,
+                    Radical { Degree: { } d } when IsPlaceholderList(d) => MathListSubIndexType.Degree,
+                    Radical _ => MathListSubIndexType.Radicand,
                     _ => MathListSubIndexType.None
                 });
-            if (a is LargeOperator)
-            {
-                InsertInner("(",")");
-            }
+            if (a is LargeOperator) InsertInner("(", ")");
         }
 
         void InsertSymbolName(string name, bool subscript = false, bool superscript = false)
@@ -568,56 +580,46 @@ public sealed class CgMathKeyboard : IDisposable
                     break;
                 case MathListSubIndexType.Numerator:
                 case MathListSubIndexType.Denominator:
-                    {
-                        if (!(self.Atoms[index.AtomIndex] is Atoms.Fraction frac))
-                            throw new SubIndexTypeMismatchException(typeof(Atoms.Fraction), index);
-                        if (index.SubIndexType == MathListSubIndexType.Numerator)
-                        {
-                            InsertCharFromMathListIndex(frac.Numerator, index.SubIndex, charToInsert);
-                        }
-                        else
-                        {
-                            InsertCharFromMathListIndex(frac.Denominator, index.SubIndex, charToInsert);
-                        }
-                    }
+                {
+                    if (!(self.Atoms[index.AtomIndex] is Fraction frac))
+                        throw new SubIndexTypeMismatchException(typeof(Fraction), index);
+                    if (index.SubIndexType == MathListSubIndexType.Numerator)
+                        InsertCharFromMathListIndex(frac.Numerator, index.SubIndex, charToInsert);
+                    else
+                        InsertCharFromMathListIndex(frac.Denominator, index.SubIndex, charToInsert);
+                }
                     break;
                 case MathListSubIndexType.Subscript:
                 case MathListSubIndexType.Superscript:
-                    {
-                        var mathAtom = self.Atoms[index.AtomIndex];
-                        var script = subIndexType == MathListSubIndexType.Subscript
-                            ? mathAtom.Subscript
-                            : mathAtom.Superscript;
-                        InsertCharFromMathListIndex(script, index.SubIndex, charToInsert);
-                    }
+                {
+                    var mathAtom = self.Atoms[index.AtomIndex];
+                    var script = subIndexType == MathListSubIndexType.Subscript
+                        ? mathAtom.Subscript
+                        : mathAtom.Superscript;
+                    InsertCharFromMathListIndex(script, index.SubIndex, charToInsert);
+                }
                     break;
                 case MathListSubIndexType.Inner:
-                    {
-                        var innerAtom = self.Atoms[index.AtomIndex];
-                        if (innerAtom is not Atoms.Inner inner)
-                            throw new SubIndexTypeMismatchException(typeof(Atoms.Inner), index);
-                        InsertCharFromMathListIndex(inner.InnerList, index.SubIndex, charToInsert);
-                    }
+                {
+                    var innerAtom = self.Atoms[index.AtomIndex];
+                    if (innerAtom is not Inner inner)
+                        throw new SubIndexTypeMismatchException(typeof(Inner), index);
+                    InsertCharFromMathListIndex(inner.InnerList, index.SubIndex, charToInsert);
+                }
                     break;
                 case MathListSubIndexType.Degree:
                 case MathListSubIndexType.Radicand:
-                    {
-                        if (!(self.Atoms[index.AtomIndex] is Radical radical))
-                        {
-                            throw new SubIndexTypeMismatchException(typeof(Radical), index);
-                        }
+                {
+                    if (!(self.Atoms[index.AtomIndex] is Radical radical))
+                        throw new SubIndexTypeMismatchException(typeof(Radical), index);
 
-                        if (index.SubIndexType == MathListSubIndexType.Degree)
-                        {
-                            InsertCharFromMathListIndex(radical.Degree, index.SubIndex, charToInsert);
-                        }
-                        else
-                        {
-                            InsertCharFromMathListIndex(radical.Radicand, index.SubIndex, charToInsert);
-                        }
+                    if (index.SubIndexType == MathListSubIndexType.Degree)
+                        InsertCharFromMathListIndex(radical.Degree, index.SubIndex, charToInsert);
+                    else
+                        InsertCharFromMathListIndex(radical.Radicand, index.SubIndex, charToInsert);
 
-                        break;
-                    }
+                    break;
+                }
             }
         }
 
@@ -637,9 +639,9 @@ public sealed class CgMathKeyboard : IDisposable
             while (currentIndex > -1)
             {
                 var currentAtom = self[currentIndex--];
-                if (currentAtom is Atoms.Variable variable)
+                if (currentAtom is Variable variable)
                     funcName = variable.Nucleus + funcName;
-                else if (currentAtom is Atoms.LargeOperator largeOperator && largeOperator.ForceNoLimits)
+                else if (currentAtom is LargeOperator largeOperator && largeOperator.ForceNoLimits)
                     funcName = largeOperator.Nucleus + funcName;
                 else
                     break;
@@ -651,7 +653,7 @@ public sealed class CgMathKeyboard : IDisposable
                         lastValidLen = len;
                         break;
                     case "cbrt":
-                        lastValid = new Atoms.Radical(new MathList(new Atoms.Number("3")), LaTeXSettings.PlaceholderList);
+                        lastValid = new Radical(new MathList(new Number("3")), LaTeXSettings.PlaceholderList);
                         lastValidLen = len;
                         break;
                     case "abs":
@@ -660,15 +662,17 @@ public sealed class CgMathKeyboard : IDisposable
                         InsertInner("|", "|");
                         return;
                     default:
-                        var newAtom = LaTeXSettings.AtomForCommand('\\' + funcName) as Atoms.LargeOperator;
+                        var newAtom = LaTeXSettings.AtomForCommand('\\' + funcName) as LargeOperator;
                         if (newAtom != null)
                         {
                             lastValid = newAtom;
                             lastValidLen = len;
                         }
+
                         break;
                 }
             }
+
             if (lastValid != null)
             {
                 for (var i = 0; i < lastValidLen; i++)
@@ -721,16 +725,16 @@ public sealed class CgMathKeyboard : IDisposable
                 HandleScriptButton(false);
                 break;
             case CgMathKeyboardInput.Fraction:
-                InsertAtom(new Atoms.Fraction(LaTeXSettings.PlaceholderList, LaTeXSettings.PlaceholderList));
+                InsertAtom(new Fraction(LaTeXSettings.PlaceholderList, LaTeXSettings.PlaceholderList));
                 break;
             case CgMathKeyboardInput.SquareRoot:
-                InsertAtom(new Atoms.Radical(new MathList(), LaTeXSettings.PlaceholderList));
+                InsertAtom(new Radical(new MathList(), LaTeXSettings.PlaceholderList));
                 break;
             case CgMathKeyboardInput.CubeRoot:
-                InsertAtom(new Atoms.Radical(new MathList(new Atoms.Number("3")), LaTeXSettings.PlaceholderList));
+                InsertAtom(new Radical(new MathList(new Number("3")), LaTeXSettings.PlaceholderList));
                 break;
             case CgMathKeyboardInput.NthRoot:
-                InsertAtom(new Atoms.Radical(LaTeXSettings.PlaceholderList, LaTeXSettings.PlaceholderList));
+                InsertAtom(new Radical(LaTeXSettings.PlaceholderList, LaTeXSettings.PlaceholderList));
                 break;
             case CgMathKeyboardInput.BothRoundBrackets:
                 InsertInner("(", ")");
@@ -955,7 +959,7 @@ public sealed class CgMathKeyboard : IDisposable
                 InsertSymbolName(@"\ ");
                 break;
             case CgMathKeyboardInput.Prime:
-                InsertAtom(new Atoms.Prime(1));
+                InsertAtom(new Prime(1));
                 break;
             case CgMathKeyboardInput.Modulo:
                 InsertSymbolName(@"\%");
@@ -967,10 +971,10 @@ public sealed class CgMathKeyboard : IDisposable
                 InsertSymbolName(@"\lor");
                 break;
             case CgMathKeyboardInput.LeftRoundBracket:
-                InsertInner("(",")");
+                InsertInner("(", ")");
                 break;
             case CgMathKeyboardInput.RightRoundBracket:
-                
+
                 break;
             case CgMathKeyboardInput.LeftSquareBracket:
             case CgMathKeyboardInput.RightSquareBracket:
@@ -999,27 +1003,27 @@ public sealed class CgMathKeyboard : IDisposable
                                $"{nameof(LaTeXSettings.AtomForCommand)} returned null for {input}"));
                 break;
             case CgMathKeyboardInput.Equals:
+            {
+                var currentIndex = InsertionIndex.AtomIndex - 1;
+                if (MathList[currentIndex] is Relation rel)
                 {
-                    var currentIndex = InsertionIndex.AtomIndex - 1;
-                    if (MathList[currentIndex] is Atoms.Relation rel)
+                    if (rel.Nucleus == "<")
                     {
-                        if (rel.Nucleus == "<")
-                        {
-                            DeleteBackwards(true);
-                            InsertSymbolName(@"\leq");
-                            break;
-                        }
-
-                        if (rel.Nucleus == ">")
-                        {
-                            DeleteBackwards(true);
-                            InsertSymbolName(@"\geq");
-                            break;
-                        }
+                        DeleteBackwards(true);
+                        InsertSymbolName(@"\leq");
+                        break;
                     }
 
-                    InsertAtom(LaTeXSettings.AtomForCommand("="));
+                    if (rel.Nucleus == ">")
+                    {
+                        DeleteBackwards(true);
+                        InsertSymbolName(@"\geq");
+                        break;
+                    }
                 }
+
+                InsertAtom(LaTeXSettings.AtomForCommand("="));
+            }
                 break;
             case CgMathKeyboardInput.A:
             case CgMathKeyboardInput.B:
@@ -1073,9 +1077,9 @@ public sealed class CgMathKeyboard : IDisposable
             case CgMathKeyboardInput.SmallX:
             case CgMathKeyboardInput.SmallY:
             case CgMathKeyboardInput.SmallZ:
-                {
-                    InsertCharFromMathListIndex(MathList, _insertionIndex, (char)input);
-                }
+            {
+                InsertCharFromMathListIndex(MathList, _insertionIndex, (char)input);
+            }
                 break;
             case CgMathKeyboardInput.Alpha:
             case CgMathKeyboardInput.Beta:
@@ -1132,7 +1136,7 @@ public sealed class CgMathKeyboard : IDisposable
             case CgMathKeyboardInput.SmallPsi:
             case CgMathKeyboardInput.SmallOmega:
                 // All Greek letters are rendered as variables.
-                InsertAtom(new Atoms.Variable(((char)input).ToStringInvariant()));
+                InsertAtom(new Variable(((char)input).ToStringInvariant()));
                 break;
         }
 
@@ -1185,14 +1189,11 @@ public sealed class CgMathKeyboard : IDisposable
         if (cursorPosition.X == 0)
             cursorPosition.X = 1f;
         var offset = -Font.PointSize * 2 / 3;
-        if (!HasText)
-        {
-            cursorPosition.Y = Measure.Height;
-        }
+        if (!HasText) cursorPosition.Y = Measure.Height;
         switch (shape)
         {
             case CaretShape.IBeam:
-                canvas.DrawLine(cursorPosition.X, cursorPosition.Y+offset,
+                canvas.DrawLine(cursorPosition.X, cursorPosition.Y + offset,
                     cursorPosition.X, cursorPosition.Y, 1f);
                 break;
         }
