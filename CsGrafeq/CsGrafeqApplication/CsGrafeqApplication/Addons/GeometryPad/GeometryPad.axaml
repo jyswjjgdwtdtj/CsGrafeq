@@ -215,7 +215,7 @@
                                                 <Flyout ShowMode="Standard" Placement="BottomEdgeAlignedLeft">
                                                     <Grid ColumnDefinitions="80,120" RowDefinitions="Auto,Auto"
                                                           RowSpacing="3">
-                                                        <TextBlock Grid.Row="0" Grid.Column="0"
+                                                        <TextBlock Grid.Row="0" Grid.Column="0" Foreground="Black"
                                                                    VerticalAlignment="Center">
                                                             Color:
                                                         </TextBlock>
@@ -223,11 +223,11 @@
                                                                      Color="{CompiledBinding Color,Converter={StaticResource UIntToColor}}"
                                                                      IsAlphaEnabled="False"
                                                                      IsAccentColorsVisible="False" />
-                                                        <TextBlock Grid.Row="1" Grid.Column="0"
+                                                        <TextBlock Grid.Row="1" Grid.Column="0" Foreground="Black"
                                                                    VerticalAlignment="Center">
                                                             Enabled
                                                         </TextBlock>
-                                                        <CheckBox Grid.Row="1" Grid.Column="1"
+                                                        <CheckBox Grid.Row="1" Grid.Column="1" Foreground="Black"
                                                                   IsChecked="{CompiledBinding IsUserEnabled}"
                                                                   HorizontalAlignment="Center" />
                                                     </Grid>
@@ -562,7 +562,7 @@
                                                 <Flyout ShowMode="Standard" Placement="BottomEdgeAlignedLeft">
                                                     <Grid ColumnDefinitions="120,120" RowDefinitions="30,30,30"
                                                           RowSpacing="3">
-                                                        <TextBlock Grid.Row="0" Grid.Column="0"
+                                                        <TextBlock Grid.Row="0" Grid.Column="0" Foreground="Black"
                                                                    VerticalAlignment="Center">
                                                             Color:
                                                         </TextBlock>
@@ -571,19 +571,19 @@
                                                                      Color="{CompiledBinding Color,Converter={StaticResource UIntToColor}}"
                                                                      IsAlphaVisible="False"
                                                                      IsAccentColorsVisible="False" />
-                                                        <TextBlock Grid.Row="1" Grid.Column="0"
+                                                        <TextBlock Grid.Row="1" Grid.Column="0" Foreground="Black"
                                                                    VerticalAlignment="Center">
                                                             Show Formula:
                                                         </TextBlock>
-                                                        <CheckBox Grid.Row="1" Grid.Column="1"
+                                                        <CheckBox Grid.Row="1" Grid.Column="1" Foreground="Black"
                                                                   IsChecked="{CompiledBinding ShowFormula}"
                                                                   VerticalAlignment="Center"
                                                                   HorizontalAlignment="Center" />
-                                                        <TextBlock Grid.Row="2" Grid.Column="0"
+                                                        <TextBlock Grid.Row="2" Grid.Column="0" Foreground="Black"
                                                                    VerticalAlignment="Center">
                                                             Opacity:
                                                         </TextBlock>
-                                                        <Slider Grid.Row="2" Grid.Column="1"
+                                                        <Slider Grid.Row="2" Grid.Column="1" Foreground="Black"
                                                                 Value="{CompiledBinding Opacity}" Minimum="0"
                                                                 Maximum="255" VerticalAlignment="Center"
                                                                 HorizontalAlignment="Stretch" />

@@ -10,11 +10,11 @@
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="Stretch" Value="Fill" />
         <Style Selector="^.Fill">
-            <Setter Property="Fill" Value="{DynamicResource CgForegroundBrush}" />
+            <Setter Property="Fill" Value="{DynamicResource MaterialPrimaryMidForegroundBrush}" />
             <Setter Property="Stroke" Value="Transparent" />
         </Style>
         <Style Selector="^.Stroke">
-            <Setter Property="Stroke" Value="{DynamicResource CgForegroundBrush}" />
+            <Setter Property="Stroke" Value="{DynamicResource MaterialPrimaryMidForegroundBrush}" />
             <Setter Property="Fill" Value="Transparent" />
         </Style>
     </Style>

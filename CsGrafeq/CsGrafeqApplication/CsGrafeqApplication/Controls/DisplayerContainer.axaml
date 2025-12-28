@@ -51,11 +51,6 @@
                         </Style>
                     </Style>
                 </Panel.Styles>
-                <Panel ZIndex="5" IsHitTestVisible="False" Name="InfoCanvas" VerticalAlignment="Stretch"
-                       HorizontalAlignment="Stretch">
-                    <geopad:GeoPadInfo DataContext="{CompiledBinding  Displayer.Addons[0].DataContext}"
-                                       HorizontalAlignment="Stretch" />
-                </Panel>
                 <Grid ZIndex="10" Name="PART_Grid">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="300" />
@@ -84,7 +79,8 @@
                     <Border BorderThickness="0,0,0,1"
                             BorderBrush="{DynamicResource CgOppositeTranslucentBackgroundBrush1}" Grid.Column="2"
                             Grid.Row="0" Name="PART_CoverDisplayer">
-                        <CheckBox Width="15" Height="40" VerticalAlignment="Center" HorizontalAlignment="Left"
+                        <DockPanel>
+                        <CheckBox DockPanel.Dock="Left" Width="15" Height="40" VerticalAlignment="Center" HorizontalAlignment="Left"
                                   Name="Toggle" Foreground="{DynamicResource MaterialPrimaryMidForegroundBrush}">
                             <CheckBox.Template>
                                 <ControlTemplate>
@@ -123,6 +119,12 @@
                                 </Transitions>
                             </CheckBox.Transitions>
                         </CheckBox>
+                            <Panel DockPanel.Dock="Right" ZIndex="5" IsHitTestVisible="False" Name="InfoCanvas" VerticalAlignment="Stretch"
+                                   HorizontalAlignment="Stretch">
+                                <geopad:GeoPadInfo DataContext="{CompiledBinding  Displayer.Addons[0].DataContext}"
+                                                   HorizontalAlignment="Stretch" />
+                            </Panel>
+                        </DockPanel>
                     </Border>
                 </Grid>
                 <Grid ColumnDefinitions="*,52" RowDefinitions="*,52" ZIndex="15" Name="SettingDockPanel"
@@ -321,7 +323,7 @@
                                 <Button>
                                     <Button.Flyout>
                                         <Flyout Placement="Left">
-                                            <ComboBox SelectionChanged="ThemeSelectionChanged" SelectedIndex="2">
+                                            <ComboBox Foreground="Black" SelectionChanged="ThemeSelectionChanged" SelectedIndex="2">
                                                 <ComboBoxItem>
                                                     <TextBlock
                                                         Text="{CompiledBinding MultiLanguageResources.LightText.Data}" />
@@ -346,7 +348,7 @@
                                 <Button>
                                     <Button.Flyout>
                                         <Flyout Placement="Left">
-                                            <ColorPicker IsAlphaVisible="False" IsAlphaEnabled="False"
+                                            <ColorPicker Foreground="Black"  IsAlphaVisible="False" IsAlphaEnabled="False"
                                                          ColorChanged="ColorSettingColorChanged" />
                                         </Flyout>
                                     </Button.Flyout>
@@ -470,9 +472,9 @@ Each of your stars🌟 is the motivation for my development. Thank you🙏😊.
                                     </ToolTip.Tip>
                                     <Button.Flyout>
                                         <Flyout Placement="Left">
-                                            <ComboBox
-                                                SelectedIndex="{x:Static i18N:Languages.CurrentLanguageIndex}"
-                                                SelectionChanged="LanguageSelectionChanged">
+                                            <ComboBox Foreground="Black"
+                                                      SelectedIndex="{x:Static i18N:Languages.CurrentLanguageIndex}"
+                                                      SelectionChanged="LanguageSelectionChanged">
                                                 <ComboBoxItem>
                                                     <TextBlock Text="en-us (English)" />
                                                 </ComboBoxItem>
@@ -485,14 +487,6 @@ Each of your stars🌟 is the motivation for my development. Thank you🙏😊.
                                     <Path Name="Language" Classes="Icon Fill"
                                           Data="M17.25 1a.75.75 0 0 1 .75.75V3h4.5a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0V4.5h-9.5v.75a.75.75 0 0 1-1.5 0v-1.5A.75.75 0 0 1 11.5 3h5V1.75a.75.75 0 0 1 .75-.75zm-3.5 5a.75.75 0 0 0 0 1.5h4.428L16.77 8.674a.75.75 0 0 0-.27.576v.25h-4.75a.75.75 0 0 0 0 1.5h4.75v2.734a.75.75 0 0 1-.966.718l-.569-.17a.75.75 0 0 0-.43 1.436l.569.171A2.25 2.25 0 0 0 18 13.734V11h4.25a.75.75 0 0 0 0-1.5h-4.128l2.608-2.174A.75.75 0 0 0 20.25 6h-6.5zm-5.361.477l-.049-.104a.73.73 0 0 0-1.315.087l-5.964 14.5l-.032.096a.754.754 0 0 0 .426.886a.73.73 0 0 0 .963-.402l1.547-3.76l.094.006h7.087l1.433 3.737l.042.092a.73.73 0 0 0 .91.334a.755.755 0 0 0 .418-.972l-5.56-14.5zm-3.74 9.809L7.81 8.747l2.947 7.539h-6.11z" />
                                 </Button>
-                                <views:MsgBoxButton ButtonDefinitions="Yes|No" MsgBoxTitle="456">
-                                    <views:MsgBoxButton.Content>
-                                        123
-                                    </views:MsgBoxButton.Content>
-                                    <views:MsgBoxButton.MsgBoxContent>
-                                        123
-                                    </views:MsgBoxButton.MsgBoxContent>
-                                </views:MsgBoxButton>
                             </StackPanel>
                         </controls:ShownControl>
                     </Border>

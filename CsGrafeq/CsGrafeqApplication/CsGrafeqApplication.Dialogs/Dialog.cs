@@ -5,8 +5,6 @@ using CsGrafeqApplication.Dialogs.Interfaces;
 using CsGrafeqApplication.Dialogs.Params;
 using CsGrafeqApplication.Dialogs.Windows;
 using DialogHostAvalonia;
-using MsBox.Avalonia.ViewModels;
-using MsBox.Avalonia.Windows;
 
 namespace CsGrafeqApplication.Dialogs;
 
