@@ -17,7 +17,6 @@ public static class InputHelper
 
         if (f is TextBox tb)
         {
-            Console.WriteLine(input.ToString());
             switch (input)
             {
                 case CgMathKeyboardInput.Backspace:

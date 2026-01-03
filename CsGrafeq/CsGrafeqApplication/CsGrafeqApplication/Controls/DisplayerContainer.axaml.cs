@@ -252,54 +252,6 @@ public partial class DisplayerContainer : UserControl
                     break;
             }
     }
-
-/*
-    private static bool IsWindow = (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime)!;
-    private Window CurrentWindow;
-    private double PressedXPosRatio = 0;
-    private int PressedYPos;
-    private PixelPoint PressedWidnowPos;
-    private void TitlePointerPressed(object? sender, PointerPressedEventArgs e)
-    {
-        if (IsWindow&&e.Properties.IsLeftButtonPressed)
-        {
-            CurrentWindow=TopLevel.GetTopLevel(this) as Window;
-            var PressedPoint = CurrentWindow.PointToScreen(e.GetCurrentPoint(CurrentWindow).Position);
-            PressedYPos=PressedPoint.Y;
-            PressedXPosRatio=PressedPoint.X/CurrentWindow.Width;
-            PressedWidnowPos = CurrentWindow.Position;
-        }
-    }
-
-    private void TitlePointerReleased(object? sender, PointerReleasedEventArgs e)
-    {
-        Console.WriteLine(CurrentWindow.PointToScreen(e.GetCurrentPoint(CurrentWindow).Position));
-        preventMove=false;
-    }
-
-    private void TitlePointerMoved(object? sender, PointerEventArgs e)
-    {
-        if (IsWindow&&e.Properties.IsLeftButtonPressed&&(!preventMove))
-        {
-            if (CurrentWindow.WindowState == WindowState.Maximized)
-                CurrentWindow.WindowState = WindowState.Normal;
-            var currentPos =CurrentWindow.PointToScreen(e.GetCurrentPoint(CurrentWindow).Position);
-            CurrentWindow.Position = new(PressedWidnowPos.X+currentPos.X-(int)(CurrentWindow.Width*PressedXPosRatio), PressedWidnowPos.Y+currentPos.Y-PressedYPos);
-        }
-    }
-    private bool preventMove = false;
-    private void TitleDoubleTapped(object? sender, TappedEventArgs e)
-    {
-        if (IsWindow)
-        {
-            if (CurrentWindow.WindowState == WindowState.Maximized)
-                CurrentWindow.WindowState = WindowState.Normal;
-            else if (CurrentWindow.WindowState == WindowState.Normal)
-                CurrentWindow.WindowState = WindowState.Maximized;
-            e.Handled = true;
-            preventMove=true;
-        }
-    }*/
     private async void SaveClicked(object? sender, RoutedEventArgs e)
     {
         var topLevel = TopLevel.GetTopLevel(this);

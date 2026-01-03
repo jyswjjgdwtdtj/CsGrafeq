@@ -97,7 +97,7 @@ public readonly struct LineStruct
         Point1 = point1;
         Point2 = point2;
     }
-
+    //ax+by+c=0
     public (double a, double b, double c) GetNormal()
     {
         if (Point1.X == Point2.X)
@@ -106,76 +106,98 @@ public readonly struct LineStruct
             return (0, 1, -Point2.Y);
         return (Point2.Y - Point1.Y, Point1.X - Point2.X, Point2.X * Point1.Y - Point1.X * Point2.Y);
     }
-
-    public string ExpStr
+    public string GetNormalStr()
     {
-        get
+        var (a, b, c) = GetNormal();
+        var sb = new StringBuilder();
+        if (a == 0)
         {
-            var (a, b, c) = GetNormal();
-            var sb = new StringBuilder();
-            if (a == 0)
-            {
-                //do nothing
-            }
-            else if (a == 1)
-            {
-                sb.Append("x");
-            }
-            else if (a == -1)
-            {
-                sb.Append("-x");
-            }
-            else
-            {
-                sb.Append(a + "x");
-            }
-
-            if (b == 0)
-            {
-                //do nothing
-            }
-            else if (b == 1)
-            {
-                sb.Append("+y");
-            }
-            else if (b == -1)
-            {
-                sb.Append("-y");
-            }
-            else if (b > 0)
-            {
-                sb.Append("+" + b + "y");
-            }
-            else
-            {
-                sb.Append(b + "y");
-            }
-
-            if (c == 0)
-            {
-                //do nothing
-            }
-            else if (c == 1)
-            {
-                sb.Append("+1");
-            }
-            else if (c == -1)
-            {
-                sb.Append("-1");
-            }
-            else if (c > 0)
-            {
-                sb.Append("+" + c);
-            }
-            else
-            {
-                sb.Append(c);
-            }
-
-            sb.Append("=0");
-            return sb.ToString();
+            //do nothing
         }
+        else if (a == 1)
+        {
+            sb.Append("x");
+        }
+        else if (a == -1)
+        {
+            sb.Append("-x");
+        }
+        else
+        {
+            sb.Append(a + "x");
+        }
+
+        if (b == 0)
+        {
+            //do nothing
+        }
+        else if (b == 1)
+        {
+            sb.Append("+y");
+        }
+        else if (b == -1)
+        {
+            sb.Append("-y");
+        }
+        else if (b > 0)
+        {
+            sb.Append("+" + b + "y");
+        }
+        else
+        {
+            sb.Append(b + "y");
+        }
+
+        if (c == 0)
+        {
+            //do nothing
+        }
+        else if (c == 1)
+        {
+            sb.Append("+1");
+        }
+        else if (c == -1)
+        {
+            sb.Append("-1");
+        }
+        else if (c > 0)
+        {
+            sb.Append("+" + c);
+        }
+        else
+        {
+            sb.Append(c);
+        }
+
+        sb.Append("=0");
+        return sb.ToString();
     }
+
+    public string GetSlopeInterceptStr()
+    {
+        var (a, b, c) = GetNormal();
+        if (b == 0)
+        {
+            return $"x={-c / a}";
+        }
+        var slope = -a / b;
+        var intercept = -c / b;
+        var slopeStr = slope switch
+        {
+            1 => "",
+            -1 => "-",
+            _ => slope.ToString()
+        };
+        var interceptStr = intercept switch
+        {
+            > 0 => "+" + intercept,
+            0 => "",
+            _ => intercept.ToString()
+        };
+        return $"y={slopeStr}x{interceptStr}";
+    }
+
+    public string ExpStr => GetSlopeInterceptStr();
 
     public double Distance => (Point1 - Point2).GetLength();
 }

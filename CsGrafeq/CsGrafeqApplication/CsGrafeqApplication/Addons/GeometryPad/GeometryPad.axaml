@@ -437,10 +437,10 @@
                                                                                     VerticalAlignment="Center"
                                                                                     Classes="Big" />
                                                                             <ContentControl
-                                                                                Content="{CompiledBinding PointGetter.ShapeParameters}">
+                                                                                Content="{CompiledBinding PointGetter}">
                                                                                 <ContentControl.ContentTemplate>
-                                                                                    <geopad:ShapeShowcaseDataTemplate>
-                                                                                        <geopad:ShapeShowcaseDataTemplate.ShapeShowcaseTemplate>
+                                                                                    <geopad:ShapeParamsTemplate>
+                                                                                        <geopad:ShapeParamsTemplate.ShapeTemplate>
                                                                                             <DataTemplate
                                                                                                 DataType="shapes:GeometryShape">
                                                                                                 <ctls:ToggleBox
@@ -451,8 +451,8 @@
                                                                                                         Text="{CompiledBinding Name}" />
                                                                                                 </ctls:ToggleBox>
                                                                                             </DataTemplate>
-                                                                                        </geopad:ShapeShowcaseDataTemplate.ShapeShowcaseTemplate>
-                                                                                    </geopad:ShapeShowcaseDataTemplate>
+                                                                                        </geopad:ShapeParamsTemplate.ShapeTemplate>
+                                                                                    </geopad:ShapeParamsTemplate>
                                                                                 </ContentControl.ContentTemplate>
                                                                             </ContentControl>
                                                                             <TextBlock Text=")" TextAlignment="Left"
@@ -512,8 +512,8 @@
                                                                             <ContentControl
                                                                                 Content="{CompiledBinding Getter}">
                                                                                 <ContentControl.ContentTemplate>
-                                                                                    <geopad:ShapeShowcaseDataTemplate>
-                                                                                        <geopad:ShapeShowcaseDataTemplate.ShapeShowcaseTemplate>
+                                                                                    <geopad:ShapeParamsTemplate>
+                                                                                        <geopad:ShapeParamsTemplate.ShapeTemplate>
                                                                                             <DataTemplate
                                                                                                 DataType="shapes:GeometryShape">
                                                                                                 <ctls:ToggleBox
@@ -525,8 +525,8 @@
                                                                                                         Classes="Big" />
                                                                                                 </ctls:ToggleBox>
                                                                                             </DataTemplate>
-                                                                                        </geopad:ShapeShowcaseDataTemplate.ShapeShowcaseTemplate>
-                                                                                        <geopad:ShapeShowcaseDataTemplate.ExpNumberTemplate>
+                                                                                        </geopad:ShapeParamsTemplate.ShapeTemplate>
+                                                                                        <geopad:ShapeParamsTemplate.NumberTemplate>
                                                                                             <DataTemplate
                                                                                                 DataType="csGrafeq:ExpNumber">
                                                                                                 <TextBox
@@ -541,8 +541,8 @@
                                                                                                     </TextBox.Styles>
                                                                                                 </TextBox>
                                                                                             </DataTemplate>
-                                                                                        </geopad:ShapeShowcaseDataTemplate.ExpNumberTemplate>
-                                                                                    </geopad:ShapeShowcaseDataTemplate>
+                                                                                        </geopad:ShapeParamsTemplate.NumberTemplate>
+                                                                                    </geopad:ShapeParamsTemplate>
                                                                                 </ContentControl.ContentTemplate>
                                                                             </ContentControl>
                                                                             <TextBlock Text=")" TextAlignment="Left"

@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <OutputType>Exe</OutputType>
+        <OutputType>WinExe</OutputType>
         <TargetFramework>net10.0</TargetFramework>
         <InvariantGlobalization>false</InvariantGlobalization>
         <Nullable>enable</Nullable>
-        <PublishReadyToRun>true</PublishReadyToRun>
+        <PublishAOT>true</PublishAOT>
 		<PublishTrimmed>true</PublishTrimmed>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
         <LangVersion>Preview</LangVersion>

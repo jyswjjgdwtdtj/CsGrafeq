@@ -7,8 +7,8 @@
         x:Class="CsGrafeqApplication.Dialogs.Windows.MsgBoxWindow"
         SizeToContent="WidthAndHeight"
         x:DataType="params:MsgBoxParams"
-        Topmost="{Binding Topmost}"
-        WindowStartupLocation="{Binding WindowStartupLocation}"
+        Topmost="{CompiledBinding Topmost}"
+        WindowStartupLocation="{CompiledBinding WindowStartupLocation}"
         CanResize="False" 
         CanMaximize="False" CanMinimize="False"
         ExtendClientAreaToDecorationsHint="True"
@@ -16,5 +16,5 @@
         SystemDecorations="Full"
         BorderThickness="1"
         TransparencyLevelHint="Transparent" Background="{DynamicResource CgBackgroundBrush}"
-        Title="{Binding Title}" Margin="0" Padding="0">
+        Title="{CompiledBinding Title}" Margin="0" Padding="0">
 </Window>

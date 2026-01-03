@@ -21,8 +21,8 @@
         <Setter Property="Padding" Value="16 4 16 4" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="assists:ButtonAssist.HoverColor"
-                Value="{Binding $self.Foreground, Converter={StaticResource BrushRoundConverter}}" />
-        <Setter Property="assists:ButtonAssist.ClickFeedbackColor" Value="{Binding $self.Foreground}" />
+                Value="{CompiledBinding $self.Foreground, Converter={StaticResource BrushRoundConverter}}" />
+        <Setter Property="assists:ButtonAssist.ClickFeedbackColor" Value="{CompiledBinding $self.Foreground}" />
         <Setter Property="ClipToBounds" Value="False" />
         <Setter Property="Template">
             <ControlTemplate>

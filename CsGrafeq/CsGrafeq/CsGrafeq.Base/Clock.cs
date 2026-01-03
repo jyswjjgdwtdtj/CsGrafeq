@@ -36,7 +36,6 @@ public class Clock
     {
         if (Running)
         {
-            Console.WriteLine("Do");
             Running = false;
             OnElapsed?.Invoke();
         }

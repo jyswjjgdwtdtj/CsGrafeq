@@ -92,6 +92,7 @@ public partial class GeometryPad : Addon
         var p2 = AddShape(new GeoPoint(new PointGetter_FromLocation((1.5, 1.5))));
         var s1 = AddShape(new Straight(new LineGetter_Connected(p1, p2)));
         var p3 = AddShape(new GeoPoint(new PointGetter_OnLine(s1, (0, 0))));
+        var p4 = AddShape(new GeoPoint(new PointGetter_MiddlePoint(p1,p2)));
         var c1 = AddShape(new Circle(new CircleGetter_FromCenterAndRadius(p1)));
         CgMathKeyboard kb = new(new MathList());
         kb.KeyPress(CgMathKeyboardInput.SmallS, CgMathKeyboardInput.SmallI, CgMathKeyboardInput.SmallN,

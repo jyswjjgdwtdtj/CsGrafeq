@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Templates;
 using CsGrafeqApplication.Dialogs.Models;
 using CsGrafeqApplication.Dialogs.Params;
 
@@ -7,9 +8,19 @@ namespace CsGrafeqApplication.Dialogs.Views;
 
 public class MsgBoxButton : Button
 {
-    public static readonly DirectProperty<MsgBoxButton, object?> MsgBoxContentProperty =
-        AvaloniaProperty.RegisterDirect<MsgBoxButton, object?>(
-            nameof(MsgBoxContent), o => o.MsgBoxContent, (o, v) => o.MsgBoxContent = v);
+    public static readonly DirectProperty<MsgBoxButton, IDataTemplate?> MsgBoxContentTemplateProperty =
+        AvaloniaProperty.RegisterDirect<MsgBoxButton, IDataTemplate?>(
+            nameof(MsgBoxContentTemplate), o => o.MsgBoxContentTemplate, (o, v) => o.MsgBoxContentTemplate = v);
+
+
+    public static readonly DirectProperty<MsgBoxButton, object?> MsgBoxContentTemplateParamProperty = AvaloniaProperty.RegisterDirect<MsgBoxButton, object?>(
+        nameof(MsgBoxContentTemplateParam), o => o.MsgBoxContentTemplateParam, (o, v) => o.MsgBoxContentTemplateParam = v);
+
+    public object? MsgBoxContentTemplateParam
+    {
+        get => field;
+        set => SetAndRaise(MsgBoxContentTemplateParamProperty, ref field, value);
+    }
 
     public static readonly StyledProperty<ButtonDefinitions> ButtonDefinitionsProperty =
         AvaloniaProperty.Register<MsgBoxButton, ButtonDefinitions>(
@@ -95,10 +106,10 @@ public class MsgBoxButton : Button
         get => GetValue(TitleProperty);
         set => SetValue(TitleProperty, value);
     }
-    public object? MsgBoxContent
+    public IDataTemplate? MsgBoxContentTemplate
     {
         get => field;
-        set => SetAndRaise(MsgBoxContentProperty, ref field, value);
+        set => SetAndRaise(MsgBoxContentTemplateProperty, ref field, value);
     }
 
     public ButtonDefinitions ButtonDefinitions
@@ -122,7 +133,7 @@ public class MsgBoxButton : Button
         var res = await MessageBoxManager.GetMessageBoxStandard(new MsgBoxParams()
         {
             ButtonDefinitions = ButtonDefinitions,
-            Content = MsgBoxContent,
+            Content = (MsgBoxContentTemplate?.Match(MsgBoxContentTemplateParam)??false)?MsgBoxContentTemplate.Build(MsgBoxContentTemplateParam):null,
             Title = MsgBoxTitle,
             MinWidth = MsgBoxMinWidth,
             MaxHeight = MsgBoxMaxHeight,

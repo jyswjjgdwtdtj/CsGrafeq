@@ -358,13 +358,14 @@
                                     <Path Name="ColorPathIcon" Classes="Icon Fill"
                                           Data="M3.839 5.858c2.94-3.916 9.03-5.055 13.364-2.36c4.28 2.66 5.854 7.777 4.1 12.577c-1.655 4.533-6.016 6.328-9.159 4.048c-1.177-.854-1.634-1.925-1.854-3.664l-.106-.987l-.045-.398c-.123-.934-.311-1.352-.705-1.572c-.535-.298-.892-.305-1.595-.033l-.351.146l-.179.078c-1.014.44-1.688.595-2.541.416l-.2-.047l-.164-.047c-2.789-.864-3.202-4.647-.565-8.157m.984 6.716l.123.037l.134.03c.439.087.814.015 1.437-.242l.602-.257c1.202-.493 1.985-.54 3.046.05c.917.512 1.275 1.298 1.457 2.66l.053.459l.055.532l.047.422c.172 1.361.485 2.09 1.248 2.644c2.275 1.65 5.534.309 6.87-3.349c1.516-4.152.174-8.514-3.484-10.789c-3.675-2.284-8.899-1.306-11.373 1.987c-2.075 2.763-1.82 5.28-.215 5.816m11.225-1.994a1.25 1.25 0 1 1 2.414-.647a1.25 1.25 0 0 1-2.414.647m.494 3.488a1.25 1.25 0 1 1 2.415-.647a1.25 1.25 0 0 1-2.415.647M14.07 7.577a1.25 1.25 0 1 1 2.415-.647a1.25 1.25 0 0 1-2.415.647m-.028 8.998a1.25 1.25 0 1 1 2.414-.647a1.25 1.25 0 0 1-2.414.647m-3.497-9.97a1.25 1.25 0 1 1 2.415-.646a1.25 1.25 0 0 1-2.415.646" />
                                 </Button>
-                                <views:MsgBoxButton ButtonDefinitions="OK" MsgBoxMinWidth="600" MsgBoxMaxWidth="600">
+                                <views:MsgBoxButton ButtonDefinitions="OK" MsgBoxMinWidth="600" MsgBoxMaxWidth="600" MsgBoxContentTemplateParam="{CompiledBinding .}">
                                     <ToolTip.Tip>
                                         <TextBlock Text="{CompiledBinding MultiLanguageResources.SettingText.Data}" />
                                     </ToolTip.Tip>
                                     <Path Name="Setting" Classes="Icon Fill"
                                           Data="M2.5 2A1.5 1.5 0 0 0 1 3.5v1a1.5 1.5 0 0 0 1 1.415V11.5A2.5 2.5 0 0 0 4.5 14h2.1a5.5 5.5 0 0 1-.393-1H4.5A1.5 1.5 0 0 1 3 11.5V6h10.5A1.5 1.5 0 0 0 15 4.5v-1A1.5 1.5 0 0 0 13.5 2zM2 3.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5zm7.067 4.943a2 2 0 0 1-1.431 2.478l-.461.118a4.7 4.7 0 0 0 .01 1.016l.35.083a2 2 0 0 1 1.456 2.519l-.127.422q.387.307.835.518l.325-.344a2 2 0 0 1 2.91.002l.337.358q.44-.204.822-.498l-.156-.556a2 2 0 0 1 1.43-2.478l.46-.118a4.7 4.7 0 0 0-.01-1.017l-.348-.082a2 2 0 0 1-1.456-2.52l.126-.422a4.3 4.3 0 0 0-.835-.518l-.325.344a2 2 0 0 1-2.91-.001l-.337-.358a4.3 4.3 0 0 0-.821.497zM11.5 12.5a1 1 0 1 1 0-2a1 1 0 0 1 0 2" />
-                                    <views:MsgBoxButton.MsgBoxContent>
+                                    <views:MsgBoxButton.MsgBoxContentTemplate>
+                                        <DataTemplate DataType="vm:DisplayerContainerViewModel">
                                         <TabControl VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                                             <TabItem Header="Setting">
                                                 <TabControl TabStripPlacement="Left" Margin="0,15">
@@ -414,10 +415,8 @@
                                             </TabItem>
                                             <TabItem Header="Description">
                                                 <ScrollViewer VerticalScrollBarVisibility="Visible"
-                                                              HorizontalScrollBarVisibility="Hidden">
+                                                              HorizontalScrollBarVisibility="Disabled">
                                                     <controls1:Markdown xml:space="preserve">
-[Avalk(README.md)|[中文](README_ZH.md)
-
 # CsGrafeq
 
 ## Description
@@ -464,7 +463,8 @@ Each of your stars🌟 is the motivation for my development. Thank you🙏😊.
                                                 </ScrollViewer>
                                             </TabItem>
                                         </TabControl>
-                                    </views:MsgBoxButton.MsgBoxContent>
+                                        </DataTemplate>
+                                    </views:MsgBoxButton.MsgBoxContentTemplate>
                                 </views:MsgBoxButton>
                                 <Button>
                                     <ToolTip.Tip>
