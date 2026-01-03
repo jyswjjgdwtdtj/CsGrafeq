@@ -23,7 +23,7 @@
             </Style>
         </Styles>
     </UserControl.Styles>
-    <Panel>
+    <Panel Focusable="False">
         <Border Name="DisplayerCon" ZIndex="0" BorderThickness="0">
             <ContentPresenter Content="{CompiledBinding Displayer}" />
         </Border>

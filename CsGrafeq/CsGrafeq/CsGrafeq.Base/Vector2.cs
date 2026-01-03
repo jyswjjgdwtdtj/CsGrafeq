@@ -1,9 +1,10 @@
 ﻿using CsGrafeq.Interfaces;
+using CsGrafeq.MVVM;
 using ReactiveUI;
 
 namespace CsGrafeq;
 
-public class Vector2<T> : ReactiveObject, IPoint<T>
+public class Vector2<T> : ObservableObject, IPoint<T>
 {
     public Vector2(T x, T y)
     {

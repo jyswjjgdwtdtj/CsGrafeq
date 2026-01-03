@@ -30,9 +30,12 @@ public class MultiLanguageResourcesGenerator : IIncrementalGenerator
             var key = parts[0].Trim().Replace(" ", "").Replace("\t", "") + "Text";
             var s1 = parts[1].Trim();
             var s2 = parts[2].Trim();
-            builder.AppendLine(
-                $"\tpublic MultiLanguageData {key} {{ get; }} = new() {{ {title[1]} = \"{s1}\", {title[2]} = \"{s2}\" }};");
-            dicBuilder.AppendLine($"\t\t\t[\"{key}\"] = {key},");
+            if (s1.Length * key.Length * s2.Length != 0)
+            {
+                builder.AppendLine(
+                    $"\tpublic MultiLanguageData {key} {{ get; }} = new() {{ {title[1]} = \"{s1}\", {title[2]} = \"{s2}\" }};");
+                dicBuilder.AppendLine($"\t\t\t[\"{key}\"] = {key},");
+            }
         }
 
         builder.AppendLine("\tpublic MultiLanguageResources(){");

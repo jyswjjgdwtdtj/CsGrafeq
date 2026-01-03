@@ -1,16 +1,20 @@
-﻿namespace CsGrafeq.Shapes.ShapeGetter;
+﻿using CsGrafeq.I18N;
+
+namespace CsGrafeq.Shapes.ShapeGetter;
 
 public abstract class GeometryGetter : Getter
 {
     /// <summary>
     ///     操作名称
     /// </summary>
-    public abstract string ActionName { get; }
+    public abstract MultiLanguageData ActionName { get; }
 
     /// <summary>
     ///     用到的图形 即显示在UI上“函数”的参数
     /// </summary>
-    public abstract GeometryShape[] Parameters { get; }
+    public IReadOnlyList<ShapeParameter>? ShapeParameters { get; init; }
+
+    public IReadOnlyList<NumberParameter>? NumberParameters { get; init; }
 
     /// <summary>
     ///     由绑定到的图形调用 代表完成Getter的桥接作用 将这个Getter对应的图形绑定到其基于的图形

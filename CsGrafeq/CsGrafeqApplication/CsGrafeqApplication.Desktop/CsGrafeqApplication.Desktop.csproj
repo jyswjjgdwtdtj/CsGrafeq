@@ -5,6 +5,7 @@
         <InvariantGlobalization>false</InvariantGlobalization>
         <Nullable>enable</Nullable>
         <PublishReadyToRun>true</PublishReadyToRun>
+		<PublishTrimmed>true</PublishTrimmed>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
         <LangVersion>Preview</LangVersion>
     </PropertyGroup>

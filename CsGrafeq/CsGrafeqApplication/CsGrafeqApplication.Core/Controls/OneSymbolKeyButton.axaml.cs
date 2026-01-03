@@ -1,8 +1,10 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using CsGrafeq.CSharpMath.Editor;
+using CsGrafeqApplication.Core.Utils;
 
 namespace CsGrafeqApplication.Core.Controls;
 
@@ -20,12 +22,6 @@ public partial class OneSymbolKeyButton : UserControl
     public OneSymbolKeyButton()
     {
         AvaloniaXamlLoader.Load(this);
-        var fm = TopLevel.GetTopLevel(this)?.FocusManager;
-        if (fm != null)
-            PART_Button.Click += (s, e) =>
-            {
-                if (fm.GetFocusedElement() is MathBox mb) mb.PressKey(KeyboardInput);
-            };
     }
 
     public CgMathKeyboardInput KeyboardInput
@@ -38,5 +34,10 @@ public partial class OneSymbolKeyButton : UserControl
     {
         get => field;
         set => SetAndRaise(ButtonProperty, ref field, value);
+    }
+
+    private void PART_Button_OnClick(object? sender, RoutedEventArgs e)
+    {
+        TopLevel.GetTopLevel(this)?.Input(KeyboardInput);
     }
 }

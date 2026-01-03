@@ -9,6 +9,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\CsGrafeq.Base\CsGrafeq.Base.csproj"/>
+        <ProjectReference Include="..\CsGrafeq.MVVM\CsGrafeq.MVVM.csproj" />
     </ItemGroup>
 
     <ItemGroup>

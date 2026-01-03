@@ -705,11 +705,11 @@ public sealed class CgMathKeyboard : IDisposable
                 MathList.Clear();
                 InsertionIndex = MathListIndex.Level0Index(0);
                 break;
-            case CgMathKeyboardInput.Return:
+            /*case CgMathKeyboardInput.Return:
                 ReturnPressed?.Invoke(this, EventArgs.Empty);
                 InsertionPositionHighlighted = false;
                 StopBlinking();
-                return;
+                return;*/
             case CgMathKeyboardInput.Dismiss:
                 DismissPressed?.Invoke(this, EventArgs.Empty);
                 InsertionPositionHighlighted = false;
@@ -754,7 +754,7 @@ public sealed class CgMathKeyboard : IDisposable
             case CgMathKeyboardInput.Absolute:
                 InsertInner("|", "|");
                 break;
-            case CgMathKeyboardInput.BaseEPower:
+            /*case CgMathKeyboardInput.BaseEPower:
                 InsertAtom(LaTeXSettings.AtomForCommand("e")
                            ?? throw new InvalidCodePathException(
                                $"{nameof(LaTeXSettings.AtomForCommand)} returned null for e"));
@@ -768,7 +768,7 @@ public sealed class CgMathKeyboard : IDisposable
                 break;
             case CgMathKeyboardInput.LogarithmWithBase:
                 InsertSymbolName(@"\log", true);
-                break;
+                break;*/
             case CgMathKeyboardInput.Sine:
                 InsertSymbolName(@"\sin");
                 break;
@@ -841,7 +841,7 @@ public sealed class CgMathKeyboard : IDisposable
             case CgMathKeyboardInput.AreaHyperbolicCosecant:
                 InsertSymbolName(@"\arcsch");
                 break;
-            case CgMathKeyboardInput.LimitWithBase:
+            /*case CgMathKeyboardInput.LimitWithBase:
                 InsertSymbolName(@"\lim", true);
                 break;
             case CgMathKeyboardInput.Integral:
@@ -921,7 +921,7 @@ public sealed class CgMathKeyboard : IDisposable
                 break;
             case CgMathKeyboardInput.PartialDifferential:
                 InsertSymbolName(@"\partial");
-                break;
+                break;*/
             case CgMathKeyboardInput.NotEquals:
                 InsertSymbolName(@"\neq");
                 break;
@@ -937,7 +937,7 @@ public sealed class CgMathKeyboard : IDisposable
             case CgMathKeyboardInput.Divide:
                 InsertSymbolName(@"\div");
                 break;
-            case CgMathKeyboardInput.Infinity:
+            /*case CgMathKeyboardInput.Infinity:
                 InsertSymbolName(@"\infty");
                 break;
             case CgMathKeyboardInput.Degree:
@@ -951,13 +951,13 @@ public sealed class CgMathKeyboard : IDisposable
                 break;
             case CgMathKeyboardInput.RightCurlyBracket:
                 InsertSymbolName(@"\}");
-                break;
+                break;*/
             case CgMathKeyboardInput.Percentage:
                 InsertSymbolName(@"\%");
                 break;
-            case CgMathKeyboardInput.Space:
+            /*case CgMathKeyboardInput.Space:
                 InsertSymbolName(@"\ ");
-                break;
+                break;*/
             case CgMathKeyboardInput.Prime:
                 InsertAtom(new Prime(1));
                 break;
@@ -976,8 +976,8 @@ public sealed class CgMathKeyboard : IDisposable
             case CgMathKeyboardInput.RightRoundBracket:
 
                 break;
-            case CgMathKeyboardInput.LeftSquareBracket:
-            case CgMathKeyboardInput.RightSquareBracket:
+            //case CgMathKeyboardInput.LeftSquareBracket:
+            //case CgMathKeyboardInput.RightSquareBracket:
             case CgMathKeyboardInput.D0:
             case CgMathKeyboardInput.D1:
             case CgMathKeyboardInput.D2:
@@ -993,9 +993,9 @@ public sealed class CgMathKeyboard : IDisposable
             case CgMathKeyboardInput.Minus:
             case CgMathKeyboardInput.Ratio:
             case CgMathKeyboardInput.Comma:
-            case CgMathKeyboardInput.Semicolon:
+            //case CgMathKeyboardInput.Semicolon:
             case CgMathKeyboardInput.Factorial:
-            case CgMathKeyboardInput.VerticalBar:
+            //case CgMathKeyboardInput.VerticalBar:
             case CgMathKeyboardInput.LessThan:
             case CgMathKeyboardInput.GreaterThan:
                 InsertAtom(LaTeXSettings.AtomForCommand(new string((char)input, 1))
@@ -1081,7 +1081,7 @@ public sealed class CgMathKeyboard : IDisposable
                 InsertCharFromMathListIndex(MathList, _insertionIndex, (char)input);
             }
                 break;
-            case CgMathKeyboardInput.Alpha:
+            /*case CgMathKeyboardInput.Alpha:
             case CgMathKeyboardInput.Beta:
             case CgMathKeyboardInput.Gamma:
             case CgMathKeyboardInput.Delta:
@@ -1137,7 +1137,7 @@ public sealed class CgMathKeyboard : IDisposable
             case CgMathKeyboardInput.SmallOmega:
                 // All Greek letters are rendered as variables.
                 InsertAtom(new Variable(((char)input).ToStringInvariant()));
-                break;
+                break;*/
         }
 
         ResetPlaceholders(MathList);

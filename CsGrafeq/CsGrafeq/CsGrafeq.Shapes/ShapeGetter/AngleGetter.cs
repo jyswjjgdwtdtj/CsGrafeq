@@ -1,4 +1,5 @@
-﻿using static System.Math;
+﻿using CsGrafeq.I18N;
+using static System.Math;
 
 namespace CsGrafeq.Shapes.ShapeGetter;
 
@@ -34,10 +35,10 @@ public class AngleGetter_FromThreePoint : AngleGetter
         AnglePoint = anglePoint;
         Point1 = point1;
         Point2 = point2;
+        ShapeParameters = [AnglePoint, Point1, Point2];
     }
 
-    public override string ActionName => "Angle";
-    public override GeometryShape[] Parameters => [AnglePoint, Point1, Point2];
+    public override MultiLanguageData ActionName => MultiLanguageResources.AngleText;
 
     public override void Attach(GeometryShape subShape)
     {

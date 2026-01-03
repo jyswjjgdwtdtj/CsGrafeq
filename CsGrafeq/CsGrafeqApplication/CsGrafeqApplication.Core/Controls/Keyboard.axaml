@@ -16,6 +16,18 @@
         </ResourceDictionary>
     </controls:Keyboard.Resources>
     <controls:Keyboard.Styles>
+        <Style Selector="controls|TwoSymbolKeyButton">
+            <Setter Property="Focusable" Value="False"></Setter>
+        </Style>
+        <Style Selector="controls|OneSymbolKeyButton">
+            <Setter Property="Focusable" Value="False"></Setter>
+        </Style>
+        <Style Selector="controls|TwoSymbolKeyButtonInPlace">
+            <Setter Property="Focusable" Value="False"></Setter>
+        </Style>
+        <Style Selector="StackPanel">
+            <Setter Property="Focusable" Value="False"></Setter>
+        </Style>
         <Style Selector="controls|Keyboard">
             <Setter Property="Foreground" Value="{DynamicResource CgForegroundBrush}" />
             <Setter Property="VerticalAlignment" Value="Stretch" />

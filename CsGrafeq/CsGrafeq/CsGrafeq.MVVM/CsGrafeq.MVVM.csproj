@@ -7,11 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="ReactiveUI" Version="22.2.1" />
+      <PackageReference Include="ReactiveUI" Version="22.2.1" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\CsGrafeq.I18N.Generator\CsGrafeq.I18N.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
+      <ProjectReference Include="..\CsGrafeq.I18N\CsGrafeq.I18N.csproj" />
     </ItemGroup>
 
 </Project>

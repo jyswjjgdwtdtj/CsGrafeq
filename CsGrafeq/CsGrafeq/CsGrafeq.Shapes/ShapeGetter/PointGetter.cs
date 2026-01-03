@@ -1,4 +1,5 @@
-﻿using CsGrafeq.Utilities;
+﻿using CsGrafeq.I18N;
+using CsGrafeq.Utilities;
 using ReactiveUI;
 using static CsGrafeq.Shapes.GeometryMath;
 using static System.Math;
@@ -21,49 +22,6 @@ public abstract class PointGetter : GeometryGetter
     }
 }
 
-/// <summary>
-///     轴对称点
-/// </summary>
-public class PointGetter_AxialSymmetryPoint : PointGetter
-{
-    private readonly Line Line;
-    private readonly Point Point;
-
-    public PointGetter_AxialSymmetryPoint(Point point, Line line)
-    {
-        Point = point;
-        Line = line;
-    }
-
-    public override string ActionName => "Reflect";
-    public override GeometryShape[] Parameters => [Point, Line];
-
-    public override Vec GetPoint()
-    {
-        var v1 = Line.Current.Point1;
-        var v2 = Line.Current.Point2;
-        var ControlPoint = Point.Location;
-        var dx = v2.X - v1.X;
-        var dy = v2.Y - v1.Y;
-        var t = ((ControlPoint.X - v1.X) * dx + (ControlPoint.Y - v1.Y) * dy) / (dx * dx + dy * dy);
-        return new Vec(v1.X + t * dx, v1.Y + t * dy) * 2 - ControlPoint;
-    }
-
-    public override void Attach(GeometryShape subShape)
-    {
-        Point.AddSubShape(subShape);
-        Line.AddSubShape(subShape);
-        ;
-        ;
-    }
-
-    public override void UnAttach(GeometryShape subShape)
-    {
-        Point.RemoveSubShape(subShape);
-        Line.RemoveSubShape(subShape);
-    }
-}
-
 #region Movable
 
 public abstract class PointGetter_Movable : PointGetter
@@ -76,6 +34,7 @@ public abstract class PointGetter_Movable : PointGetter
         PointY = new ExpNumber(0, this);
         PointX.UserSetValueStr += XChanged;
         PointY.UserSetValueStr += YChanged;
+        ShapeParameters = [];
     }
 
     public abstract GeometryShape? On { get; }
@@ -117,9 +76,8 @@ public class PointGetter_FromLocation : PointGetter_Movable
         PointY.SetNumber(y);
     }
 
-    public override string ActionName => "";
+    public override MultiLanguageData ActionName => MultiLanguageResources.PointText;
     public override GeometryShape? On => null;
-    public override GeometryShape[] Parameters => [];
 
     public override Vec GetPoint()
     {
@@ -164,8 +122,7 @@ public abstract class PointGetter_OnShape<T> : PointGetter_Movable where T : Geo
 
     protected T OnShape { get; init; }
     public override GeometryShape On => OnShape;
-    public override string ActionName { get; } = "On" + nameof(T);
-    public override GeometryShape[] Parameters => [OnShape];
+    public override MultiLanguageData ActionName => MultiLanguageResources.PointText;
 
     public sealed override Vec GetPoint()
     {
@@ -442,10 +399,10 @@ public class PointGetter_NearestPointOnLine : PointGetter
     {
         Line = line;
         Point = point;
+        ShapeParameters = [point, line];
     }
 
-    public override string ActionName => "Nearest";
-    public override GeometryShape[] Parameters => [Point, Line];
+    public override MultiLanguageData ActionName => MultiLanguageResources.NearestPointText;
 
     public override Vec GetPoint()
     {
@@ -466,8 +423,6 @@ public class PointGetter_NearestPointOnLine : PointGetter
     {
         Line.AddSubShape(subShape);
         Point.AddSubShape(subShape);
-        ;
-        ;
     }
 
     public override void UnAttach(GeometryShape subShape)
@@ -476,6 +431,48 @@ public class PointGetter_NearestPointOnLine : PointGetter
         Point.RemoveSubShape(subShape);
     }
 }
+
+/// <summary>
+///     轴对称点
+/// </summary>
+public class PointGetter_AxialSymmetryPoint : PointGetter
+{
+    private readonly Line Line;
+    private readonly Point Point;
+
+    public PointGetter_AxialSymmetryPoint(Point point, Line line)
+    {
+        Point = point;
+        Line = line;
+        ShapeParameters =[point,line];
+    }
+
+    public override MultiLanguageData ActionName => MultiLanguageResources.AxialSymmetryText;
+
+    public override Vec GetPoint()
+    {
+        var v1 = Line.Current.Point1;
+        var v2 = Line.Current.Point2;
+        var ControlPoint = Point.Location;
+        var dx = v2.X - v1.X;
+        var dy = v2.Y - v1.Y;
+        var t = ((ControlPoint.X - v1.X) * dx + (ControlPoint.Y - v1.Y) * dy) / (dx * dx + dy * dy);
+        return new Vec(v1.X + t * dx, v1.Y + t * dy) * 2 - ControlPoint;
+    }
+
+    public override void Attach(GeometryShape subShape)
+    {
+        Point.AddSubShape(subShape);
+        Line.AddSubShape(subShape);
+    }
+
+    public override void UnAttach(GeometryShape subShape)
+    {
+        Point.RemoveSubShape(subShape);
+        Line.RemoveSubShape(subShape);
+    }
+}
+
 
 #endregion
 
@@ -489,9 +486,8 @@ public abstract class PointGetter_FromTwoPoint : PointGetter
     {
         Point1 = point1;
         Point2 = point2;
+        ShapeParameters = [point1,point2];
     }
-
-    public override GeometryShape[] Parameters => [Point1, Point2];
 
     public override void Attach(GeometryShape subShape)
     {
@@ -518,10 +514,13 @@ public class PointGetter_EndOfLine : PointGetter
     {
         this.line = line;
         First = first;
+        ActionName = first
+            ? MultiLanguageResources.StartPointText
+            : MultiLanguageResources.EndPointText;
+        ShapeParameters= [line];
     }
 
-    public override string ActionName => (First ? "First" : "Second") + "EndOf";
-    public override GeometryShape[] Parameters => [line];
+    public override MultiLanguageData ActionName { get; }
 
     public override Vec GetPoint()
     {
@@ -548,7 +547,7 @@ public class PointGetter_MiddlePoint : PointGetter_FromTwoPoint
     {
     }
 
-    public override string ActionName => "MidPoint";
+    public override MultiLanguageData ActionName { get; } = MultiLanguageResources.Instance.MiddlePointText;
 
     public override Vec GetPoint()
     {
@@ -590,9 +589,8 @@ public abstract class PointGetter_FromThreePoint : PointGetter
         Point1 = point1;
         Point2 = point2;
         Point3 = point3;
+        ShapeParameters = [point1,point2,point3];
     }
-
-    public override GeometryShape[] Parameters => [Point1, Point2, Point3];
     public abstract override Vec GetPoint();
 
     public override void Attach(GeometryShape subShape)
@@ -600,10 +598,6 @@ public abstract class PointGetter_FromThreePoint : PointGetter
         Point1.AddSubShape(subShape);
         Point2.AddSubShape(subShape);
         Point3.AddSubShape(subShape);
-
-        ;
-        ;
-        ;
     }
 
     public override void UnAttach(GeometryShape subShape)
@@ -614,13 +608,13 @@ public abstract class PointGetter_FromThreePoint : PointGetter
     }
 }
 
-public class PointGetter_MedianCenter : PointGetter_FromThreePoint
+public class PointGetter_Centroid : PointGetter_FromThreePoint
 {
-    public PointGetter_MedianCenter(Point point1, Point point2, Point point3) : base(point1, point2, point3)
+    public PointGetter_Centroid(Point point1, Point point2, Point point3) : base(point1, point2, point3)
     {
     }
 
-    public override string ActionName => "MedianCenter";
+    public override MultiLanguageData ActionName { get; } = MultiLanguageResources.Instance.CentroidText;
 
     public override Vec GetPoint()
     {
@@ -637,7 +631,7 @@ public class PointGetter_OrthoCenter : PointGetter_FromThreePoint
     {
     }
 
-    public override string ActionName => "OrthoCenter";
+    public override MultiLanguageData ActionName { get; } = MultiLanguageResources.Instance.OrthocenterText;
 
     public override Vec GetPoint()
     {
@@ -657,7 +651,7 @@ public class PointGetter_InCenter : PointGetter_FromThreePoint
     {
     }
 
-    public override string ActionName => "InCenter";
+    public override MultiLanguageData ActionName { get; } = MultiLanguageResources.Instance.IncenterText;
 
     public override Vec GetPoint()
     {
@@ -671,13 +665,13 @@ public class PointGetter_InCenter : PointGetter_FromThreePoint
     }
 }
 
-public class PointGetter_OutCenter : PointGetter_FromThreePoint
+public class PointGetter_Circumcenter : PointGetter_FromThreePoint
 {
-    public PointGetter_OutCenter(Point point1, Point point2, Point point3) : base(point1, point2, point3)
+    public PointGetter_Circumcenter(Point point1, Point point2, Point point3) : base(point1, point2, point3)
     {
     }
 
-    public override string ActionName => "OutCenter";
+    public override MultiLanguageData ActionName { get; } = MultiLanguageResources.Instance.CircumcenterText;
 
     public override Vec GetPoint()
     {
@@ -701,15 +695,22 @@ public class PointGetter_OutCenter : PointGetter_FromThreePoint
 
 #region Intersection
 
-public abstract class PointGetter_Intersection<TShape1, TShape2>(TShape1 shape1, TShape2 shape2, bool isFirst)
+public abstract class PointGetter_Intersection<TShape1, TShape2>
     : PointGetter
     where TShape1 : GeometryShape
     where TShape2 : GeometryShape
 {
-    protected readonly bool IsFirst = isFirst;
-    protected readonly TShape1 Shape1 = shape1;
-    protected readonly TShape2 Shape2 = shape2;
-    public override GeometryShape[] Parameters => [Shape1, Shape2];
+    public PointGetter_Intersection(TShape1 shape1, TShape2 shape2, bool isFirst)
+    {
+        ShapeParameters = [shape1, shape2];
+        IsFirst = isFirst;
+        Shape1= shape1;
+        Shape2= shape2;
+    }
+    protected readonly bool IsFirst;
+    protected readonly TShape1 Shape1;
+    protected readonly TShape2 Shape2;
+    public override MultiLanguageData ActionName { get; } = MultiLanguageResources.Instance.IntersectText;
 
     public override void Attach(GeometryShape subShape)
     {
@@ -731,8 +732,6 @@ public abstract class PointGetter_Intersection<TShape1, TShape2>(TShape1 shape1,
 public class PointGetter_FromLineAndCircle(Line line, Circle circle, bool isFirst)
     : PointGetter_Intersection<Line, Circle>(line, circle, isFirst)
 {
-    public override string ActionName => "LineAndCircle";
-
     public override Vec GetPoint()
     {
         var vs = IntersectionMath.FromLineAndCircle(line.Current, circle.Current);
@@ -744,8 +743,6 @@ public class PointGetter_FromLineAndCircle(Line line, Circle circle, bool isFirs
 public class PointGetter_FromTwoCircle(Circle shape1, Circle shape2, bool isFirst)
     : PointGetter_Intersection<Circle, Circle>(shape1, shape2, isFirst)
 {
-    public override string ActionName => "TwoCircle";
-
     public sealed override Vec GetPoint()
     {
         var vs = IntersectionMath.FromTwoCircle(shape1.Current, shape2.Current);
@@ -755,8 +752,6 @@ public class PointGetter_FromTwoCircle(Circle shape1, Circle shape2, bool isFirs
 
 public class PointGetter_FromTwoLine(Line line1, Line line2) : PointGetter_Intersection<Line, Line>(line1, line2, false)
 {
-    public override string ActionName => "Intersect";
-
     public override Vec GetPoint()
     {
         var v = IntersectionMath.FromTwoLine(line1.Current, line2.Current);

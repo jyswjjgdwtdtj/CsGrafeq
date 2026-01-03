@@ -59,6 +59,7 @@
     <ItemGroup>
         <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.CSharpMath.Editor\CsGrafeq.CSharpMath.Editor.csproj"/>
         <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.I18N\CsGrafeq.I18N.csproj" />
+        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.MVVM\CsGrafeq.MVVM.csproj" />
     </ItemGroup>
 
     <ItemGroup>

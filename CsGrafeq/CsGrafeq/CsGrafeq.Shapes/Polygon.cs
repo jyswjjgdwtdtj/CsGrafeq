@@ -11,12 +11,11 @@ public class Polygon : FilledShape
 
     public Polygon(PolygonGetter getter)
     {
+        TypeName = MultiLanguageResources.PolygonText;
         PolygonGetter = getter;
         PolygonGetter.Attach(this);
         RefreshValues();
     }
-
-    public override string TypeName => "Polygon";
     public override PolygonGetter Getter => PolygonGetter;
 
     public override void RefreshValues()

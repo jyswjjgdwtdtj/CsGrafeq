@@ -17,12 +17,8 @@ public abstract class Line : GeometryShape
         RefreshValues();
     }
 
-    public override string TypeName => "Line";
-
     public override LineGetter Getter => LineGetter;
-    public LineStruct LineData => Current;
-
-
+    
     public override void RefreshValues()
     {
         Current = LineGetter.GetLine();
@@ -50,9 +46,8 @@ public class Segment : Line
 {
     public Segment(LineGetter_Segment segment) : base(segment)
     {
+        TypeName = MultiLanguageResources.SegmentText;
     }
-
-    public override string TypeName => "Segment";
 
     public override void RefreshValues()
     {
@@ -71,9 +66,8 @@ public class Half : Line
 {
     public Half(LineGetter_Half segment) : base(segment)
     {
+        TypeName = MultiLanguageResources.HalfLineText;
     }
-
-    public override string TypeName => "Half";
 
     public override bool CheckIsValid(Vec vec)
     {
@@ -85,9 +79,8 @@ public class Straight : Line
 {
     public Straight(LineGetter lineGetter) : base(lineGetter)
     {
+        TypeName = MultiLanguageResources.StraightText;
     }
-
-    public override string TypeName => "Straight";
 
     public override bool CheckIsValid(Vec vec)
     {

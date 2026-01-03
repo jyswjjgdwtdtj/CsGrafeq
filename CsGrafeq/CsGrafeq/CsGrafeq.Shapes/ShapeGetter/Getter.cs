@@ -1,7 +1,7 @@
-using ReactiveUI;
+using CsGrafeq.MVVM;
 
 namespace CsGrafeq.Shapes.ShapeGetter;
 
-public class Getter : ReactiveObject
+public class Getter : ObservableObject
 {
 }

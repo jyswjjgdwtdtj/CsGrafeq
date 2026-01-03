@@ -1,4 +1,6 @@
-﻿namespace CsGrafeq.Shapes.ShapeGetter;
+﻿using CsGrafeq.I18N;
+
+namespace CsGrafeq.Shapes.ShapeGetter;
 
 public class PolygonGetter : GeometryGetter
 {
@@ -6,12 +8,11 @@ public class PolygonGetter : GeometryGetter
 
     public PolygonGetter(Point[] points)
     {
-        Points = new Point[points.Length];
         Points = [.. points];
+        ShapeParameters = [.. Points];
     }
 
-    public override string ActionName => "Polygon";
-    public override GeometryShape[] Parameters => Points;
+    public override MultiLanguageData ActionName { get; } = MultiLanguageResources.Instance.PolygonText;
 
     public override void Attach(GeometryShape subShape)
     {

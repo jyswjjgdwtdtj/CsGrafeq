@@ -1,11 +1,12 @@
 using Avalonia;
 using Avalonia.Themes.Fluent;
+using CsGrafeq.MVVM;
 using Material.Styles.Themes;
 using ReactiveUI;
 
 namespace CsGrafeqApplication;
 
-public class Static : ReactiveObject
+public class Static : ObservableObject
 {
     static Static()
     {

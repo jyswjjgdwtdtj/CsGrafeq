@@ -23,6 +23,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.MVVM\CsGrafeq.MVVM.csproj" />
       <ProjectReference Include="..\CsGrafeqApplication.Core\CsGrafeqApplication.Core.csproj" />
     </ItemGroup>
 

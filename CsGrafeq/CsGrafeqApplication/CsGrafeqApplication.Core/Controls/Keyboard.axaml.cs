@@ -30,11 +30,4 @@ public partial class Keyboard : TemplatedControl
     {
         TopLevel.GetTopLevel(this)?.Input(CgMathKeyboardInput.Backspace);
     }
-
-    protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
-    {
-        base.OnApplyTemplate(e);
-        var BackspaceButton = e.NameScope.Find<Button>("BackspaceButton");
-        if (BackspaceButton != null) BackspaceButton.Click += BackspaceButton_OnClick;
-    }
 }

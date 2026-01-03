@@ -1,4 +1,5 @@
-﻿using static CsGrafeq.Shapes.GeometryMath;
+﻿using CsGrafeq.I18N;
+using static CsGrafeq.Shapes.GeometryMath;
 
 namespace CsGrafeq.Shapes.ShapeGetter;
 
@@ -18,10 +19,10 @@ public class CircleGetter_FromThreePoint : CircleGetter
         Point1 = point1;
         Point2 = point2;
         Point3 = point3;
+        ShapeParameters=[Point1, Point2, Point3];
     }
 
-    public override string ActionName => "Circle";
-    public override GeometryShape[] Parameters => [Point1, Point2, Point3];
+    public override MultiLanguageData ActionName => MultiLanguageResources.CircleText;
 
     public override CircleStruct GetCircle()
     {
@@ -56,23 +57,23 @@ public class CircleGetter_FromThreePoint : CircleGetter
     }
 }
 
-public class CircleGetter_FromCenterAndRadius : CircleGetter, IHasExpNumberShapeGetter
+public class CircleGetter_FromCenterAndRadius : CircleGetter
 {
     public CircleGetter_FromCenterAndRadius(Point center)
     {
         Radius = new ExpNumber(1, this);
         Radius.ValueStr = "1";
         Center = center;
-        ExpNumbers = [new ExpNumberData { Description = "Radius", Number = Radius }];
+        ExpNumbers = [new( Radius,MultiLanguageResources.RadiusText )];
+        ShapeParameters = [Center];
     }
+
+    public override MultiLanguageData ActionName => MultiLanguageResources.CircleText;
 
     public Point Center { get; init; }
     public ExpNumber Radius { get; init; }
 
-    public override string ActionName => "Circle";
-    public override GeometryShape[] Parameters => [Center];
-
-    public IReadOnlyList<ExpNumberData> ExpNumbers { get; init; }
+    public IReadOnlyList<NumberParameter> ExpNumbers { get; init; }
 
     public override CircleStruct GetCircle()
     {
@@ -102,10 +103,10 @@ public class CircleGetter_FromCenterAndPoint : CircleGetter
     {
         Center = center;
         Point = point;
+        ShapeParameters = [Center, Point];
     }
 
-    public override string ActionName => "Circle";
-    public override GeometryShape[] Parameters => [Center, Point];
+    public override MultiLanguageData ActionName => MultiLanguageResources.CircleText;
 
     public override CircleStruct GetCircle()
     {
@@ -128,7 +129,7 @@ public class CircleGetter_FromCenterAndPoint : CircleGetter
     }
 }
 
-public class CircleGetter_Apollonius : CircleGetter, IHasExpNumberShapeGetter
+public class CircleGetter_Apollonius : CircleGetter
 {
     private readonly Point PointA;
     private readonly Point PointB;
@@ -139,14 +140,13 @@ public class CircleGetter_Apollonius : CircleGetter, IHasExpNumberShapeGetter
         PointB = b;
         Ratio = new ExpNumber(1, this);
         Ratio.ValueStr = "1";
-        ExpNumbers = [new ExpNumberData { Description = "Ratio", Number = Ratio }];
+        NumberParameters = [new(Ratio, MultiLanguageResources.RatioText)];
+        ShapeParameters = [PointA, PointB];
     }
 
-    public ExpNumber Ratio { get; init; }
+    public override MultiLanguageData ActionName => MultiLanguageResources.ApolloniusText;
 
-    public override string ActionName => "Circle";
-    public override GeometryShape[] Parameters => [PointA, PointB];
-    public IReadOnlyList<ExpNumberData> ExpNumbers { get; init; }
+    public ExpNumber Ratio { get; init; }
 
     public override CircleStruct GetCircle()
     {

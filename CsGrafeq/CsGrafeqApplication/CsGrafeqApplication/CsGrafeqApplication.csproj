@@ -25,80 +25,63 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
     <ItemGroup>
-        <None Remove="Assets\camera.svg"/>
-        <None Remove="Assets\delete.svg"/>
-        <None Remove="Assets\Github.svg"/>
-        <None Remove="Assets\input.svg"/>
-        <None Remove="Assets\shape.svg"/>
-        <None Remove="Assets\slider.svg"/>
-        <None Remove="Fonts\MapleMono-CN-Regular.ttf"/>
+        <None Remove="Assets\camera.svg" />
+        <None Remove="Assets\delete.svg" />
+        <None Remove="Assets\Github.svg" />
+        <None Remove="Assets\input.svg" />
+        <None Remove="Assets\shape.svg" />
+        <None Remove="Assets\slider.svg" />
+        <None Remove="Fonts\MapleMono-CN-Regular.ttf" />
     </ItemGroup>
     <ItemGroup>
-        <AvaloniaResource Include="Assets\avalonia-logo.ico"/>
-        <AvaloniaResource Include="Assets\calc.svg"/>
-        <AvaloniaResource Include="Assets\camera.svg"/>
-        <AvaloniaResource Include="Assets\favicon.ico"/>
-        <None Remove="Assets\csharp.svg"/>
-        <AvaloniaResource Include="Assets\csharp.svg"/>
-        <None Remove="Assets\error.svg"/>
-        <AvaloniaResource Include="Assets\error.svg"/>
-        <None Remove="Assets\folder.svg"/>
-        <AvaloniaResource Include="Assets\folder.svg"/>
-        <None Remove="Assets\keyboard.svg"/>
-        <None Remove="Assets\language.svg"/>
-        <None Remove="Assets\linedown.svg"/>
-        <None Remove="Assets\setting.svg"/>
-        <None Remove="Assets\stepback.svg"/>
-        <None Remove="Assets\stepover.svg"/>
-        <None Remove="Assets\lineup.svg"/>
-        <None Remove="Assets\zoomin.svg"/>
-        <None Remove="Assets\zoomout.svg"/>
-        <None Remove="Assets\trash.svg"/>
-        <None Remove="Assets\selectall.svg"/>
-        <None Remove="Assets\deselectall.svg"/>
-        <None Remove="Assets\add.svg"/>
-        <None Remove="Assets\theme.svg"/>
-        <None Remove="Assets\save.svg"/>
-        <None Remove="Assets\close.svg"/>
-        <None Remove="Assets\closefullscreen.svg"/>
-        <None Remove="Assets\openfullscreen.svg"/>
-        <None Remove="Assets\minimize.svg"/>
+        <AvaloniaResource Include="Assets\avalonia-logo.ico" />
+        <AvaloniaResource Include="Assets\calc.svg" />
+        <AvaloniaResource Include="Assets\camera.svg" />
+        <AvaloniaResource Include="Assets\favicon.ico" />
+        <None Remove="Assets\csharp.svg" />
+        <AvaloniaResource Include="Assets\csharp.svg" />
+        <None Remove="Assets\error.svg" />
+        <AvaloniaResource Include="Assets\error.svg" />
+        <None Remove="Assets\folder.svg" />
+        <AvaloniaResource Include="Assets\folder.svg" />
     </ItemGroup>
 
     <ItemGroup>
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-        <PackageReference Include="Avalonia"/>
-        <PackageReference Include="Avalonia.Controls.ColorPicker"/>
-        <PackageReference Include="Avalonia.Fonts.Inter"/>
-        <PackageReference Include="Avalonia.Skia"/>
-        <PackageReference Include="Avalonia.Themes.Fluent"/>
-        <PackageReference Include="CSharpMath"/>
-        <PackageReference Include="CSharpMath.Editor"/>
-        <PackageReference Include="CSharpMath.Evaluation"/>
-        <PackageReference Include="CSharpMath.Rendering"/>
-        <PackageReference Include="CSharpMath.SkiaSharp"/>
-        <PackageReference Include="DialogHost.Avalonia"/>
-        <PackageReference Include="HarfBuzzSharp"/>
-        <PackageReference Include="LiveMarkdown.Avalonia"/>
-        <PackageReference Include="Material.Avalonia"/>
-        <PackageReference Include="Material.Avalonia.Dialogs"/>
+        <PackageReference Include="Avalonia" />
+        <PackageReference Include="Avalonia.Controls.ColorPicker" />
+        <PackageReference Include="Avalonia.Fonts.Inter" />
+        <PackageReference Include="Avalonia.Skia" />
+        <PackageReference Include="Avalonia.Themes.Fluent" />
+        <PackageReference Include="CSharpMath" />
+        <PackageReference Include="CSharpMath.Editor" />
+        <PackageReference Include="CSharpMath.Evaluation" />
+        <PackageReference Include="CSharpMath.Rendering" />
+        <PackageReference Include="CSharpMath.SkiaSharp" />
+        <PackageReference Include="DialogHost.Avalonia" />
+        <PackageReference Include="HarfBuzzSharp" />
+        <PackageReference Include="LiveMarkdown.Avalonia" />
+        <PackageReference Include="Material.Avalonia" />
+        <PackageReference Include="Material.Avalonia.Dialogs" />
         <PackageReference Include="MessageBox.Avalonia.Markdown" />
-        <PackageReference Include="SkiaSharp"/>
-        <PackageReference Include="SkiaSharp.HarfBuzz"/>
-        <PackageReference Include="Svg.Controls.Skia.Avalonia"/>
-        <PackageReference Include="Sylinko.CSharpMath.Avalonia"/>
+        <PackageReference Include="ReactiveUI" />
+        <PackageReference Include="SkiaSharp" />
+        <PackageReference Include="SkiaSharp.HarfBuzz" />
+        <PackageReference Include="Svg.Controls.Skia.Avalonia" />
+        <PackageReference Include="Sylinko.CSharpMath.Avalonia" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Base\CsGrafeq.Base.csproj"/>
-        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Compiler\CsGrafeq.Compiler.csproj"/>
-        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.CSharpMath.Editor\CsGrafeq.CSharpMath.Editor.csproj"/>
-        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Debug\CsGrafeq.Debug.csproj"/>
-        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.I18N\CsGrafeq.I18N.csproj"/>
-        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Interval\CsGrafeq.Interval.csproj"/>
-        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Shapes\CsGrafeq.Shapes.csproj"/>
-        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Windows\CsGrafeq.Windows.csproj"/>
-        <ProjectReference Include="..\CsGrafeqApplication.Core\CsGrafeqApplication.Core.csproj"/>
+        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Base\CsGrafeq.Base.csproj" />
+        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Compiler\CsGrafeq.Compiler.csproj" />
+        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.CSharpMath.Editor\CsGrafeq.CSharpMath.Editor.csproj" />
+        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Debug\CsGrafeq.Debug.csproj" />
+        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.I18N\CsGrafeq.I18N.csproj" />
+        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Interval\CsGrafeq.Interval.csproj" />
+        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.MVVM\CsGrafeq.MVVM.csproj" />
+        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Shapes\CsGrafeq.Shapes.csproj" />
+        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Windows\CsGrafeq.Windows.csproj" />
+        <ProjectReference Include="..\CsGrafeqApplication.Core\CsGrafeqApplication.Core.csproj" />
         <ProjectReference Include="..\CsGrafeqApplication.Dialogs\CsGrafeqApplication.Dialogs.csproj" />
     </ItemGroup>
 
@@ -129,9 +112,5 @@
             <LastGenOutput>Resources.en-us.Designer.cs</LastGenOutput>
             <Generator>ResXFileCodeGenerator</Generator>
         </EmbeddedResource>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Folder Include="Fonts\"/>
     </ItemGroup>
 </Project>

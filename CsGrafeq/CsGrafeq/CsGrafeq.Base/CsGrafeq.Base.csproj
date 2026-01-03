@@ -18,7 +18,11 @@
         <PackageReference Include="DialogHost.Avalonia" Version="0.10.0"/>
         <PackageReference Include="Material.Avalonia" Version="3.13.3"/>
         <PackageReference Include="Material.Avalonia.Dialogs" Version="3.13.3"/>
-        <PackageReference Include="ReactiveUI" Version="22.2.1"/>
+        <PackageReference Include="ReactiveUI" Version="22.2.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\CsGrafeq.MVVM\CsGrafeq.MVVM.csproj" />
     </ItemGroup>
 
 </Project>

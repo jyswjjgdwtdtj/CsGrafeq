@@ -22,7 +22,7 @@
                                                        Stroke="{DynamicResource CgForegroundBrush}" Width="15"
                                                        Height="15" StrokeThickness="1" />
                                         </Border>
-                                        <corecontrols:MathBox MathList="{CompiledBinding MathList}" CanInput="False"
+                                        <corecontrols:MathBox ClipToBounds="True" MathList="{CompiledBinding MathList}" CanInput="False"
                                                               Foreground="{DynamicResource CgForegroundBrush}" />
                                     </DockPanel>
                                 </Border>

@@ -5,3 +5,5 @@ Release/
 obj/
 *.pdb
 *.Test/
+publish/
+

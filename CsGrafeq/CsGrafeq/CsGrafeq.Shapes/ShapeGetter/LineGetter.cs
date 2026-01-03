@@ -1,11 +1,10 @@
-﻿using static System.Math;
+﻿using CsGrafeq.I18N;
+using static System.Math;
 
 namespace CsGrafeq.Shapes.ShapeGetter;
 
 public abstract class LineGetter : GeometryGetter
 {
-    public override string ActionName => "Line";
-    public override GeometryShape[] Parameters => [];
     public abstract LineStruct GetLine();
 }
 
@@ -17,16 +16,17 @@ public abstract class LineGetter_TwoPoint : LineGetter
     {
         Point1 = p1;
         Point2 = p2;
+        ShapeParameters =
+        [
+            new ShapeParameter(Point1, MultiLanguageResources.StartPointText),
+            new ShapeParameter(Point2, MultiLanguageResources.EndPointText)
+        ];
     }
-
-    public override GeometryShape[] Parameters => [Point1, Point2];
 
     public override void Attach(GeometryShape subShape)
     {
         Point1.AddSubShape(subShape);
         Point2.AddSubShape(subShape);
-        ;
-        ;
     }
 
     public override void UnAttach(GeometryShape subShape)
@@ -42,7 +42,7 @@ public class LineGetter_Connected : LineGetter_TwoPoint
     {
     }
 
-    public override string ActionName => "Staight";
+    public override MultiLanguageData ActionName => MultiLanguageResources.StraightText;
 
     public override LineStruct GetLine()
     {
@@ -56,7 +56,7 @@ public sealed class LineGetter_Segment : LineGetter_Connected
     {
     }
 
-    public override string ActionName => "Segment";
+    public override MultiLanguageData ActionName => MultiLanguageResources.SegmentText;
 }
 
 public sealed class LineGetter_Half : LineGetter_Connected
@@ -65,7 +65,7 @@ public sealed class LineGetter_Half : LineGetter_Connected
     {
     }
 
-    public override string ActionName => "Half";
+    public override MultiLanguageData ActionName => MultiLanguageResources.HalfLineText;
 }
 
 /// <summary>
@@ -75,9 +75,10 @@ public class LineGetter_PerpendicularBisector : LineGetter_TwoPoint
 {
     public LineGetter_PerpendicularBisector(Point p1, Point p2) : base(p1, p2)
     {
+        ShapeParameters = [new ShapeParameter(Point1), new ShapeParameter(Point2)];
     }
 
-    public override string ActionName => "PerpendicularBisector";
+    public override MultiLanguageData ActionName => MultiLanguageResources.PerpendicularBisectorText;
 
     public override LineStruct GetLine()
     {
@@ -105,19 +106,16 @@ public class LineGetter_AngleBisector : LineGetter
         Point1 = p1;
         Point2 = p2;
         AnglePoint = anglePoint;
+        ShapeParameters = [Point1, Point2, new ShapeParameter(AnglePoint, MultiLanguageResources.AngleText)];
     }
 
-    public override GeometryShape[] Parameters => [Point1, Point2, AnglePoint];
-    public override string ActionName => "AngleBisector";
+    public override MultiLanguageData ActionName => MultiLanguageResources.AngleBisectorText;
 
     public override void Attach(GeometryShape subShape)
     {
         Point1.AddSubShape(subShape);
         Point2.AddSubShape(subShape);
         AnglePoint.AddSubShape(subShape);
-        ;
-        ;
-        ;
     }
 
     public override void UnAttach(GeometryShape subShape)
@@ -153,12 +151,11 @@ public abstract class LineGetter_PointAndLine : LineGetter
     {
         Line = line;
         Point = point;
+        ShapeParameters = [point, line];
     }
 
     public Line Line { get; init; }
     public Point Point { get; init; }
-
-    public override GeometryShape[] Parameters => [Line, Point];
 
     public override void Attach(GeometryShape subShape)
     {
@@ -181,7 +178,7 @@ public class LineGetter_Vertical : LineGetter_PointAndLine
     {
     }
 
-    public override string ActionName => "Vertical";
+    public override MultiLanguageData ActionName => MultiLanguageResources.VerticalLineText;
 
     public override LineStruct GetLine()
     {
@@ -204,7 +201,7 @@ public class LineGetter_Parallel : LineGetter_PointAndLine
     {
     }
 
-    public override string ActionName => "Parallel";
+    public override MultiLanguageData ActionName => MultiLanguageResources.Instance.ParallelLineText;
 
     public override LineStruct GetLine()
     {
@@ -228,12 +225,12 @@ public class LineGetter_Fitted : LineGetter
 {
     public LineGetter_Fitted(Point[] points)
     {
-        Points = [.. points];
+        Points = [..points];
+        ShapeParameters = [..points];
     }
 
-    public override string ActionName => "Fitted";
+    public override MultiLanguageData ActionName => MultiLanguageResources.FittedText;
     public Point[] Points { get; init; }
-    public override GeometryShape[] Parameters => [..Points];
 
     public override LineStruct GetLine()
     {

@@ -10,12 +10,11 @@ public class Circle : FilledShape
 
     public Circle(CircleGetter cg)
     {
+        TypeName = MultiLanguageResources.CircleText;
         CircleGetter = cg;
         cg.Attach(this);
         RefreshValues();
     }
-
-    public override string TypeName => "Circle";
     public double Radius => Current.Radius;
     public double LocY => Current.Center.Y;
     public double LocX => Current.Center.X;
@@ -24,7 +23,7 @@ public class Circle : FilledShape
     public override void RefreshValues()
     {
         Current = CircleGetter.GetCircle();
-        Description = $"Center:({LocX},{LocY}),Radius:{Radius}";
+        Description = $"{MultiLanguageResources.CircleCenterText}:({LocX},{LocY}),{MultiLanguageResources.RadiusText}:{Radius}";
         InvokeShapeChanged();
     }
 

@@ -1,4 +1,6 @@
 ﻿global using ShapeChangedHandler = System.Action;
+using CsGrafeq.I18N;
+using CsGrafeq.MVVM;
 using ReactiveUI;
 using static CsGrafeq.Utilities.ColorHelper;
 
@@ -11,7 +13,7 @@ public delegate void ShapeChangedHandler<T1, T2>(T1 shape, T2 args) where T1 : S
 /// <summary>
 ///     几何图形基类
 /// </summary>
-public abstract class Shape : ReactiveObject, IDisposable
+public abstract class Shape : ObservableObject, IDisposable
 {
     /// <summary>
     ///     是否可以交互
@@ -60,7 +62,7 @@ public abstract class Shape : ReactiveObject, IDisposable
     /// <summary>
     ///     当前图形名称
     /// </summary>
-    public abstract string TypeName { get; }
+    public MultiLanguageData TypeName { get; init; }
 
     /// <summary>
     ///     简介

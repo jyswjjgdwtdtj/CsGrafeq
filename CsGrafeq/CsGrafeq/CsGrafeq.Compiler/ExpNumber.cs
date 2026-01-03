@@ -1,4 +1,5 @@
 ﻿using CsGrafeq.Compiler;
+using CsGrafeq.MVVM;
 using CsGrafeq.Numeric;
 using CsGrafeq.Utilities;
 using ReactiveUI;
@@ -10,7 +11,7 @@ namespace CsGrafeq;
 ///     充满了别扭 没办法……
 ///     面向用户编程就是这样子 要拗出很奇怪恶心的东西
 /// </summary>
-public class ExpNumber : ReactiveObject
+public class ExpNumber : ObservableObject
 {
     private readonly HasReferenceFunction<Func<DoubleNumber>> Direct;
 

@@ -230,7 +230,7 @@ public enum CgMathKeyboardInput
     Right = '⏵',
     Backspace = '⌫',
     Clear = '⎚',
-    Return = '\n',
+   // Return = '\n',
     Dismiss = '❌',
     Delete = '⌦',
 
@@ -255,21 +255,21 @@ public enum CgMathKeyboardInput
     Ratio = ':',
     Percentage = '%',
     Comma = ',',
-    Semicolon = ';',
+    //Semicolon = ';',
     Factorial = '!',
-    Infinity = '∞',
+    /*Infinity = '∞',
     Angle = '∠',
     Degree = '°',
     VerticalBar = '|',
     Logarithm = '㏒',
-    NaturalLogarithm = '㏑',
+    NaturalLogarithm = '㏑',*/
     Prime = '\'',
-    PartialDifferential = '∂',
+    /*PartialDifferential = '∂',
     LeftArrow = '←',
     UpArrow = '↑',
     RightArrow = '→',
     DownArrow = '↓',
-    Space = ' ',
+    Space = ' ',*/
 
     // More complicated operators
     Slash = '/',
@@ -279,16 +279,16 @@ public enum CgMathKeyboardInput
     SquareRoot = '√',
     CubeRoot = '∛',
     NthRoot = '∜',
-    BaseEPower = 'ℯ',
-    LogarithmWithBase = '㏐',
+    //BaseEPower = 'ℯ',
+    //LogarithmWithBase = '㏐',
 
     // Basic Brackets
     LeftRoundBracket = '(',
     RightRoundBracket = ')',
-    LeftSquareBracket = '[',
+    /*LeftSquareBracket = '[',
     RightSquareBracket = ']',
     LeftCurlyBracket = '{',
-    RightCurlyBracket = '}',
+    RightCurlyBracket = '}',*/
 
     // Both Brackets
     BothRoundBrackets = '㈾',
@@ -359,7 +359,7 @@ public enum CgMathKeyboardInput
     SmallX = 'x',
     SmallY = 'y',
     SmallZ = 'z',
-
+/*
     // Capital Greek alphabets
     Alpha = 'Α',
     Beta = 'Β',
@@ -417,7 +417,7 @@ public enum CgMathKeyboardInput
     SmallChi = 'χ',
     SmallPsi = 'ψ',
     SmallOmega = 'ω',
-
+*/
     // Trigonometric functions
     Sine = '␖',
     Cosine = '℅',
@@ -445,7 +445,7 @@ public enum CgMathKeyboardInput
     AreaHyperbolicCotangent = '◶',
     AreaHyperbolicSecant = '⚆',
     AreaHyperbolicCosecant = '⚇',
-
+/*
     // Calculus operators
     LimitWithBase = '㋏',
     Integral = '∫',
@@ -469,7 +469,7 @@ public enum CgMathKeyboardInput
     ClockwiseIntegral = '∱',
     ClockwiseContourIntegral = '∲',
     CounterClockwiseContourIntegral = '∳',
-
+*/
     Modulo = '⊘',
     Cap = '∧',
     Cup = '∨',

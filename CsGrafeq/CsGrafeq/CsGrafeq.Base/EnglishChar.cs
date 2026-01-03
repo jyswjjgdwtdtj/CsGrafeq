@@ -1,13 +1,14 @@
 ﻿using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
 using CsGrafeq.Collections;
+using CsGrafeq.MVVM;
 using ReactiveUI;
 using static CsGrafeq.Utilities.ThrowHelper;
 using static System.Math;
 
 namespace CsGrafeq;
 
-public class EnglishChar : ReactiveObject
+public class EnglishChar : ObservableObject
 {
     protected EnglishChar()
     {

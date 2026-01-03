@@ -60,7 +60,7 @@ internal static class GeometryActions
                 Description = new MultiLanguageData
                     { English = "Put the median center of three points", Chinese = "放置三点的重心（质心）" },
                 GetterConstructor =
-                    ConstructorInvoker.Create(typeof(PointGetter_MedianCenter).GetConstructors()
+                    ConstructorInvoker.Create(typeof(PointGetter_Centroid).GetConstructors()
                         .FirstOrDefault()!), // ctor(Point, Point, Point)
                 Args = [ShapeArg.Point, ShapeArg.Point, ShapeArg.Point],
                 Self = ShownShapeArg.Point
@@ -71,7 +71,7 @@ internal static class GeometryActions
                 Description = new MultiLanguageData
                     { English = "Put the median center of three points", Chinese = "放置三点的外心（外接圆心）" },
                 GetterConstructor =
-                    ConstructorInvoker.Create(typeof(PointGetter_OutCenter).GetConstructors()
+                    ConstructorInvoker.Create(typeof(PointGetter_Circumcenter).GetConstructors()
                         .FirstOrDefault()!), // ctor(Point, Point, Point)
                 Args = [ShapeArg.Point, ShapeArg.Point, ShapeArg.Point],
                 Self = ShownShapeArg.Point

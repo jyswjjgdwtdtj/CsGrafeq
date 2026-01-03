@@ -16,6 +16,7 @@ public class ImplicitFunction : Shape
 
     public ImplicitFunction(MathList ml)
     {
+        TypeName=MultiLanguageResources.ImplicitFunctionText;
         PropertyChanged += (s, e) =>
         {
             RefreshIsActive();
@@ -99,8 +100,6 @@ public class ImplicitFunction : Shape
             Description = Expression;
         }
     }
-
-    public override string TypeName => "ImplicitFunction";
 
     private void RefreshExpression()
     {

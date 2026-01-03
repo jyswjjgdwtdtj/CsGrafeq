@@ -12,6 +12,7 @@
         <ProjectReference Include="..\CsGrafeq.Compiler\CsGrafeq.Compiler.csproj"/>
         <ProjectReference Include="..\CsGrafeq.I18N\CsGrafeq.I18N.csproj"/>
         <ProjectReference Include="..\CsGrafeq.Interval\CsGrafeq.Interval.csproj"/>
+        <ProjectReference Include="..\CsGrafeq.MVVM\CsGrafeq.MVVM.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

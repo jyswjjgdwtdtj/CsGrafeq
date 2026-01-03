@@ -11,14 +11,13 @@ public class Angle : GeometryShape
 
     public Angle(AngleGetter getter)
     {
+        TypeName = MultiLanguageResources.AngleText;
         AngleGetter = getter;
         AngleGetter.Attach(this);
         RefreshValues();
     }
 
     public override GeometryGetter Getter => AngleGetter;
-    public override string TypeName => "Angle";
-
     public override void RefreshValues()
     {
         AngleData = AngleGetter.GetAngle();

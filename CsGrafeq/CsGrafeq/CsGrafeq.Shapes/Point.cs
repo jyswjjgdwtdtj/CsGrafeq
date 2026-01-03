@@ -11,6 +11,7 @@ public class Point : GeometryShape
 
     public Point(PointGetter pointgetter)
     {
+        TypeName =MultiLanguageResources.PointText;
         PointGetter = pointgetter;
         PointGetter.Attach(this);
         RefreshValues();
@@ -25,8 +26,6 @@ public class Point : GeometryShape
     public Vector2Double Location { get; } = new(0, 0);
 
     public override PointGetter Getter => PointGetter;
-
-    public override string TypeName => "Point";
 
     public override void RefreshValues()
     {

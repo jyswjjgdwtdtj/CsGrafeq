@@ -43,13 +43,14 @@
             <TextBlock Text="{CompiledBinding #UC.FirstButton}" IsVisible="{CompiledBinding #UC.IsChecked}"
                        Foreground="{DynamicResource CgForegroundBrush}" VerticalAlignment="Bottom"
                        HorizontalAlignment="Left" FontSize="30" />
-            <TextBlock Text="{CompiledBinding #UC.SecondButton}" IsVisible="{CompiledBinding !#UC.IsChecked}"
+            <TextBlock Text="{CompiledBinding #UC.SecondButton}" IsVisible="{CompiledBinding #UC.IsChecked}"
                        Foreground="{DynamicResource CgHalfForegroundBrush}" VerticalAlignment="Top"
                        HorizontalAlignment="Right" FontSize="20" />
+            
             <TextBlock Text="{CompiledBinding #UC.SecondButton}" IsVisible="{CompiledBinding !#UC.IsChecked}"
                        Foreground="{DynamicResource CgForegroundBrush}" VerticalAlignment="Bottom"
                        HorizontalAlignment="Left" FontSize="30" />
-            <TextBlock Text="{CompiledBinding #UC.FirstButton}" IsVisible="{CompiledBinding #UC.IsChecked}"
+            <TextBlock Text="{CompiledBinding #UC.FirstButton}" IsVisible="{CompiledBinding !#UC.IsChecked}"
                        Foreground="{DynamicResource CgHalfForegroundBrush}" VerticalAlignment="Top"
                        HorizontalAlignment="Right" FontSize="20" />
         </Panel>

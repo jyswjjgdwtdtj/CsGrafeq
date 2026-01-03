@@ -1,4 +1,6 @@
-﻿namespace CsGrafeq.Shapes;
+﻿using CsGrafeq.I18N;
+
+namespace CsGrafeq.Shapes;
 
 public sealed class Value<T> : Shape
 {
@@ -6,12 +8,11 @@ public sealed class Value<T> : Shape
 
     public Value(T value)
     {
+        TypeName = new MultiLanguageData() { Chinese = typeof(T).Name, English = typeof(T).Name };
         _Value = value;
         Name = IsNullRetEmpty(_Value.ToString());
         Visible = false;
     }
-
-    public override string TypeName { get; } = typeof(T).GetType().Name;
 
     public override void Dispose()
     {
