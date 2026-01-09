@@ -1,5 +1,5 @@
 ﻿using CsGrafeq.Shapes.ShapeGetter;
-using static CsGrafeq.Utilities.CsGrafeqMath;
+using static CsGrafeq.Numeric.CsGrafeqMath;
 using static CsGrafeq.Shapes.ShapeGetter.AngleGetter;
 
 namespace CsGrafeq.Shapes;

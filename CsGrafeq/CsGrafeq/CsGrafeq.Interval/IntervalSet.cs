@@ -2,7 +2,7 @@
 using CsGrafeq.Interval.Interface;
 using static CsGrafeq.Interval.Def;
 using static CsGrafeq.Interval.Extensions.IntervalSetExtension;
-using CGMath = CsGrafeq.Utilities.CsGrafeqMath;
+using CGMath = CsGrafeq.Numeric.CsGrafeqMath;
 
 namespace CsGrafeq.Interval;
 

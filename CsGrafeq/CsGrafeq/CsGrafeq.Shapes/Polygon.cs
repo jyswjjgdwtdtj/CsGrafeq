@@ -1,4 +1,5 @@
-﻿using CsGrafeq.Shapes.ShapeGetter;
+﻿using CsGrafeq.Numeric;
+using CsGrafeq.Shapes.ShapeGetter;
 using CsGrafeq.Utilities;
 using static CsGrafeq.Shapes.GeometryMath;
 

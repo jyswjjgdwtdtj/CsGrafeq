@@ -9,7 +9,7 @@ global using GeoCircle = CsGrafeq.Shapes.Circle;
 global using GeoShape = CsGrafeq.Shapes.Shape;
 global using GeoSegment = CsGrafeq.Shapes.Segment;
 global using CsGrafeq;
-global using static CsGrafeq.Utilities.CsGrafeqMath;
+global using static CsGrafeq.Numeric.CsGrafeqMath;
 global using static System.Math;
 using System.Runtime.CompilerServices;
 using Avalonia.Interactivity;

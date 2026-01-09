@@ -79,6 +79,7 @@
         <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.I18N\CsGrafeq.I18N.csproj" />
         <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Interval\CsGrafeq.Interval.csproj" />
         <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.MVVM\CsGrafeq.MVVM.csproj" />
+        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Numeric\CsGrafeq.Numeric.csproj" />
         <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Shapes\CsGrafeq.Shapes.csproj" />
         <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Windows\CsGrafeq.Windows.csproj" />
         <ProjectReference Include="..\CsGrafeqApplication.Core\CsGrafeqApplication.Core.csproj" />

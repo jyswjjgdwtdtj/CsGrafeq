@@ -1,4 +1,4 @@
-﻿using static CsGrafeq.Utilities.CsGrafeqMath;
+﻿using static CsGrafeq.Numeric.CsGrafeqMath;
 
 namespace CsGrafeq.Shapes;
 

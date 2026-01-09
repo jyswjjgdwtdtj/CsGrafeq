@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using CsGrafeq.Shapes.ShapeGetter;
 using static CsGrafeq.Shapes.GeometryMath;
-using static CsGrafeq.Utilities.CsGrafeqMath;
+using static CsGrafeq.Numeric.CsGrafeqMath;
 
 namespace CsGrafeq.Shapes;
 

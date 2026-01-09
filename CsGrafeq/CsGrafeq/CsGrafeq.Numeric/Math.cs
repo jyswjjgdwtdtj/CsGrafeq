@@ -2,7 +2,7 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using sysMath = System.Math;
 
-namespace CsGrafeq.Utilities;
+namespace CsGrafeq.Numeric;
 
 public static class CsGrafeqMath
 {

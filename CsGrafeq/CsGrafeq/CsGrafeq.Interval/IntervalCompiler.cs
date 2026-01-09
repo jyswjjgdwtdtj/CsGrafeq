@@ -2,7 +2,6 @@
 using System.Reflection;
 using System.Reflection.Emit;
 using CsGrafeq.Interval.Interface;
-using FastExpressionCompiler;
 
 namespace CsGrafeq.Interval;
 
@@ -22,7 +21,6 @@ public static class IntervalCompiler
     public static IntervalHandler<IntervalSet> CompileByDynamicMethod(
         Expression<IntervalHandler<IntervalSet>> expression)
     {
-        expression.CompileFast();
         if (expression == null)
             throw new ArgumentNullException("expression");
         var dynamicMethod = new DynamicMethod("dynamicmethod", typeof(Def),

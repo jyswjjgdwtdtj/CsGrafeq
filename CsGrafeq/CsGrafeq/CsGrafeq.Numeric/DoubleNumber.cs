@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
-using CGMath = CsGrafeq.Utilities.CsGrafeqMath;
-
+using CGMath = CsGrafeq.Numeric.CsGrafeqMath;
+using MathNet.Symbolics;
 namespace CsGrafeq.Numeric;
 
 public struct DoubleNumber : IComputableNumber<DoubleNumber>

@@ -1,4 +1,5 @@
 ﻿using CsGrafeq.Interval.Interface;
+using CsGrafeq.Numeric;
 using CsGrafeq.Utilities;
 
 namespace CsGrafeq.Interval;

@@ -1,4 +1,5 @@
 ﻿using CsGrafeq.I18N;
+using CsGrafeq.Numeric;
 using CsGrafeq.Utilities;
 using ReactiveUI;
 using static CsGrafeq.Shapes.GeometryMath;

@@ -1,5 +1,5 @@
 ﻿using static CsGrafeq.Interval.Def;
-using CGMath = CsGrafeq.Utilities.CsGrafeqMath;
+using CGMath = CsGrafeq.Numeric.CsGrafeqMath;
 
 namespace CsGrafeq.Interval;
 
