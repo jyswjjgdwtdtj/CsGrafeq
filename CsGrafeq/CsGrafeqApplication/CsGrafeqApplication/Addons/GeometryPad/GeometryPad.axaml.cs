@@ -31,7 +31,7 @@ using AvaRect = Avalonia.Rect;
 using AvaSize = Avalonia.Size;
 using GeoHalf = CsGrafeq.Shapes.Half;
 using static CsGrafeqApplication.Extension;
-using static CsGrafeqApplication.GlobalSetting;
+using static CsGrafeqApplication.Setting;
 using static CsGrafeqApplication.Core.Utils.StaticSkiaResources;
 
 namespace CsGrafeqApplication.Addons.GeometryPad;
@@ -342,7 +342,7 @@ public partial class GeometryPad : Addon
     protected override void OnLoaded(RoutedEventArgs e)
     {
         base.OnLoaded(e);
-        foreach (var control in this.GetTemplateChildren().OfType<TextBox>()) control.Styles.Add(Static.FluentTheme);
+        foreach (var control in this.GetTemplateChildren().OfType<TextBox>()) control.Styles.Add(Themes.FluentTheme);
     }
 
     private class LbDataTemplate : IDataTemplate

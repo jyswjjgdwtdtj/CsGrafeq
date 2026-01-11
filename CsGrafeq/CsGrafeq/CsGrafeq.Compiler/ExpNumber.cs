@@ -111,23 +111,24 @@ public class ExpNumber : ObservableObject
             IsError = false;
             return;
         }
-
         Func.Dispose();
         IsExpression = true;
-        if (Compiler.Compiler.TryCompile<DoubleNumber>(expression, 0, out var expFunc, out var usedVars, out var ex))
+        Compiler.Compiler.TryCompile<DoubleNumber>(expression, 0,true).Match(funcTuple =>
         {
-            Func = new HasReferenceFunction<Func<DoubleNumber>>((Func<DoubleNumber>)expFunc, usedVars);
+            Func = new HasReferenceFunction<Func<DoubleNumber>>((Func<DoubleNumber>)funcTuple.func, funcTuple.usedVars);
             IsError = false;
             SetValue(Func.Function().Value);
             UserSetValueStr?.Invoke();
             return;
-        }
-
-        Func = None;
-        SetValue(double.NaN);
-        IsError = true;
-        Error = ex;
-        UserSetValueStr?.Invoke();
+        }, ex =>
+        {
+            Func = None;
+            SetValue(double.NaN);
+            IsError = true;
+            Error = ex;
+            UserSetValueStr?.Invoke();
+            
+        });
     }
 
     private void SetValue(double value)

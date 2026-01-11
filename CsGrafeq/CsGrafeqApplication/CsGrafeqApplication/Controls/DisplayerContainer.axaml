@@ -379,7 +379,7 @@
                                                         <TextBlock xml:space="preserve">Nothing currently...</TextBlock>
                                                     </TabItem>
                                                     <TabItem Header="Graph"
-                                                             IsVisible="{x:Static cga:GlobalSetting.AllowExpression}">
+                                                             IsVisible="{x:Static cga:Setting.CanDrawFunction}">
                                                         <StackPanel>
                                                             <CheckBox Name="MovingOp" IsChecked="{CompiledBinding Displayer.MovingOptimization}">
                                                                 <CheckBox.Styles>
@@ -402,13 +402,12 @@
                                                         </StackPanel>
                                                     </TabItem>
                                                     <TabItem Header="Implicit Function"
-                                                             IsVisible="{x:Static cga:GlobalSetting.AllowExpression}">
+                                                             IsVisible="{x:Static cga:Setting.CanDrawFunction}">
                                                         <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto"
-                                                              DataContext="{x:Static cga:Static.Instance}">
+                                                              DataContext="{x:Static cga:Setting.Instance}">
                                                             <TextBlock Grid.Row="0" Grid.Column="0">Default Opacity:</TextBlock>
                                                             <TextBox Grid.Row="1" Grid.Column="0"
-                                                                     Text="{CompiledBinding DefaultOpacity}"
-                                                                     x:DataType="cga:Static" />
+                                                                     Text="{CompiledBinding DefaultOpacity}" x:DataType="cga:Setting"/>
                                                         </Grid>
                                                     </TabItem>
                                                 </TabControl>

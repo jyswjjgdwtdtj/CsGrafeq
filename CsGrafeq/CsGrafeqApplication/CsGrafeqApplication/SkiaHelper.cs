@@ -13,11 +13,11 @@ public static class SkiaHelper
 
     static SkiaHelper()
     {
-        Static.Theme.ThemeChangedEndObservable.Subscribe(t =>
+        Themes.Theme.ThemeChangedEndObservable.Subscribe(t =>
         {
             Refresh(t);
         });
-        Refresh(Static.Theme);
+        Refresh(Themes.Theme);
     }
 
     public static SKPaint FilledMid { get; } = new() { IsAntialias = true };

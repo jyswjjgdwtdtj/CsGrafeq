@@ -34,6 +34,7 @@ public class Result<T, E> where E : Exception
         okValue = _value!;
         return _isSuccessful;
     }
+    
 
     public bool Error(out E exception)
     {

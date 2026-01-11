@@ -28,7 +28,7 @@ public class ImplicitFunction : Shape
         MathList = ml.Clone(false);
         EnglishChar.Instance.CharValueChanged += CharValueChanged;
         RenderTarget.OnRender += RenderTarget_OnRender;
-        Opacity = Static.Instance.DefaultOpacity;
+        Opacity = Setting.Instance.DefaultOpacity;
         BorderBrush = IsCorrect ? Brushes.Blue : Brushes.Red;
     }
 

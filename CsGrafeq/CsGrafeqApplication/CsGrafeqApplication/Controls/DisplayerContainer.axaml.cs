@@ -286,8 +286,8 @@ public partial class DisplayerContainer : UserControl
 
     private void ColorSettingColorChanged(object? sender, ColorChangedEventArgs e)
     {
-        var newtheme = Material.Styles.Themes.Theme.Create(Static.Theme.CurrentTheme);
+        var newtheme = Material.Styles.Themes.Theme.Create(Themes.Theme.CurrentTheme);
         newtheme.SetPrimaryColor(e.NewColor);
-        Static.Theme.CurrentTheme = newtheme;
+        Themes.Theme.CurrentTheme = newtheme;
     }
 }

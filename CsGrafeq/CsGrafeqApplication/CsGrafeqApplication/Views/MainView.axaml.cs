@@ -7,7 +7,5 @@ public partial class MainView : UserControl
     public MainView()
     {
         InitializeComponent();
-        KeyDown += GlobalEvents.CallKeyDown;
-        KeyUp += GlobalEvents.CallKeyUp;
     }
 }

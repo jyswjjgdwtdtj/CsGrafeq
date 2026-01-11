@@ -33,7 +33,7 @@ public static class EntityBuilder
     public static Entity FromString(string s)
     {
         var exp = new Entity();
-        exp.Elements.AddRange(s.GetTokens().ParseTokens());
+        exp.Elements.AddRange(s.GetTokens().GetElements());
         return exp;
     }
 
