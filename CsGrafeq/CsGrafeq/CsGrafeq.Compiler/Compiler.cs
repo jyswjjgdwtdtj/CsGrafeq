@@ -26,7 +26,7 @@ public static class Compiler
         where T : IComputableNumber<T>, INeedClone<T>
     {
         ParameterExpression x, y, z;
-        var exp = useSimplification?ContructSimplifiedExpTree<T>(expression, paraCount, out x, out y, out z, out usedVars):ConstructExpTree<T>(expression, paraCount, out x, out y, out z, out usedVars);
+        var exp =ConstructExpTree<T>(expression, paraCount, out x, out y, out z, out usedVars,useSimplification);
         var expResult = Expression.Lambda(exp, ((IEnumerable<ParameterExpression>)[x, y, z]).Take((int)paraCount));
         return expResult.Compile();
     }
@@ -37,7 +37,7 @@ public static class Compiler
         //expFunc = Compile<T>(expression,paraCount,out usedVars);
         try
         {
-            return Result<(Delegate func,EnglishCharEnum)>.Success((Compile<T>(expression, paraCount,useSimplification, out var usedVars),usedVars));
+            return Result<(Delegate func,EnglishCharEnum)>.Success((Compile<T>(expression, paraCount,useSimplification, out var usedVars),usedVars),expression);
         }
         catch (Exception e)
         {
@@ -51,6 +51,12 @@ public static class Compiler
     }
 
     public static Expression ConstructExpTree<T>(this string expression, [Range(0, 3)] uint argsLength,
+        out ParameterExpression x, out ParameterExpression y, out ParameterExpression z,
+        out EnglishCharEnum usedVars, bool enableSimplification) where T : IComputableNumber<T>
+    {
+        return enableSimplification?ContructSimplifiedExpTree<T>(expression, argsLength, out x, out y, out z, out usedVars):ConstructExpTree<T>(expression, argsLength, out x, out y, out z, out usedVars);
+    }
+    public static Expression ConstructExpTree<T>(this string expression, [Range(0, 3)] uint argsLength, 
         out ParameterExpression xVar, out ParameterExpression yVar, out ParameterExpression zVar,
         out EnglishCharEnum usedVars) where T : IComputableNumber<T>
     {

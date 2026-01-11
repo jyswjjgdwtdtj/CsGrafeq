@@ -445,7 +445,7 @@ public class CartesianDisplayer : Displayer
             PreviousUnitLength = UnitLength;
             PreviousZero = Zero;
             WheelingStopWatch.Restart();
-            if (ZoomingOptimization)
+            if (Setting.Instance.ZoomOptimization)
                 lock (LockTargetForPreviousBuffer)
                 {
                     lock (TotalBufferLock)
@@ -471,7 +471,7 @@ public class CartesianDisplayer : Displayer
             X = (long)((long)x - ((long)x - PreviousZero.X) * ratioX),
             Y = (long)((long)y - ((long)y - PreviousZero.Y) * ratioY)
         };
-        if (!ZoomingOptimization || ratioX > 2 || ratioX < 0.5 || ratioY > 2 || ratioY < 0.5)
+        if (!Setting.Instance.ZoomOptimization || ratioX > 2 || ratioX < 0.5 || ratioY > 2 || ratioY < 0.5)
         {
             WheelingStopWatch.Stop();
             WheelingStopWatch.Reset();

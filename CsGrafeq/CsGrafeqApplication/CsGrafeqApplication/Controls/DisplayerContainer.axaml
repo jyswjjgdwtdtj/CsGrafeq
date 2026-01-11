@@ -10,6 +10,7 @@
              xmlns:controls1="clr-namespace:CsGrafeqApplication.Core.Controls;assembly=CsGrafeqApplication.Core"
              xmlns:views="clr-namespace:CsGrafeqApplication.Dialogs.Views;assembly=CsGrafeqApplication.Dialogs"
              xmlns:cga="clr-namespace:CsGrafeqApplication"
+             xmlns:views1="clr-namespace:CsGrafeqApplication.Views"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CsGrafeqApplication.Controls.DisplayerContainer"
              x:DataType="vm:DisplayerContainerViewModel" Foreground="{DynamicResource CgForegroundBrush}"
@@ -308,14 +309,14 @@
                                 </StackPanel.Styles>
                                 <Button Click="SaveClicked">
                                     <ToolTip.Tip>
-                                        <TextBlock Text="Save" />
+                                        <TextBlock Text="{CompiledBinding MultiLanguageResources.SaveText.Data}" />
                                     </ToolTip.Tip>
                                     <Path Name="Save" Classes="Icon Fill"
                                           Data="M13 14a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2zM3 6a3 3 0 0 1 3-3h20a3 3 0 0 1 3 3v2a3 3 0 0 1-1 2.236V23.5a5.5 5.5 0 0 1-5.5 5.5h-13A5.5 5.5 0 0 1 4 23.5V10.236C3.386 9.686 3 8.888 3 8zm3 5v12.5A3.5 3.5 0 0 0 9.5 27h13a3.5 3.5 0 0 0 3.5-3.5V11zm0-6a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h20a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1z" />
                                 </Button>
                                 <Button Click="Github_Clicked">
                                     <ToolTip.Tip>
-                                        <TextBlock Text="Open Github Site" />
+                                        <TextBlock Text="{CompiledBinding MultiLanguageResources.OpenGithubText.Data}" />
                                     </ToolTip.Tip>
                                     <Path Name="Github" Classes="Icon Fill"
                                           Data="M448 96c0-35.3-28.7-64-64-64H64C28.7 32 0 60.7 0 96v320c0 35.3 28.7 64 64 64h320c35.3 0 64-28.7 64-64zM265.8 407.7c0-1.8 0-6 .1-11.6c.1-11.4.1-28.8.1-43.7c0-15.6-5.2-25.5-11.3-30.7c37-4.1 76-9.2 76-73.1c0-18.2-6.5-27.3-17.1-39c1.7-4.3 7.4-22-1.7-45c-13.9-4.3-45.7 17.9-45.7 17.9c-26.6-7.5-56.6-7.5-83.2 0c0 0-31.8-22.2-45.7-17.9c-9.1 22.9-3.5 40.6-1.7 45c-10.6 11.7-15.6 20.8-15.6 39c0 63.6 37.3 69 74.3 73.1c-4.8 4.3-9.1 11.7-10.6 22.3c-9.5 4.3-33.8 11.7-48.3-13.9c-9.1-15.8-25.5-17.1-25.5-17.1c-16.2-.2-1.1 10.2-1.1 10.2c10.8 5 18.4 24.2 18.4 24.2c9.7 29.7 56.1 19.7 56.1 19.7c0 9 .1 21.7.1 30.6c0 4.8.1 8.6.1 10c0 4.3-3 9.5-11.5 8c-66-22.1-112.2-84.9-112.2-158.3c0-91.8 70.2-161.5 162-161.5S388 165.6 388 257.4c.1 73.4-44.7 136.3-110.7 158.3c-8.4 1.5-11.5-3.7-11.5-8m-90.5-54.8c-.2-1.5 1.1-2.8 3-3.2c1.9-.2 3.7.6 3.9 1.9c.3 1.3-1 2.6-3 3c-1.9.4-3.7-.4-3.9-1.7m-9.1 3.2c-2.2.2-3.7-.9-3.7-2.4c0-1.3 1.5-2.4 3.5-2.4c1.9-.2 3.7.9 3.7 2.4c0 1.3-1.5 2.4-3.5 2.4m-14.3-2.2c-1.9-.4-3.2-1.9-2.8-3.2s2.4-1.9 4.1-1.5c2 .6 3.3 2.1 2.8 3.4c-.4 1.3-2.4 1.9-4.1 1.3m-12.5-7.3c-1.5-1.3-1.9-3.2-.9-4.1c.9-1.1 2.8-.9 4.3.6c1.3 1.3 1.8 3.3.9 4.1c-.9 1.1-2.8.9-4.3-.6m-8.5-10c-1.1-1.5-1.1-3.2 0-3.9c1.1-.9 2.8-.2 3.7 1.3c1.1 1.5 1.1 3.3 0 4.1c-.9.6-2.6 0-3.7-1.5m-6.3-8.8c-1.1-1.3-1.3-2.8-.4-3.5c.9-.9 2.4-.4 3.5.6c1.1 1.3 1.3 2.8.4 3.5c-.9.9-2.4.4-3.5-.6m-6-6.4c-1.3-.6-1.9-1.7-1.5-2.6c.4-.6 1.5-.9 2.8-.4c1.3.7 1.9 1.8 1.5 2.6c-.4.9-1.7 1.1-2.8.4" />
@@ -367,99 +368,14 @@
                                     <views:MsgBoxButton.MsgBoxContentTemplate>
                                         <DataTemplate DataType="vm:DisplayerContainerViewModel">
                                         <TabControl VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                                            <TabItem Header="Setting">
-                                                <TabControl TabStripPlacement="Left" Margin="0,15">
-                                                    <TabControl.Styles>
-                                                        <Style Selector="TabItem">
-                                                            <Setter Property="Height">20</Setter>
-                                                            <Setter Property="MinHeight">20</Setter>
-                                                        </Style>
-                                                    </TabControl.Styles>
-                                                    <TabItem Header="General">
-                                                        <TextBlock xml:space="preserve">Nothing currently...</TextBlock>
-                                                    </TabItem>
-                                                    <TabItem Header="Graph"
-                                                             IsVisible="{x:Static cga:Setting.CanDrawFunction}">
-                                                        <StackPanel>
-                                                            <CheckBox Name="MovingOp" IsChecked="{CompiledBinding Displayer.MovingOptimization}">
-                                                                <CheckBox.Styles>
-                                                                    <Style Selector="Border#NormalRectangle">
-                                                                        <Setter Property="BorderBrush" Value="Black" />
-                                                                    </Style>
-                                                                </CheckBox.Styles>
-                                                                <TextBlock
-                                                                    Text="{CompiledBinding MultiLanguageResources.MovingOpText.Data}" />
-                                                            </CheckBox>
-                                                            <CheckBox Name="ZoomingOp"  IsChecked="{CompiledBinding Displayer.ZoomingOptimization}">
-                                                                <CheckBox.Styles>
-                                                                    <Style Selector="Border#NormalRectangle">
-                                                                        <Setter Property="BorderBrush" Value="Black" />
-                                                                    </Style>
-                                                                </CheckBox.Styles>
-                                                                <TextBlock
-                                                                    Text="{CompiledBinding MultiLanguageResources.ZoomingOpText.Data}" />
-                                                            </CheckBox>
-                                                        </StackPanel>
-                                                    </TabItem>
-                                                    <TabItem Header="Implicit Function"
-                                                             IsVisible="{x:Static cga:Setting.CanDrawFunction}">
-                                                        <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto"
-                                                              DataContext="{x:Static cga:Setting.Instance}">
-                                                            <TextBlock Grid.Row="0" Grid.Column="0">Default Opacity:</TextBlock>
-                                                            <TextBox Grid.Row="1" Grid.Column="0"
-                                                                     Text="{CompiledBinding DefaultOpacity}" x:DataType="cga:Setting"/>
-                                                        </Grid>
-                                                    </TabItem>
-                                                </TabControl>
+                                            <TabItem Header="{CompiledBinding MultiLanguageResources.SettingText}">
+                                                <views1:SettingView/>
                                             </TabItem>
-                                            <TabItem Header="Description">
-                                                <ScrollViewer VerticalScrollBarVisibility="Visible"
-                                                              HorizontalScrollBarVisibility="Disabled">
-                                                    <controls1:Markdown xml:space="preserve">
-# CsGrafeq
-
-## Description
-
-CsGrafeq is a geometry sketchpad. It's made by Avalonia and use Material.Avalonia as its theme. For the sake that JIT is unavailable in mobile platforms and browser, CsGrafeq now only support Desktop (now only Windows). 
-
-Project in old version folder is for stably implicit function plotting, which is made by .NET Framework. The function of Implicit function plotting
-is being made now.
-
-## Features
-
-- ReadyToRun compiled, no .Net Runtime environment required.
-- High quality function image plotting.
-- Beautiful UI
-
-
-## Future and Plan
-
-### Short term plan
-
-1. Add implicit function supports
-2. Add text block supports
-3. Implement custom msgbox/inputbox
-4. Implement mathematical calculation (e.g. 0.5->1/2, 1.414->√2)
-
-### Long term plan
-
-1. Add more shapes supports
-2. Fix bugs
-
-Welcome to any programming enthusiasts who wish to collaborate on development. \
-You can put forward your opinions and suggestions in [Issues](https://github.com/jyswjjgdwtdtj/CsGrafeq/issues), I will
-reply as soon as possible. \
-Due to the pressure of high school academic studies, I will engage in development during the winter and summer holidays.
-Each of your stars🌟 is the motivation for my development. Thank you🙏😊.
-
-                                                    </controls1:Markdown>
-                                                </ScrollViewer>
+                                            <TabItem Header="{CompiledBinding MultiLanguageResources.DescriptionText}">
+                                                <views1:DescriptionView />
                                             </TabItem>
-                                            <TabItem Header="Usage">
-                                                <ScrollViewer VerticalScrollBarVisibility="Visible"
-                                                              HorizontalScrollBarVisibility="Hidden">
-                                                    <controls1:Markdown xml:space="preserve" />
-                                                </ScrollViewer>
+                                            <TabItem Header="{CompiledBinding MultiLanguageResources.UsageText}">
+                                                <views1:UsageView/>
                                             </TabItem>
                                         </TabControl>
                                         </DataTemplate>

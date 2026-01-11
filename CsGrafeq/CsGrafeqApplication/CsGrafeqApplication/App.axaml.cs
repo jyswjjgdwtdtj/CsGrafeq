@@ -1,6 +1,8 @@
-﻿using Avalonia;
+﻿using System;
+using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using CsGrafeq.I18N;
 using CsGrafeq.Windows.IME;
 using CsGrafeqApplication.ViewModels;
 using CsGrafeqApplication.Views;
@@ -11,7 +13,11 @@ public class App : Application
 {
     public override void Initialize()
     {
-        Languages.SetLanguage("zh-hans");
+        var lang = System.Globalization.CultureInfo.CurrentCulture.IetfLanguageTag.ToLower();
+        if(lang.Contains("zh")||lang.Contains("cn")||lang.Contains("hans"))
+            Languages.SetLanguage("zh-hans");
+        else
+            Languages.SetLanguage("en-us");
         AvaloniaXamlLoader.Load(this);
         var _ = SkiaHelper.FilledMid;
     }

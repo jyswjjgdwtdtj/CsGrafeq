@@ -12,7 +12,7 @@
         ExtendClientAreaToDecorationsHint="True"
         ExtendClientAreaChromeHints="NoChrome"
         SystemDecorations="Full"
-        TransparencyLevelHint="Transparent" Background="{DynamicResource CgBackgroundBrush}">
+        TransparencyLevelHint="Transparent"  Background="{DynamicResource CgBackgroundBrush}" Loaded="WindowLoaded" >
     <Window.Styles>
         <StyleInclude Source="avares://CsGrafeqApplication.Core/Styles/PathStyles.axaml" />
         <Style Selector="Path.BarIcon">
@@ -23,7 +23,8 @@
             <Setter Property="Fill" Value="{DynamicResource CgForegroundBrush}" ></Setter>
         </Style>
     </Window.Styles>
-    <DockPanel LastChildFill="True">
+    <Border BorderBrush="{DynamicResource MaterialPrimaryMidBrush}" BorderThickness="1">
+        <DockPanel LastChildFill="True">
         <Border DockPanel.Dock="Top" Height="30">
             <Canvas Name="Canvas">
                 <DockPanel LastChildFill="True" Canvas.Left="{CompiledBinding OffSet}"
@@ -110,4 +111,5 @@
         </Border>
         <views:MainView />
     </DockPanel>
+    </Border>
 </Window>

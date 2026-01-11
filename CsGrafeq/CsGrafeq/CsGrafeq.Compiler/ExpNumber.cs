@@ -113,7 +113,7 @@ public class ExpNumber : ObservableObject
         }
         Func.Dispose();
         IsExpression = true;
-        Compiler.Compiler.TryCompile<DoubleNumber>(expression, 0,true).Match(funcTuple =>
+        Compiler.Compiler.TryCompile<DoubleNumber>(expression, 0,Setting.Instance.EnableExpressionSimplification).Match(funcTuple =>
         {
             Func = new HasReferenceFunction<Func<DoubleNumber>>((Func<DoubleNumber>)funcTuple.func, funcTuple.usedVars);
             IsError = false;

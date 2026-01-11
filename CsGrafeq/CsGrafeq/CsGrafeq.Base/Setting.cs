@@ -2,12 +2,13 @@
 
 global using CsGrafeq;
 global using CsGrafeq.I18N;
-global using CsGrafeqApplication.Core.Utils;
+using System;
+using CsGrafeq.MVVM;
 using ReactiveUI;
 
-namespace CsGrafeqApplication;
+namespace CsGrafeq;
 
-public class Setting:ReactiveObject
+public class Setting:ObservableObject
 {
     public static Setting Instance { get; } = new();
     /// <summary>
@@ -32,8 +33,25 @@ public class Setting:ReactiveObject
     public bool EnableExpressionSimplification
     {
         get;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref field, value);
+            Console.WriteLine(123);
+        }
+    } = false;
+
+    public bool MoveOptimization
+    {
+        get;
         set => this.RaiseAndSetIfChanged(ref field, value);
     } = false;
+
+    public bool ZoomOptimization
+    {
+        get;
+        set => this.RaiseAndSetIfChanged(ref field, value);
+    } = false;
+
 
 
 }

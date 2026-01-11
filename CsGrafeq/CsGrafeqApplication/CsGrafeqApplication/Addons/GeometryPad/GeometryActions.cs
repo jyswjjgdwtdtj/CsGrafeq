@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Reflection;
 using Avalonia.Collections;
+using CsGrafeq.I18N;
 using CsGrafeq.Shapes;
 using CsGrafeq.Shapes.ShapeGetter;
 using static CsGrafeq.Utilities.ThrowHelper;

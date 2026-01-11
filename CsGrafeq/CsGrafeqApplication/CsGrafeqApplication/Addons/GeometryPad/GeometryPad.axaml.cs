@@ -13,6 +13,7 @@ using Avalonia.Layout;
 using Avalonia.LogicalTree;
 using Avalonia.Media;
 using CsGrafeq.CSharpMath.Editor;
+using CsGrafeq.I18N;
 using CsGrafeq.Interval;
 using CsGrafeq.Shapes;
 using CsGrafeq.Shapes.ShapeGetter;
@@ -31,7 +32,6 @@ using AvaRect = Avalonia.Rect;
 using AvaSize = Avalonia.Size;
 using GeoHalf = CsGrafeq.Shapes.Half;
 using static CsGrafeqApplication.Extension;
-using static CsGrafeqApplication.Setting;
 using static CsGrafeqApplication.Core.Utils.StaticSkiaResources;
 
 namespace CsGrafeqApplication.Addons.GeometryPad;
@@ -50,7 +50,6 @@ public partial class GeometryPad : Addon
 
     public GeometryPad()
     {
-        Setting = new GeometryPadSetting(this);
         DataContext = VM = new GeometryPadViewModel();
         Shapes = VM.Shapes;
         CurrentAction = GeometryActions.Actions.FirstOrDefault()?.FirstOrDefault()!;
@@ -59,8 +58,8 @@ public partial class GeometryPad : Addon
             // 添加隐函数时启用移动缩放优化
             if (Shapes.GetShapes<ImplicitFunction>().Count() > 0)
             {
-                Owner?.MovingOptimization = true;
-                Owner?.ZoomingOptimization = true;
+                Setting.Instance.MoveOptimization = true;
+                Setting.Instance.ZoomOptimization = true;
             }
 
             var newshapes = e.NewItems?.OfType<GeoShape>() ?? [];
@@ -170,8 +169,8 @@ public partial class GeometryPad : Addon
             MathToPixelSK = value.MathToPixelSK;
             if (Shapes.GetShapes<ImplicitFunction>().Count() > 0)
             {
-                Owner?.MovingOptimization = true;
-                Owner?.ZoomingOptimization = true;
+                Setting.Instance.ZoomOptimization = true;
+                Setting.Instance.MoveOptimization = true;
             }
         }
     }
@@ -240,8 +239,8 @@ public partial class GeometryPad : Addon
         if (sender is TextBox tb)
             if (e.Property == TextBox.TextProperty)
             {
-                var re = IntervalCompiler.TryCompile(tb.Text);
-                if (tb.Text == "" || re.Success(out _))
+                var re = IntervalCompiler.TryCompile(tb.Text,Setting.Instance.EnableExpressionSimplification);
+                if (tb.Text == "" || re.Success(out _,out _))
                 {
                     DataValidationErrors.ClearErrors(tb);
                 }
@@ -266,8 +265,8 @@ public partial class GeometryPad : Addon
             if (e.Property == TextBox.TextProperty)
                 if ((string)e.NewValue != (string)e.OldValue)
                 {
-                    var re = IntervalCompiler.TryCompile(tb.Text);
-                    if (tb.Text == "" || re.Success(out _))
+                    var re = IntervalCompiler.TryCompile(tb.Text,Setting.Instance.EnableExpressionSimplification);
+                    if (tb.Text == "" || re.Success(out _,out _))
                     {
                         DataValidationErrors.ClearErrors(tb);
                     }
@@ -1187,7 +1186,7 @@ public partial class GeometryPad : Addon
             if (s is T tar)
             {
                 var dis = ((tar.DistanceTo(v) - v) * disp.UnitLength).GetLength();
-                if (dis < PointerTouchRange && dis < distance)
+                if (dis < Setting.PointerTouchRange && dis < distance)
                 {
                     distance = dis;
                     shape = tar;
@@ -1457,6 +1456,8 @@ public partial class GeometryPad : Addon
                     case '(':
                     case ')':
                     case '%':
+                    case ',':
+                    case '^':
                         return;
                 }
             }
@@ -1536,7 +1537,7 @@ public partial class GeometryPad : Addon
     {
         var s = (sender as MathBox)!;
         MathTextBoxContainer.BorderBrush =
-            !s.HasText || (s.IsCorrect && IntervalCompiler.TryCompile(s.Expression).Success(out _))
+            !s.HasText || (s.IsCorrect && IntervalCompiler.TryCompile(s.Expression,Setting.Instance.EnableExpressionSimplification).Success(out _,out _))
                 ? Brushes.Blue
                 : Brushes.Red;
     }

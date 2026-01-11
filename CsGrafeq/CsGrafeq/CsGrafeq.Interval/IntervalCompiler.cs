@@ -7,13 +7,13 @@ namespace CsGrafeq.Interval;
 
 public static class IntervalCompiler
 {
-    public static HasReferenceIntervalSetFunc<IntervalSet> Compile(string expression)
+    public static HasReferenceIntervalSetFunc<IntervalSet> Compile(string expression,bool enableSimplification=false)
     {
         if (string.IsNullOrEmpty(expression))
             throw new ArgumentNullException("expression");
         var exptree =
             Compiler.Compiler.ConstructExpTree<IntervalSet>(expression, 2, out var xVar, out var yVar, out _,
-                out var reference).Reduce();
+                out var reference,enableSimplification).Reduce();
         return new HasReferenceIntervalSetFunc<IntervalSet>(
             CompileByDynamicMethod(Expression.Lambda<IntervalHandler<IntervalSet>>(exptree, xVar, yVar)), reference);
     }
@@ -152,11 +152,11 @@ public static class IntervalCompiler
             ilGenerator.Emit(OpCodes.Call, mi);
     }
 
-    public static Result<HasReferenceIntervalSetFunc<IntervalSet>> TryCompile(string expression)
+    public static Result<HasReferenceIntervalSetFunc<IntervalSet>> TryCompile(string expression,bool enableSimplification)
     {
         try
         {
-            return Result<HasReferenceIntervalSetFunc<IntervalSet>>.Success(Compile(expression));
+            return Result<HasReferenceIntervalSetFunc<IntervalSet>>.Success(Compile(expression,enableSimplification));
         }
         catch (Exception e)
         {

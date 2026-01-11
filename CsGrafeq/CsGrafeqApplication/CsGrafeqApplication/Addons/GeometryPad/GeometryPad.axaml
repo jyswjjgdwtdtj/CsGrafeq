@@ -10,6 +10,7 @@
              xmlns:cga="clr-namespace:CsGrafeqApplication"
              xmlns:csGrafeq="clr-namespace:CsGrafeq;assembly=CsGrafeq.Compiler"
              xmlns:corecontrols="clr-namespace:CsGrafeqApplication.Core.Controls;assembly=CsGrafeqApplication.Core"
+             xmlns:cg="clr-namespace:CsGrafeq;assembly=CsGrafeq.Base"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CsGrafeqApplication.Addons.GeometryPad.GeometryPad" x:DataType="geopad:GeometryPadViewModel">
     <UserControl.Styles>
@@ -165,7 +166,7 @@
             </TabItem.Header>
             <DockPanel ZIndex="1" LastChildFill="True">
                 <Border DockPanel.Dock="Top" Background="{StaticResource HTMedian}" CornerRadius="0,0,5,5"
-                        IsVisible="{x:Static cga:Setting.CanDrawFunction}">
+                        IsVisible="{x:Static cg:Setting.CanDrawFunction}">
                     <DockPanel LastChildFill="True" HorizontalAlignment="Stretch" Margin="5">
                         <Border Width="30" Height="30" DockPanel.Dock="Left">
                             <Path Name="AddPathIcon" Classes="Icon Fill"

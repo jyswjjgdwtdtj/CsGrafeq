@@ -1,0 +1,46 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:cga="clr-namespace:CsGrafeqApplication"
+             xmlns:csGrafeqApplication="clr-namespace:CsGrafeqApplication;assembly=CsGrafeq.Base"
+             xmlns:csGrafeq="clr-namespace:CsGrafeq;assembly=CsGrafeq.Base"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="CsGrafeqApplication.Views.SettingView" x:DataType="csGrafeq:Setting">
+    <TabControl TabStripPlacement="Left" Margin="0,15">
+        <TabControl.Styles>
+            <Style Selector="TabItem">
+                <Setter Property="Height">20</Setter>
+                <Setter Property="MinHeight">20</Setter>
+            </Style>
+        </TabControl.Styles>
+        <TabItem Header="{CompiledBinding MultiLanguageResources.GeneralText}">
+            <TextBlock xml:space="preserve">Nothing currently...</TextBlock>
+        </TabItem>
+        <TabItem Header="{CompiledBinding MultiLanguageResources.GraphText}">
+            <StackPanel>
+                <CheckBox Name="MoveOp" IsChecked="{CompiledBinding MoveOptimization,Mode=TwoWay}" >
+                    <TextBlock
+                        Text="{CompiledBinding MultiLanguageResources.MoveOpText.Data}" />
+                </CheckBox>
+                <CheckBox Name="ZoomOp" IsChecked="{CompiledBinding ZoomOptimization,Mode=TwoWay}">
+                    <TextBlock
+                        Text="{CompiledBinding MultiLanguageResources.ZoomOpText.Data}" />
+                </CheckBox>
+                <CheckBox Name="ExpSim" IsChecked="{CompiledBinding EnableExpressionSimplification,Mode=TwoWay}">
+                    <TextBlock
+                        Text="{CompiledBinding MultiLanguageResources.ExpSimplificationText.Data}" />
+                </CheckBox>
+            </StackPanel>
+        </TabItem>
+        <TabItem Header="{CompiledBinding MultiLanguageResources.ImplicitFunctionText}"
+                 IsVisible="{x:Static csGrafeq:Setting.CanDrawFunction}">
+            <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto"
+                  DataContext="{x:Static csGrafeq:Setting.Instance}">
+                <TextBlock Grid.Row="0" Grid.Column="0">Default Opacity:</TextBlock>
+                <TextBox Grid.Row="1" Grid.Column="0"
+                         Text="{CompiledBinding DefaultOpacity}" x:DataType="csGrafeq:Setting" />
+            </Grid>
+        </TabItem>
+    </TabControl>
+</UserControl>

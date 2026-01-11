@@ -5,7 +5,9 @@ using Avalonia.Input;
 using Avalonia.Input.GestureRecognizers;
 using Avalonia.Metadata;
 using Avalonia.Rendering;
+using Avalonia.Skia;
 using Avalonia.Threading;
+using CsGrafeq.I18N;
 using CsGrafeqApplication.Addons;
 using SkiaSharp;
 using AddonPointerEventArgs = CsGrafeqApplication.Addons.Addon.AddonPointerEventArgs;
@@ -40,24 +42,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
         RenderClock.OnElapsed += Render;
         IsHitTestVisible = true;
     }
-
-    /// <summary>
-    ///     缩放优化
-    /// </summary>
-    public bool ZoomingOptimization { get; set; } = false;
-
-    /// <summary>
-    ///     移动优化
-    /// </summary>
-    public bool MovingOptimization { get; set; } = false;
-
-    public bool ZOPEnable { get; set; } = true;
-    public bool MOPEnable { get; set; } = true;
-
     [Content] public AddonList Addons { get; } = new();
-
-    public DisplayerContainer Owner { get; set; }
-
     /// <summary>
     ///     并无卵用
     /// </summary>

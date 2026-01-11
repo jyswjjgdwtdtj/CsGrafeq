@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reflection;
+using CsGrafeq.I18N;
 
 namespace CsGrafeqApplication.Addons.GeometryPad;
 

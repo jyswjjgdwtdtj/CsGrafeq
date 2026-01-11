@@ -1,62 +1,72 @@
 ﻿namespace CsGrafeq;
 
-public class Result<T, E> where E : Exception
+public class Result<TSuccess, TException> where TException : Exception
 {
-    private readonly E? _exception;
+    private readonly TException? _exception;
 
     private readonly bool _isSuccessful;
-    private readonly T? _value;
+    private readonly TSuccess? _value;
+    private readonly string? _successMessage;
 
-    protected Result(T value)
+    protected Result(TSuccess value, string? message = null)
     {
         _isSuccessful = true;
         _value = value;
+        _successMessage = message;
     }
 
-    protected Result(E exception)
+    protected Result(TException exception)
     {
         _isSuccessful = false;
         _exception = exception;
     }
 
-    public static Result<T, E> Success(T okValue)
+    public static Result<TSuccess, TException> Success(TSuccess okValue, string? message = null)
     {
-        return new Result<T, E>(okValue);
+        return new Result<TSuccess, TException>(okValue,message);
     }
 
-    public static Result<T, E> Error(E exception)
+    public static Result<TSuccess, TException> Error(TException exception)
     {
-        return new Result<T, E>(exception);
+        return new Result<TSuccess, TException>(exception);
     }
 
-    public bool Success(out T okValue)
+    public bool Success(out TSuccess okValue,out string? message)
     {
         okValue = _value!;
+        message = _successMessage;
         return _isSuccessful;
     }
     
 
-    public bool Error(out E exception)
+    public bool Error(out TException exception)
     {
         exception = _exception!;
         return !_isSuccessful;
     }
 
-    public void Match(Action<T> successAction, Action<E> errorAction)
+    public void Match(Action<TSuccess> successAction, Action<TException> errorAction)
     {
         if (_isSuccessful)
             successAction(_value!);
         else
             errorAction(_exception!);
     }
+    public void Match(Action<TSuccess,string?> successAction, Action<TException> errorAction)
+    {
+        if (_isSuccessful)
+            successAction(_value!,_successMessage);
+        else
+            errorAction(_exception!);
+    }
 
-    public void IfSuccess(Action<T> successAction)
+    public void IfSuccess(Action<TSuccess> successAction)
     {
         if (_isSuccessful)
             successAction(_value!);
     }
 
-    public void IfError(Action<E> errorAction)
+    public void IfError(Action<TException> errorAction)
     {
         if (!_isSuccessful)
             errorAction(_exception!);
@@ -69,9 +79,9 @@ public class Result<T, E> where E : Exception
     }
 }
 
-public class Result<T> : Result<T, Exception>
+public class Result<TSuccess> : Result<TSuccess, Exception>
 {
-    protected Result(T value) : base(value)
+    protected Result(TSuccess value,string? message) : base(value,message)
     {
     }
 
@@ -79,18 +89,18 @@ public class Result<T> : Result<T, Exception>
     {
     }
 
-    public new static Result<T> Success(T okValue)
+    public new static Result<TSuccess> Success(TSuccess okValue, string? message = null)
     {
-        return new Result<T>(okValue);
+        return new Result<TSuccess>(okValue,message);
     }
 
-    public static Result<T> Error(string error)
+    public static Result<TSuccess> Error(string error)
     {
-        return new Result<T>(new Exception(error));
+        return new Result<TSuccess>(new Exception(error));
     }
 
-    public new static Result<T> Error(Exception exception)
+    public new static Result<TSuccess> Error(Exception exception)
     {
-        return new Result<T>(exception);
+        return new Result<TSuccess>(exception);
     }
 }
