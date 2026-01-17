@@ -16,13 +16,13 @@ public class ExpNumber : ObservableObject
     private readonly HasReferenceFunction<Func<DoubleNumber>> Direct;
 
     private readonly HasReferenceFunction<Func<DoubleNumber>> None = new(NoneFunc, EnglishCharEnum.None);
-    public readonly object Owner;
+    public readonly object? Owner;
     private HasReferenceFunction<Func<DoubleNumber>> Func;
     private DoubleNumber Number;
     private int NumberChangedSuspended;
     private string ShownText = "0";
 
-    public ExpNumber(double initialNumber = 0, object owner = null)
+    public ExpNumber(double initialNumber = 0, object? owner = null)
     {
         Owner = owner;
         Direct = new HasReferenceFunction<Func<DoubleNumber>>(DirectFunc, EnglishCharEnum.None);
@@ -59,8 +59,8 @@ public class ExpNumber : ObservableObject
         private set => this.RaiseAndSetIfChanged(ref field, value);
     } = new();
 
-    public event Action NumberChanged;
-    public event Action UserSetValueStr;
+    public event Action? NumberChanged;
+    public event Action? UserSetValueStr;
 
     private void CallNumberChanged()
     {

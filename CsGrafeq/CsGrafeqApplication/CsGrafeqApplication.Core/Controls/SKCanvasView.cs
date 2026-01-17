@@ -9,8 +9,9 @@ using Avalonia.Rendering.SceneGraph;
 using Avalonia.Skia;
 using Avalonia.Threading;
 using SkiaSharp;
+using static System.Math;
 
-namespace CsGrafeqApplication.Controls;
+namespace CsGrafeqApplication.Core.Controls;
 #if USE_FIRST
 /// <summary>
 ///     A Xaml canvas control that can be drawn on using SkiaSharp drawing commands

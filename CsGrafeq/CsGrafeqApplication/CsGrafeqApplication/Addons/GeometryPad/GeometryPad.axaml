@@ -207,12 +207,12 @@
                             <geopad:GeoShapeAndElseTemplate>
                                 <geopad:GeoShapeAndElseTemplate.IsGeometryShape>
                                     <DataTemplate DataType="shapes:GeometryShape">
-                                        <ctls:ToggleBox
+                                        <corecontrols:ToggleBox
                                             IsChecked="{CompiledBinding Selected, Mode=TwoWay}"
                                             IsOver="{CompiledBinding PointerOver, Mode=OneWayToSource}"
                                             Height="{CompiledBinding IsDeleted,Converter={StaticResource BoolToDouble},ConverterParameter='70',Mode=OneWay}"
                                             Background="{CompiledBinding Color,Converter={StaticResource UIntColorToBrush},ConverterParameter=160}">
-                                            <ctls:ToggleBox.Flyout>
+                                            <corecontrols:ToggleBox.Flyout>
                                                 <Flyout ShowMode="Standard" Placement="BottomEdgeAlignedLeft">
                                                     <Grid ColumnDefinitions="80,120" RowDefinitions="Auto,Auto"
                                                           RowSpacing="3">
@@ -233,7 +233,7 @@
                                                                   HorizontalAlignment="Center" />
                                                     </Grid>
                                                 </Flyout>
-                                            </ctls:ToggleBox.Flyout>
+                                            </corecontrols:ToggleBox.Flyout>
                                             <DockPanel LastChildFill="True">
                                                 <CheckBox
                                                     IsChecked="{CompiledBinding Visible,Mode=TwoWay}"
@@ -399,7 +399,7 @@
                                                                             <TextBlock Text=" " TextAlignment="Left"
                                                                                     VerticalAlignment="Center"
                                                                                     Classes="Small" />
-                                                                            <ctls:ToggleBox
+                                                                            <corecontrols:ToggleBox
                                                                                 IsChecked="{CompiledBinding On.Selected, Mode=TwoWay,DataType=getter:PointGetter_Movable}"
                                                                                 IsOver="{CompiledBinding On.PointerOver, Mode=OneWayToSource,DataType=getter:PointGetter_Movable}"
                                                                                 Background="{CompiledBinding On.Color,Converter={StaticResource UIntColorToBrush},ConverterParameter=160,DataType=getter:PointGetter_Movable}">
@@ -407,7 +407,7 @@
                                                                                     Text="{CompiledBinding On.Name,DataType=getter:PointGetter_Movable}"
                                                                                     VerticalAlignment="Center"
                                                                                     Classes="Small" />
-                                                                            </ctls:ToggleBox>
+                                                                            </corecontrols:ToggleBox>
                                                                         </StackPanel>
                                                                     </Grid>
                                                                 </DataTemplate>
@@ -444,13 +444,13 @@
                                                                                         <geopad:ShapeParamsTemplate.ShapeTemplate>
                                                                                             <DataTemplate
                                                                                                 DataType="shapes:GeometryShape">
-                                                                                                <ctls:ToggleBox
+                                                                                                <corecontrols:ToggleBox
                                                                                                     IsChecked="{CompiledBinding Selected, Mode=TwoWay}"
                                                                                                     IsOver="{CompiledBinding PointerOver, Mode=OneWayToSource}"
                                                                                                     Background="{CompiledBinding Color,Converter={StaticResource UIntColorToBrush},ConverterParameter=160}">
                                                                                                     <TextBlock
                                                                                                         Text="{CompiledBinding Name}" />
-                                                                                                </ctls:ToggleBox>
+                                                                                                </corecontrols:ToggleBox>
                                                                                             </DataTemplate>
                                                                                         </geopad:ShapeParamsTemplate.ShapeTemplate>
                                                                                     </geopad:ShapeParamsTemplate>
@@ -517,14 +517,14 @@
                                                                                         <geopad:ShapeParamsTemplate.ShapeTemplate>
                                                                                             <DataTemplate
                                                                                                 DataType="shapes:GeometryShape">
-                                                                                                <ctls:ToggleBox
+                                                                                                <corecontrols:ToggleBox
                                                                                                     IsChecked="{CompiledBinding Selected, Mode=TwoWay}"
                                                                                                     IsOver="{CompiledBinding PointerOver, Mode=OneWayToSource}"
                                                                                                     Background="{CompiledBinding Color,Converter={StaticResource UIntColorToBrush},ConverterParameter=160}">
                                                                                                     <TextBlock
                                                                                                         Text="{CompiledBinding Name}"
                                                                                                         Classes="Big" />
-                                                                                                </ctls:ToggleBox>
+                                                                                                </corecontrols:ToggleBox>
                                                                                             </DataTemplate>
                                                                                         </geopad:ShapeParamsTemplate.ShapeTemplate>
                                                                                         <geopad:ShapeParamsTemplate.NumberTemplate>
@@ -560,7 +560,7 @@
                                                     </ContentControl.ContentTemplate>
                                                 </ContentControl>
                                             </DockPanel>
-                                        </ctls:ToggleBox>
+                                        </corecontrols:ToggleBox>
                                     </DataTemplate>
                                 </geopad:GeoShapeAndElseTemplate.IsGeometryShape>
                                 <geopad:GeoShapeAndElseTemplate.IsElse>
@@ -678,7 +678,7 @@
                             <Expander Classes="NoBorderExpander" BorderThickness="0"
                                       TemplateApplied="Expander_TemplateApplied"
                                       IsExpanded="True" CornerRadius="0" HorizontalAlignment="Stretch"
-                                      Width="{CompiledBinding $parent[StackPanel].Bounds.Width}"
+                                      Width="{CompiledBinding $parent[VirtualizingStackPanel].Bounds.Width}"
                                       Padding="0" Background="Transparent"
                                       Foreground="{DynamicResource CgForegroundBrush}">
                                 <Expander.Header>

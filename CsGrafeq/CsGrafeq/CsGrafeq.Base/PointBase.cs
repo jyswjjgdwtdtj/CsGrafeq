@@ -3,6 +3,7 @@ global using PointI = CsGrafeq.PointBase<int>;
 global using PointF = CsGrafeq.PointBase<float>;
 global using PointD = CsGrafeq.PointBase<decimal>;
 using System.Numerics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CsGrafeq;
 
@@ -73,4 +74,12 @@ public struct PointBase<T> where T : INumber<T>
     }
 
     public static readonly PointBase<T> Empty = new(T.Zero, T.Zero);
+    public override bool Equals([NotNullWhen(true)] object? obj)
+    {
+        return (obj is PointBase<T> pb)&&pb==this;
+    }
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(X, Y);
+    }
 }

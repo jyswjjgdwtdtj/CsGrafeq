@@ -16,11 +16,45 @@ internal static class IntervalSetExtension
                 _Sup = callback(ranges[i]._Sup)
             };
     }
+    /// <summary>
+    ///     单调增
+    /// </summary>
+    public static unsafe void MonotoneTransform(this Range[] ranges, Func<double,double> callback)
+    {
+        for (var i = 0; i < ranges.Length; i++)
+            ranges[i] = new Range
+            {
+                _Inf = callback(ranges[i]._Inf),
+                _Sup = callback(ranges[i]._Sup)
+            };
+    }
 
     /// <summary>
     ///     单调减
     /// </summary>
     public static unsafe void MonotoneTransformOp(this Range[] ranges, delegate*<double, double> callback)
+    {
+        if (ranges.Length == 0)
+            return;
+        int i = 0, j = ranges.Length - 1; //注意！j为nuint类型 如果Length=0 j会变为最大值
+        for (; i < j; i++, j--)
+        {
+            var ri = ranges[i];
+            var rj = ranges[j];
+            ranges[j] = new Range { _Inf = callback(ri._Sup), _Sup = callback(ri._Inf) };
+            ranges[i] = new Range { _Inf = callback(rj._Sup), _Sup = callback(rj._Inf) };
+        }
+
+        if (i == j)
+        {
+            var r = ranges[i];
+            ranges[i] = new Range { _Inf = callback(r._Sup), _Sup = callback(r._Inf) };
+        }
+    }
+    /// <summary>
+    ///     单调减
+    /// </summary>
+    public static unsafe void MonotoneTransformOp(this Range[] ranges, Func<double,double> callback)
     {
         if (ranges.Length == 0)
             return;

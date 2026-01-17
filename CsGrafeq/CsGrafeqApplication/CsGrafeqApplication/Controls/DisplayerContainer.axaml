@@ -7,10 +7,11 @@
              xmlns:geopad="clr-namespace:CsGrafeqApplication.Addons.GeometryPad"
              xmlns:controls="clr-namespace:CsGrafeqApplication.Controls"
              xmlns:i18N="clr-namespace:CsGrafeq.I18N;assembly=CsGrafeq.I18N"
-             xmlns:controls1="clr-namespace:CsGrafeqApplication.Core.Controls;assembly=CsGrafeqApplication.Core"
+             xmlns:corecontrols="clr-namespace:CsGrafeqApplication.Core.Controls;assembly=CsGrafeqApplication.Core"
              xmlns:views="clr-namespace:CsGrafeqApplication.Dialogs.Views;assembly=CsGrafeqApplication.Dialogs"
              xmlns:cga="clr-namespace:CsGrafeqApplication"
              xmlns:views1="clr-namespace:CsGrafeqApplication.Views"
+             xmlns:ripple="clr-namespace:Material.Ripple;assembly=Material.Ripple"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CsGrafeqApplication.Controls.DisplayerContainer"
              x:DataType="vm:DisplayerContainerViewModel" Foreground="{DynamicResource CgForegroundBrush}"
@@ -28,98 +29,76 @@
         <Border Name="DisplayerCon" ZIndex="0" BorderThickness="0">
             <ContentPresenter Content="{CompiledBinding Displayer}" />
         </Border>
-        <controls1:Keyboard>
+        <corecontrols:Keyboard>
             <Panel Name="PART_Container" IsTabStop="False">
                 <Panel.Styles>
                     <Style Selector="Control">
                         <Setter Property="IsTabStop" Value="False" />
                     </Style>
-                    <Style Selector="GridSplitter#Splitter">
-                        <Setter Property="Background" Value="{DynamicResource CgOppositeTranslucentBackgroundBrush1}" />
-                        <Style Selector="^ Border">
-                            <Setter Property="Width" Value="{CompiledBinding SplitterThicknessOff}" />
-                            <Setter Property="Transitions">
-                                <Transitions>
-                                    <DoubleTransition Property="Width" Duration="0:0:0.1" />
-                                </Transitions>
-                            </Setter>
-                        </Style>
-                        <Style Selector="^:pointerover Border">
-                            <Setter Property="Width" Value="{CompiledBinding SplitterThicknessOn}" />
-                        </Style>
-                        <Style Selector="^:pressed Border">
-                            <Setter Property="Width" Value="{CompiledBinding SplitterThicknessOn}" />
-                        </Style>
-                    </Style>
                 </Panel.Styles>
-                <Grid ZIndex="10" Name="PART_Grid">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="300" />
-                        <ColumnDefinition Width="6" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Border Grid.Column="0" Grid.Row="0" BorderThickness="0" BorderBrush="Gray"
-                            Name="OperationContainer"
-                            DataContext="{CompiledBinding Displayer}"
-                            Background="{DynamicResource CgTranslucentBackgroundBrush}">
-                        <ItemsControl ItemsSource="{CompiledBinding Addons}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <VirtualizingStackPanel Orientation="Vertical" />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate DataType="addons:Addon">
-                                    <ContentPresenter Content="{CompiledBinding .}" />
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                <StackPanel Orientation="Horizontal" ZIndex="10" Name="PART_Grid">
+                    <corecontrols:ExpandBox Name="OperationContainerExpandBox" ExpandDirection="Right" IsExpanded="{CompiledBinding #Toggle.IsChecked,Mode=OneWay}" Margin="0" Padding="0">
+                        <Border Width="400" BorderThickness="0" BorderBrush="Gray" HorizontalAlignment="Left"
+                                Name="OperationContainer"
+                                DataContext="{CompiledBinding Displayer}"
+                                Background="{DynamicResource CgTranslucentBackgroundBrush}">
+                            <ItemsControl ItemsSource="{CompiledBinding Addons}" HorizontalAlignment="Stretch">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel Orientation="Vertical" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="addons:Addon">
+                                        <ContentPresenter Content="{CompiledBinding .}" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Border>
+                    </corecontrols:ExpandBox>
+                    <Border IsVisible="{CompiledBinding #Toggle.IsChecked,Mode=OneWay}" Width="8" VerticalAlignment="Stretch" Background="Transparent" Name="OuterBorder" Loaded="OuterBorderLoaded" PointerPressed="OuterBorderPressed" PointerReleased="OuterBorderReleased" PointerMoved="OuterBorderMoved">
+                        <Border.Styles>
+                            <Style Selector="Border#OuterBorder">
+                                <Setter Property="Background" Value="{DynamicResource CgOppositeTranslucentBackgroundBrush1}" />
+                                <Style Selector="^ Border#InnerBorder">
+                                    <Setter Property="Width" Value="{CompiledBinding SplitterThicknessOff}" />
+                                    <Setter Property="Opacity" Value="0.2"></Setter>
+                                    <Setter Property="Transitions">
+                                        <Transitions>
+                                            <DoubleTransition Property="Width" Duration="0:0:0.1" />
+                                            <DoubleTransition Property="Opacity" Duration="0:0:0.1" />
+                                        </Transitions>
+                                    </Setter>
+                                    <Setter Property="Background" Value="{DynamicResource MaterialPrimaryMidBrush}"></Setter>
+                                </Style>
+                                <Style Selector="^:pointerover Border#InnerBorder">
+                                    <Setter Property="Width" Value="{CompiledBinding SplitterThicknessOn}" />
+                                </Style>
+                                <Style Selector="^:dragging Border#InnerBorder">
+                                    <Setter Property="Width" Value="{CompiledBinding SplitterThicknessOn}" />
+                                    <Setter Property="Opacity" Value="0.5"></Setter>
+                                </Style>
+                            </Style>
+                        </Border.Styles>
+                        <Border HorizontalAlignment="Center" VerticalAlignment="Stretch" Name="InnerBorder"></Border>
                     </Border>
-                    <GridSplitter Grid.Column="1" ResizeDirection="Columns" Name="Splitter" ClipToBounds="False"
-                                  Width="1" />
-                    <Border BorderThickness="0,0,0,1"
-                            BorderBrush="{DynamicResource CgOppositeTranslucentBackgroundBrush1}" Grid.Column="2"
-                            Grid.Row="0" Name="PART_CoverDisplayer">
+                    <Border BorderThickness="0"
+                            BorderBrush="{DynamicResource CgOppositeTranslucentBackgroundBrush1}" Name="PART_CoverDisplayer">
                         <DockPanel>
-                        <CheckBox DockPanel.Dock="Left" Width="15" Height="40" VerticalAlignment="Center" HorizontalAlignment="Left"
-                                  Name="Toggle" Foreground="{DynamicResource MaterialPrimaryMidForegroundBrush}">
-                            <CheckBox.Template>
-                                <ControlTemplate>
-                                    <Border>
-                                        <Border Name="Border" CornerRadius="4" BorderThickness="0"
-                                                Background="{DynamicResource MaterialPrimaryMidBrush}"
-                                                VerticalAlignment="Center" HorizontalAlignment="Center">
-                                            <TextBlock Name="TextBlock" MinWidth="0" MinHeight="0"
-                                                       VerticalAlignment="Center" HorizontalAlignment="Center" />
-                                        </Border>
-                                    </Border>
-                                </ControlTemplate>
-                            </CheckBox.Template>
-                            <CheckBox.Styles>
-                                <Style Selector="CheckBox#Toggle TextBlock#TextBlock">
-                                    <Setter Property="Text" Value="&lt;" />
+                        <ToggleButton DockPanel.Dock="Left" Width="15" Height="40" VerticalAlignment="Center" HorizontalAlignment="Left" IsChecked="True"
+                                  Name="Toggle" Foreground="{DynamicResource MaterialPrimaryMidForegroundBrush}" Background="{DynamicResource MaterialPrimaryMidBrush}">
+                            <ToggleButton.Styles>
+                                <Style Selector="ToggleButton#Toggle">
+                                    <Setter Property="Content" Value="&gt;" />
                                 </Style>
-                                <Style Selector="CheckBox#Toggle:checked TextBlock#TextBlock">
-                                    <Setter Property="Text" Value="&gt;" />
+                                <Style Selector="ToggleButton#Toggle:checked">
+                                    <Setter Property="Content" Value="&lt;" />
                                 </Style>
-                                <Style Selector="CheckBox#Toggle Border#Border">
-                                    <Setter Property="Width" Value="15" />
-                                    <Setter Property="Height" Value="40" />
+                                <Style Selector="ToggleButton#Toggle:not(:disabled) /template/ ripple|RippleEffect#PART_Ripple ContentPresenter">
+                                    <Setter Property="Padding" Value="0"></Setter>
                                 </Style>
-                                <Style Selector="CheckBox#Toggle:pressed Border#Border">
-                                    <Setter Property="Width"
-                                            Value="13" />
-                                    <Setter Property="Height"
-                                            Value="38" />
-                                </Style>
-                            </CheckBox.Styles>
-                            <CheckBox.Transitions>
-                                <Transitions>
-                                    <DoubleTransition Property="Width" Duration="0:0:0.2" />
-                                    <DoubleTransition Property="Height" Duration="0:0:0.2" />
-                                </Transitions>
-                            </CheckBox.Transitions>
-                        </CheckBox>
+                            </ToggleButton.Styles>
+                        </ToggleButton>
                             <Panel DockPanel.Dock="Right" ZIndex="5" IsHitTestVisible="False" Name="InfoCanvas" VerticalAlignment="Stretch"
                                    HorizontalAlignment="Stretch">
                                 <geopad:GeoPadInfo DataContext="{CompiledBinding  Displayer.Addons[0].DataContext}"
@@ -127,7 +106,7 @@
                             </Panel>
                         </DockPanel>
                     </Border>
-                </Grid>
+                </StackPanel>
                 <Grid ColumnDefinitions="*,52" RowDefinitions="*,52" ZIndex="15" Name="SettingDockPanel"
                       VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                     <Grid.Styles>
@@ -181,9 +160,9 @@
                         </ToggleButton>
                     </Border>
                     <Border Grid.Column="0" Grid.Row="1">
-                        <controls:ShownControl
-                            IsShown="{CompiledBinding #SettingToggle.IsChecked,Mode=OneWay}"
-                            Margin="0" Padding="0" Duration="0.2" HorizontalAlignment="Right" Orientation="Horizontal">
+                        <corecontrols:ExpandBox ExpandDirection="Left"
+                                                IsExpanded="{CompiledBinding #SettingToggle.IsChecked,Mode=OneWay}"
+                                                Margin="0" Padding="0" HorizontalAlignment="Right" >
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch"
                                         Name="SettingStackPanelHor"
                                         Spacing="5" Margin="0" HorizontalAlignment="Stretch">
@@ -277,12 +256,12 @@
 
                                 </Button>
                             </StackPanel>
-                        </controls:ShownControl>
+                        </corecontrols:ExpandBox>
                     </Border>
                     <Border Grid.Column="1" Grid.Row="0">
-                        <controls:ShownControl VerticalAlignment="Bottom" Orientation="Vertical"
-                                               IsShown="{CompiledBinding #SettingToggle.IsChecked,Mode=OneWay}"
-                                               Margin="0" Padding="0" Duration="0.2">
+                        <corecontrols:ExpandBox VerticalAlignment="Bottom"
+                                               IsExpanded="{CompiledBinding #SettingToggle.IsChecked,Mode=OneWay}"
+                                               Margin="0" Padding="0" ExpandDirection="Up">
                             <StackPanel Orientation="Vertical" Name="SettingStackPanel"
                                         Spacing="5" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Stretch">
                                 <StackPanel.Styles>
@@ -403,7 +382,7 @@
                                           Data="M17.25 1a.75.75 0 0 1 .75.75V3h4.5a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0V4.5h-9.5v.75a.75.75 0 0 1-1.5 0v-1.5A.75.75 0 0 1 11.5 3h5V1.75a.75.75 0 0 1 .75-.75zm-3.5 5a.75.75 0 0 0 0 1.5h4.428L16.77 8.674a.75.75 0 0 0-.27.576v.25h-4.75a.75.75 0 0 0 0 1.5h4.75v2.734a.75.75 0 0 1-.966.718l-.569-.17a.75.75 0 0 0-.43 1.436l.569.171A2.25 2.25 0 0 0 18 13.734V11h4.25a.75.75 0 0 0 0-1.5h-4.128l2.608-2.174A.75.75 0 0 0 20.25 6h-6.5zm-5.361.477l-.049-.104a.73.73 0 0 0-1.315.087l-5.964 14.5l-.032.096a.754.754 0 0 0 .426.886a.73.73 0 0 0 .963-.402l1.547-3.76l.094.006h7.087l1.433 3.737l.042.092a.73.73 0 0 0 .91.334a.755.755 0 0 0 .418-.972l-5.56-14.5zm-3.74 9.809L7.81 8.747l2.947 7.539h-6.11z" />
                                 </Button>
                             </StackPanel>
-                        </controls:ShownControl>
+                        </corecontrols:ExpandBox>
                     </Border>
                 </Grid>
                 <Border ZIndex="20" Name="PopupBack">
@@ -429,6 +408,6 @@
                     </Grid>
                 </Border>
             </Panel>
-        </controls1:Keyboard>
+        </corecontrols:Keyboard>
     </Panel>
 </UserControl>

@@ -9,6 +9,7 @@ using Avalonia.Skia;
 using Avalonia.Threading;
 using CsGrafeq.I18N;
 using CsGrafeqApplication.Addons;
+using CsGrafeqApplication.Core.Controls;
 using SkiaSharp;
 using AddonPointerEventArgs = CsGrafeqApplication.Addons.Addon.AddonPointerEventArgs;
 using AddonPointerEventArgsBase = CsGrafeqApplication.Addons.Addon.AddonPointerEventArgsBase;

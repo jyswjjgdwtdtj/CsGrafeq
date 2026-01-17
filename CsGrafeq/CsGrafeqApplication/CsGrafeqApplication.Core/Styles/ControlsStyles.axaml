@@ -5,4 +5,7 @@
             <!-- Add Controls for Previewer Here -->
         </Border>
     </Design.PreviewWith>
+    <StyleInclude Source="../Controls/ExpandBox.axaml"/>
+    <StyleInclude Source="../Controls/ToggleBox.axaml"/>
+    
 </Styles>

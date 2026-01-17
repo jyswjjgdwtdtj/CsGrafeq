@@ -3,6 +3,7 @@
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                    xmlns:controls="clr-namespace:CsGrafeqApplication.Core.Controls"
+                   xmlns:csGrafeq="clr-namespace:CsGrafeq;assembly=CsGrafeq.Base"
                    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
                    x:Class="CsGrafeqApplication.Core.Controls.Keyboard" x:Name="UC">
     <Design.PreviewWith>
@@ -35,7 +36,8 @@
             <Setter Property="Template">
                 <ControlTemplate>
                     <DockPanel LastChildFill="True">
-                        <Expander DockPanel.Dock="Bottom" Name="PART_Expander"
+                        <controls:ExpandBox DockPanel.Dock="Bottom" DataContext="{x:Static csGrafeq:Setting.Instance}" IsExpanded="{CompiledBinding ShowKeyboard}" x:DataType="csGrafeq:Setting" ExpandDirection="Up">
+                        <Expander Name="PART_Expander" 
                                   Background="{DynamicResource CgTranslucentBackgroundBrush}" ExpandDirection="Down"
                                   VerticalAlignment="Bottom" IsExpanded="False" Focusable="False">
                             <Expander.Styles>
@@ -234,6 +236,7 @@
                                 </StackPanel>
                             </Grid>
                         </Expander>
+                        </controls:ExpandBox>
                         <ContentPresenter Content="{TemplateBinding Content}" />
                     </DockPanel>
                 </ControlTemplate>

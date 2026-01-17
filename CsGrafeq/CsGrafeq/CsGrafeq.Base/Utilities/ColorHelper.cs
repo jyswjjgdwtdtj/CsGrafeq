@@ -13,7 +13,7 @@ public class ColorHelper
         Color color;
         do
         {
-            color = Color.FromKnownColor((KnownColor)Colors.GetValue(Rnd.Next(Colors.Length - 27) + 27));
+            color = Color.FromKnownColor((KnownColor)Colors.GetValue(Rnd.Next(Colors.Length - 27) + 27)!);
         } while (GetRealBrightness(color) > 0.8 || GetRealBrightness(color) < 0.2);
 
         return (uint)color.ToArgb();

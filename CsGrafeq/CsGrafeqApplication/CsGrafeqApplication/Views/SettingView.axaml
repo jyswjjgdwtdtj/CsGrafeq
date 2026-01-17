@@ -7,7 +7,7 @@
              xmlns:csGrafeq="clr-namespace:CsGrafeq;assembly=CsGrafeq.Base"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CsGrafeqApplication.Views.SettingView" x:DataType="csGrafeq:Setting">
-    <TabControl TabStripPlacement="Left" Margin="0,15">
+    <TabControl TabStripPlacement="Left" Margin="0,15" MinHeight="350">
         <TabControl.Styles>
             <Style Selector="TabItem">
                 <Setter Property="Height">20</Setter>
@@ -15,32 +15,43 @@
             </Style>
         </TabControl.Styles>
         <TabItem Header="{CompiledBinding MultiLanguageResources.GeneralText}">
-            <TextBlock xml:space="preserve">Nothing currently...</TextBlock>
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
+                <StackPanel Margin="15">
+                    <CheckBox IsChecked="{CompiledBinding ShowKeyboard,Mode=TwoWay}" >
+                        <TextBlock
+                            Text="{CompiledBinding MultiLanguageResources.ShowKeyboardText.Data}" />
+                    </CheckBox>
+                </StackPanel>
+            </ScrollViewer>
         </TabItem>
         <TabItem Header="{CompiledBinding MultiLanguageResources.GraphText}">
-            <StackPanel>
-                <CheckBox Name="MoveOp" IsChecked="{CompiledBinding MoveOptimization,Mode=TwoWay}" >
-                    <TextBlock
-                        Text="{CompiledBinding MultiLanguageResources.MoveOpText.Data}" />
-                </CheckBox>
-                <CheckBox Name="ZoomOp" IsChecked="{CompiledBinding ZoomOptimization,Mode=TwoWay}">
-                    <TextBlock
-                        Text="{CompiledBinding MultiLanguageResources.ZoomOpText.Data}" />
-                </CheckBox>
-                <CheckBox Name="ExpSim" IsChecked="{CompiledBinding EnableExpressionSimplification,Mode=TwoWay}">
-                    <TextBlock
-                        Text="{CompiledBinding MultiLanguageResources.ExpSimplificationText.Data}" />
-                </CheckBox>
-            </StackPanel>
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
+                <StackPanel Margin="15">
+                    <CheckBox Name="MoveOp" IsChecked="{CompiledBinding MoveOptimization,Mode=TwoWay}" >
+                        <TextBlock
+                            Text="{CompiledBinding MultiLanguageResources.MoveOpText.Data}" />
+                    </CheckBox>
+                    <CheckBox Name="ZoomOp" IsChecked="{CompiledBinding ZoomOptimization,Mode=TwoWay}">
+                        <TextBlock
+                            Text="{CompiledBinding MultiLanguageResources.ZoomOpText.Data}" />
+                    </CheckBox>
+                    <CheckBox Name="ExpSim" IsChecked="{CompiledBinding EnableExpressionSimplification,Mode=TwoWay}">
+                        <TextBlock
+                            Text="{CompiledBinding MultiLanguageResources.ExpSimplificationText.Data}" />
+                    </CheckBox>
+                </StackPanel>
+            </ScrollViewer>
         </TabItem>
         <TabItem Header="{CompiledBinding MultiLanguageResources.ImplicitFunctionText}"
                  IsVisible="{x:Static csGrafeq:Setting.CanDrawFunction}">
-            <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto"
-                  DataContext="{x:Static csGrafeq:Setting.Instance}">
-                <TextBlock Grid.Row="0" Grid.Column="0">Default Opacity:</TextBlock>
-                <TextBox Grid.Row="1" Grid.Column="0"
-                         Text="{CompiledBinding DefaultOpacity}" x:DataType="csGrafeq:Setting" />
-            </Grid>
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
+                <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto" Margin="15"
+                      DataContext="{x:Static csGrafeq:Setting.Instance}">
+                    <TextBlock Grid.Row="0" Grid.Column="0">Default Opacity:</TextBlock>
+                    <TextBox Grid.Row="1" Grid.Column="0"
+                             Text="{CompiledBinding DefaultOpacity}" x:DataType="csGrafeq:Setting" />
+                </Grid>
+            </ScrollViewer>
         </TabItem>
     </TabControl>
 </UserControl>

@@ -4,7 +4,7 @@ using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Metadata;
 
-namespace CsGrafeqApplication.Controls;
+namespace CsGrafeqApplication.Core.Controls;
 
 [PseudoClasses(":checked", ":over")]
 public class ToggleBox : TemplatedControl

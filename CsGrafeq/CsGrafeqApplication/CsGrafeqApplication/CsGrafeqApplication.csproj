@@ -95,9 +95,6 @@
             <AutoGen>True</AutoGen>
             <DependentUpon>Resources.resx</DependentUpon>
         </Compile>
-        <Compile Update="Controls\ShownControl.cs">
-            <DependentUpon>ShownControl.axaml</DependentUpon>
-        </Compile>
     </ItemGroup>
 
     <ItemGroup>

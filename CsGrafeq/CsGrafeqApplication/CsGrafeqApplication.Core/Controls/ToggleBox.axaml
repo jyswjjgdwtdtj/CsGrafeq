@@ -1,20 +1,12 @@
-<ResourceDictionary xmlns="https://github.com/avaloniaui"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:controls="using:CsGrafeqApplication.Controls">
 
-    <!--
-    Additional resources 
-    Using Control Themes:
-         https://docs.avaloniaui.net/docs/basics/user-interface/styling/control-themes
-    Using Theme Variants:
-         https://docs.avaloniaui.net/docs/guides/styles-and-resources/how-to-use-theme-variants
-  -->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:control="clr-namespace:CsGrafeqApplication.Core.Controls">
     <Design.PreviewWith>
-        <Border Width="100" Height="50">
-            <controls:ToggleBox />
-        </Border>
+        <control:ToggleBox />
     </Design.PreviewWith>
-    <ControlTheme x:Key="{x:Type controls:ToggleBox}" TargetType="controls:ToggleBox">
+
+    <Style Selector="control|ToggleBox">
         <Setter Property="Focusable" Value="True" />
         <Style Selector="^ /template/ Border#BackgroundShower">
             <Setter Property="Opacity" Value="0" />
@@ -47,5 +39,5 @@
                 </Panel>
             </ControlTemplate>
         </Setter>
-    </ControlTheme>
-</ResourceDictionary>
+    </Style>
+</Styles>

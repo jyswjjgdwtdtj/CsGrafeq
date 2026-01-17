@@ -52,6 +52,11 @@ public class Setting:ObservableObject
         set => this.RaiseAndSetIfChanged(ref field, value);
     } = false;
 
+    public bool ShowKeyboard
+    {
+        get;
+        set => this.RaiseAndSetIfChanged(ref field, value);
+    } = true;
 
 
 }

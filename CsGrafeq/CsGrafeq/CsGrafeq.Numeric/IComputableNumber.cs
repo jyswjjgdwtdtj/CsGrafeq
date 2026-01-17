@@ -39,7 +39,10 @@ public interface IComputableNumber<T> : IHasOperatorNumber<T>, INeedClone<T>
             { "median", GetUnManagedPtr(T.Median) },
             { "min", GetUnManagedPtr(T.Min) },
             { "max", GetUnManagedPtr(T.Max) },
-            { "clone", GetUnManagedPtr(T.Clone) }
+            { "clone", GetUnManagedPtr(T.Clone) },
+            { "arctan2", GetUnManagedPtr(T.ArcTan2) },
+            { "maxof", GetUnManagedPtr(T.MaxOf) },
+            { "minof", GetUnManagedPtr(T.MinOf) },
         };
     }
 
@@ -74,8 +77,16 @@ public interface IComputableNumber<T> : IHasOperatorNumber<T>, INeedClone<T>
         { "median", T.Median },
         { "min", T.Min },
         { "max", T.Max },
-        { "clone", T.Clone }
+        { "clone", T.Clone },
+        { "arctan2", T.ArcTan2  },
+        { "maxof", T.MaxOf  },
+        { "minof", T.MinOf  },
     };
+
+    static IReadOnlyList<string> EnumerableParamMethods { get; } =[
+        "maxof",
+        "minof",
+    ];
 
     static IDictionary<string, nint> MethodPtrDictionary { get; }
 
@@ -129,5 +140,24 @@ public interface IComputableNumber<T> : IHasOperatorNumber<T>, INeedClone<T>
     static abstract T Median(T num1, T num2, T num3);
     static abstract T Min(T num1, T num2);
     static abstract T Max(T num1, T num2);
-    static abstract T CreateFromDouble(double num);
+    static abstract T ArcTan2(T y, T x);
+    static abstract T MaxOf(IEnumerable<T> nums);
+    static abstract T MinOf(IEnumerable<T> nums);
+    static abstract T Mod(T num1, T num2);
+    static abstract T Gamma(T num);
+    static abstract T LnGamma(T num);
+    static abstract T Psi(T num);
+    /// <summary>
+    /// ¸ßË¹Îó²îº¯Êý
+    /// </summary>
+    static abstract T Erf(T num);
+    static abstract T Erfc(T num);
+    static abstract T Erfinv(T num);
+    static abstract T Erfcinv(T num);
+    static abstract T Digamma(T num);
+    static abstract T BesselJ(T num1, T num2);
+    static abstract T BesselY(T num1, T num2);
+    static abstract T BesselI(T num1, T num2);
+    static abstract T BesselK(T num1, T num2);
+    static abstract T CreateFromDouble(double num);    
 }

@@ -3,6 +3,8 @@ using CsGrafeq.Interval.Interface;
 using static CsGrafeq.Interval.Def;
 using static CsGrafeq.Interval.Extensions.IntervalSetExtension;
 using CGMath = CsGrafeq.Numeric.CsGrafeqMath;
+using MathNet.Numerics;
+using static CsGrafeq.Utilities.ThrowHelper;
 
 namespace CsGrafeq.Interval;
 
@@ -345,7 +347,7 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
 
     public static Def operator !=(IntervalSet i1, IntervalSet i2)
     {
-        return ThrowWithMessage<NotImplementedException, Def>(new NotImplementedException());
+        return Def.FF;
     }
 
     public static Def operator <(IntervalSet i1, IntervalSet i2)
@@ -434,6 +436,15 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
         if (i1.IsEmpty || i2.IsEmpty)
             return Empty;
         return IntervalSetMethod(i1, i2, &RangeMax);
+    }
+    
+    public static IntervalSet MaxOf(IEnumerable<IntervalSet> nums)
+    {
+        return nums.Aggregate(Empty, Max);
+    }
+    public static IntervalSet MinOf(IEnumerable<IntervalSet> nums)
+    {
+        return nums.Aggregate(Empty, Min);
     }
 
     private static Range RangeMax(Range i1, Range i2)
@@ -716,13 +727,13 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
         {
             if (i1.Number == (int)i1.Number && i2._Inf == (int)i2._Inf)
                 return Create(CGMath.GCD((int)i1.Number, (int)i2._Inf));
-            return ThrowWithMessage<ArgumentException, IntervalSet>(new ArgumentException("参数需经过Floor,Ceil函数处理"));
+            return Throw<ArgumentException, IntervalSet>(new ArgumentException("参数需经过Floor,Ceil函数处理"));
         }
 
         if (i1.IsEmpty || i2.IsEmpty)
             return Empty;
         if (!(i1.Intervals[0].TryGetInteger(out _) && i2.Intervals[0].TryGetInteger(out _)))
-            return ThrowWithMessage<ArgumentException, IntervalSet>(new ArgumentException("参数需经过Floor,Ceil函数处理"));
+            return Throw<ArgumentException, IntervalSet>(new ArgumentException("参数需经过Floor,Ceil函数处理"));
         if (i1.Intervals.Length == 1 && i2.Intervals.Length == 1)
             return Create(CGMath.GCD((int)i1.Intervals[0]._Inf, (int)i2.Intervals[0]._Inf));
         if (i1.Intervals.Length == 2 && i2.Intervals.Length == 1)
@@ -754,13 +765,13 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
         {
             if (i1.Number == (int)i1.Number && i2._Inf == (int)i2._Inf)
                 return Create(CGMath.LCM((int)i1.Number, (int)i2._Inf));
-            return ThrowWithMessage<ArgumentException, IntervalSet>(new ArgumentException("参数需经过Floor,Ceil函数处理"));
+            return Throw<ArgumentException, IntervalSet>(new ArgumentException("参数需经过Floor,Ceil函数处理"));
         }
 
         if (i1.IsEmpty || i2.IsEmpty)
             return Empty;
         if (!(i1.Intervals[0].TryGetInteger(out _) && i2.Intervals[0].TryGetInteger(out _)))
-            return ThrowWithMessage<ArgumentException, IntervalSet>(new ArgumentException("参数需经过Floor,Ceil函数处理"));
+            return Throw<ArgumentException, IntervalSet>(new ArgumentException("参数需经过Floor,Ceil函数处理"));
         if (i1.Intervals.Length == 1 && i2.Intervals.Length == 1)
             return Create(CGMath.LCM((int)i1.Intervals[0]._Inf, (int)i2.Intervals[0]._Inf));
         if (i1.Intervals.Length == 2 && i2.Intervals.Length == 1)
@@ -972,12 +983,420 @@ public readonly struct IntervalSet : IInterval<IntervalSet>
         var res = num.Intervals.Slice(0, current);
         return Create(res, FT);
     }
+    /// <summary>
+    /// 图像见 <a href="https://www.desmos.com/3d/ssq30zgep2"/>
+    /// </summary>
+    public static IntervalSet ArcTan2(IntervalSet y, IntervalSet x)
+    {
+        if (y.IsEmpty || x.IsEmpty)
+            return Empty;
+
+        if (y.IsNumber && x.IsNumber)
+            return Create(Math.Atan2(y.Number, x.Number));
+
+        // 笛卡尔积枚举边界点：atan2 在矩形上极值只可能出现在边界，
+        // 此处用四个角点做保守包络；若穿过原点或 x==0，会返回全角以保证正确性。
+        var tmp = new Range[y.Intervals.Length * x.Intervals.Length];
+        var loc = 0;
+
+        foreach (var ry in y.Intervals)
+        foreach (var rx in x.Intervals)
+        {
+            // if rectangle contains (0,0), atan2 取值会覆盖整个 (-π, π]
+            if (ry.ContainsEqual(0) && rx.ContainsEqual(0))
+            {
+                tmp[loc++] = new Range(-Math.PI, Math.PI);
+                continue;
+            }
+
+            // if x spans 0, atan2 会跨越不连续点，直接给全角最保守
+            if (rx.ContainsEqual(0))
+            {
+                tmp[loc++] = new Range(-Math.PI, Math.PI);
+                continue;
+            }
+
+            var a1 = Math.Atan2(ry._Inf, rx._Inf);
+            var a2 = Math.Atan2(ry._Inf, rx._Sup);
+            var a3 = Math.Atan2(ry._Sup, rx._Inf);
+            var a4 = Math.Atan2(ry._Sup, rx._Sup);
+
+            var min = Math.Min(Math.Min(a1, a2), Math.Min(a3, a4));
+            var max = Math.Max(Math.Max(a1, a2), Math.Max(a3, a4));
+
+            // 角度在 -π/π 处可能“折返”，如果跨越该切点，保守返回全角
+            if (max - min > Math.PI)
+            {
+                tmp[loc++] = new Range(-Math.PI, Math.PI);
+                continue;
+            }
+
+            tmp[loc++] = new Range(min, max);
+        }
+
+        var res = tmp.Slice(0, loc).FormatRanges();
+        return Create(res, y._Def & x._Def);
+    }
 
     #endregion
 
-    [DoesNotReturn]
-    private static TResult ThrowWithMessage<TException, TResult>(TException exception) where TException : Exception
+    #region 特殊函数
+
+    public static IntervalSet Mod(IntervalSet num1, IntervalSet num2)
     {
-        throw exception;
+        return num1 % num2;
     }
+    /// <summary>
+    /// 由AI生成 不保证准确性 请谨慎使用
+    /// </summary>
+
+    public static IntervalSet Gamma(IntervalSet num)
+    {
+        // Gamma(x) 在 (0, +∞) 上：在 (0, ~1.4616) 单调递减，之后单调递增；存在极点于 0,-1,-2,...
+        // 先处理包含非正整数/0 的区间：直接给全范围保守
+        if (num.IsEmpty) return Empty;
+        if (!num.IsNumber && ContainsNonPositiveInteger(num))
+            return Create(double.NegativeInfinity, double.PositiveInfinity, FT);
+
+        // 若整个输入位于 (0, +∞)，可按性质在“最小值点”处分段以收紧
+        if (num._Inf > 0)
+        {
+            const double gammaMinX = 1.4616321449683623; // Gamma 在正实数上的全局最小点（近似常数）
+            return ApplyUnarySplitByPoint(num, gammaMinX, static x => SpecialFunctions.Gamma(x));
+        }
+
+        // 其它情况（包括跨过 0 或负数区域）强行端点包络（保守）
+        return ApplyUnaryCornerEnvelope(num, static x => SpecialFunctions.Gamma(x));
+    }
+
+    /// <summary>
+    /// 由AI生成 不保证准确性 请谨慎使用
+    /// </summary>
+    public static IntervalSet LnGamma(IntervalSet num)
+    {
+        // ln(Gamma(x)) 在 (0, +∞) 上也具有单峰（在 ~1.4616 附近达到最小）
+        if (num.IsEmpty) return Empty;
+        if (!num.IsNumber && ContainsNonPositiveInteger(num))
+            return Create(double.NegativeInfinity, double.PositiveInfinity, FT);
+
+        if (num._Inf > 0)
+        {
+            const double gammaMinX = 1.4616321449683623;
+            return ApplyUnarySplitByPoint(num, gammaMinX, static x => SpecialFunctions.GammaLn(x));
+        }
+
+        return ApplyUnaryCornerEnvelope(num, static x => SpecialFunctions.GammaLn(x));
+    }
+
+    /// <summary>
+    /// 由AI生成 不保证准确性 请谨慎使用
+    /// </summary>
+    public static IntervalSet Psi(IntervalSet num)
+    {
+        // Psi == Digamma。Digamma 在每个 (−n, −n+1) 上严格递增，在正实数上严格递增；在 0,-1,-2... 有极点
+        return Digamma(num);
+    }
+
+    /// <summary>
+    /// 由AI生成 不保证准确性 请谨慎使用
+    /// </summary>
+    public static IntervalSet Digamma(IntervalSet num)
+    {
+        if (num.IsEmpty) return Empty;
+        if (!num.IsNumber && ContainsNonPositiveInteger(num))
+            return Create(double.NegativeInfinity, double.PositiveInfinity, FT);
+
+        // 在 (0,+∞) 上严格单调递增
+        if (num._Inf > 0)
+            return ApplyUnaryMonotoneInc(num, SpecialFunctions.DiGamma);
+
+        // 负区间分段/角点包络（保守）
+        return ApplyUnaryCornerEnvelope(num, static x => SpecialFunctions.DiGamma(x));
+    }
+
+    /// <summary>
+    /// 由AI生成 不保证准确性 请谨慎使用
+    /// </summary>
+    public static IntervalSet Erf(IntervalSet num)
+    {
+        // erf(x) 在 R 上严格递增，值域 (-1,1)
+        return ApplyUnaryMonotoneInc(num, SpecialFunctions.Erf);
+    }
+
+    /// <summary>
+    /// 由AI生成 不保证准确性 请谨慎使用
+    /// </summary>
+    public static IntervalSet Erfc(IntervalSet num)
+    {
+        // erfc(x)=1-erf(x) 在 R 上严格递减，值域 (0,2)
+        return ApplyUnaryMonotoneDec(num, SpecialFunctions.Erfc);
+    }
+
+    /// <summary>
+    /// 由AI生成 不保证准确性 请谨慎使用
+    /// </summary>
+    public static IntervalSet Erfinv(IntervalSet num)
+    {
+        // erfinv 在 [-1,1] 上严格递增
+        return ApplyUnaryMonotoneIncWithDomain(num, -1.0, 1.0, SpecialFunctions.ErfInv);
+    }
+
+    /// <summary>
+    /// 由AI生成 不保证准确性 请谨慎使用
+    /// </summary>
+    public static IntervalSet Erfcinv(IntervalSet num)
+    {
+        // erfcinv 在 [0,2] 上严格递减
+        return ApplyUnaryMonotoneDecWithDomain(num, 0.0, 2.0, SpecialFunctions.ErfcInv);
+    }
+
+    /// <summary>
+    /// 由AI生成 不保证准确性 请谨慎使用
+    /// </summary>
+    public static IntervalSet BesselJ(IntervalSet num1, IntervalSet num2)
+    {
+        return ApplyBinaryCornerEnvelope(num1, num2, SpecialFunctions.BesselJ);
+    }
+
+    /// <summary>
+    /// 由AI生成 不保证准确性 请谨慎使用
+    /// </summary>
+    public static IntervalSet BesselY(IntervalSet num1, IntervalSet num2)
+    {
+        return ApplyBinaryCornerEnvelope(num1, num2, SpecialFunctions.BesselY);
+    }
+
+    /// <summary>
+    /// 由AI生成 不保证准确性 请谨慎使用
+    /// </summary>
+    public static IntervalSet BesselI(IntervalSet num1, IntervalSet num2)
+    {
+        return ApplyBinaryCornerEnvelope(num1, num2, SpecialFunctions.BesselI);
+    }
+
+    /// <summary>
+    /// 由AI生成 不保证准确性 请谨慎使用
+    /// </summary>
+    public static IntervalSet BesselK(IntervalSet num1, IntervalSet num2)
+    {
+        return ApplyBinaryCornerEnvelope(num1, num2, SpecialFunctions.BesselK);
+    }
+
+    private static bool ContainsNonPositiveInteger(IntervalSet num)
+    {
+        // 检测是否包含 0,-1,-2,...（Gamma/LnGamma/Digamma/Trigamma 极点）
+        // 由于 IntervalSet 可能是多个 Range：逐段判断是否跨越某个非正整数
+        foreach (var r in num.Intervals)
+        {
+            if (r._Sup < 0)
+            {
+                // 负区间：[a,b]，若包含某个 -k（k>=0）
+                var ceil = (int)Math.Ceiling(r._Inf); // 注意 r._Inf <= r._Sup
+                var floor = (int)Math.Floor(r._Sup);
+                for (var n = ceil; n <= floor; n++)
+                {
+                    if (n <= 0 && r.ContainsEqual(n))
+                        return true;
+                }
+            }
+            else if (r.ContainsEqual(0))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static IntervalSet ApplyUnaryMonotoneInc(IntervalSet input, Func<double, double> f)
+    {
+        if (input.IsEmpty) return Empty;
+        if (input.IsNumber) return Create(f(input.Number));
+
+        var ranges = (Range[])input.Intervals.Clone();
+        ranges.MonotoneTransform(f);
+
+        var def = input._Def;
+        if (HasNaNOrInf(ranges))
+            return Create(double.NegativeInfinity, double.PositiveInfinity, FT);
+
+        return Create(ranges.FormatRanges(), def);
+    }
+
+    private static IntervalSet ApplyUnaryMonotoneDec(IntervalSet input, Func<double, double> f)
+    {
+        if (input.IsEmpty) return Empty;
+        if (input.IsNumber) return Create(f(input.Number));
+
+        var ranges = (Range[])input.Intervals.Clone();
+        ranges.MonotoneTransformOp(f);
+
+        var def = input._Def;
+        if (HasNaNOrInf(ranges))
+            return Create(double.NegativeInfinity, double.PositiveInfinity, FT);
+
+        return Create(ranges.FormatRanges(), def);
+    }
+
+    private static IntervalSet ApplyUnaryMonotoneIncWithDomain(IntervalSet input, double domainMin, double domainMax, Func<double, double> f)
+    {
+        if (input.IsEmpty) return Empty;
+
+        if (input.IsNumber)
+        {
+            if (input.Number < domainMin || input.Number > domainMax) return Empty;
+            return Create(f(input.Number));
+        }
+
+        var clipped = ((Range[])input.Intervals.Clone()).SetBounds(new Range(domainMin, domainMax));
+        if (clipped.Length == 0) return Empty;
+
+        var def = (clipped.Length == input.Intervals.Length && input._Inf >= domainMin && input._Sup <= domainMax) ? input._Def : FT;
+
+        var tmp = Create(clipped, def);
+        return ApplyUnaryMonotoneInc(tmp, f);
+    }
+
+    private static IntervalSet ApplyUnaryMonotoneDecWithDomain(IntervalSet input, double domainMin, double domainMax, Func<double, double> f)
+    {
+        if (input.IsEmpty) return Empty;
+
+        if (input.IsNumber)
+        {
+            if (input.Number < domainMin || input.Number > domainMax) return Empty;
+            return Create(f(input.Number));
+        }
+
+        var clipped = ((Range[])input.Intervals.Clone()).SetBounds(new Range(domainMin, domainMax));
+        if (clipped.Length == 0) return Empty;
+
+        var def = (clipped.Length == input.Intervals.Length && input._Inf >= domainMin && input._Sup <= domainMax) ? input._Def : FT;
+
+        var tmp = Create(clipped, def);
+        return ApplyUnaryMonotoneDec(tmp, f);
+    }
+
+    private static IntervalSet ApplyUnarySplitByPoint(IntervalSet input, double splitX, Func<double, double> f)
+    {
+        // 对每个 Range，如果跨越 splitX，则拆成两段分别按单调处理后再合并（用于“单峰/单谷”）
+        if (input.IsEmpty) return Empty;
+        if (input.IsNumber) return Create(f(input.Number));
+
+        var tmp = new Range[input.Intervals.Length * 2];
+        var loc = 0;
+
+        foreach (var r in input.Intervals)
+        {
+            if (r._Sup <= splitX || r._Inf >= splitX)
+            {
+                tmp[loc++] = r;
+                continue;
+            }
+
+            tmp[loc++] = new Range(r._Inf, splitX);
+            tmp[loc++] = new Range(splitX, r._Sup);
+        }
+
+        var splitSet = Create(tmp.Slice(0, loc), input._Def);
+
+        // (0, split] 上按递减处理，[split, +∞) 上按递增处理（这里用于 Gamma/LnGamma 的“先降后升”）
+        var resRanges = new Range[splitSet.Intervals.Length];
+        for (var i = 0; i < splitSet.Intervals.Length; i++)
+        {
+            var rr = splitSet.Intervals[i];
+            if (rr._Sup <= splitX)
+            {
+                var a = f(rr._Inf);
+                var b = f(rr._Sup);
+                resRanges[i] = new Range(Math.Min(a, b), Math.Max(a, b));
+            }
+            else
+            {
+                var a = f(rr._Inf);
+                var b = f(rr._Sup);
+                resRanges[i] = new Range(Math.Min(a, b), Math.Max(a, b));
+            }
+        }
+
+        var def = input._Def;
+        if (HasNaNOrInf(resRanges))
+            def = FT;
+
+        return Create(resRanges.FormatRanges(), def);
+    }
+
+    private static IntervalSet ApplyUnaryCornerEnvelope(IntervalSet input, Func<double, double> f)
+    {
+        if (input.IsEmpty) return Empty;
+        if (input.IsNumber) return Create(f(input.Number));
+
+        var res = new Range[input.Intervals.Length];
+        var def = input._Def;
+
+        for (var i = 0; i < input.Intervals.Length; i++)
+        {
+            var r = input.Intervals[i];
+            var fa = f(r._Inf);
+            var fb = f(r._Sup);
+
+            if (double.IsNaN(fa) || double.IsNaN(fb) || double.IsInfinity(fa) || double.IsInfinity(fb))
+            {
+                res[i] = new Range(double.NegativeInfinity, double.PositiveInfinity);
+                def = FT;
+                continue;
+            }
+
+            res[i] = new Range(Math.Min(fa, fb), Math.Max(fa, fb));
+        }
+
+        return Create(res.FormatRanges(), def);
+    }
+
+    private static IntervalSet ApplyBinaryCornerEnvelope(IntervalSet a, IntervalSet b, Func<double, double, double> f)
+    {
+        if (a.IsEmpty || b.IsEmpty) return Empty;
+
+        if (a.IsNumber && b.IsNumber)
+            return Create(f(a.Number, b.Number));
+
+        var tmp = new Range[a.Intervals.Length * b.Intervals.Length];
+        var loc = 0;
+        var def = a._Def & b._Def;
+
+        foreach (var ra in a.Intervals)
+        foreach (var rb in b.Intervals)
+        {
+            var v1 = f(ra._Inf, rb._Inf);
+            var v2 = f(ra._Inf, rb._Sup);
+            var v3 = f(ra._Sup, rb._Inf);
+            var v4 = f(ra._Sup, rb._Sup);
+
+            if (double.IsNaN(v1) || double.IsNaN(v2) || double.IsNaN(v3) || double.IsNaN(v4) ||
+                double.IsInfinity(v1) || double.IsInfinity(v2) || double.IsInfinity(v3) || double.IsInfinity(v4))
+            {
+                tmp[loc++] = new Range(double.NegativeInfinity, double.PositiveInfinity);
+                def = FT;
+                continue;
+            }
+
+            var min = Math.Min(Math.Min(v1, v2), Math.Min(v3, v4));
+            var max = Math.Max(Math.Max(v1, v2), Math.Max(v3, v4));
+            tmp[loc++] = new Range(min, max);
+        }
+
+        return Create(tmp.Slice(0, loc).FormatRanges(), def);
+    }
+
+    private static bool HasNaNOrInf(Range[] ranges)
+    {
+        foreach (var r in ranges)
+        {
+            if (double.IsNaN(r._Inf) || double.IsNaN(r._Sup) || double.IsInfinity(r._Inf) || double.IsInfinity(r._Sup))
+                return true;
+        }
+
+        return false;
+    }
+
+    #endregion
 }
