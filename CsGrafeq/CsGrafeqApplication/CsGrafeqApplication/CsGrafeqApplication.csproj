@@ -60,6 +60,7 @@
         <PackageReference Include="CSharpMath.SkiaSharp" />
         <PackageReference Include="DialogHost.Avalonia" />
         <PackageReference Include="HarfBuzzSharp" />
+        <PackageReference Include="HotAvalonia" />
         <PackageReference Include="LiveMarkdown.Avalonia" />
         <PackageReference Include="Material.Avalonia" />
         <PackageReference Include="Material.Avalonia.Dialogs" />
@@ -67,14 +68,12 @@
         <PackageReference Include="ReactiveUI" />
         <PackageReference Include="SkiaSharp" />
         <PackageReference Include="SkiaSharp.HarfBuzz" />
-        <PackageReference Include="Svg.Controls.Skia.Avalonia" />
         <PackageReference Include="Sylinko.CSharpMath.Avalonia" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Base\CsGrafeq.Base.csproj" />
         <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Compiler\CsGrafeq.Compiler.csproj" />
-        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.CSharpMath.Editor\CsGrafeq.CSharpMath.Editor.csproj" />
         <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Debug\CsGrafeq.Debug.csproj" />
         <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.I18N\CsGrafeq.I18N.csproj" />
         <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Interval\CsGrafeq.Interval.csproj" />
@@ -94,6 +93,10 @@
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
             <DependentUpon>Resources.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Controls\ImplicitFunctionBox.axaml.cs">
+          <DependentUpon>ImplicitFunctionBox.axaml</DependentUpon>
+          <SubType>Code</SubType>
         </Compile>
     </ItemGroup>
 

@@ -395,7 +395,7 @@ public class CartesianDisplayer : Displayer
         dc.DrawText("0", new SKPoint(Zero.X + 3, Zero.Y + TextFont.Size), SKTextAlign.Left, TextFont,
             AxisPaintMain);
     }
-
+    
     public override void CompoundBuffers()
     {
         lock (TotalBufferLock)

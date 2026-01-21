@@ -12,14 +12,13 @@ using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.LogicalTree;
 using Avalonia.Media;
-using CsGrafeq.CSharpMath.Editor;
 using CsGrafeq.I18N;
 using CsGrafeq.Interval;
 using CsGrafeq.Shapes;
 using CsGrafeq.Shapes.ShapeGetter;
 using CsGrafeqApplication.Controls.Displayers;
 using CsGrafeqApplication.Core.Controls;
-using CsGrafeqApplication.Dialog;
+using CsGrafeqApplication.Dialogs.InfoDialog;
 using CSharpMath.Atom;
 using CSharpMath.Avalonia;
 using DialogHostAvalonia;
@@ -93,10 +92,7 @@ public partial class GeometryPad : Addon
         var p3 = AddShape(new GeoPoint(new PointGetter_OnLine(s1, (0, 0))));
         var p4 = AddShape(new GeoPoint(new PointGetter_MiddlePoint(p1,p2)));
         var c1 = AddShape(new Circle(new CircleGetter_FromCenterAndRadius(p1)));
-        CgMathKeyboard kb = new(new MathList());
-        kb.KeyPress(CgMathKeyboardInput.SmallS, CgMathKeyboardInput.SmallI, CgMathKeyboardInput.SmallN,
-            CgMathKeyboardInput.SmallX);
-        var ip1 = AddShape(CreateImpFunc(kb.MathList));
+        var ip1 = AddShape(CreateImpFunc("y=sin(x)"));
 #endif
         InitializeComponent();
     }
@@ -220,13 +216,12 @@ public partial class GeometryPad : Addon
     {
         if (sender is Border border) FlyoutBase.ShowAttachedFlyout(border);
     }
-
     /// <summary>
     ///     创建新的隐函数图形
     /// </summary>
     /// <param name="expression"></param>
     /// <returns></returns>
-    private ImplicitFunction CreateImpFunc(MathList expression)
+    private ImplicitFunction CreateImpFunc(string expression)
     {
         var ins = new ImplicitFunction(expression);
         ins.RenderTarget.OnRender += (dc, s) =>
@@ -248,7 +243,7 @@ public partial class GeometryPad : Addon
                 {
                     re.Error(out var ex);
                     DataValidationErrors.SetError(tb, ex);
-                    CsGrafeqApplication.Dialog.Dialogs.Info(new TextBlock { Text = ex.Message }, InfoType.Error);
+                    this.Info(new TextBlock { Text = ex.Message }, InfoType.Error);
                 }
             }
     }
@@ -274,7 +269,7 @@ public partial class GeometryPad : Addon
                     {
                         re.Error(out var ex);
                         DataValidationErrors.SetError(tb, ex);
-                        CsGrafeqApplication.Dialog.Dialogs.Info(new TextBlock { Text = ex.Message }, InfoType.Error);
+                        this.Info(new TextBlock { Text = ex.Message }, InfoType.Error);
                     }
 
                     DoFuncTextChange(tb, (string)e.NewValue, (string)e.OldValue);
@@ -1353,7 +1348,7 @@ public partial class GeometryPad : Addon
                     if (n.IsError)
                     {
                         DataValidationErrors.SetError(tb, n.Error);
-                        CsGrafeqApplication.Dialog.Dialogs.Info(new TextBlock { Text = n.Error.Message }, InfoType.Error);
+                        this.Info(new TextBlock { Text = n.Error.Message }, InfoType.Error);
                     }
                     else
                     {
@@ -1519,28 +1514,17 @@ public partial class GeometryPad : Addon
             if (rb.IsChecked == true && rb.Tag is ActionData ad)
             {
                 SetAction(ad);
-                CsGrafeqApplication.Dialog.Dialogs.Info(new TextBlock { Text = CurrentAction.Description.Data }, InfoType.Information);
+                this.Info(new TextBlock { Text = CurrentAction.Description.Data }, InfoType.Information);
             }
     }
 
     private void MathTextBoxKeyDown(object? sender, KeyEventArgs e)
     {
-        var box = MathTextBox.InnerMathBox;
-        if (e.Key == Key.Enter && e.KeyModifiers == KeyModifiers.None && box?.IsCorrect == true)
+        if (e.Key == Key.Enter && e.KeyModifiers == KeyModifiers.None && IntervalCompiler.TryCompile(MathTextBox.Function.Expression??"",Setting.Instance.EnableExpressionSimplification).Success(out _,out _))
         {
-            AddShape(CreateImpFunc(box.MathList));
-            box.PressKey(CgMathKeyboardInput.Clear);
+            AddShape(CreateImpFunc(MathTextBox.Function.Expression));
+            MathTextBox.Clear();
         }
     }
-
-    private void MathTextBoxMathInputted(object? sender, RoutedEventArgs e)
-    {
-        var s = (sender as MathBox)!;
-        MathTextBoxContainer.BorderBrush =
-            !s.HasText || (s.IsCorrect && IntervalCompiler.TryCompile(s.Expression,Setting.Instance.EnableExpressionSimplification).Success(out _,out _))
-                ? Brushes.Blue
-                : Brushes.Red;
-    }
-
     #endregion
 }

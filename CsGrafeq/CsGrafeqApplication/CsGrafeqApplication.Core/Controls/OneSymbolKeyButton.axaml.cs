@@ -3,7 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using CsGrafeq.CSharpMath.Editor;
+using CsGrafeq.Keyboard;
 using CsGrafeqApplication.Core.Utils;
 
 namespace CsGrafeqApplication.Core.Controls;
@@ -15,8 +15,8 @@ public partial class OneSymbolKeyButton : UserControl
         AvaloniaProperty.RegisterDirect<OneSymbolKeyButton, string>(
             nameof(Button), o => o.Button, (o, v) => o.Button = v);
 
-    public static readonly DirectProperty<OneSymbolKeyButton, CgMathKeyboardInput> KeyboardInputProperty =
-        AvaloniaProperty.RegisterDirect<OneSymbolKeyButton, CgMathKeyboardInput>(
+    public static readonly DirectProperty<OneSymbolKeyButton, KeyboardInput> KeyboardInputProperty =
+        AvaloniaProperty.RegisterDirect<OneSymbolKeyButton, KeyboardInput>(
             nameof(KeyboardInput), o => o.KeyboardInput, (o, v) => o.KeyboardInput = v);
 
     public OneSymbolKeyButton()
@@ -24,7 +24,7 @@ public partial class OneSymbolKeyButton : UserControl
         AvaloniaXamlLoader.Load(this);
     }
 
-    public CgMathKeyboardInput KeyboardInput
+    public KeyboardInput KeyboardInput
     {
         get => field;
         set => SetAndRaise(KeyboardInputProperty, ref field, value);

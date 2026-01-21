@@ -14,14 +14,15 @@ using CsGrafeq.I18N;
 using CsGrafeqApplication.Addons.GeometryPad;
 using CsGrafeqApplication.Controls.Displayers;
 using CsGrafeqApplication.Core.Utils;
-using CsGrafeqApplication.Dialog;
+using CsGrafeqApplication.Dialogs.InfoDialog;
+using CsGrafeqApplication.Dialogs.Interfaces;
 using CsGrafeqApplication.ViewModels;
 using Material.Styles.Themes;
 using Microsoft.Win32;
 
 namespace CsGrafeqApplication.Controls;
 
-public partial class DisplayerContainer : UserControl
+public partial class DisplayerContainer : UserControl,IInfoDialog
 {
     public static readonly DirectProperty<DisplayerContainer, bool> IsOperationVisibleProperty =
         AvaloniaProperty.RegisterDirect<DisplayerContainer, bool>(nameof(VM.IsOperationVisible),
@@ -49,23 +50,24 @@ public partial class DisplayerContainer : UserControl
         keyframe2.Setters.Add(new Setter(OpacityProperty, 0.0));
         anim.Children.Add(keyframe1);
         anim.Children.Add(keyframe2);
-        Dialog.Dialogs.InfoHandler = Info;
     }
 
-    private async void Info(Control content, InfoType infotype)
+    public async void Info(object content, InfoType infotype)
     {
         var color = infotype switch
         {
             InfoType.Warning => Colors.Yellow,
             InfoType.Error => Colors.DarkRed,
-            _ => Color.FromRgb(0x77, 0xcc, 0xbb)
+            _ => Themes.Theme.CurrentTheme.PrimaryMid.Color
         };
+        ErrorIcon.IsVisible = infotype == InfoType.Error;
+        WarningIcon.IsVisible = infotype == InfoType.Warning;
         InfoOuterContainer.Background = new SolidColorBrush(Color.FromArgb(128, color.R, color.G, color.B));
         InfoCancellation.Cancel();
         InfoCancellation = new CancellationTokenSource();
         InfoPresenter.Content = content;
-        ((Control)InfoPresenter.Parent).Opacity = 1;
-        await anim.RunAsync(InfoPresenter.Parent, InfoCancellation.Token);
+        InfoOuterContainer.Opacity = 1;
+        await anim.RunAsync(InfoOuterContainer,InfoCancellation.Token);
     }
 
     private void GlobalKeyDown(object? sender, KeyEventArgs e)

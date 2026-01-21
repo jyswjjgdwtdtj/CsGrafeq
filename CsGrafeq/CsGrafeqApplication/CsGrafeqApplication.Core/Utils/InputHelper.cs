@@ -1,37 +1,37 @@
 ﻿using Avalonia.Controls;
-using CsGrafeq.CSharpMath.Editor;
+using CsGrafeq.Keyboard;
 using CsGrafeqApplication.Core.Controls;
 
 namespace CsGrafeqApplication.Core.Utils;
 
 public static class InputHelper
 {
-    public static bool Input(this TopLevel top, CgMathKeyboardInput input)
+    public static bool Input(this TopLevel top, KeyboardInput input)
     {
         var f = top.FocusManager?.GetFocusedElement();
-        if (f is MathBox mb)
+        /*if (f is RichExpressionBox mb)
         {
             mb.PressKey(input);
             return true;
-        }
+        }*/
 
         if (f is TextBox tb)
         {
             switch (input)
             {
-                case CgMathKeyboardInput.Backspace:
+                case KeyboardInput.Backspace:
                     tb.Backspace();
                     break;
-                case CgMathKeyboardInput.Delete:
+                case KeyboardInput.Delete:
                     tb.Delete();
                     break;
-                case CgMathKeyboardInput.Left:
+                case KeyboardInput.Left:
                     tb.CursorLeft();
                     break;
-                case CgMathKeyboardInput.Right:
+                case KeyboardInput.Right:
                     tb.CursorRight();
                     break;
-                case CgMathKeyboardInput.Absolute:
+                case KeyboardInput.Absolute:
                     tb.InsertTextAtCursor("abs()");
                     tb.CursorLeft();
                     break;

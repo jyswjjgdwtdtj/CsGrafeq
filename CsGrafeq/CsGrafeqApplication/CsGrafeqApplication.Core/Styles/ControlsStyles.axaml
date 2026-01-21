@@ -7,5 +7,6 @@
     </Design.PreviewWith>
     <StyleInclude Source="../Controls/ExpandBox.axaml"/>
     <StyleInclude Source="../Controls/ToggleBox.axaml"/>
+    <StyleInclude Source="../Controls/PlainExpressionBox.axaml"/>
     
 </Styles>

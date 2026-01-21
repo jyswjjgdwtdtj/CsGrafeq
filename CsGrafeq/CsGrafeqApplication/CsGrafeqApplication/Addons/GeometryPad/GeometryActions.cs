@@ -5,6 +5,7 @@ using CsGrafeq.I18N;
 using CsGrafeq.Shapes;
 using CsGrafeq.Shapes.ShapeGetter;
 using static CsGrafeq.Utilities.ThrowHelper;
+using GeoHalf=CsGrafeq.Shapes.Half;
 
 namespace CsGrafeqApplication.Addons.GeometryPad;
 
@@ -297,11 +298,11 @@ internal static class GeometryActions
         switch (target)
         {
             case ShownShapeArg.Point:
-                return new GeoPoint((PointGetter)getter);
+                return new Point((PointGetter)getter);
             case ShownShapeArg.Straight:
                 return new Straight((LineGetter)getter);
             case ShownShapeArg.Half:
-                return new Half((LineGetter_Half)getter);
+                return new GeoHalf((LineGetter_Half)getter);
             case ShownShapeArg.Segment:
                 return new Segment((LineGetter_Segment)getter);
             case ShownShapeArg.Circle:

@@ -36,6 +36,10 @@ public class MultiLanguageResourcesGenerator : IIncrementalGenerator
                     $"\tpublic MultiLanguageData {key} {{ get; }} = new() {{ {title[1]} = \"{s1}\", {title[2]} = \"{s2}\" }};");
                 dicBuilder.AppendLine($"\t\t\t[\"{key}\"] = {key},");
             }
+            else
+            {
+                builder.AppendLine("//error:" + line);
+            }
         }
 
         builder.AppendLine("\tpublic MultiLanguageResources(){");

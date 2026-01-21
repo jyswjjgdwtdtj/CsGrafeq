@@ -11,6 +11,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="HotAvalonia" Version="3.0.2" />
       <PackageReference Include="MathNet.Symbolics" Version="0.25.0" />
     </ItemGroup>
 

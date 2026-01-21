@@ -1,0 +1,19 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:CsGrafeqApplication.Core.Controls">
+    <Design.PreviewWith>
+        <controls:PlainExpressionBox />
+    </Design.PreviewWith>
+
+    <Style Selector="controls|PlainExpressionBox">
+        <!-- Set Defaults -->
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}"
+                        BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" DataContext="{TemplateBinding }">
+                    <TextBox Height="25" AcceptsReturn="False" AcceptsTab="False" IsUndoEnabled="False" Text="{CompiledBinding Expression,Mode=TwoWay}" IsReadOnly="{CompiledBinding !CanInput}" x:DataType="controls:PlainExpressionBox" Name="PART_TextBox"></TextBox>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+</Styles>

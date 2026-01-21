@@ -3,7 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.Metadata;
-using CsGrafeq.CSharpMath.Editor;
+using CsGrafeq.Keyboard;
 using CsGrafeqApplication.Core.Utils;
 
 namespace CsGrafeqApplication.Core.Controls;
@@ -28,6 +28,6 @@ public partial class Keyboard : TemplatedControl
 
     private void BackspaceButton_OnClick(object? sender, RoutedEventArgs e)
     {
-        TopLevel.GetTopLevel(this)?.Input(CgMathKeyboardInput.Backspace);
+        TopLevel.GetTopLevel(this)?.Input(KeyboardInput.Backspace);
     }
 }

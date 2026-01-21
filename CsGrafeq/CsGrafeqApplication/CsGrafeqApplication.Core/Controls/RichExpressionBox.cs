@@ -1,5 +1,5 @@
 ﻿//#define RECORD_INSTANCE
-
+/*
 using System.Drawing;
 using System.Numerics;
 using Avalonia;
@@ -24,58 +24,40 @@ using Point = Avalonia.Point;
 
 namespace CsGrafeqApplication.Core.Controls;
 
-public class MathBox : Control
+public class RichExpressionBox : Control
 {
-    public static readonly DirectProperty<MathBox, float> FontSizeProperty =
-        AvaloniaProperty.RegisterDirect<MathBox, float>(
+    public static readonly DirectProperty<RichExpressionBox, float> FontSizeProperty =
+        AvaloniaProperty.RegisterDirect<RichExpressionBox, float>(
             nameof(FontSize), o => o.FontSize, (o, v) => o.FontSize = v);
 
-
-    public static readonly DirectProperty<MathBox, string> ExpressionProperty =
-        AvaloniaProperty.RegisterDirect<MathBox, string>(
-            nameof(Expression), o => o.Expression);
-
-    public static readonly DirectProperty<MathBox, bool> IsCorrectProperty =
-        AvaloniaProperty.RegisterDirect<MathBox, bool>(
-            nameof(IsCorrect), o => o.IsCorrect);
-
-    public static readonly DirectProperty<MathBox, MathList> MathListProperty =
-        AvaloniaProperty.RegisterDirect<MathBox, MathList>(
+    public static readonly DirectProperty<RichExpressionBox, MathList> MathListProperty =
+        AvaloniaProperty.RegisterDirect<RichExpressionBox, MathList>(
             nameof(MathList), o => o.MathList, (o, v) => o.MathList = v);
 
-    public static readonly DirectProperty<MathBox, bool> PropertyToTransmitMathInputEventProperty =
-        AvaloniaProperty.RegisterDirect<MathBox, bool>(
-            nameof(PropertyToTransmitMathInputEvent), o => o.PropertyToTransmitMathInputEvent,
-            (o, v) => o.PropertyToTransmitMathInputEvent = v);
-
-    public static readonly DirectProperty<MathBox, bool> HasTextProperty =
-        AvaloniaProperty.RegisterDirect<MathBox, bool>(
-            nameof(HasText), o => o.HasText);
-
-    public static readonly StyledProperty<bool> CanInputProperty = AvaloniaProperty.Register<MathBox, bool>(
+    public static readonly StyledProperty<bool> CanInputProperty = AvaloniaProperty.Register<RichExpressionBox, bool>(
         nameof(CanInput), true);
 
-    public static readonly StyledProperty<IBrush?> BackgroundProperty = AvaloniaProperty.Register<MathBox, IBrush?>(
+    public static readonly StyledProperty<IBrush?> BackgroundProperty = AvaloniaProperty.Register<RichExpressionBox, IBrush?>(
         nameof(Background), Brushes.Transparent);
 
     public static readonly StyledProperty<SolidColorBrush?> ForegroundProperty =
-        AvaloniaProperty.Register<MathBox, SolidColorBrush?>(
+        AvaloniaProperty.Register<RichExpressionBox, SolidColorBrush?>(
             nameof(Foreground));
 
     private readonly float Scale = 1;
 
-    static MathBox()
+    static RichExpressionBox()
     {
-        AffectsRender<MathBox>(BackgroundProperty, ForegroundProperty);
-        AffectsArrange<MathBox>(MathListProperty);
+        AffectsRender<RichExpressionBox>(BackgroundProperty, ForegroundProperty);
+        AffectsArrange<RichExpressionBox>(MathListProperty);
     }
 
     //private Fonts Fonts;
-    public MathBox() : this(1)
+    public RichExpressionBox() : this(1)
     {
     }
 
-    public MathBox(float scale = 1)
+    public RichExpressionBox(float scale = 1)
     {
         Scale = scale;
         ClipToBounds = false;
@@ -137,18 +119,6 @@ public class MathBox : Control
         }
     }
 
-    public bool HasText
-    {
-        get => field;
-        set => SetAndRaise(HasTextProperty, ref field, value);
-    }
-
-    public bool PropertyToTransmitMathInputEvent
-    {
-        get => field;
-        set => SetAndRaise(PropertyToTransmitMathInputEventProperty, ref field, value);
-    }
-
     public MathList MathList
     {
         get => Keyboard.MathList;
@@ -161,18 +131,6 @@ public class MathBox : Control
             Keyboard.InsertionPositionHighlighted = true;
         }
     }
-
-    public bool IsCorrect
-    {
-        get => field;
-        private set => SetAndRaise(IsCorrectProperty, ref field, value);
-    } = false;
-
-    public string Expression
-    {
-        get => field;
-        private set => SetAndRaise(ExpressionProperty, ref field, value);
-    } = "";
 
     public float FontSize
     {
@@ -228,15 +186,7 @@ public class MathBox : Control
             return;
         foreach (var keyboardInput in keyboardInputs) Keyboard.KeyPress(keyboardInput);
         CurrentMeasuredRect = Keyboard.Measure;
-        var expres = MathList.Parse();
-        expres.Match(exp =>
-        {
-            Expression = exp;
-            IsCorrect = true;
-        }, exception => { IsCorrect = false; });
-        HasText = Keyboard.HasText;
         MathInputted?.Invoke(this, EventArgs.Empty);
-        PropertyToTransmitMathInputEvent = !PropertyToTransmitMathInputEvent;
     }
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
@@ -359,3 +309,4 @@ public class MathBox : Control
         return new Size(Max(size.Width, FontSize * 1.5), Max(size.Height, 30));
     }
 }
+*/

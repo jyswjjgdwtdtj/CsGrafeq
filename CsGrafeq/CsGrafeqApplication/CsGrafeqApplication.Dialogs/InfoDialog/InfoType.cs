@@ -1,4 +1,4 @@
-﻿namespace CsGrafeqApplication.Dialog;
+﻿namespace CsGrafeqApplication.Dialogs.InfoDialog;
 
 public enum InfoType
 {

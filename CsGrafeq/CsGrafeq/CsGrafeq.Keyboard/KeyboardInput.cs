@@ -1,6 +1,6 @@
-﻿namespace CsGrafeq.CSharpMath.Editor;
+﻿namespace CsGrafeq.Keyboard;
 
-public enum CgMathKeyboardInput
+public enum KeyboardInput
 {
 /*
   Return = 10, // 0x0000000A

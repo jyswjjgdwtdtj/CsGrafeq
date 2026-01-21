@@ -36,7 +36,7 @@
             <Setter Property="Template">
                 <ControlTemplate>
                     <DockPanel LastChildFill="True">
-                        <controls:ExpandBox DockPanel.Dock="Bottom" DataContext="{x:Static csGrafeq:Setting.Instance}" IsExpanded="{CompiledBinding ShowKeyboard}" x:DataType="csGrafeq:Setting" ExpandDirection="Up">
+                        <controls:ExpandBox BorderBrush="{DynamicResource MaterialPrimaryMidBrush}" BorderThickness="0,1,0,0" DockPanel.Dock="Bottom" DataContext="{x:Static csGrafeq:Setting.Instance}" IsExpanded="{CompiledBinding ShowKeyboard}" x:DataType="csGrafeq:Setting" ExpandDirection="Up">
                         <Expander Name="PART_Expander" 
                                   Background="{DynamicResource CgTranslucentBackgroundBrush}" ExpandDirection="Down"
                                   VerticalAlignment="Bottom" IsExpanded="False" Focusable="False">

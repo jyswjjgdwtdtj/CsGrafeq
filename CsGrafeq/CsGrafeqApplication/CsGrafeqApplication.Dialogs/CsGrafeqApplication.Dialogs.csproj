@@ -19,6 +19,7 @@
 
     <ItemGroup>
       <PackageReference Include="Avalonia" />
+      <PackageReference Include="HotAvalonia" />
       <PackageReference Include="ReactiveUI" />
     </ItemGroup>
 
