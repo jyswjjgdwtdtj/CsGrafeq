@@ -5,8 +5,8 @@ public class Result<TSuccess, TException> where TException : Exception
     private readonly TException? _exception;
 
     private readonly bool _isSuccessful;
-    private readonly TSuccess? _value;
     private readonly string? _successMessage;
+    private readonly TSuccess? _value;
 
     protected Result(TSuccess value, string? message = null)
     {
@@ -23,7 +23,7 @@ public class Result<TSuccess, TException> where TException : Exception
 
     public static Result<TSuccess, TException> Success(TSuccess okValue, string? message = null)
     {
-        return new Result<TSuccess, TException>(okValue,message);
+        return new Result<TSuccess, TException>(okValue, message);
     }
 
     public static Result<TSuccess, TException> Error(TException exception)
@@ -31,13 +31,13 @@ public class Result<TSuccess, TException> where TException : Exception
         return new Result<TSuccess, TException>(exception);
     }
 
-    public bool Success(out TSuccess okValue,out string? message)
+    public bool Success(out TSuccess okValue, out string? message)
     {
         okValue = _value!;
         message = _successMessage;
         return _isSuccessful;
     }
-    
+
 
     public bool Error(out TException exception)
     {
@@ -52,10 +52,11 @@ public class Result<TSuccess, TException> where TException : Exception
         else
             errorAction(_exception!);
     }
-    public void Match(Action<TSuccess,string?> successAction, Action<TException> errorAction)
+
+    public void Match(Action<TSuccess, string?> successAction, Action<TException> errorAction)
     {
         if (_isSuccessful)
-            successAction(_value!,_successMessage);
+            successAction(_value!, _successMessage);
         else
             errorAction(_exception!);
     }
@@ -81,7 +82,7 @@ public class Result<TSuccess, TException> where TException : Exception
 
 public class Result<TSuccess> : Result<TSuccess, Exception>
 {
-    protected Result(TSuccess value,string? message) : base(value,message)
+    protected Result(TSuccess value, string? message) : base(value, message)
     {
     }
 
@@ -91,7 +92,7 @@ public class Result<TSuccess> : Result<TSuccess, Exception>
 
     public new static Result<TSuccess> Success(TSuccess okValue, string? message = null)
     {
-        return new Result<TSuccess>(okValue,message);
+        return new Result<TSuccess>(okValue, message);
     }
 
     public static Result<TSuccess> Error(string error)

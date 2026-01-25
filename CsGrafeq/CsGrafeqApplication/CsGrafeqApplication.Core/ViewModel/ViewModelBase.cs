@@ -1,6 +1,4 @@
-﻿using CsGrafeq.I18N;
-using CsGrafeq.MVVM;
-using ReactiveUI;
+﻿using CsGrafeq.MVVM;
 
 namespace CsGrafeqApplication.Core.ViewModel;
 

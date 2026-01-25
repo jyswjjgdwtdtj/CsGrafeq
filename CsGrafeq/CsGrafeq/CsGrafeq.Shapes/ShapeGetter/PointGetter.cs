@@ -1,6 +1,5 @@
 ﻿using CsGrafeq.I18N;
 using CsGrafeq.Numeric;
-using CsGrafeq.Utilities;
 using ReactiveUI;
 using static CsGrafeq.Shapes.GeometryMath;
 using static System.Math;
@@ -445,7 +444,7 @@ public class PointGetter_AxialSymmetryPoint : PointGetter
     {
         Point = point;
         Line = line;
-        ShapeParameters =[point,line];
+        ShapeParameters = [point, line];
     }
 
     public override MultiLanguageData ActionName => MultiLanguageResources.AxialSymmetryText;
@@ -474,7 +473,6 @@ public class PointGetter_AxialSymmetryPoint : PointGetter
     }
 }
 
-
 #endregion
 
 #region FromTwoPoints
@@ -487,7 +485,7 @@ public abstract class PointGetter_FromTwoPoint : PointGetter
     {
         Point1 = point1;
         Point2 = point2;
-        ShapeParameters = [point1,point2];
+        ShapeParameters = [point1, point2];
     }
 
     public override void Attach(GeometryShape subShape)
@@ -518,7 +516,7 @@ public class PointGetter_EndOfLine : PointGetter
         ActionName = first
             ? MultiLanguageResources.StartPointText
             : MultiLanguageResources.EndPointText;
-        ShapeParameters= [line];
+        ShapeParameters = [line];
     }
 
     public override MultiLanguageData ActionName { get; }
@@ -590,8 +588,9 @@ public abstract class PointGetter_FromThreePoint : PointGetter
         Point1 = point1;
         Point2 = point2;
         Point3 = point3;
-        ShapeParameters = [point1,point2,point3];
+        ShapeParameters = [point1, point2, point3];
     }
+
     public abstract override Vec GetPoint();
 
     public override void Attach(GeometryShape subShape)
@@ -701,16 +700,18 @@ public abstract class PointGetter_Intersection<TShape1, TShape2>
     where TShape1 : GeometryShape
     where TShape2 : GeometryShape
 {
+    protected readonly bool IsFirst;
+    protected readonly TShape1 Shape1;
+    protected readonly TShape2 Shape2;
+
     public PointGetter_Intersection(TShape1 shape1, TShape2 shape2, bool isFirst)
     {
         ShapeParameters = [shape1, shape2];
         IsFirst = isFirst;
-        Shape1= shape1;
-        Shape2= shape2;
+        Shape1 = shape1;
+        Shape2 = shape2;
     }
-    protected readonly bool IsFirst;
-    protected readonly TShape1 Shape1;
-    protected readonly TShape2 Shape2;
+
     public override MultiLanguageData ActionName { get; } = MultiLanguageResources.Instance.IntersectText;
 
     public override void Attach(GeometryShape subShape)

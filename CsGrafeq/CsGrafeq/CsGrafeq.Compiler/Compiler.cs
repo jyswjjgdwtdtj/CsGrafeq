@@ -9,7 +9,7 @@ using MathNet.Numerics;
 using MathNet.Symbolics;
 using Expression = System.Linq.Expressions.Expression;
 using sysMath = System.Math;
-using Expr= MathNet.Symbolics.SymbolicExpression;
+using Expr = MathNet.Symbolics.SymbolicExpression;
 
 namespace CsGrafeq.Compiler;
 
@@ -22,22 +22,25 @@ public static class Compiler
     private static readonly Regex numberOrpoint = new("[0-9.]");
     private static readonly Regex spaceOrtab = new(@"([ ]|\t)");
 
-    public static Delegate Compile<T>(string expression, uint paraCount,bool useSimplification, out EnglishCharEnum usedVars)
+    public static Delegate Compile<T>(string expression, uint paraCount, bool useSimplification,
+        out EnglishCharEnum usedVars)
         where T : IComputableNumber<T>, INeedClone<T>
     {
         ParameterExpression x, y, z;
-        var exp =ConstructExpTree<T>(expression, paraCount, out x, out y, out z, out usedVars,useSimplification);
+        var exp = expression.ConstructExpTree<T>(paraCount, out x, out y, out z, out usedVars, useSimplification);
         var expResult = Expression.Lambda(exp, ((IEnumerable<ParameterExpression>)[x, y, z]).Take((int)paraCount));
         return expResult.Compile();
     }
 
-    public static Result<(Delegate func,EnglishCharEnum usedVars)> TryCompile<T>(string expression, uint paraCount,bool useSimplification)
+    public static Result<(Delegate func, EnglishCharEnum usedVars)> TryCompile<T>(string expression, uint paraCount,
+        bool useSimplification)
         where T : IComputableNumber<T>
     {
         //expFunc = Compile<T>(expression,paraCount,out usedVars);
         try
         {
-            return Result<(Delegate func,EnglishCharEnum)>.Success((Compile<T>(expression, paraCount,useSimplification, out var usedVars),usedVars),expression);
+            return Result<(Delegate func, EnglishCharEnum)>.Success(
+                (Compile<T>(expression, paraCount, useSimplification, out var usedVars), usedVars), expression);
         }
         catch (Exception e)
         {
@@ -46,24 +49,27 @@ public static class Compiler
                 ex = new Exception("Incomplete expression");
             else
                 ex = e;
-            return Result<(Delegate func,EnglishCharEnum)>.Error(ex);
+            return Result<(Delegate func, EnglishCharEnum)>.Error(ex);
         }
     }
 
     public static Expression ConstructExpTree<T>(this string expression, [Range(0, 3)] uint argsLength,
         out ParameterExpression x, out ParameterExpression y, out ParameterExpression z,
-        out EnglishCharEnum usedVars, bool enableSimplification) where T : IComputableNumber<T>,allows ref struct
+        out EnglishCharEnum usedVars, bool enableSimplification) where T : IComputableNumber<T>, allows ref struct
     {
-        return enableSimplification?ContructSimplifiedExpTree<T>(expression, argsLength, out x, out y, out z, out usedVars):ConstructExpTree<T>(expression, argsLength, out x, out y, out z, out usedVars);
+        return enableSimplification
+            ? ContructSimplifiedExpTree<T>(expression, argsLength, out x, out y, out z, out usedVars)
+            : expression.ConstructExpTree<T>(argsLength, out x, out y, out z, out usedVars);
     }
-    public static Expression ConstructExpTree<T>(this string expression, [Range(0, 3)] uint argsLength, 
+
+    public static Expression ConstructExpTree<T>(this string expression, [Range(0, 3)] uint argsLength,
         out ParameterExpression xVar, out ParameterExpression yVar, out ParameterExpression zVar,
-        out EnglishCharEnum usedVars) where T : IComputableNumber<T>,allows ref struct
+        out EnglishCharEnum usedVars) where T : IComputableNumber<T>, allows ref struct
     {
         if (string.IsNullOrWhiteSpace(expression))
             throw new Exception("Expression cannot be empty");
         if (expression.StartsWith('-'))
-            expression = '0'+expression;
+            expression = '0' + expression;
         usedVars = EnglishCharEnum.None;
         var elements = expression.GetTokens().GetElements();
         var expStack = new Stack<Expression>();
@@ -256,32 +262,35 @@ public static class Compiler
 
     public static Expression ContructSimplifiedExpTree<T>(string expression, [Range(0, 3)] uint argsLength,
         out ParameterExpression xVar, out ParameterExpression yVar, out ParameterExpression zVar,
-        out EnglishCharEnum usedVars) where T : IComputableNumber<T>,allows ref struct
+        out EnglishCharEnum usedVars) where T : IComputableNumber<T>, allows ref struct
     {
-        ReadOnlySpan<char> strspan = expression.AsSpan();
-        StringBuilder sb=new StringBuilder();
-        StringBuilder totalexp=new StringBuilder();
-        for (int i=0;i<strspan.Length;i++)
+        var strspan = expression.AsSpan();
+        var sb = new StringBuilder();
+        var totalexp = new StringBuilder();
+        for (var i = 0; i < strspan.Length; i++)
         {
-            char c = strspan[i];
-            if(c=='<'||c=='>'||c=='='||c=='|'||c=='&')
+            var c = strspan[i];
+            if (c == '<' || c == '>' || c == '=' || c == '|' || c == '&')
             {
                 totalexp.Append(SimplifyExpression(sb.ToString()));
                 sb.Clear();
                 totalexp.Append(c);
-                if((c=='<'||c=='>')&&strspan[i+1]=='=')
+                if ((c == '<' || c == '>') && strspan[i + 1] == '=')
                 {
                     totalexp.Append('=');
                     i++;
                 }
+
                 continue;
             }
+
             sb.Append(c);
         }
 
         if (sb.Length > 0)
             totalexp.Append(SimplifyExpression(sb.ToString()));
-        return totalexp.ToString().ConstructExpTree<T>(argsLength,out xVar, out yVar, out zVar, out usedVars);
+        return totalexp.ToString().ConstructExpTree<T>(argsLength, out xVar, out yVar, out zVar, out usedVars);
+
         static string SimplifyExpression(string expression)
         {
             //虽然我知道很蠢 但是也没办法 
@@ -291,10 +300,11 @@ public static class Compiler
             var simplified = exp.ExponentialSimplify().TrigonometricContract();
             var str = Infix.Format(simplified.Expression);
             if (str.StartsWith('-'))
-                str = '0'+str;
+                str = '0' + str;
             return str;
         }
     }
+
     public static BigRational ToBigRational(this string numberStr)
     {
         if (string.IsNullOrWhiteSpace(numberStr))
@@ -304,28 +314,22 @@ public static class Compiler
             throw new FormatException($"Cannot parse number: {numberStr}");
 
         // 如果是整数，直接返回
-        if (numberStr.IndexOf('.') == -1)
-        {
-            return BigRational.FromBigInt(BigInteger.Parse(numberStr));
-        }
+        if (numberStr.IndexOf('.') == -1) return BigRational.FromBigInt(BigInteger.Parse(numberStr));
 
         // 处理小数：转换为分数
         var parts = numberStr.Split('.');
         var integerPart = parts[0];
         var decimalPart = parts[1];
-        
+
         // 计算分母 (10^小数位数)
         var denominator = BigInteger.Pow(10, decimalPart.Length);
-        
+
         // 计算分子
         var numerator = BigInteger.Parse(integerPart + decimalPart);
-        
+
         // 如果原数为负数，确保分子为负
-        if (numberStr.StartsWith("-"))
-        {
-            return BigRational.FromBigIntFraction(numerator, denominator);
-        }
-        
+        if (numberStr.StartsWith("-")) return BigRational.FromBigIntFraction(numerator, denominator);
+
         return BigRational.FromBigIntFraction(numerator, denominator);
     }
 
@@ -364,7 +368,7 @@ public static class Compiler
                                 if (bc == 0 && Tokens[loc].Type == TokenType.Comma)
                                 {
                                     dimcount++;
-                                    foreach (var i in GetElements(ts.ToArray()))
+                                    foreach (var i in ts.ToArray().GetElements())
                                         exp.Push(i);
                                     ts.Clear();
                                     loc++;
@@ -374,7 +378,7 @@ public static class Compiler
                                 if (bc == 0 && Tokens[loc].Type == TokenType.RightBracket)
                                 {
                                     dimcount++;
-                                    foreach (var i in GetElements(ts.ToArray()))
+                                    foreach (var i in ts.ToArray().GetElements())
                                         exp.Push(i);
                                     loc++;
                                     break;

@@ -17,9 +17,7 @@ using CsGrafeq.Interval;
 using CsGrafeq.Shapes;
 using CsGrafeq.Shapes.ShapeGetter;
 using CsGrafeqApplication.Controls.Displayers;
-using CsGrafeqApplication.Core.Controls;
 using CsGrafeqApplication.Dialogs.InfoDialog;
-using CSharpMath.Atom;
 using CSharpMath.Avalonia;
 using DialogHostAvalonia;
 using SkiaSharp;
@@ -217,6 +215,7 @@ public partial class GeometryPad : Addon
     {
         if (sender is Border border) FlyoutBase.ShowAttachedFlyout(border);
     }
+
     /// <summary>
     ///     创建新的隐函数图形
     /// </summary>
@@ -235,8 +234,8 @@ public partial class GeometryPad : Addon
         if (sender is TextBox tb)
             if (e.Property == TextBox.TextProperty)
             {
-                var re = IntervalCompiler.TryCompile(tb.Text,Setting.Instance.EnableExpressionSimplification);
-                if (tb.Text == "" || re.Success(out _,out _))
+                var re = IntervalCompiler.TryCompile(tb.Text, Setting.Instance.EnableExpressionSimplification);
+                if (tb.Text == "" || re.Success(out _, out _))
                 {
                     DataValidationErrors.ClearErrors(tb);
                 }
@@ -261,8 +260,8 @@ public partial class GeometryPad : Addon
             if (e.Property == TextBox.TextProperty)
                 if ((string)e.NewValue != (string)e.OldValue)
                 {
-                    var re = IntervalCompiler.TryCompile(tb.Text,Setting.Instance.EnableExpressionSimplification);
-                    if (tb.Text == "" || re.Success(out _,out _))
+                    var re = IntervalCompiler.TryCompile(tb.Text, Setting.Instance.EnableExpressionSimplification);
+                    if (tb.Text == "" || re.Success(out _, out _))
                     {
                         DataValidationErrors.ClearErrors(tb);
                     }
@@ -951,10 +950,7 @@ public partial class GeometryPad : Addon
             {
                 var rs = RectToCalc.ToArray();
                 RectToCalc.Clear();
-                Action<int> atn = idx =>
-                {
-                    RenderRectIntervalSet(rs[idx], RectToCalc, func, false, Points, Rects);
-                };
+                Action<int> atn = idx => { RenderRectIntervalSet(rs[idx], RectToCalc, func, false, Points, Rects); };
                 for (var i = 0; i < rs.Length; i += 100)
                 {
                     //此处不应使用并行
@@ -1527,11 +1523,14 @@ public partial class GeometryPad : Addon
 
     private void MathTextBoxKeyDown(object? sender, KeyEventArgs e)
     {
-        if (e.Key == Key.Enter && e.KeyModifiers == KeyModifiers.None && IntervalCompiler.TryCompile(MathTextBox.Function.Expression??"",Setting.Instance.EnableExpressionSimplification).Success(out _,out _))
+        if (e.Key == Key.Enter && e.KeyModifiers == KeyModifiers.None && IntervalCompiler
+                .TryCompile(MathTextBox.Function.Expression ?? "", Setting.Instance.EnableExpressionSimplification)
+                .Success(out _, out _))
         {
             AddShape(CreateImpFunc(MathTextBox.Function.Expression));
             MathTextBox.Clear();
         }
     }
+
     #endregion
 }

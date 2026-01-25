@@ -1,7 +1,6 @@
 using System.Runtime.CompilerServices;
-using CGMath = CsGrafeq.Numeric.CsGrafeqMath;
 using MathNet.Numerics;
-using System.Linq;
+using CGMath = CsGrafeq.Numeric.CsGrafeqMath;
 
 namespace CsGrafeq.Numeric;
 
@@ -259,6 +258,7 @@ public struct DoubleNumber : IComputableNumber<DoubleNumber>
     {
         return new DoubleNumber(SpecialFunctions.DiGamma(num.Value));
     }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static DoubleNumber BesselJ(DoubleNumber num1, DoubleNumber num2)
     {

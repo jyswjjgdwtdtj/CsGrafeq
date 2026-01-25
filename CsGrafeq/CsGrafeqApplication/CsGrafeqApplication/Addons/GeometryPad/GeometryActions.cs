@@ -5,7 +5,7 @@ using CsGrafeq.I18N;
 using CsGrafeq.Shapes;
 using CsGrafeq.Shapes.ShapeGetter;
 using static CsGrafeq.Utilities.ThrowHelper;
-using GeoHalf=CsGrafeq.Shapes.Half;
+using GeoHalf = CsGrafeq.Shapes.Half;
 
 namespace CsGrafeqApplication.Addons.GeometryPad;
 

@@ -32,11 +32,11 @@
             <SubType>Code</SubType>
         </Compile>
         <Compile Update="Controls\ToggleBox.axaml.cs">
-          <DependentUpon>ToggleBox.axaml</DependentUpon>
-          <SubType>Code</SubType>
+            <DependentUpon>ToggleBox.axaml</DependentUpon>
+            <SubType>Code</SubType>
         </Compile>
         <Compile Update="Controls\ExpandBox.cs">
-          <DependentUpon>ExpandBox.axaml</DependentUpon>
+            <DependentUpon>ExpandBox.axaml</DependentUpon>
         </Compile>
     </ItemGroup>
 
@@ -47,32 +47,32 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia" />
-        <PackageReference Include="Avalonia.Skia" />
-        <PackageReference Include="CSharpMath" />
-        <PackageReference Include="CSharpMath.Evaluation" />
-        <PackageReference Include="CSharpMath.Rendering" />
-        <PackageReference Include="CSharpMath.SkiaSharp" />
-        <PackageReference Include="HarfBuzzSharp" />
-        <PackageReference Include="HotAvalonia" />
-        <PackageReference Include="LiveMarkdown.Avalonia" />
-        <PackageReference Include="Material.Avalonia" />
-        <PackageReference Include="SkiaSharp" />
-        <PackageReference Include="Sylinko.CSharpMath.Avalonia" />
+        <PackageReference Include="Avalonia"/>
+        <PackageReference Include="Avalonia.Skia"/>
+        <PackageReference Include="CSharpMath"/>
+        <PackageReference Include="CSharpMath.Evaluation"/>
+        <PackageReference Include="CSharpMath.Rendering"/>
+        <PackageReference Include="CSharpMath.SkiaSharp"/>
+        <PackageReference Include="HarfBuzzSharp"/>
+        <PackageReference Include="HotAvalonia"/>
+        <PackageReference Include="LiveMarkdown.Avalonia"/>
+        <PackageReference Include="Material.Avalonia"/>
+        <PackageReference Include="SkiaSharp"/>
+        <PackageReference Include="Sylinko.CSharpMath.Avalonia"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Compiler\CsGrafeq.Compiler.csproj" />
-        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.I18N\CsGrafeq.I18N.csproj" />
-        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Interval\CsGrafeq.Interval.csproj" />
-        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Keyboard\CsGrafeq.Keyboard.csproj" />
-        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.MVVM\CsGrafeq.MVVM.csproj" />
-        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Shapes\CsGrafeq.Shapes.csproj" />
+        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Compiler\CsGrafeq.Compiler.csproj"/>
+        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.I18N\CsGrafeq.I18N.csproj"/>
+        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Interval\CsGrafeq.Interval.csproj"/>
+        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Keyboard\CsGrafeq.Keyboard.csproj"/>
+        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.MVVM\CsGrafeq.MVVM.csproj"/>
+        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Shapes\CsGrafeq.Shapes.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <AdditionalFiles Include="Resources\ButtonTypeRadioButton.axaml" />
-        <AdditionalFiles Include="Resources\ConverterResource.axaml" />
+        <AdditionalFiles Include="Resources\ButtonTypeRadioButton.axaml"/>
+        <AdditionalFiles Include="Resources\ConverterResource.axaml"/>
     </ItemGroup>
 
     <ItemGroup>

@@ -1,33 +1,30 @@
 using System;
-using Avalonia.Media;
 using CsGrafeq.Interval;
-using CsGrafeqApplication;
 using CsGrafeqApplication.Addons;
-using CSharpMath.Atom;
 using ReactiveUI;
-using SkiaSharp;
 
 namespace CsGrafeq.Shapes;
 
 public class ImplicitFunction : Shape
 {
-#if  DEBUG
-    public static ImplicitFunction DebugFunc=new("y=sin(x)");
+#if DEBUG
+    public static ImplicitFunction DebugFunc = new("y=sin(x)");
 #endif
     public readonly Renderable RenderTarget = new();
+
     public ImplicitFunction(string expression)
     {
-        TypeName=MultiLanguageResources.ImplicitFunctionText;
+        TypeName = MultiLanguageResources.ImplicitFunctionText;
         Description = "ImplicitFunction";
         PropertyChanged += (s, e) =>
         {
-            if(e.PropertyName == nameof(IsCorrect)|| e.PropertyName == nameof(IsDeleted))
+            if (e.PropertyName == nameof(IsCorrect) || e.PropertyName == nameof(IsDeleted))
                 RefreshIsActive();
         };
         EnglishChar.Instance.CharValueChanged += CharValueChanged;
         Opacity = Setting.Instance.DefaultOpacity;
-        
-        Expression=expression;
+
+        Expression = expression;
     }
 
     public byte Opacity
@@ -80,7 +77,7 @@ public class ImplicitFunction : Shape
             Description = Expression;
         }
     }
-    
+
     public void SetExpression(string expression)
     {
         Expression = expression;

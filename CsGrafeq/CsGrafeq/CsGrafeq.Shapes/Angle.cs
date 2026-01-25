@@ -18,6 +18,7 @@ public class Angle : GeometryShape
     }
 
     public override GeometryGetter Getter => AngleGetter;
+
     public override void RefreshValues()
     {
         AngleData = AngleGetter.GetAngle();

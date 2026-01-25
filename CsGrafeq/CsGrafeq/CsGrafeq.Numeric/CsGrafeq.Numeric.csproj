@@ -7,12 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\CsGrafeq.Base\CsGrafeq.Base.csproj" />
+        <ProjectReference Include="..\CsGrafeq.Base\CsGrafeq.Base.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="HotAvalonia" Version="3.0.2" />
-      <PackageReference Include="MathNet.Symbolics" Version="0.25.0" />
+        <PackageReference Include="HotAvalonia" Version="3.0.2"/>
+        <PackageReference Include="MathNet.Symbolics" Version="0.25.0"/>
     </ItemGroup>
 
 </Project>

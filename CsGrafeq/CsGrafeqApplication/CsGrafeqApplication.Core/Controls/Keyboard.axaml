@@ -18,16 +18,16 @@
     </controls:Keyboard.Resources>
     <controls:Keyboard.Styles>
         <Style Selector="controls|TwoSymbolKeyButton">
-            <Setter Property="Focusable" Value="False"></Setter>
+            <Setter Property="Focusable" Value="False" />
         </Style>
         <Style Selector="controls|OneSymbolKeyButton">
-            <Setter Property="Focusable" Value="False"></Setter>
+            <Setter Property="Focusable" Value="False" />
         </Style>
         <Style Selector="controls|TwoSymbolKeyButtonInPlace">
-            <Setter Property="Focusable" Value="False"></Setter>
+            <Setter Property="Focusable" Value="False" />
         </Style>
         <Style Selector="StackPanel">
-            <Setter Property="Focusable" Value="False"></Setter>
+            <Setter Property="Focusable" Value="False" />
         </Style>
         <Style Selector="controls|Keyboard">
             <Setter Property="Foreground" Value="{DynamicResource CgForegroundBrush}" />
@@ -36,206 +36,247 @@
             <Setter Property="Template">
                 <ControlTemplate>
                     <DockPanel LastChildFill="True">
-                        <controls:ExpandBox BorderBrush="{DynamicResource MaterialPrimaryMidBrush}" BorderThickness="0,1,0,0" DockPanel.Dock="Bottom" DataContext="{x:Static csGrafeq:Setting.Instance}" IsExpanded="{CompiledBinding ShowKeyboard}" x:DataType="csGrafeq:Setting" ExpandDirection="Up">
-                        <Expander Name="PART_Expander" 
-                                  Background="{DynamicResource CgTranslucentBackgroundBrush}" ExpandDirection="Down"
-                                  VerticalAlignment="Bottom" IsExpanded="False" Focusable="False">
-                            <Expander.Styles>
-                                <Style Selector="Expander /template/ ToggleButton">
-                                    <Style Selector="^ /template/ Grid Border">
-                                        <Setter Property="RenderTransform">
-                                            <RotateTransform Angle="180" />
-                                        </Setter>
-                                        <Style Selector="^ Path">
-                                            <Setter Property="Fill" Value="{DynamicResource CgForegroundBrush}" />
-                                        </Style>
-                                    </Style>
-                                    <Setter Property="Focusable" Value="False" />
-                                </Style>
-                            </Expander.Styles>
-                            <Grid RowDefinitions="50,50,50,50" RowSpacing="1">
-                                <Grid.Styles>
-                                    <Style Selector="controls|TwoSymbolKeyButton.Char">
-                                        <Setter Property="Height" Value="48" />
-                                        <Setter Property="Width" Value="48" />
-                                    </Style>
-                                </Grid.Styles>
-                                <StackPanel Orientation="Horizontal" Spacing="3" HorizontalAlignment="Center">
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="1" SecondButton="+"
-                                                                 FirstKeyboardInput="D1" SecondKeyboardInput="Plus"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="2" SecondButton="-"
-                                                                 FirstKeyboardInput="D2" SecondKeyboardInput="Minus"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="3" SecondButton="*"
-                                                                 FirstKeyboardInput="D3" SecondKeyboardInput="Multiply"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="4" SecondButton="/"
-                                                                 FirstKeyboardInput="D4" SecondKeyboardInput="Slash"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="5" SecondButton="^"
-                                                                 FirstKeyboardInput="D5" SecondKeyboardInput="Power"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="6" SecondButton="%"
-                                                                 FirstKeyboardInput="D6" SecondKeyboardInput="Modulo"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="7" SecondButton="="
-                                                                 FirstKeyboardInput="D7" SecondKeyboardInput="Equals"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="8" SecondButton="&lt;"
-                                                                 FirstKeyboardInput="D8" SecondKeyboardInput="LessThan"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="9" SecondButton="&gt;"
-                                                                 FirstKeyboardInput="D9"
-                                                                 SecondKeyboardInput="GreaterThan"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="0" SecondButton="("
-                                                                 FirstKeyboardInput="D0"
-                                                                 SecondKeyboardInput="BothRoundBrackets"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="&lt;" SecondButton="⌊"
-                                                                 FirstKeyboardInput="LessThan"
-                                                                 SecondKeyboardInput="BothFloor"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="&gt;" SecondButton="⌈"
-                                                                 FirstKeyboardInput="GreaterThan"
-                                                                 SecondKeyboardInput="BothCeiling"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                </StackPanel>
-                                <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="3"
-                                            HorizontalAlignment="Center">
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="∧" SecondButton="∨"
-                                                                 FirstKeyboardInput="Cap" SecondKeyboardInput="Cup"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="q" SecondButton="Q"
-                                                                 FirstKeyboardInput="SmallQ" SecondKeyboardInput="Q"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="w" SecondButton="W"
-                                                                 FirstKeyboardInput="SmallW" SecondKeyboardInput="W"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="e" SecondButton="E"
-                                                                 FirstKeyboardInput="SmallE" SecondKeyboardInput="E"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="r" SecondButton="R"
-                                                                 FirstKeyboardInput="SmallR" SecondKeyboardInput="R"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="t" SecondButton="T"
-                                                                 FirstKeyboardInput="SmallT" SecondKeyboardInput="T"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="y" SecondButton="Y"
-                                                                 FirstKeyboardInput="SmallY" SecondKeyboardInput="Y"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="u" SecondButton="U"
-                                                                 FirstKeyboardInput="SmallU" SecondKeyboardInput="U"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="i" SecondButton="I"
-                                                                 FirstKeyboardInput="SmallI" SecondKeyboardInput="I"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="o" SecondButton="O"
-                                                                 FirstKeyboardInput="SmallO" SecondKeyboardInput="O"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="p" SecondButton="P"
-                                                                 FirstKeyboardInput="SmallP" SecondKeyboardInput="P"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="," SecondButton="!"
-                                                                 FirstKeyboardInput="Comma"
-                                                                 SecondKeyboardInput="Factorial"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                </StackPanel>
-                                <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="3"
-                                            HorizontalAlignment="Center">
-                                    <ToggleButton Name="ShiftCheckBox" FontSize="20" Width="80"
-                                                  VerticalAlignment="Stretch"
-                                                  Focusable="False" IsChecked="False" Height="48" BorderThickness="1"
-                                                  BorderBrush="{DynamicResource CgForegroundBrush}"
-                                                  FontFamily="{StaticResource MapleMono}" Padding="0">
-                                        <ToggleButton.Transitions>
-                                            <Transitions>
-                                                <BrushTransition Property="Background" Duration="0:0:0.2" />
-                                            </Transitions>
-                                        </ToggleButton.Transitions>
-                                        <ToggleButton.Styles>
-                                            <Style Selector="ToggleButton:checked">
-                                                <Setter Property="Background"
-                                                        Value="{DynamicResource CgOppositeTranslucentBackgroundBrush0}" />
+                        <controls:ExpandBox BorderBrush="{DynamicResource MaterialPrimaryMidBrush}"
+                                            BorderThickness="0,1,0,0" DockPanel.Dock="Bottom"
+                                            DataContext="{x:Static csGrafeq:Setting.Instance}"
+                                            IsExpanded="{CompiledBinding ShowKeyboard}" x:DataType="csGrafeq:Setting"
+                                            ExpandDirection="Up">
+                            <Expander Name="PART_Expander"
+                                      Background="{DynamicResource CgTranslucentBackgroundBrush}"
+                                      ExpandDirection="Down"
+                                      VerticalAlignment="Bottom" IsExpanded="False" Focusable="False">
+                                <Expander.Styles>
+                                    <Style Selector="Expander /template/ ToggleButton">
+                                        <Style Selector="^ /template/ Grid Border">
+                                            <Setter Property="RenderTransform">
+                                                <RotateTransform Angle="180" />
+                                            </Setter>
+                                            <Style Selector="^ Path">
+                                                <Setter Property="Fill" Value="{DynamicResource CgForegroundBrush}" />
                                             </Style>
-                                        </ToggleButton.Styles>
-                                        Shift
-                                    </ToggleButton>
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="a" SecondButton="A"
-                                                                 FirstKeyboardInput="SmallA" SecondKeyboardInput="A"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="s" SecondButton="S"
-                                                                 FirstKeyboardInput="SmallS" SecondKeyboardInput="S"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="d" SecondButton="D"
-                                                                 FirstKeyboardInput="SmallD" SecondKeyboardInput="D"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="f" SecondButton="F"
-                                                                 FirstKeyboardInput="SmallF" SecondKeyboardInput="F"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="g" SecondButton="G"
-                                                                 FirstKeyboardInput="SmallG" SecondKeyboardInput="G"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="h" SecondButton="H"
-                                                                 FirstKeyboardInput="SmallH" SecondKeyboardInput="H"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="j" SecondButton="J"
-                                                                 FirstKeyboardInput="SmallJ" SecondKeyboardInput="J"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="k" SecondButton="K"
-                                                                 FirstKeyboardInput="SmallK" SecondKeyboardInput="K"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="l" SecondButton="L"
-                                                                 FirstKeyboardInput="SmallL" SecondKeyboardInput="L"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <RepeatButton CornerRadius="4" BorderBrush="{DynamicResource CgForegroundBrush}"
-                                                  BorderThickness="1" Width="55" Focusable="False"
-                                                  Name="BackspaceButton"
-                                                  Click="BackspaceButton_OnClick"
-                                                  Height="{CompiledBinding $parent[StackPanel].Height}"
-                                                  Background="{DynamicResource CgBackgroundBrush}" Padding="0">
-                                        <AccessText VerticalAlignment="Center" HorizontalAlignment="Center" Text="⌫"
-                                                    FontFamily="{StaticResource MapleMono}" FontSize="25" />
-                                    </RepeatButton>
-                                </StackPanel>
-                                <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="3"
-                                            HorizontalAlignment="Center">
-                                    <controls:TwoSymbolKeyButtonInPlace Classes="Char" FirstButton="√"
-                                                                        SecondButton="n√"
-                                                                        FirstKeyboardInput="SquareRoot"
-                                                                        SecondKeyboardInput="Z"
-                                                                        IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="." SecondButton="|"
-                                                                 FirstKeyboardInput="Decimal"
-                                                                 SecondKeyboardInput="Absolute"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="z" SecondButton="Z"
-                                                                 FirstKeyboardInput="SmallZ" SecondKeyboardInput="Z"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="x" SecondButton="X"
-                                                                 FirstKeyboardInput="SmallX" SecondKeyboardInput="X"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="c" SecondButton="C"
-                                                                 FirstKeyboardInput="SmallC" SecondKeyboardInput="C"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="v" SecondButton="V"
-                                                                 FirstKeyboardInput="SmallV" SecondKeyboardInput="V"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="b" SecondButton="B"
-                                                                 FirstKeyboardInput="SmallB" SecondKeyboardInput="B"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="n" SecondButton="N"
-                                                                 FirstKeyboardInput="SmallN" SecondKeyboardInput="N"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:TwoSymbolKeyButton Classes="Char" FirstButton="m" SecondButton="M"
-                                                                 FirstKeyboardInput="SmallM" SecondKeyboardInput="M"
-                                                                 IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    <controls:OneSymbolKeyButton Classes="Char" Button="←" KeyboardInput="Left" />
-                                    <controls:OneSymbolKeyButton Classes="Char" Button="→" KeyboardInput="Right" />
-                                </StackPanel>
-                            </Grid>
-                        </Expander>
+                                        </Style>
+                                        <Setter Property="Focusable" Value="False" />
+                                    </Style>
+                                </Expander.Styles>
+                                <Grid RowDefinitions="50,50,50,50" RowSpacing="1">
+                                    <Grid.Styles>
+                                        <Style Selector="controls|TwoSymbolKeyButton.Char">
+                                            <Setter Property="Height" Value="48" />
+                                            <Setter Property="Width" Value="48" />
+                                        </Style>
+                                    </Grid.Styles>
+                                    <StackPanel Orientation="Horizontal" Spacing="3" HorizontalAlignment="Center">
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="1" SecondButton="+"
+                                                                     FirstKeyboardInput="D1" SecondKeyboardInput="Plus"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="2" SecondButton="-"
+                                                                     FirstKeyboardInput="D2"
+                                                                     SecondKeyboardInput="Minus"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="3" SecondButton="*"
+                                                                     FirstKeyboardInput="D3"
+                                                                     SecondKeyboardInput="Multiply"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="4" SecondButton="/"
+                                                                     FirstKeyboardInput="D4"
+                                                                     SecondKeyboardInput="Slash"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="5" SecondButton="^"
+                                                                     FirstKeyboardInput="D5"
+                                                                     SecondKeyboardInput="Power"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="6" SecondButton="%"
+                                                                     FirstKeyboardInput="D6"
+                                                                     SecondKeyboardInput="Modulo"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="7" SecondButton="="
+                                                                     FirstKeyboardInput="D7"
+                                                                     SecondKeyboardInput="Equals"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="8" SecondButton="&lt;"
+                                                                     FirstKeyboardInput="D8"
+                                                                     SecondKeyboardInput="LessThan"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="9" SecondButton="&gt;"
+                                                                     FirstKeyboardInput="D9"
+                                                                     SecondKeyboardInput="GreaterThan"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="0" SecondButton="("
+                                                                     FirstKeyboardInput="D0"
+                                                                     SecondKeyboardInput="BothRoundBrackets"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="&lt;" SecondButton="⌊"
+                                                                     FirstKeyboardInput="LessThan"
+                                                                     SecondKeyboardInput="BothFloor"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="&gt;" SecondButton="⌈"
+                                                                     FirstKeyboardInput="GreaterThan"
+                                                                     SecondKeyboardInput="BothCeiling"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="3"
+                                                HorizontalAlignment="Center">
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="∧" SecondButton="∨"
+                                                                     FirstKeyboardInput="Cap" SecondKeyboardInput="Cup"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="q" SecondButton="Q"
+                                                                     FirstKeyboardInput="SmallQ"
+                                                                     SecondKeyboardInput="Q"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="w" SecondButton="W"
+                                                                     FirstKeyboardInput="SmallW"
+                                                                     SecondKeyboardInput="W"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="e" SecondButton="E"
+                                                                     FirstKeyboardInput="SmallE"
+                                                                     SecondKeyboardInput="E"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="r" SecondButton="R"
+                                                                     FirstKeyboardInput="SmallR"
+                                                                     SecondKeyboardInput="R"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="t" SecondButton="T"
+                                                                     FirstKeyboardInput="SmallT"
+                                                                     SecondKeyboardInput="T"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="y" SecondButton="Y"
+                                                                     FirstKeyboardInput="SmallY"
+                                                                     SecondKeyboardInput="Y"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="u" SecondButton="U"
+                                                                     FirstKeyboardInput="SmallU"
+                                                                     SecondKeyboardInput="U"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="i" SecondButton="I"
+                                                                     FirstKeyboardInput="SmallI"
+                                                                     SecondKeyboardInput="I"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="o" SecondButton="O"
+                                                                     FirstKeyboardInput="SmallO"
+                                                                     SecondKeyboardInput="O"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="p" SecondButton="P"
+                                                                     FirstKeyboardInput="SmallP"
+                                                                     SecondKeyboardInput="P"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="," SecondButton="!"
+                                                                     FirstKeyboardInput="Comma"
+                                                                     SecondKeyboardInput="Factorial"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="3"
+                                                HorizontalAlignment="Center">
+                                        <ToggleButton Name="ShiftCheckBox" FontSize="20" Width="80"
+                                                      VerticalAlignment="Stretch"
+                                                      Focusable="False" IsChecked="False" Height="48"
+                                                      BorderThickness="1"
+                                                      BorderBrush="{DynamicResource CgForegroundBrush}"
+                                                      FontFamily="{StaticResource MapleMono}" Padding="0">
+                                            <ToggleButton.Transitions>
+                                                <Transitions>
+                                                    <BrushTransition Property="Background" Duration="0:0:0.2" />
+                                                </Transitions>
+                                            </ToggleButton.Transitions>
+                                            <ToggleButton.Styles>
+                                                <Style Selector="ToggleButton:checked">
+                                                    <Setter Property="Background"
+                                                            Value="{DynamicResource CgOppositeTranslucentBackgroundBrush0}" />
+                                                </Style>
+                                            </ToggleButton.Styles>
+                                            Shift
+                                        </ToggleButton>
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="a" SecondButton="A"
+                                                                     FirstKeyboardInput="SmallA"
+                                                                     SecondKeyboardInput="A"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="s" SecondButton="S"
+                                                                     FirstKeyboardInput="SmallS"
+                                                                     SecondKeyboardInput="S"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="d" SecondButton="D"
+                                                                     FirstKeyboardInput="SmallD"
+                                                                     SecondKeyboardInput="D"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="f" SecondButton="F"
+                                                                     FirstKeyboardInput="SmallF"
+                                                                     SecondKeyboardInput="F"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="g" SecondButton="G"
+                                                                     FirstKeyboardInput="SmallG"
+                                                                     SecondKeyboardInput="G"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="h" SecondButton="H"
+                                                                     FirstKeyboardInput="SmallH"
+                                                                     SecondKeyboardInput="H"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="j" SecondButton="J"
+                                                                     FirstKeyboardInput="SmallJ"
+                                                                     SecondKeyboardInput="J"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="k" SecondButton="K"
+                                                                     FirstKeyboardInput="SmallK"
+                                                                     SecondKeyboardInput="K"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="l" SecondButton="L"
+                                                                     FirstKeyboardInput="SmallL"
+                                                                     SecondKeyboardInput="L"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <RepeatButton CornerRadius="4"
+                                                      BorderBrush="{DynamicResource CgForegroundBrush}"
+                                                      BorderThickness="1" Width="55" Focusable="False"
+                                                      Name="BackspaceButton"
+                                                      Click="BackspaceButton_OnClick"
+                                                      Height="{CompiledBinding $parent[StackPanel].Height}"
+                                                      Background="{DynamicResource CgBackgroundBrush}" Padding="0">
+                                            <AccessText VerticalAlignment="Center" HorizontalAlignment="Center"
+                                                        Text="⌫"
+                                                        FontFamily="{StaticResource MapleMono}" FontSize="25" />
+                                        </RepeatButton>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="3"
+                                                HorizontalAlignment="Center">
+                                        <controls:TwoSymbolKeyButtonInPlace Classes="Char" FirstButton="√"
+                                                                            SecondButton="n√"
+                                                                            FirstKeyboardInput="SquareRoot"
+                                                                            SecondKeyboardInput="Z"
+                                                                            IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="." SecondButton="|"
+                                                                     FirstKeyboardInput="Decimal"
+                                                                     SecondKeyboardInput="Absolute"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="z" SecondButton="Z"
+                                                                     FirstKeyboardInput="SmallZ"
+                                                                     SecondKeyboardInput="Z"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="x" SecondButton="X"
+                                                                     FirstKeyboardInput="SmallX"
+                                                                     SecondKeyboardInput="X"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="c" SecondButton="C"
+                                                                     FirstKeyboardInput="SmallC"
+                                                                     SecondKeyboardInput="C"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="v" SecondButton="V"
+                                                                     FirstKeyboardInput="SmallV"
+                                                                     SecondKeyboardInput="V"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="b" SecondButton="B"
+                                                                     FirstKeyboardInput="SmallB"
+                                                                     SecondKeyboardInput="B"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="n" SecondButton="N"
+                                                                     FirstKeyboardInput="SmallN"
+                                                                     SecondKeyboardInput="N"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="m" SecondButton="M"
+                                                                     FirstKeyboardInput="SmallM"
+                                                                     SecondKeyboardInput="M"
+                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
+                                        <controls:OneSymbolKeyButton Classes="Char" Button="←" KeyboardInput="Left" />
+                                        <controls:OneSymbolKeyButton Classes="Char" Button="→" KeyboardInput="Right" />
+                                    </StackPanel>
+                                </Grid>
+                            </Expander>
                         </controls:ExpandBox>
                         <ContentPresenter Content="{TemplateBinding Content}" />
                     </DockPanel>

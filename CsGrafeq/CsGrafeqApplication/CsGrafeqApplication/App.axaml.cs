@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Globalization;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
@@ -13,8 +13,8 @@ public class App : Application
 {
     public override void Initialize()
     {
-        var lang = System.Globalization.CultureInfo.CurrentCulture.IetfLanguageTag.ToLower();
-        if(lang.Contains("zh")||lang.Contains("cn")||lang.Contains("hans"))
+        var lang = CultureInfo.CurrentCulture.IetfLanguageTag.ToLower();
+        if (lang.Contains("zh") || lang.Contains("cn") || lang.Contains("hans"))
             Languages.SetLanguage("zh-hans");
         else
             Languages.SetLanguage("en-us");

@@ -4,16 +4,16 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-		<EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
+        <EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="HotAvalonia" Version="3.0.2" />
-        <PackageReference Include="ReactiveUI" Version="22.2.1" />
+        <PackageReference Include="HotAvalonia" Version="3.0.2"/>
+        <PackageReference Include="ReactiveUI" Version="22.2.1"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\CsGrafeq.I18N.Generator\CsGrafeq.I18N.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"  PrivateAssets="all"/>
+        <ProjectReference Include="..\CsGrafeq.I18N.Generator\CsGrafeq.I18N.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="all"/>
     </ItemGroup>
 
 </Project>

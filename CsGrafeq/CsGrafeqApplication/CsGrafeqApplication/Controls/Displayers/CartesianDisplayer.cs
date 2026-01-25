@@ -222,7 +222,6 @@ public class CartesianDisplayer : Displayer
     /// <param name="dc"></param>
     protected void RenderAxisLine(SKCanvas dc)
     {
-        return;
         var width = Bounds.Width;
         var height = Bounds.Height;
         //y
@@ -396,7 +395,7 @@ public class CartesianDisplayer : Displayer
         dc.DrawText("0", new SKPoint(Zero.X + 3, Zero.Y + TextFont.Size), SKTextAlign.Left, TextFont,
             AxisPaintMain);
     }
-    
+
     public override void CompoundBuffers()
     {
         lock (TotalBufferLock)

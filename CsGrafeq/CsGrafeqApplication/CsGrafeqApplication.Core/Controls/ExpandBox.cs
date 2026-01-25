@@ -1,6 +1,4 @@
-﻿using Avalonia;
-using Avalonia.Animation.Easings;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 
 namespace CsGrafeqApplication.Core.Controls;
 

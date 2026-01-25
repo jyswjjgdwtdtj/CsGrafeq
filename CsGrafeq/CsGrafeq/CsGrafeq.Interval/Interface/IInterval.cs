@@ -11,7 +11,8 @@ public interface IInterval
     Def Def { get; }
 }
 
-public interface IInterval<T> : IRange, IComputableNumber<T>, IInterval, INeedClone<T> where T : IInterval<T>,allows ref struct
+public interface IInterval<T> : IRange, IComputableNumber<T>, IInterval, INeedClone<T>
+    where T : IInterval<T>, allows ref struct
 {
     static abstract T Create(double min, double max, Def def);
 

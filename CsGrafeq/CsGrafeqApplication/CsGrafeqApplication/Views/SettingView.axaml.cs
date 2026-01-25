@@ -1,7 +1,4 @@
-﻿using System;
-using Avalonia;
-using Avalonia.Controls;
-using ReactiveUI;
+﻿using Avalonia.Controls;
 
 namespace CsGrafeqApplication.Views;
 

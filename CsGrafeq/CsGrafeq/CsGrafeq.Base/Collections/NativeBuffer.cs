@@ -107,6 +107,14 @@ public class NativeBuffer<T> : IDisposable where T : struct
         return res;
     }
 
+    public Span<T> AsSpan()
+    {
+        unsafe
+        {
+            return new Span<T>(pointer, (int)Length);
+        }
+    }
+
     public ref struct NativeBufferEnumerator
     {
         private readonly unsafe ref T* pointer;
@@ -149,13 +157,6 @@ public class NativeBuffer<T> : IDisposable where T : struct
 
             index++;
             return true;
-        }
-    }
-    public Span<T> AsSpan()
-    {
-        unsafe
-        {
-            return new Span<T>(pointer, (int)Length);
         }
     }
 }

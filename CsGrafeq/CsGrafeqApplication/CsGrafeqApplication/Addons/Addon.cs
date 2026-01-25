@@ -32,6 +32,7 @@ public abstract class Addon : UserControl
     }
 
     public abstract string AddonName { get; }
+
     internal void CallRender(SKCanvas dc, SKRect rect)
     {
         if (IsAddonLoaded.Value)

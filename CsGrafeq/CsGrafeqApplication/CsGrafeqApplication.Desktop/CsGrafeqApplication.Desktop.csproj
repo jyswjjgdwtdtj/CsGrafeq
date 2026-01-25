@@ -4,7 +4,7 @@
         <TargetFramework>net10.0</TargetFramework>
         <InvariantGlobalization>false</InvariantGlobalization>
         <Nullable>enable</Nullable>
-		<PublishTrimmed>true</PublishTrimmed>
+        <PublishTrimmed>true</PublishTrimmed>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
         <LangVersion>Preview</LangVersion>
     </PropertyGroup>
@@ -23,7 +23,7 @@
         <PackageReference Remove="Packaging.Targets"/>
         <PackageReference Include="Avalonia"/>
         <PackageReference Include="Avalonia.Diagnostics"/>
-        <PackageReference Include="HotAvalonia" />
+        <PackageReference Include="HotAvalonia"/>
         <PackageReference Include="LiveMarkdown.Avalonia"/>
     </ItemGroup>
 

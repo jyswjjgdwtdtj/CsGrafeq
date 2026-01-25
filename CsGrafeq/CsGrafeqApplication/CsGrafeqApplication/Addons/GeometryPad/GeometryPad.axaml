@@ -7,13 +7,10 @@
              xmlns:shapes="clr-namespace:CsGrafeq.Shapes;assembly=CsGrafeq.Shapes"
              xmlns:getter="clr-namespace:CsGrafeq.Shapes.ShapeGetter;assembly=CsGrafeq.Shapes"
              xmlns:shapes1="clr-namespace:CsGrafeq.Shapes"
-             xmlns:cga="clr-namespace:CsGrafeqApplication"
              xmlns:csGrafeq="clr-namespace:CsGrafeq;assembly=CsGrafeq.Compiler"
              xmlns:corecontrols="clr-namespace:CsGrafeqApplication.Core.Controls;assembly=CsGrafeqApplication.Core"
              xmlns:cg="clr-namespace:CsGrafeq;assembly=CsGrafeq.Base"
-             xmlns:shapes2="clr-namespace:CsGrafeq.Shapes;assembly=CsGrafeqApplication.Core"
              xmlns:geometryPad="clr-namespace:CsGrafeqApplication.Addons.GeometryPad"
-             xmlns:controls="clr-namespace:CsGrafeqApplication.Core.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CsGrafeqApplication.Addons.GeometryPad.GeometryPad" x:DataType="geometryPad:GeometryPadViewModel">
     <UserControl.Styles>
@@ -153,8 +150,8 @@
             <Setter Property="Height" Value="25" />
         </Style>
         <Style Selector="Path.FunctionIcon">
-            <Setter Property="Fill" Value="{DynamicResource CgForegroundBrush}"></Setter>
-            <Setter Property="Stretch" Value="None"></Setter>
+            <Setter Property="Fill" Value="{DynamicResource CgForegroundBrush}" />
+            <Setter Property="Stretch" Value="None" />
         </Style>
     </UserControl.Styles>
     <TabControl TabStripPlacement="Left" Name="TabControl" Margin="0" Padding="0"
@@ -165,7 +162,8 @@
                     <Canvas Width="32" Height="32">
                         <Rectangle Canvas.Left="5" Canvas.Top="4" Width="22" Height="25"
                                    Fill="{DynamicResource MaterialPrimaryMidBrush}" />
-                        <Path Classes="FunctionIcon" Data="M26 30H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h20a2 2 0 0 1 2 2v24a2 2 0 0 1-2 2M6 4v24h20V4Z" />
+                        <Path Classes="FunctionIcon"
+                              Data="M26 30H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h20a2 2 0 0 1 2 2v24a2 2 0 0 1-2 2M6 4v24h20V4Z" />
                         <Path Classes="FunctionIcon" Data="M9 7h11v2H9zm0 5h7v2H9z" />
                     </Canvas>
                 </Viewbox>
@@ -191,9 +189,9 @@
                                      AcceptsTab="False" KeyUp="NewFuncOnClick" Name="NewFuncTextBox"
                                      TemplateApplied="NewFuncTextBoxTemplateApplied"
                                      PropertyChanged="NewFuncPropertyChanged" Margin="0,0,5,0" />-->
-                            <ctls:ImplicitFunctionBox HorizontalAlignment="Stretch" Name="MathTextBox" Function="{CompiledBinding DefaultImplicitFunction}"
-                                                             CanInput="True" KeyDown="MathTextBoxKeyDown">
-                            </ctls:ImplicitFunctionBox>
+                            <ctls:ImplicitFunctionBox HorizontalAlignment="Stretch" Name="MathTextBox"
+                                                      Function="{CompiledBinding DefaultImplicitFunction}"
+                                                      CanInput="True" KeyDown="MathTextBoxKeyDown" />
                         </Border>
                     </DockPanel>
                 </Border>
@@ -271,16 +269,19 @@
                                                                             Tapped="EventHandledTrue" />
                                                                         <StackPanel Orientation="Horizontal">
                                                                             <TextBlock
-                                                                                    TextAlignment="Left"
-                                                                                    VerticalAlignment="Center" LetterSpacing="0"
-                                                                                    Classes="Big">
-                                                                                <Run Text=" ="></Run>
-                                                                                <Run Text="{CompiledBinding MultiLanguageResources.PointText.Data}"></Run>
+                                                                                TextAlignment="Left"
+                                                                                VerticalAlignment="Center"
+                                                                                LetterSpacing="0"
+                                                                                Classes="Big">
+                                                                                <Run Text=" =" />
+                                                                                <Run
+                                                                                    Text="{CompiledBinding MultiLanguageResources.PointText.Data}" />
                                                                             </TextBlock>
                                                                             <TextBlock
                                                                                 TextAlignment="Left"
-                                                                                VerticalAlignment="Center" LetterSpacing="0"
-                                                                                Classes="Big" Text="("/>
+                                                                                VerticalAlignment="Center"
+                                                                                LetterSpacing="0"
+                                                                                Classes="Big" Text="(" />
                                                                             <TextBox
                                                                                 Text="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointX.ValueStr,Mode=TwoWay}"
                                                                                 Classes="CommonTextBox Big"
@@ -340,15 +341,18 @@
                                                                                     Margin="0,5"
                                                                                     VerticalAlignment="Center">
                                                                                 <TextBlock TextAlignment="Left"
-                                                                                    VerticalAlignment="Center" LetterSpacing="0"
-                                                                                    Classes="Big" >
-                                                                                    <Run Text=" ="></Run>
-                                                                                    <Run  Text="{CompiledBinding MultiLanguageResources.CantBeMovedText.Data}"></Run>
+                                                                                    VerticalAlignment="Center"
+                                                                                    LetterSpacing="0"
+                                                                                    Classes="Big">
+                                                                                    <Run Text=" =" />
+                                                                                    <Run
+                                                                                        Text="{CompiledBinding MultiLanguageResources.CantBeMovedText.Data}" />
                                                                                 </TextBlock>
                                                                                 <TextBlock
                                                                                     TextAlignment="Left"
-                                                                                    VerticalAlignment="Center" LetterSpacing="0"
-                                                                                    Classes="Big" Text="("/>
+                                                                                    VerticalAlignment="Center"
+                                                                                    LetterSpacing="0"
+                                                                                    Classes="Big" Text="(" />
                                                                                 <TextBox
                                                                                     Text="{CompiledBinding ((getter:PointGetter_Movable)PointGetter).PointX.ValueStr,Mode=TwoWay}"
                                                                                     Classes="CommonTextBox Big"
@@ -394,10 +398,12 @@
                                                                             VerticalAlignment="Center" Grid.Column="1"
                                                                             Grid.Row="1">
                                                                             <TextBlock TextAlignment="Left"
-                                                                                    VerticalAlignment="Center" LetterSpacing="0"
+                                                                                    VerticalAlignment="Center"
+                                                                                    LetterSpacing="0"
                                                                                     Classes="Small">
-                                                                                <Run Text="{CompiledBinding MultiLanguageResources.OnText.Data}"></Run>
-                                                                                <Run Text=" "/>
+                                                                                <Run
+                                                                                    Text="{CompiledBinding MultiLanguageResources.OnText.Data}" />
+                                                                                <Run Text=" " />
                                                                             </TextBlock>
                                                                             <TextBlock
                                                                                 Text="{CompiledBinding On.TypeName,Mode=TwoWay,DataType=getter:PointGetter_Movable}"
@@ -435,10 +441,12 @@
                                                                                 Grid.Column="1"
                                                                                 Grid.Row="0">
                                                                             <TextBlock TextAlignment="Left"
-                                                                                    VerticalAlignment="Center" LetterSpacing="0"
-                                                                                    Classes="Big" >
-                                                                                <Run Text=" ="></Run>
-                                                                                <Run Text="{CompiledBinding PointGetter.ActionName.Data}"></Run>
+                                                                                    VerticalAlignment="Center"
+                                                                                    LetterSpacing="0"
+                                                                                    Classes="Big">
+                                                                                <Run Text=" =" />
+                                                                                <Run
+                                                                                    Text="{CompiledBinding PointGetter.ActionName.Data}" />
                                                                             </TextBlock>
                                                                             <TextBlock Text="(" TextAlignment="Left"
                                                                                     VerticalAlignment="Center"
@@ -508,10 +516,12 @@
                                                                                 Grid.Column="1"
                                                                                 Grid.Row="0">
                                                                             <TextBlock TextAlignment="Left"
-                                                                                    VerticalAlignment="Center" LetterSpacing="0"
-                                                                                    Classes="Big" >
-                                                                                <Run Text=" ="></Run>
-                                                                                <Run Text="{CompiledBinding Getter.ActionName.Data}"></Run>
+                                                                                    VerticalAlignment="Center"
+                                                                                    LetterSpacing="0"
+                                                                                    Classes="Big">
+                                                                                <Run Text=" =" />
+                                                                                <Run
+                                                                                    Text="{CompiledBinding Getter.ActionName.Data}" />
                                                                             </TextBlock>
                                                                             <TextBlock Text="(" TextAlignment="Left"
                                                                                     VerticalAlignment="Center"
@@ -652,7 +662,8 @@
                     <Canvas Width="24" Height="24">
                         <Ellipse Fill="{DynamicResource MaterialPrimaryMidBrush}" Canvas.Left="4" Canvas.Top="4"
                                  Width="10" Height="10" />
-                        <Path Classes="FunctionIcon" Data="M8 17.95q.25.025.488.038T9 18t.513-.012t.487-.038V20h10V10h-2.05q.025-.25.038-.488T18 9t-.012-.513T17.95 8H20q.825 0 1.413.588T22 10v10q0 .825-.587 1.413T20 22H10q-.825 0-1.412-.587T8 20zM9 16q-2.925 0-4.962-2.037T2 9t2.038-4.962T9 2t4.963 2.038T16 9t-2.037 4.963T9 16m0-2q2.075 0 3.538-1.463T14 9t-1.463-3.537T9 4T5.463 5.463T4 9t1.463 3.538T9 14m0-5" />
+                        <Path Classes="FunctionIcon"
+                              Data="M8 17.95q.25.025.488.038T9 18t.513-.012t.487-.038V20h10V10h-2.05q.025-.25.038-.488T18 9t-.012-.513T17.95 8H20q.825 0 1.413.588T22 10v10q0 .825-.587 1.413T20 22H10q-.825 0-1.412-.587T8 20zM9 16q-2.925 0-4.962-2.037T2 9t2.038-4.962T9 2t4.963 2.038T16 9t-2.037 4.963T9 16m0-2q2.075 0 3.538-1.463T14 9t-1.463-3.537T9 4T5.463 5.463T4 9t1.463 3.538T9 14m0-5" />
                     </Canvas>
                 </Viewbox>
             </TabItem.Header>
@@ -727,7 +738,8 @@
                                    Fill="{DynamicResource MaterialPrimaryMidBrush}" />
                         <Rectangle Canvas.Left="32" Canvas.Top="41" Width="8" Height="7"
                                    Fill="{DynamicResource MaterialPrimaryMidBrush}" />
-                        <Path Classes="FunctionIcon" Data="M12.625 35.5H43.4c4.546 0 6.96-2.32 6.96-6.867v-15.82c0-4.547-2.414-6.868-6.96-6.868H12.624c-4.336 0-6.984 2.32-6.984 6.868v15.82c0 4.547 2.414 6.867 6.984 6.867m-.047-3.516c-2.086 0-3.164-1.101-3.164-3.164V12.625c0-2.062 1.078-3.14 3.164-3.14h30.867c2.063 0 3.141 1.078 3.141 3.14V28.82c0 2.063-1.078 3.164-3.14 3.164Zm23.578 18.07c2.438 0 4.524-1.57 5.297-3.75h7.125c.961 0 1.781-.82 1.781-1.874c0-1.078-.82-1.899-1.781-1.899h-7.125a5.62 5.62 0 0 0-5.297-3.726a5.67 5.67 0 0 0-5.32 3.726H7.539c-1.055 0-1.898.82-1.898 1.899c0 1.054.843 1.875 1.898 1.875h23.297a5.67 5.67 0 0 0 5.32 3.75m0-2.882a2.716 2.716 0 0 1-2.742-2.742c0-1.57 1.195-2.766 2.742-2.766s2.742 1.195 2.742 2.766a2.716 2.716 0 0 1-2.742 2.742" />
+                        <Path Classes="FunctionIcon"
+                              Data="M12.625 35.5H43.4c4.546 0 6.96-2.32 6.96-6.867v-15.82c0-4.547-2.414-6.868-6.96-6.868H12.624c-4.336 0-6.984 2.32-6.984 6.868v15.82c0 4.547 2.414 6.867 6.984 6.867m-.047-3.516c-2.086 0-3.164-1.101-3.164-3.164V12.625c0-2.062 1.078-3.14 3.164-3.14h30.867c2.063 0 3.141 1.078 3.141 3.14V28.82c0 2.063-1.078 3.164-3.14 3.164Zm23.578 18.07c2.438 0 4.524-1.57 5.297-3.75h7.125c.961 0 1.781-.82 1.781-1.874c0-1.078-.82-1.899-1.781-1.899h-7.125a5.62 5.62 0 0 0-5.297-3.726a5.67 5.67 0 0 0-5.32 3.726H7.539c-1.055 0-1.898.82-1.898 1.899c0 1.054.843 1.875 1.898 1.875h23.297a5.67 5.67 0 0 0 5.32 3.75m0-2.882a2.716 2.716 0 0 1-2.742-2.742c0-1.57 1.195-2.766 2.742-2.766s2.742 1.195 2.742 2.766a2.716 2.716 0 0 1-2.742 2.742" />
                     </Canvas>
                 </Viewbox>
             </TabItem.Header>

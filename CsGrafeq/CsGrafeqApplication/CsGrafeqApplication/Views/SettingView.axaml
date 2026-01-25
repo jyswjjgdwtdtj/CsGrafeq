@@ -2,8 +2,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:cga="clr-namespace:CsGrafeqApplication"
-             xmlns:csGrafeqApplication="clr-namespace:CsGrafeqApplication;assembly=CsGrafeq.Base"
              xmlns:csGrafeq="clr-namespace:CsGrafeq;assembly=CsGrafeq.Base"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CsGrafeqApplication.Views.SettingView" x:DataType="csGrafeq:Setting">
@@ -17,7 +15,7 @@
         <TabItem Header="{CompiledBinding MultiLanguageResources.GeneralText}">
             <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
                 <StackPanel Margin="15">
-                    <CheckBox IsChecked="{CompiledBinding ShowKeyboard,Mode=TwoWay}" >
+                    <CheckBox IsChecked="{CompiledBinding ShowKeyboard,Mode=TwoWay}">
                         <TextBlock
                             Text="{CompiledBinding MultiLanguageResources.ShowKeyboardText.Data}" />
                     </CheckBox>
@@ -27,7 +25,7 @@
         <TabItem Header="{CompiledBinding MultiLanguageResources.GraphText}">
             <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
                 <StackPanel Margin="15">
-                    <CheckBox Name="MoveOp" IsChecked="{CompiledBinding MoveOptimization,Mode=TwoWay}" >
+                    <CheckBox Name="MoveOp" IsChecked="{CompiledBinding MoveOptimization,Mode=TwoWay}">
                         <TextBlock
                             Text="{CompiledBinding MultiLanguageResources.MoveOpText.Data}" />
                     </CheckBox>

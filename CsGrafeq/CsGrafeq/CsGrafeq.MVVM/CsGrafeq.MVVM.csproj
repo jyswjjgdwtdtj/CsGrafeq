@@ -7,12 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="HotAvalonia" Version="3.0.2" />
-      <PackageReference Include="ReactiveUI" Version="22.2.1" />
+        <PackageReference Include="HotAvalonia" Version="3.0.2"/>
+        <PackageReference Include="ReactiveUI" Version="22.2.1"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\CsGrafeq.I18N\CsGrafeq.I18N.csproj" />
+        <ProjectReference Include="..\CsGrafeq.I18N\CsGrafeq.I18N.csproj"/>
     </ItemGroup>
 
 </Project>

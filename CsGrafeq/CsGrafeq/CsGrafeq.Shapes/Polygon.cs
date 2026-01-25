@@ -1,6 +1,5 @@
 ﻿using CsGrafeq.Numeric;
 using CsGrafeq.Shapes.ShapeGetter;
-using CsGrafeq.Utilities;
 using static CsGrafeq.Shapes.GeometryMath;
 
 namespace CsGrafeq.Shapes;
@@ -17,6 +16,7 @@ public class Polygon : FilledShape
         PolygonGetter.Attach(this);
         RefreshValues();
     }
+
     public override PolygonGetter Getter => PolygonGetter;
 
     public override void RefreshValues()

@@ -13,14 +13,14 @@
         <ProjectReference Include="..\CsGrafeq.Base\CsGrafeq.Base.csproj"/>
         <ProjectReference Include="..\CsGrafeq.Compiler\CsGrafeq.Compiler.csproj"/>
         <ProjectReference Include="..\CsGrafeq.Debug\CsGrafeq.Debug.csproj"/>
-        <ProjectReference Include="..\CsGrafeq.Numeric\CsGrafeq.Numeric.csproj" />
+        <ProjectReference Include="..\CsGrafeq.Numeric\CsGrafeq.Numeric.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="CSharpMath.Evaluation" Version="0.5.1"/>
         <PackageReference Include="DialogHost.Avalonia" Version="0.10.0"/>
         <PackageReference Include="FastExpressionCompiler" Version="5.3.0"/>
-        <PackageReference Include="HotAvalonia" Version="3.0.2" />
+        <PackageReference Include="HotAvalonia" Version="3.0.2"/>
     </ItemGroup>
 
 </Project>

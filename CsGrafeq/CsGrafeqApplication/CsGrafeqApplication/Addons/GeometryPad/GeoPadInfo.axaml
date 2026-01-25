@@ -1,14 +1,10 @@
-﻿
-<UserControl xmlns="https://github.com/avaloniaui"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              xmlns:geopad="clr-namespace:CsGrafeqApplication.Addons.GeometryPad;assembly=CsGrafeqApplication"
              xmlns:shapes="clr-namespace:CsGrafeq.Shapes"
-             xmlns:corecontrols="clr-namespace:CsGrafeqApplication.Core.Controls;assembly=CsGrafeqApplication.Core"
-             xmlns:shapes1="clr-namespace:CsGrafeq.Shapes;assembly=CsGrafeqApplication.Core"
-             xmlns:controls="clr-namespace:CsGrafeqApplication.Core.Controls"
              xmlns:controls1="clr-namespace:CsGrafeqApplication.Controls"
              x:Class="CsGrafeqApplication.Addons.GeometryPad.GeoPadInfo" x:DataType="geopad:GeometryPadViewModel">
     <Border CornerRadius="5">
@@ -26,8 +22,9 @@
                                                        Stroke="{DynamicResource CgForegroundBrush}" Width="15"
                                                        Height="15" StrokeThickness="1" />
                                         </Border>
-                                        <controls1:ImplicitFunctionBox ClipToBounds="True" CanInput="False" Function="{CompiledBinding}"
-                                                              Foreground="{DynamicResource CgForegroundBrush}" />
+                                        <controls1:ImplicitFunctionBox ClipToBounds="True" CanInput="False"
+                                                                       Function="{CompiledBinding}"
+                                                                       Foreground="{DynamicResource CgForegroundBrush}" />
                                     </DockPanel>
                                 </Border>
                             </Border>

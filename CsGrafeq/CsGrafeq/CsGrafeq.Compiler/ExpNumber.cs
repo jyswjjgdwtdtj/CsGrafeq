@@ -1,7 +1,6 @@
 ﻿using CsGrafeq.Compiler;
 using CsGrafeq.MVVM;
 using CsGrafeq.Numeric;
-using CsGrafeq.Utilities;
 using ReactiveUI;
 using static CsGrafeq.Utilities.DoubleCompareHelper;
 
@@ -111,24 +110,25 @@ public class ExpNumber : ObservableObject
             IsError = false;
             return;
         }
+
         Func.Dispose();
         IsExpression = true;
-        Compiler.Compiler.TryCompile<DoubleNumber>(expression, 0,Setting.Instance.EnableExpressionSimplification).Match(funcTuple =>
-        {
-            Func = new HasReferenceFunction<Func<DoubleNumber>>((Func<DoubleNumber>)funcTuple.func, funcTuple.usedVars);
-            IsError = false;
-            SetValue(Func.Function().Value);
-            UserSetValueStr?.Invoke();
-            return;
-        }, ex =>
-        {
-            Func = None;
-            SetValue(double.NaN);
-            IsError = true;
-            Error = ex;
-            UserSetValueStr?.Invoke();
-            
-        });
+        Compiler.Compiler.TryCompile<DoubleNumber>(expression, 0, Setting.Instance.EnableExpressionSimplification)
+            .Match(funcTuple =>
+            {
+                Func = new HasReferenceFunction<Func<DoubleNumber>>((Func<DoubleNumber>)funcTuple.func,
+                    funcTuple.usedVars);
+                IsError = false;
+                SetValue(Func.Function().Value);
+                UserSetValueStr?.Invoke();
+            }, ex =>
+            {
+                Func = None;
+                SetValue(double.NaN);
+                IsError = true;
+                Error = ex;
+                UserSetValueStr?.Invoke();
+            });
     }
 
     private void SetValue(double value)

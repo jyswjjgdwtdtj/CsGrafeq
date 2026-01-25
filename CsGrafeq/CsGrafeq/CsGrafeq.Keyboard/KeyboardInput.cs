@@ -230,7 +230,8 @@ public enum KeyboardInput
     Right = '⏵',
     Backspace = '⌫',
     Clear = '⎚',
-   // Return = '\n',
+
+    // Return = '\n',
     Dismiss = '❌',
     Delete = '⌦',
 
@@ -255,8 +256,10 @@ public enum KeyboardInput
     Ratio = ':',
     Percentage = '%',
     Comma = ',',
+
     //Semicolon = ';',
     Factorial = '!',
+
     /*Infinity = '∞',
     Angle = '∠',
     Degree = '°',
@@ -359,6 +362,7 @@ public enum KeyboardInput
     SmallX = 'x',
     SmallY = 'y',
     SmallZ = 'z',
+
 /*
     // Capital Greek alphabets
     Alpha = 'Α',
@@ -445,6 +449,7 @@ public enum KeyboardInput
     AreaHyperbolicCotangent = '◶',
     AreaHyperbolicSecant = '⚆',
     AreaHyperbolicCosecant = '⚇',
+
 /*
     // Calculus operators
     LimitWithBase = '㋏',

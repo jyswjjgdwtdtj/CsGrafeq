@@ -1,5 +1,4 @@
 ﻿using CsGrafeq.Collections;
-using FastExpressionCompiler;
 using sysMath = System.Math;
 
 namespace CsGrafeq.Interval.Extensions;
@@ -17,10 +16,11 @@ internal static class IntervalSetExtension
             range._Sup = callback(range._Sup);
         }
     }
+
     /// <summary>
     ///     单调增
     /// </summary>
-    public static void MonotoneTransformInplace(this Span<Range> ranges, Func<double,double> callback)
+    public static void MonotoneTransformInplace(this Span<Range> ranges, Func<double, double> callback)
     {
         foreach (ref var range in ranges)
         {
@@ -51,10 +51,11 @@ internal static class IntervalSetExtension
             ranges[i] = new Range { _Inf = callback(r._Sup), _Sup = callback(r._Inf) };
         }
     }
+
     /// <summary>
     ///     单调减
     /// </summary>
-    public static void MonotoneTransformOpInplace(this Span<Range> ranges, Func<double,double> callback)
+    public static void MonotoneTransformOpInplace(this Span<Range> ranges, Func<double, double> callback)
     {
         if (ranges.Length == 0)
             return;
@@ -104,7 +105,7 @@ internal static class IntervalSetExtension
     public static unsafe IntervalSet IntervalSetMethod(IntervalSet i1, IntervalSet i2,
         delegate*<Range, Range, Range> handler)
     {
-        Span<Range> ranges = StaticUnsafeMemoryList<Range>.Rent(i1.Intervals.Length * i2.Intervals.Length);
+        var ranges = StaticUnsafeMemoryList<Range>.Rent(i1.Intervals.Length * i2.Intervals.Length);
         var loc = 0;
         foreach (var i in i1.Intervals)
         foreach (var j in i2.Intervals)
@@ -122,21 +123,19 @@ internal static class IntervalSetExtension
         var formatted = ivl.FormatRanges();
         return IntervalSet.Create(formatted, i1._Def);
     }
+
     /// <summary>
-    /// 默认已经格式化
+    ///     默认已经格式化
     /// </summary>
     /// <param name="ranges"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    public static Span<Range> SetBounds(this Span<Range> ranges, Range range,out bool ifSetBounds)
+    public static Span<Range> SetBounds(this Span<Range> ranges, Range range, out bool ifSetBounds)
     {
         ifSetBounds = false;
         if (ranges.Length == 0)
             return Span<Range>.Empty;
-        if(range._Inf<=ranges[0]._Inf && range._Sup>=ranges[^1]._Sup)
-        {
-            return ranges;
-        }
+        if (range._Inf <= ranges[0]._Inf && range._Sup >= ranges[^1]._Sup) return ranges;
         ifSetBounds = true;
         var min = range._Inf;
         var max = range._Sup;
@@ -153,14 +152,13 @@ internal static class IntervalSetExtension
         var result = ranges.Slice(left, right - left + 1);
         return result;
     }
-    public static IntervalSet IntervalAggregate(this IEnumerable<IntervalSet> ranges,Func<IntervalSet,IntervalSet,IntervalSet> aggregator)
+
+    public static IntervalSet IntervalAggregate(this IEnumerable<IntervalSet> ranges,
+        Func<IntervalSet, IntervalSet, IntervalSet> aggregator)
     {
         var enumerator = ranges.GetEnumerator();
         var value = enumerator.Current;
-        while (enumerator.MoveNext())
-        {
-            value = aggregator(value, enumerator.Current);
-        }
+        while (enumerator.MoveNext()) value = aggregator(value, enumerator.Current);
         return value;
     }
 }

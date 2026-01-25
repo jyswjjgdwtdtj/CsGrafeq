@@ -11,7 +11,7 @@ public class Point : GeometryShape
 
     public Point(PointGetter pointgetter)
     {
-        TypeName =MultiLanguageResources.PointText;
+        TypeName = MultiLanguageResources.PointText;
         PointGetter = pointgetter;
         PointGetter.Attach(this);
         RefreshValues();

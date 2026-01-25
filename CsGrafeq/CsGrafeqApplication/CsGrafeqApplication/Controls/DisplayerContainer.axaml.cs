@@ -22,8 +22,12 @@ using Microsoft.Win32;
 
 namespace CsGrafeqApplication.Controls;
 
-public partial class DisplayerContainer : UserControl,IInfoDialog
+public partial class DisplayerContainer : UserControl, IInfoDialog
 {
+    // 可按需调整
+    private const double MinOperationWidth = 50;
+    private const double ReserveRightMin = 300; // 右侧至少保留空间，避免盖住Displayer等
+
     public static readonly DirectProperty<DisplayerContainer, bool> IsOperationVisibleProperty =
         AvaloniaProperty.RegisterDirect<DisplayerContainer, bool>(nameof(VM.IsOperationVisible),
             o => o.VM.IsOperationVisible,
@@ -31,6 +35,10 @@ public partial class DisplayerContainer : UserControl,IInfoDialog
 
     private readonly Animation anim = new();
     private readonly DisplayerContainerViewModel VM = new();
+    private double _dragStartWidth;
+    private double _dragStartX;
+
+    private bool _isDragging;
     private CancellationTokenSource InfoCancellation = new();
 
     public DisplayerContainer()
@@ -67,7 +75,7 @@ public partial class DisplayerContainer : UserControl,IInfoDialog
         InfoCancellation = new CancellationTokenSource();
         InfoPresenter.Content = content;
         InfoOuterContainer.Opacity = 1;
-        await anim.RunAsync(InfoOuterContainer,InfoCancellation.Token);
+        await anim.RunAsync(InfoOuterContainer, InfoCancellation.Token);
     }
 
     private void GlobalKeyDown(object? sender, KeyEventArgs e)
@@ -230,6 +238,7 @@ public partial class DisplayerContainer : UserControl,IInfoDialog
                     break;
             }
     }
+
     private async void SaveClicked(object? sender, RoutedEventArgs e)
     {
         var topLevel = TopLevel.GetTopLevel(this);
@@ -269,76 +278,68 @@ public partial class DisplayerContainer : UserControl,IInfoDialog
         Themes.Theme.CurrentTheme = newtheme;
     }
 
-        private bool _isDragging;
-        private double _dragStartX;
-        private double _dragStartWidth;
+    private void OuterBorderPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (sender is not Control c)
+            return;
+        var pseudoClasses = OuterBorder.UnsafeGetPseudoClasses();
+        pseudoClasses.Set(":dragging", true);
+        _isDragging = true;
 
-        // 可按需调整
-        private const double MinOperationWidth = 50;
-        private const double ReserveRightMin = 300; // 右侧至少保留空间，避免盖住Displayer等
+        // 捕获指针，保证拖到控件外也能继续收到Moved/Released
+        e.Pointer.Capture(c);
 
-        private void OuterBorderPressed(object? sender, PointerPressedEventArgs e)
-        {
-            if (sender is not Control c)
-                return;
-            var pseudoClasses=OuterBorder.UnsafeGetPseudoClasses();
-            pseudoClasses.Set(":dragging", true);
-            _isDragging = true;
+        var pos = e.GetPosition(PART_Grid); // 相对包含OperationContainer的布局取坐标
+        _dragStartX = pos.X;
+        _dragStartWidth = OperationContainer.Bounds.Width;
 
-            // 捕获指针，保证拖到控件外也能继续收到Moved/Released
-            e.Pointer.Capture(c);
+        e.Handled = true;
+    }
 
-            var pos = e.GetPosition(PART_Grid); // 相对包含OperationContainer的布局取坐标
-            _dragStartX = pos.X;
-            _dragStartWidth = OperationContainer.Bounds.Width;
+    private void OuterBorderMoved(object? sender, PointerEventArgs e)
+    {
+        if (!_isDragging)
+            return;
 
-            e.Handled = true;
-        }
+        var pos = e.GetPosition(PART_Grid);
+        var delta = pos.X - _dragStartX;
 
-        private void OuterBorderMoved(object? sender, PointerEventArgs e)
-        {
-            if (!_isDragging)
-                return;
+        var target = _dragStartWidth + delta;
 
-            var pos = e.GetPosition(PART_Grid);
-            var delta = pos.X - _dragStartX;
+        // 最大宽度：不超过容器宽度 - 预留右侧空间
+        var containerWidth = PART_Grid.Bounds.Width;
+        var max = Max(MinOperationWidth, containerWidth - ReserveRightMin);
 
-            var target = _dragStartWidth + delta;
+        target = Clamp(target, MinOperationWidth, max);
 
-            // 最大宽度：不超过容器宽度 - 预留右侧空间
-            var containerWidth = PART_Grid.Bounds.Width;
-            var max = Math.Max(MinOperationWidth, containerWidth - ReserveRightMin);
+        OperationContainer.Width = target;
+        OperationContainer.InvalidateArrange();
+        OperationContainer.InvalidateMeasure();
+        e.Handled = true;
+    }
 
-            target = Math.Clamp(target, MinOperationWidth, max);
+    private void OuterBorderReleased(object? sender, PointerReleasedEventArgs e)
+    {
+        if (sender is not Control c)
+            return;
 
-            OperationContainer.Width = target;
-            OperationContainer.InvalidateArrange();
-            OperationContainer.InvalidateMeasure();
-            e.Handled = true;
-        }
+        _isDragging = false;
+        var pseudoClasses = OuterBorder.UnsafeGetPseudoClasses();
+        pseudoClasses.Set(":dragging", false);
 
-        private void OuterBorderReleased(object? sender, PointerReleasedEventArgs e)
-        {
-            if (sender is not Control c)
-                return;
 
-            _isDragging = false;
-            var pseudoClasses=OuterBorder.UnsafeGetPseudoClasses();
-            pseudoClasses.Set(":dragging", false);
-            
+        if (e.Pointer.Captured == c)
+            e.Pointer.Capture(null);
+        OperationContainer.InvalidateArrange();
+        OperationContainer.InvalidateMeasure();
 
-            if (e.Pointer.Captured == c)
-                e.Pointer.Capture(null);
-            OperationContainer.InvalidateArrange();
-            OperationContainer.InvalidateMeasure();
+        e.Handled = true;
+    }
 
-            e.Handled = true;
-        }
-
-        private void OuterBorderLoaded(object? sender, RoutedEventArgs e)
-        {
-            var pseudoClasses=OuterBorder.UnsafeGetPseudoClasses();
-            pseudoClasses.Add(":dragging");
-            pseudoClasses.Set(":dragging", false);
-        }
+    private void OuterBorderLoaded(object? sender, RoutedEventArgs e)
+    {
+        var pseudoClasses = OuterBorder.UnsafeGetPseudoClasses();
+        pseudoClasses.Add(":dragging");
+        pseudoClasses.Set(":dragging", false);
+    }
 }

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Reactive.Linq;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Avalonia.Layout;
@@ -23,16 +21,19 @@ public class ShapeParamsTemplate : IDataTemplate
             var stack = new StackPanel();
             var ctls = new List<Control>();
             stack.Orientation = Orientation.Horizontal;
-            foreach(var shapeParams in item ?? [])
+            foreach (var shapeParams in item ?? [])
             {
-                var tb = new TextBlock(){ Classes = { "Prompt" }, VerticalAlignment = VerticalAlignment.Center};
-                tb.Bind(TextBlock.TextProperty, (shapeParams.Description??shapeParams.Shape.TypeName).WhenAnyValue(x=>x.Data).Select(d=>d+":"));
+                var tb = new TextBlock { Classes = { "Prompt" }, VerticalAlignment = VerticalAlignment.Center };
+                tb.Bind(TextBlock.TextProperty,
+                    (shapeParams.Description ?? shapeParams.Shape.TypeName).WhenAnyValue(x => x.Data)
+                    .Select(d => d + ":"));
                 ctls.Add(tb);
                 var c = ShapeTemplate!.Build(shapeParams)!;
                 c.DataContext = shapeParams.Shape;
                 ctls.Add(c);
                 ctls.Add(new TextBlock { Text = ",", VerticalAlignment = VerticalAlignment.Center });
             }
+
             var expns = getter.NumberParameters;
             foreach (var expNumberData in expns ?? [])
             {

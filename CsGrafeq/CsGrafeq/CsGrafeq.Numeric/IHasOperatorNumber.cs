@@ -1,6 +1,6 @@
 ﻿namespace CsGrafeq.Numeric;
 
-public interface IHasOperatorNumber<T> where T : IHasOperatorNumber<T>,allows ref struct
+public interface IHasOperatorNumber<T> where T : IHasOperatorNumber<T>, allows ref struct
 {
     static IDictionary<string, Delegate> HasOperatorNumberMethodDictionary { get; } = new Dictionary<string, Delegate>
     {

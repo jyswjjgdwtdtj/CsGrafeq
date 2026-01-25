@@ -1,70 +1,74 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
-using CsGrafeq.Collections;
+﻿using CsGrafeq.Collections;
 using CsGrafeq.Interval.Interface;
+using MathNet.Numerics;
 using static CsGrafeq.Interval.Def;
 using static CsGrafeq.Interval.Extensions.IntervalSetExtension;
 using CGMath = CsGrafeq.Numeric.CsGrafeqMath;
-using MathNet.Numerics;
 using static CsGrafeq.Utilities.ThrowHelper;
-using Ranges= System.Span<CsGrafeq.Interval.Range>;
-using Pool= CsGrafeq.Collections.StaticUnsafeMemoryList<CsGrafeq.Interval.Range>;
-using System.Linq;
-using System.Runtime.CompilerServices;
+using Ranges = System.Span<CsGrafeq.Interval.Range>;
+using Pool = CsGrafeq.Collections.StaticUnsafeMemoryList<CsGrafeq.Interval.Range>;
 
 namespace CsGrafeq.Interval;
 
 /// <summary>
-/// 禁止多线程允许 只允许允许再单个线程！！！
-/// Pool只使用不Return释放 释放统一到最后结束运行 Pool容量足够大不会有问题 除非确保无问题
+///     禁止多线程允许 只允许允许再单个线程！！！
+///     Pool只使用不Return释放 释放统一到最后结束运行 Pool容量足够大不会有问题 除非确保无问题
 /// </summary>
 public readonly ref struct IntervalSet : IInterval<IntervalSet>
 {
     #region 静态定义
+
     public static bool NeedClone => true;
-    public static IntervalSet Empty => new(Span<Range>.Empty, IntervalSetType.Empty, FF, double.NaN, double.NaN, double.NaN);
+
+    public static IntervalSet Empty =>
+        new(Span<Range>.Empty, IntervalSetType.Empty, FF, double.NaN, double.NaN, double.NaN);
+
     #endregion
-    
+
     #region 定义
+
     public readonly IntervalSetType Type; // 1 byte
     public readonly bool IsNumber;
-    
+
     // Number
     /// <summary>
     ///     数
     /// </summary>
     internal readonly double Number; // 8 bytes
     // End Number
-    
+
     // IntervalSet
     public readonly Def _Def; // 8 bytes
     public Def Def => _Def;
+
     /// <summary>
     ///     最大值
     /// </summary>
     public readonly double _Sup;
+
     public double Sup => _Sup;
 
     /// <summary>
     ///     最小值
     /// </summary>
     public readonly double _Inf;
+
     public double Inf => _Inf;
 
     internal readonly Ranges Intervals;
     // End IntervalSet
-    
+
     // Empty
-    
+
     // End Empty
-    
+
     /// <summary>
-    /// 大而全
+    ///     大而全
     /// </summary>
     private IntervalSet(Ranges ranges, IntervalSetType type, Def def, double inf, double sup, double number)
     {
         Intervals = ranges;
-        if(ranges.IsEmpty)
+        if (ranges.IsEmpty)
             Type = IntervalSetType.Empty;
         else
             Type = type;
@@ -72,10 +76,11 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
         _Inf = inf;
         _Sup = sup;
         Number = number;
-        IsNumber= type == IntervalSetType.Number;
-        _IsEmpty= type == IntervalSetType.Empty;
-        _Width= sup - inf;
+        IsNumber = type == IntervalSetType.Number;
+        _IsEmpty = type == IntervalSetType.Empty;
+        _Width = sup - inf;
     }
+
     public static IntervalSet CreateFromDouble(double num)
     {
         return Create(num);
@@ -83,30 +88,32 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
 
     public static IntervalSet Create(double num)
     {
-        return new IntervalSet(Pool.Rent(1).SetInForce(new(num)), IntervalSetType.Number, TT, num, num, num);
+        return new IntervalSet(Pool.Rent(1).SetInForce(new Range(num)), IntervalSetType.Number, TT, num, num, num);
     }
 
     public static IntervalSet Create(double min, double max, Def def)
     {
         CGMath.SwapIfNotLess(ref min, ref max);
-        return new IntervalSet(Pool.Rent(1).SetInForce(new(min,max)),IntervalSetType.IntervalSet, TT, min, max, double.NaN);
+        return new IntervalSet(Pool.Rent(1).SetInForce(new Range(min, max)), IntervalSetType.IntervalSet, TT, min, max,
+            double.NaN);
     }
 
     public static IntervalSet Create(Span<double> nums, Def def, bool needSort = false)
     {
         var len = nums.Length;
-        if(len==0)
+        if (len == 0)
             return new IntervalSet([], IntervalSetType.Empty, def, double.NaN, double.NaN, double.NaN);
-        if(needSort)
+        if (needSort)
             nums.Sort();
-        var intervals =Pool.Rent(len);
-        for (var idx = 0; idx < len; idx++) intervals[idx] = new(nums[idx]);
+        var intervals = Pool.Rent(len);
+        for (var idx = 0; idx < len; idx++) intervals[idx] = new Range(nums[idx]);
         return new IntervalSet(intervals, IntervalSetType.IntervalSet, def, nums[0], nums[^1], double.NaN);
     }
+
     public static IntervalSet Create(Ranges ranges, Def def)
     {
         var len = ranges.Length;
-        if(len==0)
+        if (len == 0)
             return new IntervalSet([], IntervalSetType.Empty, def, double.NaN, double.NaN, double.NaN);
         return new IntervalSet(ranges, IntervalSetType.IntervalSet, def, ranges[0]._Inf, ranges[^1]._Sup, double.NaN);
     }
@@ -120,13 +127,13 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
 
     public double Width => _Width;
     public readonly double _Width;
-    public bool IsEmpty=> _IsEmpty;
+    public bool IsEmpty => _IsEmpty;
     public readonly bool _IsEmpty;
 
     public bool TryGetNumber(out double number)
     {
         number = Number;
-        return Type== IntervalSetType.Number;
+        return Type == IntervalSetType.Number;
     }
 
     public bool Contains(double num)
@@ -147,7 +154,7 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
 
     public override string ToString()
     {
-        return $"{{Def:{Def},Intervals:[{string.Join(',',Intervals.Select(o=>o.ToString()))}]}}";
+        return $"{{Def:{Def},Intervals:[{string.Join(',', Intervals.Select(o => o.ToString()))}]}}";
     }
 
     #endregion
@@ -177,11 +184,12 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
 
     public static IntervalSet operator +(IntervalSet i1, double num)
     {
-        foreach (ref var  ranges in i1.Intervals)
+        foreach (ref var ranges in i1.Intervals)
         {
-            ranges._Inf+= num;
-            ranges._Sup+= num;
+            ranges._Inf += num;
+            ranges._Sup += num;
         }
+
         return i1;
     }
 
@@ -225,8 +233,8 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
     {
         if (i1._Inf > 0 && i2._Inf > 0) return new Range { _Inf = i1._Inf * i2._Inf, _Sup = i1._Sup * i2._Sup };
         if (i1._Sup < 0 && i2._Sup < 0) return new Range { _Inf = i1._Sup * i2._Sup, _Sup = i1._Inf * i2._Inf };
-        var (min,max) = CGMath.GetMinMax(i1._Inf * i2._Inf, i1._Inf * i2._Sup, i1._Sup * i2._Inf, i1._Sup * i2._Sup);
-        return new(min,max);
+        var (min, max) = CGMath.GetMinMax(i1._Inf * i2._Inf, i1._Inf * i2._Sup, i1._Sup * i2._Inf, i1._Sup * i2._Sup);
+        return new Range(min, max);
     }
 
     public static IntervalSet operator *(double num, IntervalSet i1)
@@ -247,8 +255,10 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
                 range._Inf *= num;
                 range._Sup *= num;
             }
+
             return i1;
         }
+
         return -(i1 * -num);
     }
 
@@ -262,8 +272,9 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
         foreach (ref var range in i1.Intervals)
         {
             range._Inf = range._Inf == 0 ? double.Epsilon : range._Inf;
-            range._Sup= range._Sup == 0 ? -double.Epsilon : range._Sup;
+            range._Sup = range._Sup == 0 ? -double.Epsilon : range._Sup;
         }
+
         var loc = 0;
         foreach (ref var range in i2.Intervals)
         {
@@ -273,8 +284,10 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
                 ranges[loc++] = new Range { _Inf = 1 / range._Sup, _Sup = double.PositiveInfinity };
                 continue;
             }
-            ranges[loc++] = new Range(1 / range._Inf, 1 / range._Sup);   
+
+            ranges[loc++] = new Range(1 / range._Inf, 1 / range._Sup);
         }
+
         var res = ranges.Slice(0, loc);
         return i1 * Create(res, i2._Def);
     }
@@ -318,7 +331,7 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
             //!!! 危险示例 以下代码包含潜在危险 不应使用 !!!
             //Pool.Return(i1.Intervals.Length * 2-loc);
             //!!! 危险示例 以上代码包含潜在危险 不应使用 !!!
-            
+
             var res = ranges.Slice(0, loc);
             return Create(res, FT);
         }
@@ -331,7 +344,8 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
                 sup = i2._Sup;
             if (i2._Inf < 0)
                 inf = i2._Inf;
-            return Create(i.Intervals.SetBounds(new(inf, sup),out bool ifSetBounds), ifSetBounds?FT:i1._Def&i2.Def);
+            return Create(i.Intervals.SetBounds(new Range(inf, sup), out var ifSetBounds),
+                ifSetBounds ? FT : i1._Def & i2.Def);
         }
     }
 
@@ -444,11 +458,12 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
             return Empty;
         return IntervalSetMethod(i1, i2, &RangeMax);
     }
-    
+
     public static IntervalSet MaxOf(IEnumerable<IntervalSet> nums)
     {
         return nums.IntervalAggregate(Max);
     }
+
     public static IntervalSet MinOf(IEnumerable<IntervalSet> nums)
     {
         return nums.IntervalAggregate(Min);
@@ -495,21 +510,16 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
         var loc = -1;
         for (var i = 0; i < len; i++)
         {
-            ref var range =ref i1.Intervals[i];
+            ref var range = ref i1.Intervals[i];
             if (range._Sup < 0)
                 continue;
-            if (range._Inf < 0)
-            {
-                range._Inf = 0;
-            }
+            if (range._Inf < 0) range._Inf = 0;
             range = new Range(Math.Log(range._Inf), Math.Log(range._Sup));
-            if (loc == -1)
-            {
-                loc= i;
-            }
+            if (loc == -1) loc = i;
         }
+
         var res = i1.Intervals.Slice(loc, len - loc);
-        return Create(res, loc==0?FT:i1._Def);
+        return Create(res, loc == 0 ? FT : i1._Def);
     }
 
     public static IntervalSet Lg(IntervalSet i1)
@@ -524,21 +534,16 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
         var loc = -1;
         for (var i = 0; i < len; i++)
         {
-            ref var range =ref i1.Intervals[i];
+            ref var range = ref i1.Intervals[i];
             if (range._Sup < 0)
                 continue;
-            if (range._Inf < 0)
-            {
-                range._Inf = 0;
-            }
+            if (range._Inf < 0) range._Inf = 0;
             range = new Range(Math.Log10(range._Inf), Math.Log10(range._Sup));
-            if (loc == -1)
-            {
-                loc= i;
-            }
+            if (loc == -1) loc = i;
         }
+
         var res = i1.Intervals.Slice(loc, len - loc);
-        return Create(res, loc==0?FT:i1._Def);
+        return Create(res, loc == 0 ? FT : i1._Def);
     }
 
     public static IntervalSet Log(IntervalSet i1, IntervalSet i2)
@@ -580,7 +585,7 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
                         }
 
                     if (loc == i1.Intervals.Length)
-                        ranges[loc] = new(Double.NaN);
+                        ranges[loc] = new Range(double.NaN);
                     return Create(ranges.FormatRanges(), i1._Def);
                 }
 
@@ -608,21 +613,16 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
         var loc = -1;
         for (var i = 0; i < len; i++)
         {
-            ref var range =ref i1.Intervals[i];
+            ref var range = ref i1.Intervals[i];
             if (range._Sup < 0)
                 continue;
-            if (range._Inf < 0)
-            {
-                range._Inf = 0;
-            }
+            if (range._Inf < 0) range._Inf = 0;
             range = new Range(Math.Sqrt(range._Inf), Math.Sqrt(range._Sup));
-            if (loc == -1)
-            {
-                loc= i;
-            }
+            if (loc == -1) loc = i;
         }
+
         var res = i1.Intervals.Slice(loc, len - loc);
-        return Create(res, loc==0?FT:i1._Def);
+        return Create(res, loc == 0 ? FT : i1._Def);
     }
 
     public static unsafe IntervalSet Cbrt(IntervalSet num)
@@ -902,7 +902,7 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
             return Empty;
         if (i1._Sup < -1 || i1.Number > 1)
             return Empty;
-        var res = i1.Intervals.SetBounds(new Range { _Inf = -1, _Sup = 1 },out _);
+        var res = i1.Intervals.SetBounds(new Range { _Inf = -1, _Sup = 1 }, out _);
         res.MonotoneTransformOpInplace(&Math.Acos);
         return Create(res, i1._Sup > 1 || i1.Number < -1 ? FT : i1._Def);
     }
@@ -914,7 +914,7 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
             return Empty;
         if (i1._Sup < -1 || i1._Inf > 1)
             return Empty;
-        var res = i1.Intervals.SetBounds(new Range { _Inf = -1, _Sup = 1 },out _);
+        var res = i1.Intervals.SetBounds(new Range { _Inf = -1, _Sup = 1 }, out _);
         res.MonotoneTransformInplace(&Math.Asin);
         return Create(res, i1._Sup > 1 || i1._Inf < -1 ? FT : i1._Def);
     }
@@ -957,7 +957,7 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
     {
         if (num.IsNumber) return Create(Math.Acosh(num.Number));
         var min = num._Inf;
-        var res = num.Intervals.SetBounds(new Range(1, double.PositiveInfinity),out _);
+        var res = num.Intervals.SetBounds(new Range(1, double.PositiveInfinity), out _);
         var min1 = double.NaN;
         if (res.Length > 0)
             min1 = res[0]._Inf;
@@ -995,8 +995,9 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
         var res = num.Intervals.Slice(0, current);
         return Create(res, FT);
     }
+
     /// <summary>
-    /// 图像见 <a href="https://www.desmos.com/3d/ssq30zgep2"/>
+    ///     图像见 <a href="https://www.desmos.com/3d/ssq30zgep2" />
     /// </summary>
     public static IntervalSet ArcTan2(IntervalSet y, IntervalSet x)
     {
@@ -1058,10 +1059,10 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
     {
         return num1 % num2;
     }
-    /// <summary>
-    /// 由AI生成 不保证准确性 请谨慎使用
-    /// </summary>
 
+    /// <summary>
+    ///     由AI生成 不保证准确性 请谨慎使用
+    /// </summary>
     public static IntervalSet Gamma(IntervalSet num)
     {
         // Gamma(x) 在 (0, +∞) 上：在 (0, ~1.4616) 单调递减，之后单调递增；存在极点于 0,-1,-2,...
@@ -1082,7 +1083,7 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
     }
 
     /// <summary>
-    /// 由AI生成 不保证准确性 请谨慎使用
+    ///     由AI生成 不保证准确性 请谨慎使用
     /// </summary>
     public static IntervalSet LnGamma(IntervalSet num)
     {
@@ -1101,7 +1102,7 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
     }
 
     /// <summary>
-    /// 由AI生成 不保证准确性 请谨慎使用
+    ///     由AI生成 不保证准确性 请谨慎使用
     /// </summary>
     public static IntervalSet Psi(IntervalSet num)
     {
@@ -1110,7 +1111,7 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
     }
 
     /// <summary>
-    /// 由AI生成 不保证准确性 请谨慎使用
+    ///     由AI生成 不保证准确性 请谨慎使用
     /// </summary>
     public static IntervalSet Digamma(IntervalSet num)
     {
@@ -1127,7 +1128,7 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
     }
 
     /// <summary>
-    /// 由AI生成 不保证准确性 请谨慎使用
+    ///     由AI生成 不保证准确性 请谨慎使用
     /// </summary>
     public static IntervalSet Erf(IntervalSet num)
     {
@@ -1136,7 +1137,7 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
     }
 
     /// <summary>
-    /// 由AI生成 不保证准确性 请谨慎使用
+    ///     由AI生成 不保证准确性 请谨慎使用
     /// </summary>
     public static IntervalSet Erfc(IntervalSet num)
     {
@@ -1145,7 +1146,7 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
     }
 
     /// <summary>
-    /// 由AI生成 不保证准确性 请谨慎使用
+    ///     由AI生成 不保证准确性 请谨慎使用
     /// </summary>
     public static IntervalSet Erfinv(IntervalSet num)
     {
@@ -1154,7 +1155,7 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
     }
 
     /// <summary>
-    /// 由AI生成 不保证准确性 请谨慎使用
+    ///     由AI生成 不保证准确性 请谨慎使用
     /// </summary>
     public static IntervalSet Erfcinv(IntervalSet num)
     {
@@ -1163,7 +1164,7 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
     }
 
     /// <summary>
-    /// 由AI生成 不保证准确性 请谨慎使用
+    ///     由AI生成 不保证准确性 请谨慎使用
     /// </summary>
     public static IntervalSet BesselJ(IntervalSet num1, IntervalSet num2)
     {
@@ -1171,7 +1172,7 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
     }
 
     /// <summary>
-    /// 由AI生成 不保证准确性 请谨慎使用
+    ///     由AI生成 不保证准确性 请谨慎使用
     /// </summary>
     public static IntervalSet BesselY(IntervalSet num1, IntervalSet num2)
     {
@@ -1179,7 +1180,7 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
     }
 
     /// <summary>
-    /// 由AI生成 不保证准确性 请谨慎使用
+    ///     由AI生成 不保证准确性 请谨慎使用
     /// </summary>
     public static IntervalSet BesselI(IntervalSet num1, IntervalSet num2)
     {
@@ -1187,7 +1188,7 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
     }
 
     /// <summary>
-    /// 由AI生成 不保证准确性 请谨慎使用
+    ///     由AI生成 不保证准确性 请谨慎使用
     /// </summary>
     public static IntervalSet BesselK(IntervalSet num1, IntervalSet num2)
     {
@@ -1199,23 +1200,19 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
         // 检测是否包含 0,-1,-2,...（Gamma/LnGamma/Digamma/Trigamma 极点）
         // 由于 IntervalSet 可能是多个 Range：逐段判断是否跨越某个非正整数
         foreach (var r in num.Intervals)
-        {
             if (r._Sup < 0)
             {
                 // 负区间：[a,b]，若包含某个 -k（k>=0）
                 var ceil = (int)Math.Ceiling(r._Inf); // 注意 r._Inf <= r._Sup
                 var floor = (int)Math.Floor(r._Sup);
                 for (var n = ceil; n <= floor; n++)
-                {
                     if (n <= 0 && r.ContainsEqual(n))
                         return true;
-                }
             }
             else if (r.ContainsEqual(0))
             {
                 return true;
             }
-        }
 
         return false;
     }
@@ -1250,7 +1247,8 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
         return Create(ranges.FormatRanges(), def);
     }
 
-    private static IntervalSet ApplyUnaryMonotoneIncWithDomain(IntervalSet input, double domainMin, double domainMax, Func<double, double> f)
+    private static IntervalSet ApplyUnaryMonotoneIncWithDomain(IntervalSet input, double domainMin, double domainMax,
+        Func<double, double> f)
     {
         if (input._IsEmpty) return Empty;
 
@@ -1260,16 +1258,19 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
             return Create(f(input.Number));
         }
 
-        var clipped = (input.Intervals).SetBounds(new Range(domainMin, domainMax),out _);
+        var clipped = input.Intervals.SetBounds(new Range(domainMin, domainMax), out _);
         if (clipped.Length == 0) return Empty;
 
-        var def = (clipped.Length == input.Intervals.Length && input._Inf >= domainMin && input._Sup <= domainMax) ? input._Def : FT;
+        var def = clipped.Length == input.Intervals.Length && input._Inf >= domainMin && input._Sup <= domainMax
+            ? input._Def
+            : FT;
 
         var tmp = Create(clipped, def);
         return ApplyUnaryMonotoneInc(tmp, f);
     }
 
-    private static IntervalSet ApplyUnaryMonotoneDecWithDomain(IntervalSet input, double domainMin, double domainMax, Func<double, double> f)
+    private static IntervalSet ApplyUnaryMonotoneDecWithDomain(IntervalSet input, double domainMin, double domainMax,
+        Func<double, double> f)
     {
         if (input._IsEmpty) return Empty;
 
@@ -1279,10 +1280,12 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
             return Create(f(input.Number));
         }
 
-        var clipped = (input.Intervals).SetBounds(new Range(domainMin, domainMax),out _);
+        var clipped = input.Intervals.SetBounds(new Range(domainMin, domainMax), out _);
         if (clipped.Length == 0) return Empty;
 
-        var def = (clipped.Length == input.Intervals.Length && input._Inf >= domainMin && input._Sup <= domainMax) ? input._Def : FT;
+        var def = clipped.Length == input.Intervals.Length && input._Inf >= domainMin && input._Sup <= domainMax
+            ? input._Def
+            : FT;
 
         var tmp = Create(clipped, def);
         return ApplyUnaryMonotoneDec(tmp, f);
@@ -1402,10 +1405,8 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
     private static bool HasNaNOrInf(Ranges ranges)
     {
         foreach (var r in ranges)
-        {
             if (double.IsNaN(r._Inf) || double.IsNaN(r._Sup) || double.IsInfinity(r._Inf) || double.IsInfinity(r._Sup))
                 return true;
-        }
 
         return false;
     }

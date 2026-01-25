@@ -28,10 +28,11 @@
                                                                Content="{TemplateBinding Content}"
                                                                ContentTemplate="{TemplateBinding ContentTemplate}"
                                                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                               VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" >
+                                                               VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}">
                                     <controls:ContentExpandControl.Transitions>
                                         <Transitions>
-                                            <DoubleTransition Duration="0.25" Easing="CircularEaseOut" Property="Multiplier" />
+                                            <DoubleTransition Duration="0.25" Easing="CircularEaseOut"
+                                                              Property="Multiplier" />
                                         </Transitions>
                                     </controls:ContentExpandControl.Transitions>
                                 </controls:ContentExpandControl>
@@ -40,9 +41,7 @@
                     </ControlTemplate>
                 </Setter>
 
-                <Style Selector="^:not(.no-transitions) /template/ controls|ContentExpandControl#PART_ContentExpand">
-     
-                </Style>
+                <Style Selector="^:not(.no-transitions) /template/ controls|ContentExpandControl#PART_ContentExpand" />
 
                 <Style Selector="^ /template/ Border#PART_InnerBorder">
                     <Setter Property="ClipToBounds" Value="True" />

@@ -23,6 +23,32 @@ For the sake that JIT is unavailable in mobile platforms and browser, CsGrafeq n
 - High quality function image plotting.
 - Beautiful UI
 
+## Project Structure
+
+```
+CsGrafeq.sln
+├─ CsGrafeqApplication (Application layer: Avalonia UI + multi-platform hosts)
+│  ├─ CsGrafeqApplication: Main UI/feature assembly; aggregates core libs and UI resources (assets, controls, resource dictionaries)
+│  ├─ CsGrafeqApplication.Core: Reusable UI controls and core interaction components (keyboard, markdown, shared controls) for the app/dialogs
+│  ├─ CsGrafeqApplication.Dialogs: Dialog/message box module (View/ViewModel split), depends on Core + MVVM
+│  ├─ CsGrafeqApplication.Desktop: Desktop host/entry point (Win/macOS/Linux packaging; WinExe)
+│  ├─ CsGrafeqApplication.Android: Android host (net10.0-android)
+│  ├─ CsGrafeqApplication.iOS: iOS host (net10.0-ios)
+│  └─ CsGrafeqApplication.Browser: WebAssembly/browser host (net10.0-browser)
+└─ CsGrafeq (Core libraries: algorithms, numeric, compiler, shared infrastructure)
+   ├─ CsGrafeq.Base: Shared base infrastructure & common types/utilities (also brings core Avalonia/ReactiveUI dependencies)
+   ├─ CsGrafeq.Numeric: Numeric + symbolic math utilities/wrappers (e.g., MathNet.Symbolics), foundation for compiler/interval computations
+   ├─ CsGrafeq.Compiler: Expression/formula compilation & evaluation (symbolic + expression compiler), used by Interval/Shapes/App
+   ├─ CsGrafeq.Interval: Interval arithmetic and interval set types (Interval/IntervalSet) + compiler integration for implicit equations
+   ├─ CsGrafeq.Shapes: Shape/geometry models and related logic (depends on Interval/Compiler/Numeric/I18N, etc.)
+   ├─ CsGrafeq.MVVM: MVVM support library (ReactiveUI-based shared ViewModel infrastructure), depends on I18N
+   ├─ CsGrafeq.I18N: Internationalization/localization resources + binding support (configuration binding generator enabled)
+   ├─ CsGrafeq.I18N.Generator: Roslyn source generator/analyzer for I18N (wired into I18N as an Analyzer)
+   ├─ CsGrafeq.Windows: Windows-specific adaptation (Avalonia.Win32 and related platform glue)
+   ├─ CsGrafeq.Debug: Debug/diagnostics helpers (Avalonia.Diagnostics, etc.) for development-time tooling
+   └─ CsGrafeq.Keyboard: Keyboard-related shared library (key definitions/input helpers), used by Core/App
+
+```
 
 ## Future and Plan
 

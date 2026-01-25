@@ -1,7 +1,8 @@
 ﻿namespace CsGrafeq.Interval;
+
 /// <summary>
-/// 代表区间定义域是否完整
-/// sizeof()==> 8 bytes
+///     代表区间定义域是否完整
+///     sizeof()==> 8 bytes
 /// </summary>
 public struct Def
 {

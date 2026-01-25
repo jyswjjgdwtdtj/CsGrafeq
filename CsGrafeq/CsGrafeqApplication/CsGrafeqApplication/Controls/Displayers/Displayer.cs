@@ -43,7 +43,9 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
         RenderClock.OnElapsed += Render;
         IsHitTestVisible = true;
     }
+
     [Content] public AddonList Addons { get; } = new();
+
     /// <summary>
     ///     并无卵用
     /// </summary>

@@ -1,5 +1,4 @@
 ﻿using System;
-using Avalonia;
 using Avalonia.Skia;
 using Material.Styles.Themes;
 using SkiaSharp;
@@ -8,15 +7,12 @@ namespace CsGrafeqApplication;
 
 public static class SkiaHelper
 {
-    public static SKColor Light=SKColors.Cyan;
-    public static SKColor Mid=SKColors.Cyan;
+    public static SKColor Light = SKColors.Cyan;
+    public static SKColor Mid = SKColors.Cyan;
 
     static SkiaHelper()
     {
-        Themes.Theme.ThemeChangedEndObservable.Subscribe(t =>
-        {
-            Refresh(t);
-        });
+        Themes.Theme.ThemeChangedEndObservable.Subscribe(t => { Refresh(t); });
         Refresh(Themes.Theme);
     }
 

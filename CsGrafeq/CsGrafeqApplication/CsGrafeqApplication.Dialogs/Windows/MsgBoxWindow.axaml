@@ -9,7 +9,7 @@
         x:DataType="params:MsgBoxParams"
         Topmost="{CompiledBinding Topmost}"
         WindowStartupLocation="{CompiledBinding WindowStartupLocation}"
-        CanResize="False" 
+        CanResize="False"
         CanMaximize="False" CanMinimize="False"
         ExtendClientAreaToDecorationsHint="True"
         ExtendClientAreaChromeHints="NoChrome"

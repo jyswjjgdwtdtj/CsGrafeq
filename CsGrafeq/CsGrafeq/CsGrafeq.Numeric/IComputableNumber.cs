@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 namespace CsGrafeq.Numeric;
 
 public interface IComputableNumber<T> : IHasOperatorNumber<T>, INeedClone<T>
-    where T : IComputableNumber<T>, INeedClone<T>,allows ref struct
+    where T : IComputableNumber<T>, INeedClone<T>, allows ref struct
 {
     static IComputableNumber()
     {
@@ -42,7 +42,7 @@ public interface IComputableNumber<T> : IHasOperatorNumber<T>, INeedClone<T>
             { "clone", GetUnManagedPtr(T.Clone) },
             { "arctan2", GetUnManagedPtr(T.ArcTan2) },
             { "maxof", GetUnManagedPtr(T.MaxOf) },
-            { "minof", GetUnManagedPtr(T.MinOf) },
+            { "minof", GetUnManagedPtr(T.MinOf) }
         };
     }
 
@@ -78,14 +78,15 @@ public interface IComputableNumber<T> : IHasOperatorNumber<T>, INeedClone<T>
         { "min", T.Min },
         { "max", T.Max },
         { "clone", T.Clone },
-        { "arctan2", T.ArcTan2  },
-        { "maxof", T.MaxOf  },
-        { "minof", T.MinOf  },
+        { "arctan2", T.ArcTan2 },
+        { "maxof", T.MaxOf },
+        { "minof", T.MinOf }
     };
 
-    static IReadOnlyList<string> EnumerableParamMethods { get; } =[
+    static IReadOnlyList<string> EnumerableParamMethods { get; } =
+    [
         "maxof",
-        "minof",
+        "minof"
     ];
 
     static IDictionary<string, nint> MethodPtrDictionary { get; }
@@ -147,10 +148,12 @@ public interface IComputableNumber<T> : IHasOperatorNumber<T>, INeedClone<T>
     static abstract T Gamma(T num);
     static abstract T LnGamma(T num);
     static abstract T Psi(T num);
+
     /// <summary>
-    /// ��˹����
+    ///     ��˹����
     /// </summary>
     static abstract T Erf(T num);
+
     static abstract T Erfc(T num);
     static abstract T Erfinv(T num);
     static abstract T Erfcinv(T num);
@@ -159,5 +162,5 @@ public interface IComputableNumber<T> : IHasOperatorNumber<T>, INeedClone<T>
     static abstract T BesselY(T num1, T num2);
     static abstract T BesselI(T num1, T num2);
     static abstract T BesselK(T num1, T num2);
-    static abstract T CreateFromDouble(double num);    
+    static abstract T CreateFromDouble(double num);
 }

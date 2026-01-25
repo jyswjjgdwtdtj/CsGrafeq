@@ -1,9 +1,6 @@
 using Avalonia.Collections;
 using CsGrafeq.Shapes;
 using CsGrafeqApplication.Core.ViewModel;
-using CsGrafeqApplication.ViewModels;
-using CSharpMath.Atom;
-using ReactiveUI;
 
 namespace CsGrafeqApplication.Addons.GeometryPad;
 

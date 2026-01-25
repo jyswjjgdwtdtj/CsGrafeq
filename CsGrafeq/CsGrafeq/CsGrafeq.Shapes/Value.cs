@@ -8,7 +8,7 @@ public sealed class Value<T> : Shape
 
     public Value(T value)
     {
-        TypeName = new MultiLanguageData() { Chinese = typeof(T).Name, English = typeof(T).Name };
+        TypeName = new MultiLanguageData { Chinese = typeof(T).Name, English = typeof(T).Name };
         _Value = value;
         Name = IsNullRetEmpty(_Value.ToString());
         Visible = false;
