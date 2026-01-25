@@ -1,12 +1,15 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
+using CsGrafeq.Collections;
 using CsGrafeq.Interval.Interface;
 
 namespace CsGrafeq.Interval;
 
 public static class IntervalCompiler
 {
+    
+    public static readonly object SyncObjForIntervalSetCalc = new();
     public static HasReferenceIntervalSetFunc<IntervalSet> Compile(string expression,bool enableSimplification=false)
     {
         if (string.IsNullOrEmpty(expression))
@@ -14,8 +17,8 @@ public static class IntervalCompiler
         var exptree =
             Compiler.Compiler.ConstructExpTree<IntervalSet>(expression, 2, out var xVar, out var yVar, out _,
                 out var reference,enableSimplification).Reduce();
-        return new HasReferenceIntervalSetFunc<IntervalSet>(
-            CompileByDynamicMethod(Expression.Lambda<IntervalHandler<IntervalSet>>(exptree, xVar, yVar)), reference);
+        return new HasReferenceIntervalSetFunc<IntervalSet>(CompileByDynamicMethod(Expression.Lambda<IntervalHandler<IntervalSet>>(exptree, xVar, yVar)), reference);
+  
     }
 
     public static IntervalHandler<IntervalSet> CompileByDynamicMethod(
@@ -27,8 +30,10 @@ public static class IntervalCompiler
             new[] { typeof(IntervalSet), typeof(IntervalSet) }, typeof(IntervalSet).Module, true);
         var ilg = dynamicMethod.GetILGenerator();
         var ilr = new ILRecorder(ilg);
+        ilr.Emit(OpCodes.Call, GetInfo(StaticUnsafeMemoryList<Range>.Clear));
         CompileToILGenerator<IntervalSet>(ilr, expression.Body);
         ilr.Emit(OpCodes.Ret);
+        Console.WriteLine(ilr.GetRecord());
         var func = dynamicMethod.CreateDelegate<IntervalHandler<IntervalSet>>();
         try
         {
@@ -43,7 +48,7 @@ public static class IntervalCompiler
         return func;
     }
 
-    public static void CompileToILGenerator<T>(ILRecorder ilGenerator, Expression expression) where T : IInterval<T>
+    public static void CompileToILGenerator<T>(ILRecorder ilGenerator, Expression expression) where T : IInterval<T>,allows ref struct
     {
         switch (expression.NodeType)
         {
@@ -116,7 +121,7 @@ public static class IntervalCompiler
         }
     }
 
-    public static void EmitExpressionMethod<T>(ILRecorder ilGenerator, MethodInfo? mi) where T : IInterval<T>
+    public static void EmitExpressionMethod<T>(ILRecorder ilGenerator, MethodInfo? mi) where T : IInterval<T>,allows ref struct
     {
         if (mi is null)
             throw new ArgumentNullException(nameof(mi));
@@ -162,5 +167,9 @@ public static class IntervalCompiler
         {
             return Result<HasReferenceIntervalSetFunc<IntervalSet>>.Error(e);
         }
+    }
+    private static MethodInfo GetInfo(Delegate action)
+    {
+        return action.Method;
     }
 }

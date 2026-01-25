@@ -222,6 +222,7 @@ public class CartesianDisplayer : Displayer
     /// <param name="dc"></param>
     protected void RenderAxisLine(SKCanvas dc)
     {
+        return;
         var width = Bounds.Width;
         var height = Bounds.Height;
         //y

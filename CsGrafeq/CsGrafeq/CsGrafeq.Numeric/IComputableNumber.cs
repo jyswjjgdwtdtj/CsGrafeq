@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 namespace CsGrafeq.Numeric;
 
 public interface IComputableNumber<T> : IHasOperatorNumber<T>, INeedClone<T>
-    where T : IComputableNumber<T>, INeedClone<T>
+    where T : IComputableNumber<T>, INeedClone<T>,allows ref struct
 {
     static IComputableNumber()
     {
@@ -148,7 +148,7 @@ public interface IComputableNumber<T> : IHasOperatorNumber<T>, INeedClone<T>
     static abstract T LnGamma(T num);
     static abstract T Psi(T num);
     /// <summary>
-    /// ¸ßË¹Îó²îº¯Êý
+    /// ï¿½ï¿½Ë¹ï¿½ï¿½îº¯ï¿½ï¿½
     /// </summary>
     static abstract T Erf(T num);
     static abstract T Erfc(T num);

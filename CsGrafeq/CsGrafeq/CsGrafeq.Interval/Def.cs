@@ -1,5 +1,8 @@
 ﻿namespace CsGrafeq.Interval;
-
+/// <summary>
+/// 代表区间定义域是否完整
+/// sizeof()==> 8 bytes
+/// </summary>
 public struct Def
 {
     public bool First { get; private set; }
@@ -51,5 +54,10 @@ public struct Def
     public static Def Or(Def lhs, Def rhs)
     {
         return lhs | rhs;
+    }
+
+    public override string ToString()
+    {
+        return $"{{{First},{Second}}}";
     }
 }

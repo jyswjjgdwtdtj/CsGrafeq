@@ -32,6 +32,7 @@ using AvaSize = Avalonia.Size;
 using GeoHalf = CsGrafeq.Shapes.Half;
 using static CsGrafeqApplication.Extension;
 using static CsGrafeqApplication.Core.Utils.StaticSkiaResources;
+using Range = CsGrafeq.Interval.Range;
 
 namespace CsGrafeqApplication.Addons.GeometryPad;
 
@@ -85,14 +86,14 @@ public partial class GeometryPad : Addon
         Layers.Add(MainRenderTarget);
         MainRenderTarget.OnRender += Renderable_OnRender;
 #if DEBUG
-
+/*
         var p1 = AddShape(new GeoPoint(new PointGetter_FromLocation((0.5, 0.5))));
         var p2 = AddShape(new GeoPoint(new PointGetter_FromLocation((1.5, 1.5))));
         var s1 = AddShape(new Straight(new LineGetter_Connected(p1, p2)));
         var p3 = AddShape(new GeoPoint(new PointGetter_OnLine(s1, (0, 0))));
         var p4 = AddShape(new GeoPoint(new PointGetter_MiddlePoint(p1,p2)));
-        var c1 = AddShape(new Circle(new CircleGetter_FromCenterAndRadius(p1)));
-        var ip1 = AddShape(CreateImpFunc("y=sin(x)"));
+        var c1 = AddShape(new Circle(new CircleGetter_FromCenterAndRadius(p1)));*/
+        var ip1 = AddShape(CreateImpFunc("y=x"));
 #endif
         InitializeComponent();
     }
@@ -939,29 +940,35 @@ public partial class GeometryPad : Addon
             return;
         if (impFunc.IsDeleted)
             return;
-        var RectToCalc = new ConcurrentBag<SKRectI> { rect };
-        var Points = new ConcurrentBag<SKPoint>();
-        var Rects = new ConcurrentBag<SKRectI>();
-        var paint = new SKPaint { Color = new SKColor(impFunc.Color).WithAlpha(impFunc.Opacity) };
-        var func = impFunc.Function.Function;
-        do
+        lock (IntervalCompiler.SyncObjForIntervalSetCalc)
         {
-            var rs = RectToCalc.ToArray();
-            RectToCalc.Clear();
-            Action<int> atn = idx => RenderRectIntervalSet(rs[idx], RectToCalc, func, false, Points, Rects);
-            for (var i = 0; i < rs.Length; i += 100)
+            var RectToCalc = new ConcurrentBag<SKRectI> { rect };
+            var Points = new ConcurrentBag<SKPoint>();
+            var Rects = new ConcurrentBag<SKRectI>();
+            var paint = new SKPaint { Color = new SKColor(impFunc.Color).WithAlpha(impFunc.Opacity) };
+            var func = impFunc.Function.Function;
+            do
             {
-                //总会有莫名的问题 
-                //Parallel.For(i, Min(i + 100, rs.Length), atn);
-                for (var j = i; j < Min(i + 100, rs.Length); j++) atn(j);
-                foreach (var rectToDraw in Rects) dc.DrawRect(rectToDraw, paint);
-                Rects.Clear();
-                dc.DrawPoints(SKPointMode.Points, Points.ToArray(), paint);
-                Points.Clear();
-            }
-        } while (RectToCalc.Count != 0);
+                var rs = RectToCalc.ToArray();
+                RectToCalc.Clear();
+                Action<int> atn = idx =>
+                {
+                    RenderRectIntervalSet(rs[idx], RectToCalc, func, false, Points, Rects);
+                };
+                for (var i = 0; i < rs.Length; i += 100)
+                {
+                    //此处不应使用并行
+                    //IntervalSet计算是完全线程不安全的
+                    for (var j = i; j < Min(i + 100, rs.Length); j++) atn(j);
+                    foreach (var rectToDraw in Rects) dc.DrawRect(rectToDraw, paint);
+                    Rects.Clear();
+                    dc.DrawPoints(SKPointMode.Points, Points.ToArray(), paint);
+                    Points.Clear();
+                }
+            } while (RectToCalc.Count != 0);
 
-        dc.Flush();
+            dc.Flush();
+        }
     }
 
     private void RenderRectIntervalSet(SKRectI r, ConcurrentBag<SKRectI> RectToCalc, IntervalHandler<IntervalSet> func,
@@ -982,13 +989,13 @@ public partial class GeometryPad : Addon
             var di = i;
             var xmin = PixelToMathX(i);
             var xmax = PixelToMathX(i + dx);
-            var xi = IntervalSet.Create(xmin, xmax, Def.TT);
+            var xi = IntervalSet.Create([new Range(xmin, xmax)], Def.TT);
             for (var j = r.Top; j < r.Bottom; j += dy)
             {
                 var dj = j;
                 var ymin = PixelToMathY(j);
                 var ymax = PixelToMathY(j + dy);
-                var yi = IntervalSet.Create(ymin, ymax, Def.TT);
+                var yi = IntervalSet.Create([new Range(ymin, ymax)], Def.TT);
                 var result = func(xi, yi);
                 if (result == Def.TT)
                 {

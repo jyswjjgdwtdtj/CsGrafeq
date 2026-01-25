@@ -1,4 +1,6 @@
-﻿using sysMath = System.Math;
+﻿using CsGrafeq.Collections;
+using FastExpressionCompiler;
+using sysMath = System.Math;
 
 namespace CsGrafeq.Interval.Extensions;
 
@@ -7,32 +9,52 @@ internal static class IntervalSetExtension
     /// <summary>
     ///     单调增
     /// </summary>
-    public static unsafe void MonotoneTransform(this Range[] ranges, delegate*<double, double> callback)
+    public static unsafe void MonotoneTransformInplace(this Span<Range> ranges, delegate*<double, double> callback)
     {
-        for (var i = 0; i < ranges.Length; i++)
-            ranges[i] = new Range
-            {
-                _Inf = callback(ranges[i]._Inf),
-                _Sup = callback(ranges[i]._Sup)
-            };
+        foreach (ref var range in ranges)
+        {
+            range._Inf = callback(range._Inf);
+            range._Sup = callback(range._Sup);
+        }
     }
     /// <summary>
     ///     单调增
     /// </summary>
-    public static unsafe void MonotoneTransform(this Range[] ranges, Func<double,double> callback)
+    public static void MonotoneTransformInplace(this Span<Range> ranges, Func<double,double> callback)
     {
-        for (var i = 0; i < ranges.Length; i++)
-            ranges[i] = new Range
-            {
-                _Inf = callback(ranges[i]._Inf),
-                _Sup = callback(ranges[i]._Sup)
-            };
+        foreach (ref var range in ranges)
+        {
+            range._Inf = callback(range._Inf);
+            range._Sup = callback(range._Sup);
+        }
     }
 
     /// <summary>
     ///     单调减
     /// </summary>
-    public static unsafe void MonotoneTransformOp(this Range[] ranges, delegate*<double, double> callback)
+    public static unsafe void MonotoneTransformOpInplace(this Span<Range> ranges, delegate*<double, double> callback)
+    {
+        if (ranges.Length == 0)
+            return;
+        int i = 0, j = ranges.Length - 1;
+        for (; i < j; i++, j--)
+        {
+            var ri = ranges[i];
+            var rj = ranges[j];
+            ranges[j] = new Range { _Inf = callback(ri._Sup), _Sup = callback(ri._Inf) };
+            ranges[i] = new Range { _Inf = callback(rj._Sup), _Sup = callback(rj._Inf) };
+        }
+
+        if (i == j)
+        {
+            var r = ranges[i];
+            ranges[i] = new Range { _Inf = callback(r._Sup), _Sup = callback(r._Inf) };
+        }
+    }
+    /// <summary>
+    ///     单调减
+    /// </summary>
+    public static void MonotoneTransformOpInplace(this Span<Range> ranges, Func<double,double> callback)
     {
         if (ranges.Length == 0)
             return;
@@ -51,66 +73,44 @@ internal static class IntervalSetExtension
             ranges[i] = new Range { _Inf = callback(r._Sup), _Sup = callback(r._Inf) };
         }
     }
-    /// <summary>
-    ///     单调减
-    /// </summary>
-    public static unsafe void MonotoneTransformOp(this Range[] ranges, Func<double,double> callback)
-    {
-        if (ranges.Length == 0)
-            return;
-        int i = 0, j = ranges.Length - 1; //注意！j为nuint类型 如果Length=0 j会变为最大值
-        for (; i < j; i++, j--)
-        {
-            var ri = ranges[i];
-            var rj = ranges[j];
-            ranges[j] = new Range { _Inf = callback(ri._Sup), _Sup = callback(ri._Inf) };
-            ranges[i] = new Range { _Inf = callback(rj._Sup), _Sup = callback(rj._Inf) };
-        }
 
-        if (i == j)
-        {
-            var r = ranges[i];
-            ranges[i] = new Range { _Inf = callback(r._Sup), _Sup = callback(r._Inf) };
-        }
-    }
-
-    public static Range[] FormatRanges(this Range[] Ranges)
+    public static Span<Range> FormatRanges(this Span<Range> ranges)
     {
         var validIndex = 0;
-        for (var i = 0; i < Ranges.Length; i++)
-            if (!Ranges[i].IsInValid)
-                Ranges[validIndex++] = Ranges[i];
-
-        if (validIndex == 0) return new Range[0];
+        for (var i = 0; i < ranges.Length; i++)
+            if (!ranges[i].IsInValid)
+                ranges[validIndex++] = ranges[i];
+        if (validIndex == 0) return Span<Range>.Empty;
 
         //对区间排序
         for (var i = 0; i < validIndex - 1; i++)
         for (var j = 0; j < validIndex - i - 1; j++)
-            if (Ranges[j]._Inf > Ranges[j + 1]._Inf)
-                (Ranges[j], Ranges[j + 1]) = (Ranges[j + 1], Ranges[j]);
+            if (ranges[j]._Inf > ranges[j + 1]._Inf)
+                (ranges[j], ranges[j + 1]) = (ranges[j + 1], ranges[j]);
         var writeIndex = 0;
         for (var i = 1; i < validIndex; i++)
         {
-            ref var writecurrent = ref Ranges[writeIndex];
-            ref var readcurrent = ref Ranges[i];
+            ref var writecurrent = ref ranges[writeIndex];
+            ref var readcurrent = ref ranges[i];
             if (writecurrent._Sup >= readcurrent._Inf)
                 writecurrent._Sup = sysMath.Max(writecurrent._Sup, readcurrent._Sup);
             else
                 writeIndex++;
         }
 
-        return Ranges.Slice(0, writeIndex + 1);
+        return ranges.Slice(0, writeIndex + 1);
     }
 
     public static unsafe IntervalSet IntervalSetMethod(IntervalSet i1, IntervalSet i2,
         delegate*<Range, Range, Range> handler)
     {
-        var Ranges = new Range[i1.Intervals.Length * i2.Intervals.Length];
+        Span<Range> ranges = StaticUnsafeMemoryList<Range>.Rent(i1.Intervals.Length * i2.Intervals.Length);
         var loc = 0;
         foreach (var i in i1.Intervals)
         foreach (var j in i2.Intervals)
-            Ranges[loc++] = handler(i, j);
-        return IntervalSet.Create(FormatRanges(Ranges), i1._Def & i2._Def);
+            ranges[loc++] = handler(i, j);
+        var formatted = ranges.FormatRanges();
+        return IntervalSet.Create(formatted, i1._Def & i2._Def);
     }
 
     public static unsafe IntervalSet IntervalSetMethod(IntervalSet i1, delegate*<Range, Range> handler)
@@ -118,29 +118,49 @@ internal static class IntervalSetExtension
         var ivl = i1.Intervals;
         for (var i = 0; i < i1.Intervals.Length; i++)
             ivl[i] = handler(ivl[i]);
-        return IntervalSet.Create(FormatRanges(i1.Intervals), i1._Def);
-    }
 
-    public static Range[] SetBounds(this Range[] ranges, Range range)
+        var formatted = ivl.FormatRanges();
+        return IntervalSet.Create(formatted, i1._Def);
+    }
+    /// <summary>
+    /// 默认已经格式化
+    /// </summary>
+    /// <param name="ranges"></param>
+    /// <param name="range"></param>
+    /// <returns></returns>
+    public static Span<Range> SetBounds(this Span<Range> ranges, Range range,out bool ifSetBounds)
     {
-        var writeIndex = 0;
-        for (var readIndex = 0; readIndex < ranges.Length; readIndex++)
+        ifSetBounds = false;
+        if (ranges.Length == 0)
+            return Span<Range>.Empty;
+        if(range._Inf<=ranges[0]._Inf && range._Sup>=ranges[^1]._Sup)
         {
-            var readCurrent = ranges[readIndex];
-            if (readCurrent._Sup < range._Inf)
-                continue;
-            if (readCurrent._Inf > range._Sup)
-                break;
-            readCurrent._Inf = sysMath.Max(readCurrent._Inf, range._Inf);
-            readCurrent._Sup = sysMath.Min(readCurrent._Sup, range._Sup);
-            ranges[writeIndex++] = readCurrent;
+            return ranges;
         }
-
-        return ranges.Slice(0, writeIndex);
+        ifSetBounds = true;
+        var min = range._Inf;
+        var max = range._Sup;
+        var left = 0;
+        while (left < ranges.Length && ranges[left]._Sup < min)
+            left++;
+        if (left == ranges.Length)
+            return Span<Range>.Empty;
+        var right = ranges.Length - 1;
+        while (right >= left && ranges[right]._Inf > max)
+            right--;
+        if (right < left)
+            return Span<Range>.Empty;
+        var result = ranges.Slice(left, right - left + 1);
+        return result;
     }
-
-    public static Range[] Slice(this Range[] ranges, int start, int end)
+    public static IntervalSet IntervalAggregate(this IEnumerable<IntervalSet> ranges,Func<IntervalSet,IntervalSet,IntervalSet> aggregator)
     {
-        return ranges[start..end];
+        var enumerator = ranges.GetEnumerator();
+        var value = enumerator.Current;
+        while (enumerator.MoveNext())
+        {
+            value = aggregator(value, enumerator.Current);
+        }
+        return value;
     }
 }

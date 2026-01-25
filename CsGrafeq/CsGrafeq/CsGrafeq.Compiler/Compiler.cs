@@ -52,13 +52,13 @@ public static class Compiler
 
     public static Expression ConstructExpTree<T>(this string expression, [Range(0, 3)] uint argsLength,
         out ParameterExpression x, out ParameterExpression y, out ParameterExpression z,
-        out EnglishCharEnum usedVars, bool enableSimplification) where T : IComputableNumber<T>
+        out EnglishCharEnum usedVars, bool enableSimplification) where T : IComputableNumber<T>,allows ref struct
     {
         return enableSimplification?ContructSimplifiedExpTree<T>(expression, argsLength, out x, out y, out z, out usedVars):ConstructExpTree<T>(expression, argsLength, out x, out y, out z, out usedVars);
     }
     public static Expression ConstructExpTree<T>(this string expression, [Range(0, 3)] uint argsLength, 
         out ParameterExpression xVar, out ParameterExpression yVar, out ParameterExpression zVar,
-        out EnglishCharEnum usedVars) where T : IComputableNumber<T>
+        out EnglishCharEnum usedVars) where T : IComputableNumber<T>,allows ref struct
     {
         if (string.IsNullOrWhiteSpace(expression))
             throw new Exception("Expression cannot be empty");
@@ -256,7 +256,7 @@ public static class Compiler
 
     public static Expression ContructSimplifiedExpTree<T>(string expression, [Range(0, 3)] uint argsLength,
         out ParameterExpression xVar, out ParameterExpression yVar, out ParameterExpression zVar,
-        out EnglishCharEnum usedVars) where T : IComputableNumber<T>
+        out EnglishCharEnum usedVars) where T : IComputableNumber<T>,allows ref struct
     {
         ReadOnlySpan<char> strspan = expression.AsSpan();
         StringBuilder sb=new StringBuilder();
