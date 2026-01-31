@@ -1,0 +1,66 @@
+﻿<geometricPad:ActionsView xmlns="https://github.com/avaloniaui"
+                          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                          xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                          xmlns:geometricPad="clr-namespace:CsGrafeqApplication.Addons.GeometricPad"
+                          mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+                          x:Class="CsGrafeqApplication.Addons.GeometricPad.ActionsView">
+    <geometricPad:ActionsView.Styles>
+        <StyleInclude Source="GeometricPadStyles.axaml" />
+    </geometricPad:ActionsView.Styles>
+    <geometricPad:ActionsView.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="avares://CsGrafeqApplication.Core/Resources/ButtonTypeRadioButton.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </geometricPad:ActionsView.Resources>
+    <ItemsControl ItemsSource="{x:Static geometricPad:GeometryActions.Actions}">
+        <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+                <VirtualizingStackPanel Orientation="Vertical" />
+            </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+            <DataTemplate DataType="geometricPad:HasNameActionList">
+                <Expander Classes="NoBorderExpander" BorderThickness="0"
+                          TemplateApplied="Expander_TemplateApplied"
+                          IsExpanded="True" CornerRadius="0" HorizontalAlignment="Stretch"
+                          Width="{CompiledBinding $parent[VirtualizingStackPanel].Bounds.Width}"
+                          Padding="0" Background="Transparent"
+                          Foreground="{DynamicResource CgForegroundBrush}">
+                    <Expander.Header>
+                        <TextBlock Text="{CompiledBinding Name.Data }" Margin="0"
+                                   Padding="0" Classes="Big" />
+                    </Expander.Header>
+                    <Border Padding="10,1" Background="Transparent">
+                        <ItemsControl ItemsSource="{CompiledBinding .}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Orientation="Horizontal" ItemSpacing="5"
+                                               LineSpacing="5"
+                                               Background="Transparent" Margin="0" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <RadioButton Classes="GeoRadio"
+                                                 Theme="{StaticResource CgMaterialRadioButton}"
+                                                 Padding="0" Margin="2"
+                                                 IsCheckedChanged="RadioButtonChecked"
+                                                 Tag="{CompiledBinding .}">
+                                        <TextBlock VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"
+                                                   TextWrapping="Wrap" FontSize="11"
+                                                   TextAlignment="Center" Name="RadioText"
+                                                   Text="{CompiledBinding Name.Data}" />
+                                    </RadioButton>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Border>
+                </Expander>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
+</geometricPad:ActionsView>

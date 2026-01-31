@@ -1,0 +1,61 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:ctls="clr-namespace:CsGrafeqApplication.Controls"
+             xmlns:csgrafeqbase="clr-namespace:CsGrafeq;assembly=CsGrafeq.Base"
+             xmlns:geometricPad="clr-namespace:CsGrafeqApplication.Addons.GeometricPad"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="CsGrafeqApplication.Addons.GeometricPad.VariablesView">
+    <Design.PreviewWith>
+        <geometricPad:VariablesView />
+    </Design.PreviewWith>
+    <ContentControl DataContext="{x:Static csgrafeqbase:EnglishChar.Instance}">
+        <StackPanel Orientation="Vertical" x:DataType="csgrafeqbase:EnglishChar">
+            <ctls:VariableBox VariableName="a" Value="{CompiledBinding A,Mode=TwoWay}"
+                              IsVisible="{CompiledBinding CharsReferenceCounter[0],Converter={StaticResource IntToBool},Mode=OneWay}" />
+            <ctls:VariableBox VariableName="b" Value="{CompiledBinding B,Mode=TwoWay}"
+                              IsVisible="{CompiledBinding CharsReferenceCounter[1],Converter={StaticResource IntToBool},Mode=OneWay}" />
+            <ctls:VariableBox VariableName="c" Value="{CompiledBinding C,Mode=TwoWay}"
+                              IsVisible="{CompiledBinding CharsReferenceCounter[2],Converter={StaticResource IntToBool},Mode=OneWay}" />
+            <ctls:VariableBox VariableName="d" Value="{CompiledBinding D,Mode=TwoWay}"
+                              IsVisible="{CompiledBinding CharsReferenceCounter[3],Converter={StaticResource IntToBool},Mode=OneWay}" />
+            <ctls:VariableBox VariableName="f" Value="{CompiledBinding F,Mode=TwoWay}"
+                              IsVisible="{CompiledBinding CharsReferenceCounter[5],Converter={StaticResource IntToBool},Mode=OneWay}" />
+            <ctls:VariableBox VariableName="g" Value="{CompiledBinding G,Mode=TwoWay}"
+                              IsVisible="{CompiledBinding CharsReferenceCounter[6],Converter={StaticResource IntToBool},Mode=OneWay}" />
+            <ctls:VariableBox VariableName="h" Value="{CompiledBinding H,Mode=TwoWay}"
+                              IsVisible="{CompiledBinding CharsReferenceCounter[7],Converter={StaticResource IntToBool},Mode=OneWay}" />
+            <ctls:VariableBox VariableName="i" Value="{CompiledBinding I,Mode=TwoWay}"
+                              IsVisible="{CompiledBinding CharsReferenceCounter[8],Converter={StaticResource IntToBool},Mode=OneWay}" />
+            <ctls:VariableBox VariableName="j" Value="{CompiledBinding J,Mode=TwoWay}"
+                              IsVisible="{CompiledBinding CharsReferenceCounter[9],Converter={StaticResource IntToBool},Mode=OneWay}" />
+            <ctls:VariableBox VariableName="k" Value="{CompiledBinding K,Mode=TwoWay}"
+                              IsVisible="{CompiledBinding CharsReferenceCounter[10],Converter={StaticResource IntToBool},Mode=OneWay}" />
+            <ctls:VariableBox VariableName="l" Value="{CompiledBinding L,Mode=TwoWay}"
+                              IsVisible="{CompiledBinding CharsReferenceCounter[11],Converter={StaticResource IntToBool},Mode=OneWay}" />
+            <ctls:VariableBox VariableName="m" Value="{CompiledBinding M,Mode=TwoWay}"
+                              IsVisible="{CompiledBinding CharsReferenceCounter[12],Converter={StaticResource IntToBool},Mode=OneWay}" />
+            <ctls:VariableBox VariableName="n" Value="{CompiledBinding N,Mode=TwoWay}"
+                              IsVisible="{CompiledBinding CharsReferenceCounter[13],Converter={StaticResource IntToBool},Mode=OneWay}" />
+            <ctls:VariableBox VariableName="o" Value="{CompiledBinding O,Mode=TwoWay}"
+                              IsVisible="{CompiledBinding CharsReferenceCounter[14],Converter={StaticResource IntToBool},Mode=OneWay}" />
+            <ctls:VariableBox VariableName="p" Value="{CompiledBinding P,Mode=TwoWay}"
+                              IsVisible="{CompiledBinding CharsReferenceCounter[15],Converter={StaticResource IntToBool},Mode=OneWay}" />
+            <ctls:VariableBox VariableName="q" Value="{CompiledBinding Q,Mode=TwoWay}"
+                              IsVisible="{CompiledBinding CharsReferenceCounter[16],Converter={StaticResource IntToBool},Mode=OneWay}" />
+            <ctls:VariableBox VariableName="r" Value="{CompiledBinding R,Mode=TwoWay}"
+                              IsVisible="{CompiledBinding CharsReferenceCounter[17],Converter={StaticResource IntToBool},Mode=OneWay}" />
+            <ctls:VariableBox VariableName="s" Value="{CompiledBinding S,Mode=TwoWay}"
+                              IsVisible="{CompiledBinding CharsReferenceCounter[18],Converter={StaticResource IntToBool},Mode=OneWay}" />
+            <ctls:VariableBox VariableName="t" Value="{CompiledBinding T,Mode=TwoWay}"
+                              IsVisible="{CompiledBinding CharsReferenceCounter[19],Converter={StaticResource IntToBool},Mode=OneWay}" />
+            <ctls:VariableBox VariableName="u" Value="{CompiledBinding U,Mode=TwoWay}"
+                              IsVisible="{CompiledBinding CharsReferenceCounter[20],Converter={StaticResource IntToBool},Mode=OneWay}" />
+            <ctls:VariableBox VariableName="v" Value="{CompiledBinding V,Mode=TwoWay}"
+                              IsVisible="{CompiledBinding CharsReferenceCounter[21],Converter={StaticResource IntToBool},Mode=OneWay}" />
+            <ctls:VariableBox VariableName="w" Value="{CompiledBinding W,Mode=TwoWay}"
+                              IsVisible="{CompiledBinding CharsReferenceCounter[22],Converter={StaticResource IntToBool},Mode=OneWay}" />
+        </StackPanel>
+    </ContentControl>
+</UserControl>

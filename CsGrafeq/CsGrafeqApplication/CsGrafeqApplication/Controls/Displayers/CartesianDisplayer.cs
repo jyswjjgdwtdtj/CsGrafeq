@@ -406,7 +406,7 @@ public class CartesianDisplayer : Displayer
                 RenderAxisLine(dc);
                 foreach (var i in Addons)
                 foreach (var layer in i.Layers)
-                    layer.DrawBitmap(dc, 0, 0);
+                    layer.DrawRenderTargetTo(dc, 0, 0);
                 RenderAxisNumber(dc);
             }
         }

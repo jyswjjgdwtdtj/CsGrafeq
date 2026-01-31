@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace CsGrafeqApplication.Addons.GeometryPad;
+namespace CsGrafeqApplication.Addons.GeometricPad;
 
 public static class ImplicitFunctionExamples
 {

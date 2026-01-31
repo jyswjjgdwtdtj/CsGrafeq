@@ -1,25 +1,18 @@
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using Avalonia;
+using Avalonia.Collections;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
-using Avalonia.Controls.Shapes;
 using Avalonia.Controls.Templates;
 using Avalonia.Input;
-using Avalonia.Interactivity;
-using Avalonia.Layout;
-using Avalonia.LogicalTree;
-using Avalonia.Media;
+using Avalonia.Markup.Xaml.Styling;
 using CsGrafeq.I18N;
 using CsGrafeq.Interval;
 using CsGrafeq.Shapes;
 using CsGrafeq.Shapes.ShapeGetter;
 using CsGrafeqApplication.Controls.Displayers;
-using CsGrafeqApplication.Dialogs.InfoDialog;
-using CSharpMath.Avalonia;
-using DialogHostAvalonia;
+using CsGrafeqApplication.Utilities;
 using SkiaSharp;
 using static CsGrafeq.Shapes.GeometryMath;
 using static CsGrafeqApplication.Core.Utils.PointRectHelper;
@@ -32,69 +25,53 @@ using static CsGrafeqApplication.Extension;
 using static CsGrafeqApplication.Core.Utils.StaticSkiaResources;
 using Range = CsGrafeq.Interval.Range;
 
-namespace CsGrafeqApplication.Addons.GeometryPad;
+namespace CsGrafeqApplication.Addons.GeometricPad;
 
-public partial class GeometryPad : Addon
+public class GeometricPad : Addon
 {
     /// <summary>
     ///     所有几何图形的渲染目标
     /// </summary>
     private readonly Renderable MainRenderTarget = new();
 
-    /// <summary>
-    ///     ViewModel
-    /// </summary>
-    private readonly GeometryPadViewModel VM;
-
-    public GeometryPad()
+    public GeometricPad()
     {
-        DataContext = VM = new GeometryPadViewModel();
-        Shapes = VM.Shapes;
+        AddonName = MultiLanguageResources.Instance.GeometricPadText;
+        var host = new Control();
+        object? obj;
+        host.Resources.MergedDictionaries.Add(
+            new ResourceInclude(new Uri("avares://CsGrafeqApplication/"))
+            {
+                Source = new Uri("avares://CsGrafeqApplication/Addons/GeometricPad/GeometricResources.axaml")
+            });
+        host.TryFindResource("GeometricPadViewTemplate", out obj);
+        MainTemplate = (IDataTemplate)obj;
+        host.TryFindResource("GeometricPadInfoTemplate", out obj);
+        InfoTemplate = (IDataTemplate)obj;
         CurrentAction = GeometryActions.Actions.FirstOrDefault()?.FirstOrDefault()!;
-        Shapes.CollectionChanged += (s, e) =>
+        Layers.Add(MainRenderTarget);
+        MainRenderTarget.OnRender += Renderable_OnRender;
+        Shapes.CollectionChanged+= (s, e) =>
         {
-            // 添加隐函数时启用移动缩放优化
-            if (Shapes.GetShapes<ImplicitFunction>().Count() > 0)
-            {
-                Setting.Instance.MoveOptimization = true;
-                Setting.Instance.ZoomOptimization = true;
-            }
-
-            var newshapes = e.NewItems?.OfType<GeoShape>() ?? [];
-            var newfuncs = newshapes.OfType<ImplicitFunction>();
-            // 设置隐函数渲染目标大小
-            foreach (var fn in newfuncs)
-            {
-                fn.RenderTarget.Changed = true;
-                fn.RenderTarget.SetBitmapSize(MainRenderTarget.GetSize());
-            }
-
-            // 主渲染目标标记为已更改
-            if (newshapes.Any(o => o is GeometryShape)) MainRenderTarget.Changed = true;
+            MainRenderTarget.Changed = true;
             Owner?.AskForRender();
         };
         Shapes.OnShapeChanged += sp =>
         {
-            if (sp is ImplicitFunction impf)
-                impf.RenderTarget.Changed = true;
-            else if (sp is GeometryShape gs)
-                MainRenderTarget.Changed = true;
+            MainRenderTarget.Changed = true;
             Owner?.AskForRender();
         };
-        Layers.Add(MainRenderTarget);
-        MainRenderTarget.OnRender += Renderable_OnRender;
 #if DEBUG
-/*
         var p1 = AddShape(new GeoPoint(new PointGetter_FromLocation((0.5, 0.5))));
         var p2 = AddShape(new GeoPoint(new PointGetter_FromLocation((1.5, 1.5))));
         var s1 = AddShape(new Straight(new LineGetter_Connected(p1, p2)));
         var p3 = AddShape(new GeoPoint(new PointGetter_OnLine(s1, (0, 0))));
-        var p4 = AddShape(new GeoPoint(new PointGetter_MiddlePoint(p1,p2)));
-        var c1 = AddShape(new Circle(new CircleGetter_FromCenterAndRadius(p1)));*/
-        var ip1 = AddShape(CreateImpFunc("y=x"));
+        var p4 = AddShape(new GeoPoint(new PointGetter_MiddlePoint(p1, p2)));
+        var c1 = AddShape(new Circle(new CircleGetter_FromCenterAndRadius(p1)));
 #endif
-        InitializeComponent();
     }
+
+    internal ShapeList Shapes { get; } = new();
 
     /// <summary>
     ///     正在被移动的点
@@ -137,11 +114,6 @@ public partial class GeometryPad : Addon
     internal ActionData CurrentAction { get; private set; }
 
     /// <summary>
-    ///     图形的集合
-    /// </summary>
-    public ShapeList Shapes { get; init; }
-
-    /// <summary>
     ///     所有者
     /// </summary>
     public override Displayer? Owner
@@ -170,8 +142,6 @@ public partial class GeometryPad : Addon
         }
     }
 
-    public override string AddonName => "GeometryPad";
-
 
     /// <summary>
     ///     设置Action
@@ -195,164 +165,8 @@ public partial class GeometryPad : Addon
     {
         if (shape.IsDeleted)
             return null;
-        Shapes.Add(shape);
-        DoShapeAdd(shape);
-        if (shape is ImplicitFunction impf) Layers.Add(impf.RenderTarget);
+        CommandHelper.DoShapeAdd(Shapes, shape);
         return shape;
-    }
-
-    private void NewFuncOnClick(object? sender, KeyEventArgs e)
-    {
-        /*if (e.Key == Key.Enter && e.KeyModifiers == KeyModifiers.None &&
-            !string.IsNullOrWhiteSpace(NewFuncTextBox.Text) && IntervalCompiler.TryCompile(NewFuncTextBox.Text))
-        {
-            AddShape(CreateImpFunc(NewFuncTextBox.Text));
-            NewFuncTextBox.Text = "";
-        }*/
-    }
-
-    private void ImpFuncOnTapped(object? sender, TappedEventArgs e)
-    {
-        if (sender is Border border) FlyoutBase.ShowAttachedFlyout(border);
-    }
-
-    /// <summary>
-    ///     创建新的隐函数图形
-    /// </summary>
-    /// <param name="expression"></param>
-    /// <returns></returns>
-    private ImplicitFunction CreateImpFunc(string expression)
-    {
-        var ins = new ImplicitFunction(expression);
-        ins.RenderTarget.OnRender += (dc, s) =>
-            RenderFunction(dc, new SKRectI((int)s.Left, (int)s.Top, (int)s.Right, (int)s.Bottom), ins);
-        return ins;
-    }
-
-    private void NewFuncPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
-    {
-        if (sender is TextBox tb)
-            if (e.Property == TextBox.TextProperty)
-            {
-                var re = IntervalCompiler.TryCompile(tb.Text, Setting.Instance.EnableExpressionSimplification);
-                if (tb.Text == "" || re.Success(out _, out _))
-                {
-                    DataValidationErrors.ClearErrors(tb);
-                }
-                else
-                {
-                    re.Error(out var ex);
-                    DataValidationErrors.SetError(tb, ex);
-                    this.Info(new TextBlock { Text = ex.Message }, InfoType.Error);
-                }
-            }
-    }
-
-
-    /// <summary>
-    ///     监听隐函数控件表达式变化 设置是否错误
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void ImpFuncPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
-    {
-        if (sender is TextBox tb)
-            if (e.Property == TextBox.TextProperty)
-                if ((string)e.NewValue != (string)e.OldValue)
-                {
-                    var re = IntervalCompiler.TryCompile(tb.Text, Setting.Instance.EnableExpressionSimplification);
-                    if (tb.Text == "" || re.Success(out _, out _))
-                    {
-                        DataValidationErrors.ClearErrors(tb);
-                    }
-                    else
-                    {
-                        re.Error(out var ex);
-                        DataValidationErrors.SetError(tb, ex);
-                        this.Info(new TextBlock { Text = ex.Message }, InfoType.Error);
-                    }
-
-                    DoFuncTextChange(tb, (string)e.NewValue, (string)e.OldValue);
-                }
-    }
-
-    private void AddFuncTapped(object? sender, TappedEventArgs e)
-    {
-    }
-
-    private void NewFuncTextBoxTemplateApplied(object? s, TemplateAppliedEventArgs e)
-    {
-        var tb = s as TextBox;
-        var borderelement = e.NameScope.Find<Border>("PART_BorderElement");
-        borderelement.CornerRadius = new CornerRadius(0);
-        borderelement.BorderThickness = new Thickness(0, 0, 0, 2);
-        borderelement.Background = Brushes.Transparent;
-        tb.LostFocus += (s, e) => { borderelement.Background = Brushes.Transparent; };
-        tb.GotFocus += (s, e) => { borderelement.Background = Brushes.Transparent; };
-    }
-
-    private void Expander_TemplateApplied(object? sender, TemplateAppliedEventArgs e)
-    {
-        if (sender is Expander expander)
-            expander.TemplateApplied += (_, te) =>
-            {
-                var togglebtn = te.NameScope.Find<ToggleButton>("PART_ToggleButton");
-                togglebtn.TemplateApplied += (_, tte) =>
-                {
-                    var path = tte.NameScope.Find<Path>("PART_ExpandIcon");
-                    path.Bind(Path.FillProperty, Resources.GetResourceObservable("CgForegroundBrush"));
-                };
-            };
-    }
-
-    private void AddFuncQuestionsClicked(object? sender, RoutedEventArgs e)
-    {
-        var tp = TopLevel.GetTopLevel(this);
-        if (tp != null)
-        {
-            var lb = new ListBox { MaxHeight = tp.Height * 2 / 3, MaxWidth = tp.Width * 2 / 3 };
-            var examples = new List<string>(ImplicitFunctionExamples.Examples);
-            for (var i = 0; i < examples.Count; i++) examples[i] = examples[i].Split(";")[0];
-            lb.ItemsSource = examples;
-            lb.SelectionMode = SelectionMode.Single;
-            lb.ItemTemplate = new LbDataTemplate();
-            lb.SelectionChanged += (s, se) =>
-            {
-                /*NewFuncTextBox.Text = lb?.SelectedItem?.ToString() ?? NewFuncTextBox.Text;
-                DialogHost.Close("dialog");
-                NewFuncTextBox.Focus();*/
-            };
-            var sv = new ScrollViewer
-            {
-                MaxHeight = tp.Height * 2 / 3,
-                MaxWidth = tp.Width * 2 / 3,
-                HorizontalScrollBarVisibility = ScrollBarVisibility.Hidden
-            };
-            sv.Content = lb;
-            DialogHost.Show(sv, "dialog");
-        }
-    }
-
-    protected override void OnLoaded(RoutedEventArgs e)
-    {
-        base.OnLoaded(e);
-        foreach (var control in this.GetTemplateChildren().OfType<TextBox>()) control.Styles.Add(Themes.FluentTheme);
-    }
-
-    private class LbDataTemplate : IDataTemplate
-    {
-        public bool Match(object? data)
-        {
-            return data is string;
-        }
-
-        public Control? Build(object? param)
-        {
-            if (param is string str)
-                return new MathView { LaTeX = str, HorizontalAlignment = HorizontalAlignment.Left };
-
-            return null;
-        }
     }
 
     #region CoordinateTransformFuncs
@@ -394,7 +208,7 @@ public partial class GeometryPad : Addon
             if (shape.Selected)
                 todelete.Add(shape);
 
-        if (todelete.Count > 0) DoGeoShapesDelete(todelete.ToArray());
+        if (todelete.Count > 0) CommandHelper.DoGeoShapesDelete(todelete.ToArray());
     }
 
     public override void SelectAll()
@@ -573,7 +387,7 @@ public partial class GeometryPad : Addon
         if (IsMovingPointMovable)
         {
             var pgm = (PointGetter_Movable)MovingPoint.PointGetter;
-            DoPointMove(MovingPoint, PointMovementStartPositionStr,
+            CommandHelper.DoPointMove(MovingPoint, PointMovementStartPositionStr,
                 new Vector2<string>(pgm.PointX.ValueStr, pgm.PointY.ValueStr));
         }
 
@@ -693,9 +507,10 @@ public partial class GeometryPad : Addon
 
     #region RenderAction
 
-    protected void Renderable_OnRender(SKCanvas dc, SKRect rect)
+    protected void Renderable_OnRender(SKCanvas? dc, SKRect rect)
     {
-        if (Owner is null) return;
+        Console.WriteLine(Shapes.Count);
+        if (Owner is null || dc is null) return;
         dc.Save();
         dc.ClipRect(rect);
         RenderShapes(dc, rect, Shapes.GetShapes<GeometryShape>());
@@ -757,7 +572,7 @@ public partial class GeometryPad : Addon
                         else
                             dc.DrawLine(MathToPixelSK(vs.Item1), MathToPixelSK(vs.Item2), StrokePaintMain);
 
-                        dc.DrawBubble($"{Properties.Resources.StraightText}:{s.Name}",
+                        dc.DrawBubble($"{MultiLanguageResources.Instance.StraightText}:{s.Name}",
                             MathToPixelSK((s.Current.Point1 + s.Current.Point2) / 2),
                             BubbleBack, PaintMain);
                     }
@@ -1087,18 +902,6 @@ public partial class GeometryPad : Addon
     }
 
     /// <summary>
-    ///     点获取器的类型
-    /// </summary>
-    protected enum PGType
-    {
-        None,
-        Location,
-        OnLine,
-        OnCircle,
-        Fixed
-    }
-
-    /// <summary>
     ///     当xy两个方向的线距离均小于5时 会吸附到交点上
     /// </summary>
     protected AvaPoint FindNearestPointOnTwoAxisLine(AvaPoint location)
@@ -1193,343 +996,6 @@ public partial class GeometryPad : Addon
         }
 
         return shape != null;
-    }
-
-    #endregion
-
-    #region Do
-
-    /// <summary>
-    ///     添加“添加图形”操作到CmdManager
-    /// </summary>
-    /// <param name="shape"></param>
-    private void DoShapeAdd(GeoShape shape)
-    {
-        CmdManager.Do(
-            shape,
-            o =>
-            {
-                shape.IsDeleted = false;
-                ShapeItemsControl?.InvalidateArrange();
-            },
-            o =>
-            {
-                shape.IsDeleted = true;
-                ShapeItemsControl?.InvalidateArrange();
-            },
-            o =>
-            {
-                Shapes.Remove(shape);
-                if (o is ImplicitFunction im) Layers.Remove(im.RenderTarget);
-            }, true
-        );
-    }
-
-    /// <summary>
-    ///     添加“删除图形”操作到CmdManager
-    /// </summary>
-    /// <param name="shape"></param>
-    private void DoShapeDelete(GeoShape shape)
-    {
-        if (shape is GeometryShape geo)
-            DoGeoShapesDelete([geo]);
-        else
-            CmdManager.Do(
-                shape,
-                o =>
-                {
-                    shape.IsDeleted = true;
-                    ShapeItemsControl.InvalidateArrange();
-                },
-                o =>
-                {
-                    shape.IsDeleted = false;
-                    ShapeItemsControl.InvalidateArrange();
-                },
-                o =>
-                {
-                    Shapes.Remove(shape);
-                    if (shape is ImplicitFunction impf) Layers.Remove(impf.RenderTarget);
-                    shape.Dispose();
-                }, true
-            );
-    }
-
-    private void DoFuncTextChange(TextBox tb, string newtext, string oldtext)
-    {
-        CmdManager.Do<object?>(null, o => { tb.Text = newtext; }, o => { tb.Text = oldtext; }, o => { });
-    }
-
-    private void DoGeoShapesDelete(IEnumerable<GeometryShape> shapes)
-    {
-        var ss = shapes.Select(s => ShapeList.GetAllChildren(s)).SelectMany(o => o).Distinct().ToArray();
-        if (ss.Length > 1)
-        {
-        }
-
-        CmdManager.Do(
-            ss,
-            o =>
-            {
-                foreach (var sh in ss)
-                {
-                    sh.IsDeleted = true;
-                    sh.Selected = false;
-                }
-
-                ShapeItemsControl.InvalidateArrange();
-            },
-            o =>
-            {
-                foreach (var sh in ss)
-                {
-                    sh.IsDeleted = false;
-                    sh.Selected = false;
-                }
-
-                ShapeItemsControl.InvalidateArrange();
-            },
-            o =>
-            {
-                foreach (var geometryShape in ss)
-                {
-                    Shapes.Remove(geometryShape);
-                    geometryShape.Dispose();
-                }
-            }, true
-        );
-    }
-
-    private void DoPointMove(GeoPoint point, Vector2<string> previous, Vector2<string> next)
-    {
-        if (point.PointGetter is PointGetter_Movable pg)
-            CmdManager.Do(pg, o =>
-            {
-                pg.SetStringPoint(next);
-                point.RefreshValues();
-            }, o =>
-            {
-                pg.SetStringPoint(previous);
-                point.RefreshValues();
-            }, o => { });
-    }
-
-    private void DoPointGetterChange(GeoPoint point, PointGetter previous, PointGetter next)
-    {
-        CmdManager.Do<object?>(null, o =>
-        {
-            previous.UnAttach(point);
-            point.PointGetter = next;
-            next.Attach(point);
-            point.RefreshValues();
-        }, o =>
-        {
-            next.UnAttach(point);
-            point.PointGetter = previous;
-            previous.Attach(point);
-            point.RefreshValues();
-        }, o => { }, true);
-    }
-
-    #endregion
-
-    #region ControlAction
-
-    /// <summary>
-    ///     监听数字输入框的变化 设置是否出错 并将操作添加入CmdManager
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void Number_OnPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
-    {
-        if (sender is TextBox tb)
-            if (e.Property == TextBox.TextProperty)
-            {
-                var n = tb.Tag as ExpNumber;
-                if (n is not null && tb.IsFocused)
-                {
-                    if (n.IsError)
-                    {
-                        DataValidationErrors.SetError(tb, n.Error);
-                        this.Info(new TextBlock { Text = n.Error.Message }, InfoType.Error);
-                    }
-                    else
-                    {
-                        (n.Owner as GeometryShape)?.RefreshValues();
-                        DataValidationErrors.ClearErrors(tb);
-                    }
-
-                    CmdManager.Do(
-                        new TextChangedCommand((string?)e.OldValue ?? "", (string?)e.NewValue ?? "", n, tb));
-                }
-            }
-    }
-
-    /// <summary>
-    ///     拦截操作的通用方法
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void EventHandledTrue(object? sender, RoutedEventArgs e)
-    {
-        e.Handled = true;
-    }
-
-    /// <summary>
-    ///     删除按钮
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void DeleteButtonClicked(object? sender, RoutedEventArgs e)
-    {
-        if (sender is Button btn)
-            if (btn.Tag is GeometryShape shape)
-                DoGeoShapesDelete([shape]);
-            else if (btn.Tag is GeoShape s) DoShapeDelete(s);
-
-        e.Handled = true;
-    }
-
-    /// <summary>
-    ///     绑定拦截操作
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void NumberTextBox_OnLoaded(object? sender, RoutedEventArgs e)
-    {
-        if (sender is TextBox tb) tb.AddHandler(KeyDownEvent, TunnelTextBoxKeyDown, RoutingStrategies.Tunnel);
-    }
-
-    /// <summary>
-    ///     使在TextBox中可以通过左右键来移动到同级TextBox
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    public void TextBoxKeyDown(object? sender, KeyEventArgs e)
-    {
-        if (sender is TextBox box)
-        {
-            var parent = box.Parent;
-            if (parent != null)
-            {
-                if (e.Key == Key.Left)
-                {
-                    var ls = new List<TextBox>();
-                    foreach (var i in parent.GetLogicalChildren())
-                        if (i is TextBox tb)
-                            ls.Add(tb);
-                    var index = ls.IndexOf(box);
-                    if (index > 0)
-                        ls[index - 1].Focus();
-                    e.Handled = true;
-                    return;
-                }
-
-                if (e.Key == Key.Right)
-                {
-                    var ls = new List<TextBox>();
-                    foreach (var i in parent.GetLogicalChildren())
-                        if (i is TextBox tb)
-                            ls.Add(tb);
-                    var index = ls.IndexOf(box);
-                    if (index < ls.Count - 1)
-                        ls[index + 1].Focus();
-                    e.Handled = true;
-                    return;
-                }
-            }
-
-            if (e.KeySymbol?.Length == 1 && (e.KeySymbol?[0] ?? 0) >= 33 && (e.KeySymbol?[0] ?? 0) < 127)
-            {
-                var keyChar = e.KeySymbol[0];
-                switch (keyChar)
-                {
-                    case >= 'a' and <= 'z':
-                    case >= 'A' and <= 'Z':
-                    case >= '0' and <= '9':
-                    case '+':
-                    case '-':
-                    case '*':
-                    case '/':
-                    case '(':
-                    case ')':
-                    case '%':
-                    case ',':
-                    case '^':
-                        return;
-                }
-            }
-
-            if (e.KeyModifiers == KeyModifiers.None)
-                switch (e.PhysicalKey)
-                {
-                    case PhysicalKey.Backspace:
-                    case PhysicalKey.Delete:
-                    case PhysicalKey.ArrowLeft:
-                    case PhysicalKey.ArrowRight:
-                        return;
-                }
-        }
-
-        e.Prevent();
-    }
-
-    /// <summary>
-    ///     拦截除了部分操作以外的键盘快捷键输入
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    public void TunnelTextBoxKeyDown(object? sender, KeyEventArgs e)
-    {
-        if (e.KeyModifiers == KeyModifiers.None)
-            return;
-        if (e.KeyModifiers.HasFlag(KeyModifiers.Control))
-        {
-            if (e.Key == Key.A)
-            {
-            }
-            else if (e.Key == Key.C)
-            {
-            }
-            else if (e.Key == Key.V)
-            {
-            }
-            else
-            {
-                e.Prevent();
-            }
-
-            return;
-        }
-
-        if (e.KeyModifiers.HasFlag(KeyModifiers.Alt))
-            e.Prevent();
-    }
-
-    /// <summary>
-    ///     几何操作RadioButton被选择
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    public void RadioButtonChecked(object? sender, RoutedEventArgs e)
-    {
-        if (sender is RadioButton rb)
-            if (rb.IsChecked == true && rb.Tag is ActionData ad)
-            {
-                SetAction(ad);
-                this.Info(new TextBlock { Text = CurrentAction.Description.Data }, InfoType.Information);
-            }
-    }
-
-    private void MathTextBoxKeyDown(object? sender, KeyEventArgs e)
-    {
-        if (e.Key == Key.Enter && e.KeyModifiers == KeyModifiers.None && IntervalCompiler
-                .TryCompile(MathTextBox.Function.Expression ?? "", Setting.Instance.EnableExpressionSimplification)
-                .Success(out _, out _))
-        {
-            AddShape(CreateImpFunc(MathTextBox.Function.Expression));
-            MathTextBox.Clear();
-        }
     }
 
     #endregion

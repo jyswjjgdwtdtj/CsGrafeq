@@ -3,7 +3,7 @@ using Avalonia.Controls.Templates;
 using Avalonia.Markup.Xaml.Templates;
 using CsGrafeq.Shapes;
 
-namespace CsGrafeqApplication.Addons.GeometryPad;
+namespace CsGrafeqApplication.Addons.GeometricPad;
 
 public class ImpFuncShowDataTemplate : IDataTemplate
 {

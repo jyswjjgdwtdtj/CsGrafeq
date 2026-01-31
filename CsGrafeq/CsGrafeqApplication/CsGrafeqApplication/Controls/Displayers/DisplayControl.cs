@@ -10,8 +10,17 @@ public delegate void RenderHandler(SKCanvas dc, SKRect bounds);
 
 public class DisplayControl : CartesianDisplayer
 {
+    /// <summary>
+    /// 上一时刻的零点位置
+    /// </summary>
     private PointL LastZeroPos;
+    /// <summary>
+    /// 鼠标按下时的位置
+    /// </summary>
     private PointL MouseDownPos = new() { X = 0, Y = 0 };
+    /// <summary>
+    /// 鼠标按下时的零点位置
+    /// </summary>
     private PointL MouseDownZeroPos = new() { X = 0, Y = 0 };
 
     public DisplayControl()
@@ -43,7 +52,7 @@ public class DisplayControl : CartesianDisplayer
             AskForRender();
         }
     }
-
+    
     protected override void OnPointerMoved(PointerEventArgs e)
     {
         Debug.LogPointer("PointerMoved");
@@ -68,53 +77,47 @@ public class DisplayControl : CartesianDisplayer
                     Zero = newZero;
                     lock (TotalBufferLock)
                     {
-                        using (var dc = new SKCanvas(TotalBuffer))
+                        using var dc = new SKCanvas(TotalBuffer);
+                        dc.Clear(AxisBackground);
+                        RenderAxisLine(dc);
+                        if ( (!Setting.Instance.MoveOptimization || (LastZeroPos - Zero).Length > 50))
                         {
-                            dc.Clear(AxisBackground);
-                            RenderAxisLine(dc);
-                            if (!Setting.Instance.MoveOptimization || (LastZeroPos - Zero).Length > 50)
+                            foreach (var adn in Addons)
+                            foreach (var rt in adn.Layers)
                             {
-                                foreach (var adn in Addons)
-                                foreach (var rt in adn.Layers)
+                                if (!rt.IsActive)
+                                    continue;
+                                var size = rt.RenderTargetSize;
+                                if (size.Width != TotalBuffer.Width || size.Height != TotalBuffer.Height)
                                 {
-                                    if (!rt.IsActive)
-                                        continue;
-                                    var size = rt.GetSize();
-                                    if (size.Width != TotalBuffer.Width || size.Height != TotalBuffer.Height)
-                                    {
-                                        Throw("Bitmap size mismatch");
-                                        return;
-                                    }
-
-                                    var newbmp = rt.GetCopy();
-                                    using (var canvas = rt.GetBitmapCanvas())
-                                    {
-                                        canvas.Clear(SKColors.Transparent);
-                                        canvas.DrawBitmap(newbmp, Zero.X - LastZeroPos.X,
-                                            Zero.Y - LastZeroPos.Y);
-                                        RenderMovedPlace(canvas, rt.Render);
-                                    }
-
-                                    newbmp.Dispose();
-                                    rt.DrawBitmap(dc, 0, 0);
+                                    Throw("Bitmap size mismatch");
+                                    return;
                                 }
-
-                                LastZeroPos = Zero;
-                            }
-                            else
-                            {
-                                foreach (var adn in Addons)
-                                foreach (var layer in adn.Layers)
+                                rt.CopyRenderTargetTo(TempBuffer);
+                                using (var canvas = rt.GetBitmapCanvas()!)
                                 {
-                                    if (!layer.IsActive)
-                                        continue;
-                                    layer.DrawBitmap(dc, (int)(Zero.X - LastZeroPos.X), (int)(Zero.Y - LastZeroPos.Y));
-                                    //RenderMovedPlace(dc, layer.Render);
+                                    canvas.Clear(SKColors.Transparent);
+                                    canvas.DrawBitmap(TempBuffer, Zero.X - LastZeroPos.X,
+                                        Zero.Y - LastZeroPos.Y);
+                                    RenderMovedPlace(canvas, rt.Render);
                                 }
+                                rt.DrawRenderTargetTo(dc, 0, 0);
                             }
-
-                            RenderAxisNumber(dc);
+                            LastZeroPos = Zero;
                         }
+                        else
+                        {
+                            foreach (var adn in Addons)
+                            foreach (var layer in adn.Layers)
+                            {
+                                if (!layer.IsActive)
+                                    continue;
+                                layer.DrawRenderTargetTo(dc, (int)(Zero.X - LastZeroPos.X), (int)(Zero.Y - LastZeroPos.Y));
+                                //RenderMovedPlace(dc, layer.Render);
+                            }
+                        }
+
+                        RenderAxisNumber(dc);
                     }
 
                     InvalidateVisual();

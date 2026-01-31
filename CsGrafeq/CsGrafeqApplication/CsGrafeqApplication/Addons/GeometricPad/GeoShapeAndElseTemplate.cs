@@ -2,7 +2,7 @@
 using Avalonia.Controls.Templates;
 using CsGrafeq.Shapes;
 
-namespace CsGrafeqApplication.Addons.GeometryPad;
+namespace CsGrafeqApplication.Addons.GeometricPad;
 
 public class GeoShapeAndElseTemplate : IDataTemplate
 {

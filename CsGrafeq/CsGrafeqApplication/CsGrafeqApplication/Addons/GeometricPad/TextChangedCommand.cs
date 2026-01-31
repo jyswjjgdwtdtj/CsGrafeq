@@ -1,14 +1,15 @@
 ﻿using System;
 using Avalonia.Controls;
+using CsGrafeq.Command;
 
-namespace CsGrafeqApplication.Addons.GeometryPad;
+namespace CsGrafeqApplication.Addons.GeometricPad;
 
-public class TextChangedCommand : CommandManager.Command
+public class TextChangedCommand : CommandBase
 {
     public readonly string PreviousText;
 
     public TextChangedCommand(string previous, string current, ExpNumber target, TextBox tb)
-        : base(new object(), _ => { }, _ => { }, _ => { })
+        : base(null, null, null, null, null)
     {
         PreviousText = previous;
         CurrentText = current;

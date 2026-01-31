@@ -3,7 +3,7 @@ using Avalonia.Controls.Templates;
 using CsGrafeq.Shapes;
 using CsGrafeq.Shapes.ShapeGetter;
 
-namespace CsGrafeqApplication.Addons.GeometryPad;
+namespace CsGrafeqApplication.Addons.GeometricPad;
 
 public class ShapeTemplate : IDataTemplate
 {

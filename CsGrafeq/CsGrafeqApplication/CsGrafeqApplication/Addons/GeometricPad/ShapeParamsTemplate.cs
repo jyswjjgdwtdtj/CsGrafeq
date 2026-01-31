@@ -6,7 +6,7 @@ using Avalonia.Layout;
 using CsGrafeq.Shapes.ShapeGetter;
 using ReactiveUI;
 
-namespace CsGrafeqApplication.Addons.GeometryPad;
+namespace CsGrafeqApplication.Addons.GeometricPad;
 
 public class ShapeParamsTemplate : IDataTemplate
 {

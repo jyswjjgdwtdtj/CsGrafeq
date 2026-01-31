@@ -11,11 +11,13 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using CsGrafeq.I18N;
-using CsGrafeqApplication.Addons.GeometryPad;
+using CsGrafeqApplication.Addons.GeometricPad;
+using CsGrafeqApplication.Addons.GeometricPad;
 using CsGrafeqApplication.Controls.Displayers;
 using CsGrafeqApplication.Core.Utils;
 using CsGrafeqApplication.Dialogs.InfoDialog;
 using CsGrafeqApplication.Dialogs.Interfaces;
+using CsGrafeqApplication.Utilities;
 using CsGrafeqApplication.ViewModels;
 using Material.Styles.Themes;
 using Microsoft.Win32;
@@ -45,7 +47,7 @@ public partial class DisplayerContainer : UserControl, IInfoDialog
     {
         KeyDown += GlobalKeyDown;
         DataContext = VM;
-        VM.Displayer = new DisplayControl { Addons = { new GeometryPad() } };
+        VM.Displayer = new DisplayControl { Addons = { new GeometricPad() } };
         InitializeComponent();
         anim.Delay = TimeSpan.FromSeconds(3);
         anim.Duration = TimeSpan.FromSeconds(0.2);
@@ -176,12 +178,12 @@ public partial class DisplayerContainer : UserControl, IInfoDialog
 
     private void StepBack_Clicked(object? sender, RoutedEventArgs e)
     {
-        VM.Displayer.Addons[0].Undo();
+        CommandHelper.CommandManager.UnDo();
     }
 
     private void StepOver_Clicked(object? sender, RoutedEventArgs e)
     {
-        VM.Displayer.Addons[0].Redo();
+        CommandHelper.CommandManager.ReDo();
     }
 
     private void ZoomOut_Clicked(object? sender, RoutedEventArgs e)

@@ -28,7 +28,8 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
     public List<Addon> NeedRenderingAddons = new();
     public bool NeedRenderingAll = false;
     public List<Renderable> NeedRenderingLayers = new();
-    protected SKBitmap TotalBuffer = new(1, 1);
+    protected SKBitmap TotalBuffer { get; set; } = new(1, 1);
+    protected SKBitmap TempBuffer { get; set; } = new(1, 1);
     protected object TotalBufferLock = new();
 
     public Displayer()
@@ -187,10 +188,12 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
                 lock (TotalBufferLock)
                 {
                     TotalBuffer.Dispose();
+                    TempBuffer.Dispose();
                     TotalBuffer = new SKBitmap((int)e.NewSize.Width, (int)e.NewSize.Height);
+                    TempBuffer = new SKBitmap((int)e.NewSize.Width, (int)e.NewSize.Height);
                     foreach (var adn in Addons)
                     foreach (var layer in adn.Layers)
-                        layer.SetBitmapSize(new SKSizeI((int)e.NewSize.Width, (int)e.NewSize.Height));
+                        layer.RenderTargetSize=new SKSizeI((int)e.NewSize.Width, (int)e.NewSize.Height);
                 }
 
                 ForceToRender();
@@ -229,7 +232,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
     {
         foreach (var layer in adn.Layers)
             Invalidate(layer);
-        adn.Changed = false;
+        adn.AddonChanged = false;
     }
 
     /// <summary>
@@ -247,10 +250,10 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
     {
         var paintflag = false;
         foreach (var adn in Addons)
-            if (adn.Changed)
+            if (adn.AddonChanged)
             {
                 paintflag = true;
-                adn.Changed = false;
+                adn.AddonChanged = false;
                 Invalidate(adn);
             }
             else
@@ -285,7 +288,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
             if (adn.Owner != this)
                 foreach (var i in adn.Layers)
                 {
-                    i.SetBitmapSize(new SKSizeI((int)Max(Bounds.Width, 1), (int)Max(Bounds.Height, 1)));
+                    i.RenderTargetSize=(new SKSizeI((int)Max(Bounds.Width, 1), (int)Max(Bounds.Height, 1)));
                     adn.Owner = this;
                 }
     }

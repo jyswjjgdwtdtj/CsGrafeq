@@ -30,4 +30,10 @@ public partial class Keyboard : TemplatedControl
     {
         TopLevel.GetTopLevel(this)?.Input(KeyboardInput.Backspace);
     }
+
+    protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
+    {
+        LogicalChildren.Clear();
+        LogicalChildren.Add(Content);
+    }
 }

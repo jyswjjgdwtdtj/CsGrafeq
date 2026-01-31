@@ -1,22 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using Avalonia;
-using Avalonia.Controls;
+using Avalonia.Controls.Templates;
 using Avalonia.Input;
+using CsGrafeq.I18N;
 using CsGrafeqApplication.Controls.Displayers;
+using ReactiveUI;
 using SkiaSharp;
 
 namespace CsGrafeqApplication.Addons;
 
-public abstract class Addon : UserControl
+public abstract class Addon : ReactiveObject
 {
     public const bool DoNext = true;
     public const bool Intercept = false;
-    public readonly CommandManager CmdManager = new();
     private readonly OnceLock IsAddonLoaded = new();
     internal readonly List<Renderable> Layers = new();
 
-    public bool Changed { get; set; } = false;
+    public IDataTemplate? InfoTemplate { get; init; }
+    public IDataTemplate? MainTemplate { get; init; }
+
+    public bool AddonChanged { get; set; } = false;
 
     //Addon内部勿动
     public bool IsAddonEnabled { get; set; } = true;
@@ -31,7 +35,7 @@ public abstract class Addon : UserControl
         }
     }
 
-    public abstract string AddonName { get; }
+    public MultiLanguageData AddonName { get; init; }
 
     internal void CallRender(SKCanvas dc, SKRect rect)
     {
@@ -136,16 +140,6 @@ public abstract class Addon : UserControl
     protected virtual bool AddonPointerWheeled(AddonPointerWheelEventArgs e)
     {
         return DoNext;
-    }
-
-    public void Undo()
-    {
-        CmdManager.UnDo();
-    }
-
-    public void Redo()
-    {
-        CmdManager.ReDo();
     }
 
     public abstract void Delete();

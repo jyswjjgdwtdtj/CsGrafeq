@@ -1,4 +1,8 @@
 ﻿using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
 using System.Text;
 using CsGrafeq.Collections;
 
@@ -25,14 +29,27 @@ public class ShapeList : ObservableCollection<Shape>
         foreach (var i in this.OfType<T>())
             i.Selected = false;
     }
-
+    [Obsolete("",true)]
     public new void Add(Shape shape)
     {
-        shape.ShapeChanged += () => ShapeChanged(shape);
-        if (shape is GeometryShape s)
-            AddGeometry(s);
+        throw new NotImplementedException("Not yet implemented");
+    }
+    public Result<Shape> TryAdd(Shape shape)
+    {
+        if (shape.Owner == null)
+        {
+            shape.ShapeChanged += () => ShapeChanged(shape);
+            if (shape is GeometryShape s)
+                AddGeometry(s);
+            else
+                AddNotGeometry(shape);
+            shape.Owner = this;
+            return  Result<Shape>.Success(shape);
+        }
         else
-            AddNotGeometry(shape);
+        {
+            return  Result<Shape>.Error("Shape already added to another ShapeList");
+        }
     }
 
     public void Delete(Shape shape)
@@ -83,6 +100,7 @@ public class ShapeList : ObservableCollection<Shape>
     {
         base.Remove(shape);
         shape.Selected = false;
+        shape.Owner = null;
         foreach (var i in shape.SubShapes)
             RemoveGeometry(i);
     }
@@ -94,6 +112,7 @@ public class ShapeList : ObservableCollection<Shape>
     private void RemoveNotGeometry(Shape shape)
     {
         base.Remove(shape);
+        shape.Owner= null;
     }
 
     /// <summary>

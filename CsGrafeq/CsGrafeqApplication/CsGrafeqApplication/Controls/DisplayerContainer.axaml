@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:CsGrafeqApplication.ViewModels"
              xmlns:addons="clr-namespace:CsGrafeqApplication.Addons"
-             xmlns:geopad="clr-namespace:CsGrafeqApplication.Addons.GeometryPad"
+             xmlns:geopad="clr-namespace:CsGrafeqApplication.Addons.GeometricPad"
              xmlns:i18N="clr-namespace:CsGrafeq.I18N;assembly=CsGrafeq.I18N"
              xmlns:corecontrols="clr-namespace:CsGrafeqApplication.Core.Controls;assembly=CsGrafeqApplication.Core"
              xmlns:views="clr-namespace:CsGrafeqApplication.Dialogs.Views;assembly=CsGrafeqApplication.Dialogs"
@@ -17,16 +17,14 @@
     <UserControl.Styles>
         <Styles>
             <StyleInclude Source="avares://CsGrafeqApplication.Core/Styles/PathStyles.axaml" />
-            <Style Selector="Path.Icon">
-                <Setter Property="Width" Value="22" />
-                <Setter Property="Height" Value="22" />
-            </Style>
         </Styles>
     </UserControl.Styles>
     <Panel Focusable="False">
+        <!--绘制层-->
         <Border Name="DisplayerCon" ZIndex="0" BorderThickness="0">
             <ContentPresenter Content="{CompiledBinding Displayer}" />
         </Border>
+        <!--键盘-->
         <corecontrols:Keyboard>
             <Panel Name="PART_Container" IsTabStop="False">
                 <Panel.Styles>
@@ -34,26 +32,37 @@
                         <Setter Property="IsTabStop" Value="False" />
                     </Style>
                 </Panel.Styles>
-                <StackPanel Orientation="Horizontal" ZIndex="10" Name="PART_Grid">
+                <!--Addon显示层-->
+                <DockPanel ZIndex="10">
+                <StackPanel DockPanel.Dock="Left" Orientation="Horizontal"  Name="PART_Grid">
                     <corecontrols:ExpandBox Name="OperationContainerExpandBox" ExpandDirection="Right"
                                             IsExpanded="{CompiledBinding #Toggle.IsChecked,Mode=OneWay}" Margin="0"
                                             Padding="0">
                         <Border Width="400" BorderThickness="0" BorderBrush="Gray" HorizontalAlignment="Left"
                                 Name="OperationContainer"
-                                DataContext="{CompiledBinding Displayer}"
                                 Background="{DynamicResource CgTranslucentBackgroundBrush}">
-                            <ItemsControl ItemsSource="{CompiledBinding Addons}" HorizontalAlignment="Stretch">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <VirtualizingStackPanel Orientation="Vertical" />
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.ItemTemplate>
+                            <TabControl Name="AddonsTabControl" SelectedIndex="{CompiledBinding AddonIndex,Mode=OneWay}" ItemsSource="{CompiledBinding Displayer.Addons}" HorizontalAlignment="Stretch">
+                                <TabControl.ContentTemplate>
                                     <DataTemplate DataType="addons:Addon">
-                                        <ContentPresenter Content="{CompiledBinding .}" />
+                                        <ContentControl Content="{CompiledBinding .}" ContentTemplate="{CompiledBinding MainTemplate}">
+                                            <ContentControl.Resources>
+                                                <ResourceDictionary>
+                                                    <ResourceDictionary.MergedDictionaries>
+                                                        <ResourceInclude Source="../Addons/GeometricPad/GeometricResources.axaml"></ResourceInclude>
+                                                    </ResourceDictionary.MergedDictionaries>
+                                                </ResourceDictionary>
+                                            </ContentControl.Resources>
+                                        </ContentControl>
                                     </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
+                                </TabControl.ContentTemplate>
+                                <TabControl.Styles>
+                                    <Style Selector="TabControl#AddonsTabControl">
+                                        <Style Selector="^ /template/ Panel#PART_TabsPanel">
+                                            <Setter Property="IsVisible" Value="False"></Setter>
+                                        </Style>
+                                    </Style>
+                                </TabControl.Styles>
+                            </TabControl>
                         </Border>
                     </corecontrols:ExpandBox>
                     <Border IsVisible="{CompiledBinding #Toggle.IsChecked,Mode=OneWay}" Width="8"
@@ -108,15 +117,22 @@
                                     </Style>
                                 </ToggleButton.Styles>
                             </ToggleButton>
-                            <Panel DockPanel.Dock="Right" ZIndex="5" IsHitTestVisible="False" Name="InfoCanvas"
+                            <Panel DockPanel.Dock="Right" ZIndex="5" Name="InfoCanvas"
                                    VerticalAlignment="Stretch"
                                    HorizontalAlignment="Stretch">
-                                <geopad:GeoPadInfo DataContext="{CompiledBinding  Displayer.Addons[0].DataContext}"
-                                                   HorizontalAlignment="Stretch" />
+                                <ComboBox SelectedIndex="{CompiledBinding AddonIndex,Mode=TwoWay}" Name="ChooseAddonComboBox" VerticalAlignment="Top" ItemsSource="{CompiledBinding Displayer.Addons}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{CompiledBinding AddonName.Data}"></TextBlock>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
                             </Panel>
                         </DockPanel>
                     </Border>
                 </StackPanel>
+                </DockPanel>
+                <!--设置层-->
                 <Grid ColumnDefinitions="*,52" RowDefinitions="*,52" ZIndex="15" Name="SettingDockPanel"
                       VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                     <Grid.Styles>
@@ -128,6 +144,10 @@
                             <Style Selector="RepeatButton">
                                 <Setter Property="Width" Value="32" />
                                 <Setter Property="Height" Value="32" />
+                            </Style>
+                            <Style Selector="Path.Icon">
+                                <Setter Property="Width" Value="22" />
+                                <Setter Property="Height" Value="22" />
                             </Style>
                         </Styles>
                     </Grid.Styles>

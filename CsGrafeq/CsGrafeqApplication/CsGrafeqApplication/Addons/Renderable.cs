@@ -31,7 +31,7 @@ public class Renderable : IDisposable
             var flag = value && !field;
             field = value;
             Changed = true;
-            if (flag) SetBitmapSize(Size);
+            if (flag) RenderTargetSize = Size;
         }
     } = true;
 
@@ -40,6 +40,20 @@ public class Renderable : IDisposable
     /// </summary>
     public bool Changed { get; set; }
 
+    public SKSizeI RenderTargetSize
+    {
+        get => Size;
+        set
+        {
+            Size = value;
+            lock (BitmapLock)
+            {
+                Bitmap.Dispose();
+                Bitmap = new SKBitmap(int.Max(value.Width, 1), int.Max(value.Height, 1));
+            }
+        }
+    }
+
     /// <summary>
     ///     删除
     /// </summary>
@@ -47,20 +61,6 @@ public class Renderable : IDisposable
     {
         Bitmap?.Dispose();
         GC.SuppressFinalize(this);
-    }
-
-    /// <summary>
-    ///     改变缓冲区大小 只可放大
-    /// </summary>
-    /// <param name="size">缓冲区大小</param>
-    public void SetBitmapSize(SKSizeI size)
-    {
-        Size = size;
-        lock (BitmapLock)
-        {
-            Bitmap.Dispose();
-            Bitmap = new SKBitmap(int.Max(size.Width, 1), int.Max(size.Height, 1));
-        }
     }
 
     /// <summary>
@@ -78,25 +78,16 @@ public class Renderable : IDisposable
     }
 
     /// <summary>
-    ///     获取当前缓冲区应该的大小
-    /// </summary>
-    /// <returns></returns>
-    public SKSizeI GetSize()
-    {
-        return Size;
-    }
-
-    /// <summary>
     ///     获取缓冲区的拷贝
     /// </summary>
     /// <returns></returns>
-    public SKBitmap? GetCopy()
+    public void CopyRenderTargetTo(SKBitmap bitmap)
     {
         if (!IsActive)
-            return null;
+            return;
         lock (BitmapLock)
         {
-            return Bitmap.Copy();
+            Bitmap.TryRealCopyTo(bitmap);
         }
     }
 
@@ -106,7 +97,7 @@ public class Renderable : IDisposable
     /// <param name="canvas"></param>
     /// <param name="x"></param>
     /// <param name="y"></param>
-    public void DrawBitmap(SKCanvas canvas, int x, int y)
+    public void DrawRenderTargetTo(SKCanvas canvas, int x, int y)
     {
         if (!IsActive)
             return;

@@ -1,0 +1,144 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Design.PreviewWith>
+        <Border Padding="20">
+            <!-- Add Controls for Previewer Here -->
+        </Border>
+    </Design.PreviewWith>
+
+    <Style Selector="Viewbox">
+        <Setter Property="Width" Value="25" />
+        <Setter Property="Height" Value="25" />
+        <Setter Property="Stretch" Value="Uniform" />
+    </Style>
+    <Style Selector="Expander.NoBorderExpander">
+        <Style Selector="^ /template/ ToggleButton#ExpanderHeader">
+            <Setter Property="BorderThickness" Value="0,1,0,0" />
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style Selector="^ /template/ Border#ExpanderContent">
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+    </Style>
+    <Style Selector="TextBox">
+        <Setter Property="FontFamily" Value="{StaticResource MapleMono}" />
+    </Style>
+    <Style Selector="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource MapleMono}" />
+    </Style>
+    <Style Selector="TextBox DataValidationErrors">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <DockPanel LastChildFill="True">
+                    <ContentPresenter Background="{TemplateBinding Background}"
+                                      BorderThickness="{TemplateBinding BorderThickness}"
+                                      CornerRadius="{TemplateBinding CornerRadius}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      Content="{TemplateBinding Content}"
+                                      Padding="{TemplateBinding Padding}" />
+                </DockPanel>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="TextBox.NoDataValidation DataValidationErrors">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <DockPanel LastChildFill="True">
+                    <ContentPresenter CornerRadius="{TemplateBinding CornerRadius}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      Content="{TemplateBinding Content}"
+                                      Padding="{TemplateBinding Padding}" />
+                </DockPanel>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="TextBox.CommonTextBox">
+        <Setter Property="AcceptsReturn" Value="False" />
+        <Setter Property="MinWidth" Value="30" />
+        <Setter Property="Width" Value="NaN" />
+        <Setter Property="Height" Value="30" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="TextBox.Big">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Foreground" Value="{DynamicResource CgForegroundBrush}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="TextBox.Small">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Foreground" Value="{DynamicResource CgHalfForegroundBrush}" />
+        <Setter Property="Height" Value="20" />
+    </Style>
+    <Style Selector="TextBlock.Big">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Foreground" Value="{DynamicResource CgForegroundBrush}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="TextBlock.Small">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Foreground" Value="{DynamicResource CgHalfForegroundBrush}" />
+        <Setter Property="Height" Value="20" />
+    </Style>
+    <Style Selector="TextBlock.Prompt">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Foreground" Value="{DynamicResource CgHalfForegroundBrush}" />
+    </Style>
+    <Style Selector="RadioButton.GeoRadio">
+        <Setter Property="Width" Value="45" />
+        <Setter Property="Height" Value="45" />
+        <Setter Property="GroupName" Value="GeoRadio" />
+        <Style Selector="^ /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource CgTransparentBrush}" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Duration="0:0:0.1" Property="Background" />
+                </Transitions>
+            </Setter>
+            <Setter Property="CornerRadius" Value="5" />
+        </Style>
+        <Style Selector="^:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource MaterialPrimaryLightBrush}" />
+        </Style>
+        <Style Selector="^:checked /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource MaterialPrimaryMidBrush}" />
+        </Style>
+    </Style>
+    <Style Selector="CheckBox.VisibilityCheckBox">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border BorderThickness="0">
+                    <Panel Name="#PART_Container">
+                        <Ellipse Width="20" Height="20" Stroke="{DynamicResource MaterialPrimaryDarkBrush}"
+                                 VerticalAlignment="Center" HorizontalAlignment="Center"
+                                 StrokeThickness="1" Fill="White" ZIndex="0" />
+                        <Ellipse Width="12" Height="12" VerticalAlignment="Center"
+                                 HorizontalAlignment="Center" Name="PART_InnerCircle" ZIndex="1" />
+                    </Panel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style Selector="^ /template/ Ellipse#PART_InnerCircle">
+            <Setter Property="Fill" Value="{DynamicResource MaterialPrimaryLightBrush}" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Fill" Duration="0:0:0.1" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="^:checked /template/ Ellipse#PART_InnerCircle">
+            <Setter Property="Fill" Value="{DynamicResource MaterialPrimaryMidBrush}" />
+        </Style>
+        <Style Selector="^ /template/ Panel#PART_Container">
+            <Setter Property="Margin" Value="5,0" />
+        </Style>
+    </Style>
+    <StyleInclude Source="avares://CsGrafeqApplication.Core/Styles/PathStyles.axaml" />
+    <Style Selector="Path.FunctionIcon">
+        <Setter Property="Fill" Value="{DynamicResource CgForegroundBrush}" />
+        <Setter Property="Stretch" Value="None" />
+    </Style>
+</Styles>

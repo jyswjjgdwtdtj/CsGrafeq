@@ -15,6 +15,12 @@ public delegate void ShapeChangedHandler<T1, T2>(T1 shape, T2 args) where T1 : S
 /// </summary>
 public abstract class Shape : ObservableObject, IDisposable
 {
+    public ShapeList? Owner
+    {
+        get;
+        internal set;
+    }
+    
     /// <summary>
     ///     是否可以交互
     /// </summary>
