@@ -60,15 +60,16 @@ public static class SkiaHelper
         );
         FilledTpMid.Color = Mid.WithAlpha(90);
     }
+
     /// <summary>
-    /// 基于内存拷贝的位图复制 用以替换超低效率超高内存分配的SKBitmap.CopyTo
+    ///     基于内存拷贝的位图复制 用以替换超低效率超高内存分配的SKBitmap.CopyTo
     /// </summary>
     /// <param name="source"></param>
     /// <param name="dest"></param>
     /// <returns></returns>
     public static bool TryRealCopyTo(this SKBitmap source, SKBitmap dest)
     {
-        if(source.Width != dest.Width || source.Height != dest.Height)
+        if (source.Width != dest.Width || source.Height != dest.Height)
             return false;
         source.GetPixelSpan().CopyTo(dest.GetPixelSpan());
         return true;

@@ -116,8 +116,6 @@ public class CircleGetter_FromCenterAndPoint : CircleGetter
     {
         Center.AddSubShape(subShape);
         Point.AddSubShape(subShape);
-        ;
-        ;
     }
 
     public override void UnAttach(GeometryShape subShape)

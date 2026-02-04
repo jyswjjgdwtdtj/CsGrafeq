@@ -34,7 +34,8 @@
             </Style>
         </Styles>
     </ToggleButton.Styles>
-    <RepeatButton Name="PART_Button" Background="{DynamicResource CgBackgroundBrush}" CornerRadius="4" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+    <RepeatButton Name="PART_Button" Background="{DynamicResource CgBackgroundBrush}" CornerRadius="4"
+                  HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                   Focusable="False" BorderBrush="{DynamicResource CgForegroundBrush}">
         <Panel Width="{CompiledBinding #PART_Button.Width}" Height="{CompiledBinding #PART_Button.Height}">
             <TextBlock

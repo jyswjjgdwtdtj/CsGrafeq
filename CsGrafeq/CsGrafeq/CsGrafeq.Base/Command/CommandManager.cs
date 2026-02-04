@@ -7,7 +7,7 @@ public class CommandManager
 
     public CommandManager()
     {
-        _doList = new([new CommandBase(null,null,null, null, null)]);
+        _doList = new LinkedList<CommandBase>([new CommandBase(null, null, null, null, null)]);
         _currentDoNode = _doList.First!;
     }
 
@@ -17,8 +17,8 @@ public class CommandManager
         {
             _currentDoNode = _currentDoNode.Next!;
             _currentDoNode.Value.Do.Invoke(_currentDoNode.Value.Tag);
-            
-            Console.WriteLine("Redo:"+_currentDoNode.Value.Description);
+
+            Console.WriteLine("Redo:" + _currentDoNode.Value.Description);
         }
     }
 
@@ -27,12 +27,13 @@ public class CommandManager
         if (_currentDoNode != _doList.First)
         {
             _currentDoNode.Value.UnDo.Invoke(_currentDoNode.Value.Tag);
-            Console.WriteLine("Undo:"+_currentDoNode.Value.Description);
+            Console.WriteLine("Undo:" + _currentDoNode.Value.Description);
             _currentDoNode = _currentDoNode.Previous!;
         }
     }
 
-    public void Do(object? tag,Action<object?> initFunc, Action<object?> doFunc, Action<object?> unDoFunc, Action<object?> clearFunc, bool invokeDo = false,string des="")
+    public void Do(object? tag, Action<object?> initFunc, Action<object?> doFunc, Action<object?> unDoFunc,
+        Action<object?> clearFunc, bool invokeDo = false, string des = "")
     {
         while (_doList.Last != _currentDoNode)
         {
@@ -42,7 +43,7 @@ public class CommandManager
 
         initFunc(tag);
         if (invokeDo) doFunc.Invoke(tag);
-        _doList.AddLast(new CommandBase(tag,initFunc, doFunc, unDoFunc, clearFunc){Description = des});
+        _doList.AddLast(new CommandBase(tag, initFunc, doFunc, unDoFunc, clearFunc) { Description = des });
         _currentDoNode = _doList.Last;
     }
 
@@ -53,6 +54,7 @@ public class CommandManager
             _doList.Last!.Value.Clear(_doList.Last.Value.Tag);
             _doList.RemoveLast();
         }
+
         command.Init.Invoke(command.Tag);
         if (invokeDo) command.Do.Invoke(command.Tag);
         _doList.AddLast(command);

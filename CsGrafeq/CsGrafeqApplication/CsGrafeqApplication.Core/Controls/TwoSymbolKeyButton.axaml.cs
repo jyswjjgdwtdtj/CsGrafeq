@@ -8,14 +8,10 @@ namespace CsGrafeqApplication.Core.Controls;
 
 public partial class TwoSymbolKeyButton : ToggleButton
 {
-    public static readonly StyledProperty<float> SecondFontSizeProperty = AvaloniaProperty.Register<TwoSymbolKeyButton, float>(
-        nameof(SecondFontSize));
+    public static readonly StyledProperty<float> SecondFontSizeProperty =
+        AvaloniaProperty.Register<TwoSymbolKeyButton, float>(
+            nameof(SecondFontSize));
 
-    public float SecondFontSize
-    {
-        get => GetValue(SecondFontSizeProperty);
-        set => SetValue(SecondFontSizeProperty, value);
-    }
     public static readonly DirectProperty<TwoSymbolKeyButton, string> FirstButtonProperty =
         AvaloniaProperty.RegisterDirect<TwoSymbolKeyButton, string>(
             nameof(FirstButton), o => o.FirstButton, (o, v) => o.FirstButton = v);
@@ -26,11 +22,13 @@ public partial class TwoSymbolKeyButton : ToggleButton
 
     public static readonly DirectProperty<TwoSymbolKeyButton, KeyboardInput> FirstKeyboardInputProperty =
         AvaloniaProperty.RegisterDirect<TwoSymbolKeyButton, KeyboardInput>(
-            nameof(FirstKeyboardInput), o => o.FirstKeyboardInput, (o, v) => o.FirstKeyboardInput = v);
+            nameof(FirstKeyboardInput), o => o.FirstKeyboardInput, (o, v) => o.FirstKeyboardInput = v,
+            KeyboardInput.None);
 
     public static readonly DirectProperty<TwoSymbolKeyButton, KeyboardInput> SecondKeyboardInputProperty =
         AvaloniaProperty.RegisterDirect<TwoSymbolKeyButton, KeyboardInput>(
-            nameof(SecondKeyboardInput), o => o.SecondKeyboardInput, (o, v) => o.SecondKeyboardInput = v);
+            nameof(SecondKeyboardInput), o => o.SecondKeyboardInput, (o, v) => o.SecondKeyboardInput = v,
+            KeyboardInput.None);
 
     public static readonly DirectProperty<TwoSymbolKeyButton, string> CurrentButtonProperty =
         AvaloniaProperty.RegisterDirect<TwoSymbolKeyButton, string>(
@@ -44,8 +42,14 @@ public partial class TwoSymbolKeyButton : ToggleButton
         CurrentButton = FirstButton;
         PART_Button.Click += (s, e) =>
         {
-            TopLevel.GetTopLevel(this)?.Input(IsChecked ?? false ? FirstKeyboardInput : SecondKeyboardInput);
+            TopLevel.GetTopLevel(this)?.Input(IsChecked ?? false ? FirstButton : SecondButton);
         };
+    }
+
+    public float SecondFontSize
+    {
+        get => GetValue(SecondFontSizeProperty);
+        set => SetValue(SecondFontSizeProperty, value);
     }
 
     public string CurrentButton

@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml.Styling;
 using CsGrafeq.I18N;
-using CsGrafeq.Interval;
 using CsGrafeq.Shapes;
 using CsGrafeq.Shapes.ShapeGetter;
 using CsGrafeqApplication.Controls.Displayers;
@@ -21,9 +18,7 @@ using AvaPoint = Avalonia.Point;
 using AvaRect = Avalonia.Rect;
 using AvaSize = Avalonia.Size;
 using GeoHalf = CsGrafeq.Shapes.Half;
-using static CsGrafeqApplication.Extension;
 using static CsGrafeqApplication.Core.Utils.StaticSkiaResources;
-using Range = CsGrafeq.Interval.Range;
 
 namespace CsGrafeqApplication.Addons.GeometricPad;
 
@@ -49,7 +44,7 @@ public class GeometricPad : Addon
         CurrentAction = GeometryActions.Actions.FirstOrDefault()?.FirstOrDefault()!;
         Layers.Add(MainRenderTarget);
         MainRenderTarget.OnRender += Renderable_OnRender;
-        Shapes.CollectionChanged+= (s, e) =>
+        Shapes.CollectionChanged += (s, e) =>
         {
             MainRenderTarget.Changed = true;
             Owner?.AskForRender();
@@ -111,8 +106,6 @@ public class GeometricPad : Addon
     /// </summary>
     internal ActionData CurrentAction { get; private set; }
 
-    
-
 
     /// <summary>
     ///     设置Action
@@ -139,7 +132,6 @@ public class GeometricPad : Addon
         CommandHelper.DoShapeAdd(Shapes, shape);
         return shape;
     }
-
 
 
     #region KeyAction
@@ -479,9 +471,11 @@ public class GeometricPad : Addon
                filledPaint = new() { IsAntialias = true },
                strokePaint = new() { IsStroke = true, IsAntialias = true, StrokeWidth = 2 },
                strokePaint1 = new() { IsStroke = true, IsAntialias = true, StrokeWidth = 1 },
-               strokeMain = new() { Color = cd.AxisPaintMain.Color, IsStroke = true, IsAntialias = true, StrokeWidth = 1 },
-               paintMain = new() { Color = cd.AxisPaintMain.Color, IsAntialias = true, StrokeWidth = 1},
-               strokePaintMain = new() { Color = cd.AxisPaintMain.Color, IsAntialias = true, IsStroke = true, StrokeWidth = 1 },
+               strokeMain = new()
+                   { Color = cd.AxisPaintMain.Color, IsStroke = true, IsAntialias = true, StrokeWidth = 1 },
+               paintMain = new() { Color = cd.AxisPaintMain.Color, IsAntialias = true, StrokeWidth = 1 },
+               strokePaintMain = new()
+                   { Color = cd.AxisPaintMain.Color, IsAntialias = true, IsStroke = true, StrokeWidth = 1 },
                bubbleBack = new() { Color = cd.AxisPaint1.Color.WithAlpha(90), IsAntialias = true })
         {
             foreach (var shape in shapes)

@@ -1,7 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Avalonia.Markup.Xaml.Templates;
-using CsGrafeq.Shapes;
 using CsGrafeqApplication.Function;
 
 namespace CsGrafeqApplication.Addons.FunctionPad;

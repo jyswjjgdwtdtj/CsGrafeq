@@ -15,7 +15,6 @@
 
     <ItemGroup>
         <PackageReference Include="FastExpressionCompiler" Version="5.3.0"/>
-        <PackageReference Include="HotAvalonia" Version="3.0.2"/>
         <PackageReference Include="MathNet.Symbolics" Version="0.25.0"/>
         <PackageReference Include="ReactiveUI" Version="22.3.1"/>
     </ItemGroup>

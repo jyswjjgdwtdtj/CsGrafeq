@@ -1,9 +1,4 @@
-﻿using System;
-using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Input;
-using Avalonia.Rendering;
-using Avalonia.VisualTree;
+﻿using Avalonia.Controls;
 
 namespace CsGrafeqApplication.Views;
 

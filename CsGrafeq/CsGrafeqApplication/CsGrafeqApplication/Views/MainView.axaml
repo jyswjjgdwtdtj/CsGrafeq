@@ -13,9 +13,9 @@
         </Style>
         <Style Selector="TextBox">
             <Setter Property="FontFamily" Value="{StaticResource MapleMono}" />
-            <Setter Property="IsUndoEnabled" Value="False"/>
+            <Setter Property="IsUndoEnabled" Value="False" />
         </Style>
-        
+
     </UserControl.Styles>
     <Design.DataContext>
         <vm:MainViewModel />

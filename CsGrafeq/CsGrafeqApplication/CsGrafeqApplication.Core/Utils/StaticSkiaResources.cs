@@ -1,7 +1,4 @@
-﻿using System.Reactive.Linq;
-using Avalonia.Platform;
-using CsGrafeq;
-using ReactiveUI;
+﻿using Avalonia.Platform;
 using SkiaSharp;
 using static CsGrafeqApplication.Core.Utils.PointRectHelper;
 

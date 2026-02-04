@@ -8,10 +8,6 @@
 
 
     <ItemGroup>
-        <Compile Update="Controls\Markdown.axaml.cs">
-            <DependentUpon>Markdown.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
         <Compile Update="Controls\Keyboard.axaml">
             <DependentUpon>Keyboard.axaml</DependentUpon>
             <SubType>Code</SubType>
@@ -38,11 +34,17 @@
         <Compile Update="Controls\ExpandBox.cs">
             <DependentUpon>ExpandBox.axaml</DependentUpon>
         </Compile>
+        <Compile Update="Controls\Markdown.axaml.cs">
+            <DependentUpon>Markdown.axaml</DependentUpon>
+        </Compile>
     </ItemGroup>
 
     <ItemGroup>
         <Reference Include="Avalonia.Controls">
             <HintPath>C:\Users\bryan\.nuget\packages\avalonia\11.3.7\ref\net8.0\Avalonia.Controls.dll</HintPath>
+        </Reference>
+        <Reference Include="Avalonia.Themes.Fluent">
+            <HintPath>C:\Users\bryan\.nuget\packages\avalonia.themes.fluent\11.3.7\lib\net8.0\Avalonia.Themes.Fluent.dll</HintPath>
         </Reference>
     </ItemGroup>
 
@@ -54,7 +56,6 @@
         <PackageReference Include="CSharpMath.Rendering"/>
         <PackageReference Include="CSharpMath.SkiaSharp"/>
         <PackageReference Include="HarfBuzzSharp"/>
-        <PackageReference Include="HotAvalonia"/>
         <PackageReference Include="LiveMarkdown.Avalonia"/>
         <PackageReference Include="Material.Avalonia"/>
         <PackageReference Include="SkiaSharp"/>

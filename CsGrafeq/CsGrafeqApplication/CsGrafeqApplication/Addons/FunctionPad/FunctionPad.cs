@@ -4,12 +4,8 @@ using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Avalonia.Markup.Xaml.Styling;
-using Avalonia.Skia;
-using CsGrafeq.Command;
 using CsGrafeq.I18N;
 using CsGrafeq.Interval;
-using CsGrafeq.Shapes;
-using CsGrafeqApplication.Controls.Displayers;
 using CsGrafeqApplication.Function;
 using CsGrafeqApplication.Utilities;
 using SkiaSharp;
@@ -17,11 +13,11 @@ using Range = CsGrafeq.Interval.Range;
 
 namespace CsGrafeqApplication.Addons.FunctionPad;
 
-public class FunctionPad:Addon
+public class FunctionPad : Addon
 {
     public FunctionPad()
     {
-        AddonName=MultiLanguageResources.Instance.FunctionPadText;
+        AddonName = MultiLanguageResources.Instance.FunctionPadText;
         var host = new Control();
         object? obj;
         host.Resources.MergedDictionaries.Add(
@@ -33,92 +29,84 @@ public class FunctionPad:Addon
         MainTemplate = (IDataTemplate)obj;
         host.TryFindResource("FunctionPadInfoTemplate", out obj);
         InfoTemplate = (IDataTemplate)obj;
+        Functions.CollectionChanged += (s, e) =>
+        {
+            Setting.Instance.MoveOptimizationUserEnabled =
+                Setting.Instance.ZoomOptimizationUserEnabled = Functions.Count == 0;
+            if (Functions.Count != 0) Setting.Instance.MoveOptimization = Setting.Instance.ZoomOptimization = true;
+        };
     }
+
+    /// <summary>
+    ///     请勿自行添加或删除此列表中的元素，应使用CreateAndAddFunction和DeleteFunction方法
+    /// </summary>
+    public AvaloniaList<ImplicitFunction> Functions { get; } = new();
+
     public override void Delete()
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
+
     public override void SelectAll()
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
+
     public override void DeselectAll()
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
-    /// <summary>
-    /// 请勿自行添加或删除此列表中的元素，应使用CreateAndAddFunction和DeleteFunction方法
-    /// </summary>
-    public AvaloniaList<ImplicitFunction> Functions { get; } = new AvaloniaList<ImplicitFunction>();
 
     private ImplicitFunction CreateAndAddFunctionCore(string exp)
     {
-        var func = new ImplicitFunction(exp,this);
+        var func = new ImplicitFunction(exp, this);
         Functions.Add(func);
         Layers.Add(func.RenderTarget);
-        func.RenderTarget.RenderTargetSize = new SKSizeI((int)(Owner?.Bounds.Size.Width??1), (int)(Owner?.Bounds.Size.Height??1));
-        func.RenderTarget.OnRender+= (dc, rect) => RenderFunction(dc,new SKRectI((int)rect.Left,(int)rect.Top,(int)rect.Right,(int)rect.Bottom), func);
-        func.FuncChanged+= (ImplicitFunction f) =>
+        func.RenderTarget.RenderTargetSize =
+            new SKSizeI((int)(Owner?.Bounds.Size.Width ?? 1), (int)(Owner?.Bounds.Size.Height ?? 1));
+        func.RenderTarget.OnRender += (dc, rect) => RenderFunction(dc,
+            new SKRectI((int)rect.Left, (int)rect.Top, (int)rect.Right, (int)rect.Bottom), func);
+        func.FuncChanged += f =>
         {
             f.RenderTarget.Changed = true;
             Owner?.AskForRender();
         };
         return func;
     }
+
     public ImplicitFunction CreateAndAddFunction(string exp)
     {
-        var func=CreateAndAddFunctionCore(exp);
+        var func = CreateAndAddFunctionCore(exp);
         CommandHelper.CommandManager.Do(
             null,
-            _ =>
-            {
-            },
-            o =>
-            {
-                func.IsDeleted = false;
-            },
-            o =>
-            {
-                func.IsDeleted = true;
-            },
-            o =>
-            {
-                this.DeleteFunctionCore(func);
-            }, true
+            _ => { },
+            o => { func.IsDeleted = false; },
+            o => { func.IsDeleted = true; },
+            o => { DeleteFunctionCore(func); }, true
         );
-        return  func;
+        return func;
     }
+
     public void DeleteFunction(ImplicitFunction func)
     {
-        if(func.Owner!=this)
+        if (func.Owner != this)
             return;
         CommandHelper.CommandManager.Do(
             null,
-            _=>
-            {
-                func.IsDeleted = true;
-            },
-            o =>
-            {
-                func.IsDeleted = true;
-            },
-            o =>
-            {
-                func.IsDeleted = false;
-            },
-            o =>
-            {
-                func.IsDeleted = false;
-            }, false
+            _ => { func.IsDeleted = true; },
+            o => { func.IsDeleted = true; },
+            o => { func.IsDeleted = false; },
+            o => { func.IsDeleted = false; }
         );
     }
+
     private void DeleteFunctionCore(ImplicitFunction func)
     {
         Functions.Remove(func);
         Layers.Remove(func.RenderTarget);
         func.Dispose();
     }
-    
+
     private void RenderFunction(SKCanvas dc, SKRectI rect, ImplicitFunction impFunc)
     {
         if (!impFunc.IsCorrect)
@@ -197,5 +185,4 @@ public class FunctionPad:Addon
             }
         }
     }
-    
 }

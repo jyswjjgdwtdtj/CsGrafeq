@@ -222,6 +222,7 @@ public enum KeyboardInput
   NaturalLogarithm = 13265, // 0x000033D1
   Logarithm = 13266, // 0x000033D2
   */
+    None = 0,
 
     // Navigation
     Up = '⏶',

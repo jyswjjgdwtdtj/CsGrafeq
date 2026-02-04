@@ -42,6 +42,12 @@ public class MultiLanguageResourcesGenerator : IIncrementalGenerator
             }
         }
 
+        var en = Resources.README.Replace("\"", "\"\"");
+        var zh = Resources.README_ZH.Replace("\"", "\"\"");
+        builder.AppendLine(
+            $"\tpublic MultiLanguageData ReadmeText {{ get; }} = new MultiLanguageData() {{ Chinese = @\"{zh}\", English = @\"{en}\" }};");
+
+
         builder.AppendLine("\tpublic MultiLanguageResources(){");
         builder.AppendLine("\t\tAll = new global::System.Collections.Generic.Dictionary<string, MultiLanguageData>{");
         builder.Append(dicBuilder);

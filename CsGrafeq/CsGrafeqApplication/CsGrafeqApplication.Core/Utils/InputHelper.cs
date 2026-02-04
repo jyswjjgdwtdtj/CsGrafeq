@@ -5,6 +5,20 @@ namespace CsGrafeqApplication.Core.Utils;
 
 public static class InputHelper
 {
+    public static bool TryFindTextBox(this TopLevel top, out TextBox textBox)
+    {
+        var f = top.FocusManager?.GetFocusedElement();
+
+        if (f is TextBox tb)
+        {
+            textBox = tb;
+            return true;
+        }
+
+        textBox = null;
+        return false;
+    }
+
     public static bool Input(this TopLevel top, KeyboardInput input)
     {
         var f = top.FocusManager?.GetFocusedElement();
@@ -37,6 +51,21 @@ public static class InputHelper
                     tb.InsertTextAtCursor(((char)(int)input).ToString());
                     break;
             }
+
+        return false;
+    }
+
+    public static bool Input(this TopLevel top, string str)
+    {
+        var f = top.FocusManager?.GetFocusedElement();
+        /*if (f is RichExpressionBox mb)
+        {
+            mb.PressKey(input);
+            return true;
+        }*/
+
+        if (f is TextBox tb)
+            tb.InsertTextAtCursor(str);
 
         return false;
     }

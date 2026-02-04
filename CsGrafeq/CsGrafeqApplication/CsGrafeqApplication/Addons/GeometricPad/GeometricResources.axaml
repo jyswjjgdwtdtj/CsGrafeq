@@ -1,8 +1,6 @@
 ﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:geometricpad="clr-namespace:CsGrafeqApplication.Addons.GeometricPad"
-                    xmlns:ctls="clr-namespace:CsGrafeqApplication.Controls"
-                    xmlns:shapes1="clr-namespace:CsGrafeq.Shapes"
                     xmlns:system="clr-namespace:System;assembly=System.Runtime"
                     xmlns:addons="clr-namespace:CsGrafeqApplication.Addons">
     <DataTemplate x:Key="GeometricPadViewTemplate" x:DataType="geometricpad:GeometricPad">
@@ -89,6 +87,6 @@
             </TabControl>
         </ContentControl>
     </DataTemplate>
-    
+
     <system:Double x:Key="Number">40</system:Double>
 </ResourceDictionary>

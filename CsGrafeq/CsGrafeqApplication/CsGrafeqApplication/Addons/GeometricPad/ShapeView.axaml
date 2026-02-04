@@ -221,7 +221,7 @@
                                                                 <Run Text=" " />
                                                             </TextBlock>
                                                             <TextBlock
-                                                                Text="{CompiledBinding On.TypeName,Mode=TwoWay,DataType=getter:PointGetter_Movable}"
+                                                                Text="{CompiledBinding On.TypeName.Data,Mode=TwoWay,DataType=getter:PointGetter_Movable}"
                                                                 Classes="CommonTextBox Small" />
                                                             <TextBlock Text=" "
                                                                        TextAlignment="Left"

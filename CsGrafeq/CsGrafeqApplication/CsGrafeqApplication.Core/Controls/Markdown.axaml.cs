@@ -1,36 +1,23 @@
-﻿using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Metadata;
+﻿using Avalonia.Controls;
+using Avalonia.Controls.Templates;
 using LiveMarkdown.Avalonia;
 
 namespace CsGrafeqApplication.Core.Controls;
 
-public partial class Markdown : Border
+public partial class Markdown : UserControl
 {
-    public static readonly DirectProperty<Markdown, string?> MarkdownContentProperty =
-        AvaloniaProperty.RegisterDirect<Markdown, string?>(
-            nameof(MarkdownContent), o => o.MarkdownContent, (o, v) => o.MarkdownContent = v);
-
-    private readonly ObservableStringBuilder MarkdownStringBuilder = new();
-
     public Markdown()
     {
         InitializeComponent();
-        MdRender.MarkdownBuilder = MarkdownStringBuilder;
-        PropertyChanged += (_, e) =>
+        ContentTemplate = new FuncDataTemplate<object?>(o => true, o =>
         {
-            if (e.Property == MarkdownContentProperty)
-            {
-                MarkdownStringBuilder.Clear();
-                MarkdownStringBuilder.Append(MarkdownContent);
-            }
-        };
-    }
-
-    [Content]
-    public string? MarkdownContent
-    {
-        get => field;
-        set => SetAndRaise(MarkdownContentProperty, ref field, value);
+            var renderer = new MarkdownRenderer();
+            var builder = new ObservableStringBuilder();
+            renderer.MarkdownBuilder = builder;
+            builder.Append(o as string ?? string.Empty);
+            LogicalChildren.Clear();
+            LogicalChildren.Add(renderer);
+            return renderer;
+        });
     }
 }

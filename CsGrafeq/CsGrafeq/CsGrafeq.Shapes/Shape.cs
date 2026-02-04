@@ -1,8 +1,5 @@
 ﻿global using ShapeChangedHandler = System.Action;
-using CsGrafeq.I18N;
-using CsGrafeq.MVVM;
 using ReactiveUI;
-using static CsGrafeq.Utilities.ColorHelper;
 
 namespace CsGrafeq.Shapes;
 
@@ -13,13 +10,9 @@ public delegate void ShapeChangedHandler<T1, T2>(T1 shape, T2 args) where T1 : S
 /// <summary>
 ///     几何图形基类
 /// </summary>
-public abstract class Shape :InteractiveObject
+public abstract class Shape : InteractiveObject
 {
-    public ShapeList? Owner
-    {
-        get;
-        internal set;
-    }
+    public ShapeList? Owner { get; internal set; }
 
     /// <summary>
     ///     名字
@@ -31,8 +24,6 @@ public abstract class Shape :InteractiveObject
     } = "";
 
 
-
-    
     /// <summary>
     ///     触发ShapeChanged 代表Shape被改变
     /// </summary>

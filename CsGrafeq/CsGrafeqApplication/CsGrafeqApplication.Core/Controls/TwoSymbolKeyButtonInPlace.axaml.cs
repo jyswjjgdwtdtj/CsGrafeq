@@ -36,7 +36,7 @@ public partial class TwoSymbolKeyButtonInPlace : ToggleButton
         CurrentButton = FirstButton;
         PART_Button.Click += (s, e) =>
         {
-            TopLevel.GetTopLevel(this)?.Input(IsChecked ?? false ? FirstKeyboardInput : SecondKeyboardInput);
+            TopLevel.GetTopLevel(this)?.Input(IsChecked ?? false ? FirstButton : SecondButton);
         };
     }
 

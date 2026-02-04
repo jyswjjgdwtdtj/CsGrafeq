@@ -11,15 +11,17 @@ public delegate void RenderHandler(SKCanvas dc, SKRect bounds);
 public class DisplayControl : CartesianDisplayer
 {
     /// <summary>
-    /// 上一时刻的零点位置
+    ///     上一时刻的零点位置
     /// </summary>
     private PointL LastZeroPos;
+
     /// <summary>
-    /// 鼠标按下时的位置
+    ///     鼠标按下时的位置
     /// </summary>
     private PointL MouseDownPos = new() { X = 0, Y = 0 };
+
     /// <summary>
-    /// 鼠标按下时的零点位置
+    ///     鼠标按下时的零点位置
     /// </summary>
     private PointL MouseDownZeroPos = new() { X = 0, Y = 0 };
 
@@ -52,7 +54,7 @@ public class DisplayControl : CartesianDisplayer
             AskForRender();
         }
     }
-    
+
     protected override void OnPointerMoved(PointerEventArgs e)
     {
         Debug.LogPointer("PointerMoved");
@@ -79,8 +81,8 @@ public class DisplayControl : CartesianDisplayer
                     {
                         using var dc = new SKCanvas(TotalBuffer);
                         dc.Clear(AxisBackground);
-                        RenderAxisLine(dc);
-                        if ( (!Setting.Instance.MoveOptimization || (LastZeroPos - Zero).Length > 50))
+                        RenderAxes(dc);
+                        if (!Setting.Instance.MoveOptimization || (LastZeroPos - Zero).Length > 50)
                         {
                             foreach (var adn in Addons)
                             foreach (var rt in adn.Layers)
@@ -90,9 +92,11 @@ public class DisplayControl : CartesianDisplayer
                                 var size = rt.RenderTargetSize;
                                 if (size.Width != TotalBuffer.Width || size.Height != TotalBuffer.Height)
                                 {
-                                    Throw($"Bitmap size mismatch TotalBufferSize:{TotalBuffer.Width},{TotalBuffer.Height} RTSize:{size.Width},{size.Height}");
+                                    Throw(
+                                        $"Bitmap size mismatch TotalBufferSize:{TotalBuffer.Width},{TotalBuffer.Height} RTSize:{size.Width},{size.Height}");
                                     return;
                                 }
+
                                 rt.CopyRenderTargetTo(TempBuffer);
                                 using (var canvas = rt.GetBitmapCanvas()!)
                                 {
@@ -101,8 +105,10 @@ public class DisplayControl : CartesianDisplayer
                                         Zero.Y - LastZeroPos.Y);
                                     RenderMovedPlace(canvas, rt.Render);
                                 }
+
                                 rt.DrawRenderTargetTo(dc, 0, 0);
                             }
+
                             LastZeroPos = Zero;
                         }
                         else
@@ -112,12 +118,13 @@ public class DisplayControl : CartesianDisplayer
                             {
                                 if (!layer.IsActive)
                                     continue;
-                                layer.DrawRenderTargetTo(dc, (int)(Zero.X - LastZeroPos.X), (int)(Zero.Y - LastZeroPos.Y));
+                                layer.DrawRenderTargetTo(dc, (int)(Zero.X - LastZeroPos.X),
+                                    (int)(Zero.Y - LastZeroPos.Y));
                                 //RenderMovedPlace(dc, layer.Render);
                             }
                         }
 
-                        RenderAxisNumber(dc);
+                        RenderAxesNumber(dc);
                     }
 
                     InvalidateVisual();

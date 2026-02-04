@@ -5,9 +5,8 @@ using static CsGrafeq.Utilities.ColorHelper;
 
 namespace CsGrafeq.Shapes;
 
-public abstract class InteractiveObject: ObservableObject, IDisposable
+public abstract class InteractiveObject : ObservableObject, IDisposable
 {
-    
     /// <summary>
     ///     是否可以交互
     /// </summary>
@@ -16,7 +15,7 @@ public abstract class InteractiveObject: ObservableObject, IDisposable
         get;
         set => this.RaiseAndSetIfChanged(ref field, value);
     } = true;
-    
+
     /// <summary>
     ///     颜色 argb格式
     /// </summary>
@@ -42,13 +41,13 @@ public abstract class InteractiveObject: ObservableObject, IDisposable
             InvokeChanged();
         }
     } = true;
-    
+
     /// <summary>
     ///     当前图形名称
     /// </summary>
     public MultiLanguageData TypeName { get; init; }
-    
-    
+
+
     /// <summary>
     ///     简介
     /// </summary>
@@ -57,6 +56,7 @@ public abstract class InteractiveObject: ObservableObject, IDisposable
         get => field;
         protected set => this.RaiseAndSetIfChanged(ref field, value);
     } = "";
+
     /// <summary>
     ///     用户是否可以从UI改变
     /// </summary>
@@ -70,10 +70,7 @@ public abstract class InteractiveObject: ObservableObject, IDisposable
         }
     } = true;
 
-    public abstract void Dispose();
-    public abstract void InvokeChanged();
-    
-    
+
     /// <summary>
     ///     是否被删除（但仍保留在撤销链上）
     /// </summary>
@@ -86,4 +83,7 @@ public abstract class InteractiveObject: ObservableObject, IDisposable
             InvokeChanged();
         }
     } = false;
+
+    public abstract void Dispose();
+    public abstract void InvokeChanged();
 }

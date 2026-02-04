@@ -57,6 +57,9 @@ public class MsgBoxParams : ViewModelBase, IMakeDialogResult<string>
 
     public ButtonDefinitions ButtonDefinitions { get; set; } = new();
     private IDialogResult<string>? DialogResultTarget { get; set; }
+    public object? Param { get; set; }
+
+    public Action? CloseAction { get; set; }
 
     public void MakeDialogResult(IDialogResult<string> target)
     {

@@ -2,7 +2,6 @@
 using Avalonia.Controls.Primitives;
 using Avalonia.Media;
 using Avalonia.Metadata;
-using CsGrafeq.Shapes;
 using CsGrafeqApplication.Core.Interfaces;
 using CsGrafeqApplication.Function;
 

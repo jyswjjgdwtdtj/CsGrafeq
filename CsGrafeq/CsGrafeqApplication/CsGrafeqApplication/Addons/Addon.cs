@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Avalonia.Input;
@@ -15,14 +14,17 @@ namespace CsGrafeqApplication.Addons;
 
 public abstract class Addon : ReactiveObject
 {
-    public Addon()
-    {
-        AddonName = new MultiLanguageData(){Chinese="",English=""};
-        InfoTemplate=MainTemplate=new FuncDataTemplate<object?>(o=>true,o=>new Control());
-    }
     public const bool DoNext = true;
     public const bool Intercept = false;
     internal readonly List<Renderable> Layers = new();
+
+    public EventHandler? OwnerChanged;
+
+    public Addon()
+    {
+        AddonName = new MultiLanguageData { Chinese = "", English = "" };
+        InfoTemplate = MainTemplate = new FuncDataTemplate<object?>(o => true, o => new Control());
+    }
 
     public IDataTemplate? InfoTemplate { get; init; }
     public IDataTemplate? MainTemplate { get; init; }
@@ -32,7 +34,6 @@ public abstract class Addon : ReactiveObject
     //Addon内部勿动
     public bool IsAddonEnabled { get; set; } = true;
 
-    public EventHandler? OwnerChanged;
     /// <summary>
     ///     所有者
     /// </summary>
@@ -68,21 +69,21 @@ public abstract class Addon : ReactiveObject
 
     internal bool CallKeyDown(KeyEventArgs e)
     {
-        if ( !IsAddonEnabled || Owner == null)
+        if (!IsAddonEnabled || Owner == null)
             return DoNext;
         return OnKeyDown(e);
     }
 
     internal bool CallKeyUp(KeyEventArgs e)
     {
-        if ( !IsAddonEnabled || Owner == null)
+        if (!IsAddonEnabled || Owner == null)
             return DoNext;
         return OnKeyUp(e);
     }
 
     internal bool CallPointerMoved(AddonPointerEventArgs e)
     {
-        if ( !IsAddonEnabled || Owner == null)
+        if (!IsAddonEnabled || Owner == null)
             return DoNext;
         return OnPointerMoved(e);
     }
@@ -96,28 +97,28 @@ public abstract class Addon : ReactiveObject
 
     internal bool CallPointerReleased(AddonPointerEventArgs e)
     {
-        if ( !IsAddonEnabled || Owner == null)
+        if (!IsAddonEnabled || Owner == null)
             return DoNext;
         return OnPointerReleased(e);
     }
 
     internal bool CallPointerWheeled(AddonPointerWheelEventArgs e)
     {
-        if ( !IsAddonEnabled || Owner == null)
+        if (!IsAddonEnabled || Owner == null)
             return DoNext;
         return OnPointerWheeled(e);
     }
 
     internal bool CallPointerTapped(AddonPointerEventArgsBase e)
     {
-        if ( !IsAddonEnabled || Owner == null)
+        if (!IsAddonEnabled || Owner == null)
             return DoNext;
         return OnPointerTapped(e);
     }
 
     internal bool CallPointerDoubleTapped(AddonPointerEventArgsBase e)
     {
-        if ( !IsAddonEnabled || Owner == null)
+        if (!IsAddonEnabled || Owner == null)
             return DoNext;
         return OnPointerDoubleTapped(e);
     }
@@ -167,7 +168,42 @@ public abstract class Addon : ReactiveObject
     public abstract void Delete();
     public abstract void SelectAll();
     public abstract void DeselectAll();
-    
+
+    private class OnceLock
+    {
+        public bool Value { get; private set; }
+
+        public void SetValueTrue()
+        {
+            Value = true;
+        }
+    }
+
+    public class AddonPointerEventArgsBase(double x, double y, KeyModifiers modifiers) : EventArgs
+    {
+        public readonly KeyModifiers KeyModifiers = modifiers;
+        public readonly double X = x, Y = y;
+
+        public AvaPoint Location => new(X, Y);
+    }
+
+    public class AddonPointerEventArgs(double x, double y, PointerPointProperties properties, KeyModifiers modifiers)
+        : AddonPointerEventArgsBase(x, y, modifiers)
+    {
+        public readonly PointerPointProperties Properties = properties;
+    }
+
+    public class AddonPointerWheelEventArgs(
+        double x,
+        double y,
+        PointerPointProperties properties,
+        KeyModifiers modifiers,
+        Vec delta)
+        : AddonPointerEventArgs(x, y, properties, modifiers)
+    {
+        public readonly Vec Delta = delta;
+    }
+
     #region CoordinateTransformFuncs
 
     /// <summary>
@@ -196,39 +232,4 @@ public abstract class Addon : ReactiveObject
         MathToPixelY = VoidFunc<double, double>;
 
     #endregion
-
-    private class OnceLock
-    {
-        public bool Value { get; private set; }
-
-        public void SetValueTrue()
-        {
-            Value = true;
-        }
-    }
-
-    public class AddonPointerEventArgsBase(double x, double y, KeyModifiers modifiers) : EventArgs
-    {
-        public readonly KeyModifiers KeyModifiers = modifiers;
-        public readonly double X = x, Y = y;
-
-        public Point Location => new(X, Y);
-    }
-
-    public class AddonPointerEventArgs(double x, double y, PointerPointProperties properties, KeyModifiers modifiers)
-        : AddonPointerEventArgsBase(x, y, modifiers)
-    {
-        public readonly PointerPointProperties Properties = properties;
-    }
-
-    public class AddonPointerWheelEventArgs(
-        double x,
-        double y,
-        PointerPointProperties properties,
-        KeyModifiers modifiers,
-        Vec delta)
-        : AddonPointerEventArgs(x, y, properties, modifiers)
-    {
-        public readonly Vec Delta = delta;
-    }
 }

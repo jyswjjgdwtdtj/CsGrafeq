@@ -4,25 +4,25 @@ public class Result<TSuccess, TException> where TException : Exception
 {
     private readonly TException? _exception;
 
-    private readonly bool _isSuccessful;
     private readonly string? _successMessage;
     private readonly TSuccess? _value;
-    
-    public bool IsSuccessful => _isSuccessful;
-    public bool IsError => !_isSuccessful;
 
     protected Result(TSuccess value, string? message = null)
     {
-        _isSuccessful = true;
+        IsSuccessful = true;
         _value = value;
         _successMessage = message;
     }
 
     protected Result(TException exception)
     {
-        _isSuccessful = false;
+        IsSuccessful = false;
         _exception = exception;
     }
+
+    public bool IsSuccessful { get; }
+
+    public bool IsError => !IsSuccessful;
 
     public static Result<TSuccess, TException> Success(TSuccess okValue, string? message = null)
     {
@@ -38,30 +38,30 @@ public class Result<TSuccess, TException> where TException : Exception
     {
         okValue = _value!;
         message = _successMessage;
-        return _isSuccessful;
+        return IsSuccessful;
     }
 
 
     public bool Error(out TException exception)
     {
         exception = _exception!;
-        return !_isSuccessful;
+        return !IsSuccessful;
     }
 
     public TException? Error()
     {
-        return _isSuccessful ? null : _exception;
+        return IsSuccessful ? null : _exception;
     }
 
     public void Throw()
     {
-        if (!_isSuccessful)
+        if (!IsSuccessful)
             throw _exception!;
     }
 
     public void Match(Action<TSuccess> successAction, Action<TException> errorAction)
     {
-        if (_isSuccessful)
+        if (IsSuccessful)
             successAction(_value!);
         else
             errorAction(_exception!);
@@ -69,7 +69,7 @@ public class Result<TSuccess, TException> where TException : Exception
 
     public void Match(Action<TSuccess, string?> successAction, Action<TException> errorAction)
     {
-        if (_isSuccessful)
+        if (IsSuccessful)
             successAction(_value!, _successMessage);
         else
             errorAction(_exception!);
@@ -77,19 +77,19 @@ public class Result<TSuccess, TException> where TException : Exception
 
     public void IfSuccess(Action<TSuccess> successAction)
     {
-        if (_isSuccessful)
+        if (IsSuccessful)
             successAction(_value!);
     }
 
     public void IfError(Action<TException> errorAction)
     {
-        if (!_isSuccessful)
+        if (!IsSuccessful)
             errorAction(_exception!);
     }
 
     public void IfErrorThrow()
     {
-        if (!_isSuccessful)
+        if (!IsSuccessful)
             throw _exception!;
     }
 }

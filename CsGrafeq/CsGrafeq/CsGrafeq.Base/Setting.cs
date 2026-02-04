@@ -1,4 +1,4 @@
-﻿//#define CANDRAWFUNCTION
+﻿#define CANDRAWFUNCTION
 
 global using CsGrafeq;
 global using CsGrafeq.I18N;
@@ -33,10 +33,7 @@ public class Setting : ObservableObject
     public bool EnableExpressionSimplification
     {
         get;
-        set
-        {
-            this.RaiseAndSetIfChanged(ref field, value);
-        }
+        set => this.RaiseAndSetIfChanged(ref field, value);
     } = false;
 
     public bool MoveOptimization
@@ -51,7 +48,43 @@ public class Setting : ObservableObject
         set => this.RaiseAndSetIfChanged(ref field, value);
     } = false;
 
+    public bool MoveOptimizationUserEnabled
+    {
+        get;
+        set => this.RaiseAndSetIfChanged(ref field, value);
+    } = true;
+
+    public bool ZoomOptimizationUserEnabled
+    {
+        get;
+        set => this.RaiseAndSetIfChanged(ref field, value);
+    } = true;
+
     public bool ShowKeyboard
+    {
+        get;
+        set => this.RaiseAndSetIfChanged(ref field, value);
+    } = true;
+
+    public bool ShowAxes
+    {
+        get;
+        set => this.RaiseAndSetIfChanged(ref field, value);
+    } = true;
+
+    public bool ShowAxesNumber
+    {
+        get;
+        set => this.RaiseAndSetIfChanged(ref field, value);
+    } = true;
+
+    public bool ShowAxesMajorGrid
+    {
+        get;
+        set => this.RaiseAndSetIfChanged(ref field, value);
+    } = true;
+
+    public bool ShowAxesMinorGrid
     {
         get;
         set => this.RaiseAndSetIfChanged(ref field, value);

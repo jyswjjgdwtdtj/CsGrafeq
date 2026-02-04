@@ -1,3 +1,6 @@
+using System;
+using System.Diagnostics;
+using System.Threading;
 using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Controls;
@@ -8,8 +11,8 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using CsGrafeq.I18N;
-using CsGrafeqApplication.Addons.GeometricPad;
 using CsGrafeqApplication.Addons.FunctionPad;
+using CsGrafeqApplication.Addons.GeometricPad;
 using CsGrafeqApplication.Controls.Displayers;
 using CsGrafeqApplication.Core.Utils;
 using CsGrafeqApplication.Dialogs.InfoDialog;
@@ -17,10 +20,6 @@ using CsGrafeqApplication.Dialogs.Interfaces;
 using CsGrafeqApplication.Utilities;
 using CsGrafeqApplication.ViewModels;
 using Material.Styles.Themes;
-using Microsoft.Win32;
-using System;
-using System.Diagnostics;
-using System.Threading;
 
 namespace CsGrafeqApplication.Controls;
 
@@ -29,6 +28,7 @@ public partial class DisplayerContainer : UserControl, IInfoDialog
     // 可按需调整
     private const double MinOperationWidth = 50;
     private const double ReserveRightMin = 300; // 右侧至少保留空间，避免盖住Displayer等
+    private const string githubRepUrl = "https://github.com/jyswjjgdwtdtj/CsGrafeq";
 
     public static readonly DirectProperty<DisplayerContainer, bool> IsOperationVisibleProperty =
         AvaloniaProperty.RegisterDirect<DisplayerContainer, bool>(nameof(VM.IsOperationVisible),
@@ -47,7 +47,7 @@ public partial class DisplayerContainer : UserControl, IInfoDialog
     {
         KeyDown += GlobalKeyDown;
         DataContext = VM;
-        VM.Displayer = new DisplayControl { Addons = { new GeometricPad(),new FunctionPad()} };
+        VM.Displayer = new DisplayControl { Addons = { new GeometricPad(), new FunctionPad() } };
         InitializeComponent();
         anim.Delay = TimeSpan.FromSeconds(3);
         anim.Duration = TimeSpan.FromSeconds(0.2);
@@ -215,7 +215,7 @@ public partial class DisplayerContainer : UserControl, IInfoDialog
     {
         Languages.SetLanguage(Languages.AllowedLanguages[(sender as ComboBox)?.SelectedIndex ?? 0]);
     }
-    private const string githubRepUrl = "https://github.com/jyswjjgdwtdtj/CsGrafeq";
+
     private void Github_Clicked(object? sender, RoutedEventArgs e)
     {
         Process.Start(new ProcessStartInfo

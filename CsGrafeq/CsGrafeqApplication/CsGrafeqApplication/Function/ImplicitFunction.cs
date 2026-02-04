@@ -1,5 +1,4 @@
 using System;
-using CsGrafeq.I18N;
 using CsGrafeq.Interval;
 using CsGrafeq.Shapes;
 using CsGrafeqApplication.Addons;
@@ -11,9 +10,10 @@ namespace CsGrafeqApplication.Function;
 public class ImplicitFunction : InteractiveObject
 {
     public readonly Renderable RenderTarget = new();
-    public FunctionPad Owner { get; init; }
 
-    public ImplicitFunction(string expression,FunctionPad owner)
+    public Action<ImplicitFunction>? FuncChanged;
+
+    public ImplicitFunction(string expression, FunctionPad owner)
     {
         Owner = owner;
         Description = "ImplicitFunction";
@@ -26,6 +26,8 @@ public class ImplicitFunction : InteractiveObject
         Opacity = Setting.Instance.DefaultOpacity;
         Expression = expression;
     }
+
+    public FunctionPad Owner { get; init; }
 
     public byte Opacity
     {
@@ -68,12 +70,12 @@ public class ImplicitFunction : InteractiveObject
         {
             this.RaiseAndSetIfChanged(ref field, value);
             var last = Function;
-            var res=IntervalCompiler.TryCompile(Expression,Setting.Instance.EnableExpressionSimplification);
+            var res = IntervalCompiler.TryCompile(Expression, Setting.Instance.EnableExpressionSimplification);
             res.Match(
-                success  => 
+                success =>
                 {
                     Function = success;
-                    LastError="No Error";
+                    LastError = "No Error";
                     IsCorrect = true;
                     last.Dispose();
                 },
@@ -83,7 +85,7 @@ public class ImplicitFunction : InteractiveObject
                     LastError = failure.Message;
                 }
             );
-            
+
             InvokeChanged();
             Description = Expression;
         }
@@ -121,7 +123,4 @@ public class ImplicitFunction : InteractiveObject
     {
         FuncChanged?.Invoke(this);
     }
-
-    public Action<ImplicitFunction>? FuncChanged;
-    
 }

@@ -153,7 +153,8 @@ public class MsgBoxButton : Button
             MaxWidth = MsgBoxMaxWidth,
             MinHeight = MsgBoxMinHeight,
             Width = MsgBoxWidth,
-            Height = MsgboxHeight
+            Height = MsgboxHeight,
+            Param = MsgBoxContentTemplateParam
         }).ShowWindowDialogAsync((Window)TopLevel.GetTopLevel(this));
         //DialogResult = res;
         //OnDialogClosed();

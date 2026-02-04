@@ -14,14 +14,12 @@
                 <ResourceInclude Source="avares://CsGrafeqApplication.Core/Resources/ConverterResource.axaml" />
                 <ResourceInclude Source="avares://CsGrafeqApplication.Core/Resources/CustomColorResource.axaml" />
                 <ResourceInclude Source="/Themes/Theme.axaml" />
-                <ResourceInclude Source="Resources/ComboBox.axaml"></ResourceInclude>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
         <FontFamily x:Key="MapleMono">avares://CsGrafeqApplication.Core/Fonts/MapleMono-CN-Regular.ttf#Maple Mono CN</FontFamily>
     </Application.Resources>
     <Application.Styles>
         <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" />
-        <StyleInclude Source="avares://LiveMarkdown.Avalonia/Styles.axaml" />
         <StyleInclude Source="avares://CsGrafeqApplication.Core/Styles/ControlsStyles.axaml" />
     </Application.Styles>
 </Application>

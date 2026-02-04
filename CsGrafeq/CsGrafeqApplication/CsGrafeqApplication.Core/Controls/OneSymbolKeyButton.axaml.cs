@@ -38,6 +38,6 @@ public partial class OneSymbolKeyButton : UserControl
 
     private void PART_Button_OnClick(object? sender, RoutedEventArgs e)
     {
-        TopLevel.GetTopLevel(this)?.Input(KeyboardInput);
+        TopLevel.GetTopLevel(this)?.Input(Button);
     }
 }

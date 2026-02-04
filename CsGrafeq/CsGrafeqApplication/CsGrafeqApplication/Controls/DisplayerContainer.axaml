@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:CsGrafeqApplication.ViewModels"
              xmlns:addons="clr-namespace:CsGrafeqApplication.Addons"
-             xmlns:geopad="clr-namespace:CsGrafeqApplication.Addons.GeometricPad"
              xmlns:i18N="clr-namespace:CsGrafeq.I18N;assembly=CsGrafeq.I18N"
              xmlns:corecontrols="clr-namespace:CsGrafeqApplication.Core.Controls;assembly=CsGrafeqApplication.Core"
              xmlns:views="clr-namespace:CsGrafeqApplication.Dialogs.Views;assembly=CsGrafeqApplication.Dialogs"
@@ -26,17 +25,17 @@
         </Border>
         <!--Info显示层-->
         <Border Name="InfoContainer">
-            <TabControl Name="AddonInfoTabControl" SelectedIndex="{CompiledBinding AddonIndex,Mode=OneWay}" ItemsSource="{CompiledBinding Displayer.Addons}" HorizontalAlignment="Right">
+            <TabControl Name="AddonInfoTabControl" SelectedIndex="{CompiledBinding AddonIndex,Mode=OneWay}"
+                        ItemsSource="{CompiledBinding Displayer.Addons}" HorizontalAlignment="Right">
                 <TabControl.ContentTemplate>
                     <DataTemplate DataType="addons:Addon">
-                        <ContentControl Content="{CompiledBinding .}" ContentTemplate="{CompiledBinding InfoTemplate}">
-                        </ContentControl>
+                        <ContentControl Content="{CompiledBinding .}" ContentTemplate="{CompiledBinding InfoTemplate}" />
                     </DataTemplate>
                 </TabControl.ContentTemplate>
                 <TabControl.Styles>
                     <Style Selector="TabControl#AddonInfoTabControl">
                         <Style Selector="^ /template/ Panel#PART_TabsPanel">
-                            <Setter Property="IsVisible" Value="False"></Setter>
+                            <Setter Property="IsVisible" Value="False" />
                         </Style>
                     </Style>
                 </TabControl.Styles>
@@ -52,102 +51,109 @@
                 </Panel.Styles>
                 <!--Addon显示层-->
                 <DockPanel ZIndex="10">
-                <StackPanel DockPanel.Dock="Left" Orientation="Horizontal"  Name="PART_Grid">
-                    <corecontrols:ExpandBox Name="OperationContainerExpandBox" ExpandDirection="Right"
-                                            IsExpanded="{CompiledBinding #Toggle.IsChecked,Mode=OneWay}" Margin="0"
-                                            Padding="0">
-                        <Border Width="400" BorderThickness="0" BorderBrush="Gray" HorizontalAlignment="Left"
-                                Name="OperationContainer"
-                                Background="{DynamicResource CgTranslucentBackgroundBrush}">
-                            <TabControl Name="AddonsTabControl" SelectedIndex="{CompiledBinding AddonIndex,Mode=OneWay}" ItemsSource="{CompiledBinding Displayer.Addons}" HorizontalAlignment="Stretch">
-                                <TabControl.ContentTemplate>
-                                    <DataTemplate DataType="addons:Addon">
-                                        <ContentControl Content="{CompiledBinding .}" ContentTemplate="{CompiledBinding MainTemplate}">
-                                            <ContentControl.Resources>
-                                                <ResourceDictionary>
-                                                    <ResourceDictionary.MergedDictionaries>
-                                                        <ResourceInclude Source="../Addons/GeometricPad/GeometricResources.axaml"></ResourceInclude>
-                                                    </ResourceDictionary.MergedDictionaries>
-                                                </ResourceDictionary>
-                                            </ContentControl.Resources>
-                                        </ContentControl>
-                                    </DataTemplate>
-                                </TabControl.ContentTemplate>
-                                <TabControl.Styles>
-                                    <Style Selector="TabControl#AddonsTabControl">
-                                        <Style Selector="^ /template/ Panel#PART_TabsPanel">
-                                            <Setter Property="IsVisible" Value="False"></Setter>
-                                        </Style>
-                                    </Style>
-                                </TabControl.Styles>
-                            </TabControl>
-                        </Border>
-                    </corecontrols:ExpandBox>
-                    <Border IsVisible="{CompiledBinding #Toggle.IsChecked,Mode=OneWay}" Width="8"
-                            VerticalAlignment="Stretch" Background="Transparent" Name="OuterBorder"
-                            Loaded="OuterBorderLoaded" PointerPressed="OuterBorderPressed"
-                            PointerReleased="OuterBorderReleased" PointerMoved="OuterBorderMoved">
-                        <Border.Styles>
-                            <Style Selector="Border#OuterBorder">
-                                <Setter Property="Background"
-                                        Value="{DynamicResource CgOppositeTranslucentBackgroundBrush1}" />
-                                <Style Selector="^ Border#InnerBorder">
-                                    <Setter Property="Width" Value="{CompiledBinding SplitterThicknessOff}" />
-                                    <Setter Property="Opacity" Value="0.2" />
-                                    <Setter Property="Transitions">
-                                        <Transitions>
-                                            <DoubleTransition Property="Width" Duration="0:0:0.1" />
-                                            <DoubleTransition Property="Opacity" Duration="0:0:0.1" />
-                                        </Transitions>
-                                    </Setter>
-                                    <Setter Property="Background" Value="{DynamicResource MaterialPrimaryMidBrush}" />
-                                </Style>
-                                <Style Selector="^:pointerover Border#InnerBorder">
-                                    <Setter Property="Width" Value="{CompiledBinding SplitterThicknessOn}" />
-                                </Style>
-                                <Style Selector="^:dragging Border#InnerBorder">
-                                    <Setter Property="Width" Value="{CompiledBinding SplitterThicknessOn}" />
-                                    <Setter Property="Opacity" Value="0.5" />
-                                </Style>
-                            </Style>
-                        </Border.Styles>
-                        <Border HorizontalAlignment="Center" VerticalAlignment="Stretch" Name="InnerBorder" />
-                    </Border>
-                    <Border BorderThickness="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                            BorderBrush="{DynamicResource CgOppositeTranslucentBackgroundBrush1}"
-                            Name="PART_CoverDisplayer">
-                        <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                            <ToggleButton DockPanel.Dock="Left" Width="15" Height="40" VerticalAlignment="Center"
-                                          HorizontalAlignment="Left" IsChecked="True"
-                                          Name="Toggle"
-                                          Foreground="{DynamicResource MaterialPrimaryMidForegroundBrush}"
-                                          Background="{DynamicResource MaterialPrimaryMidBrush}">
-                                <ToggleButton.Styles>
-                                    <Style Selector="ToggleButton#Toggle">
-                                        <Setter Property="Content" Value="&gt;" />
-                                    </Style>
-                                    <Style Selector="ToggleButton#Toggle:checked">
-                                        <Setter Property="Content" Value="&lt;" />
-                                    </Style>
-                                    <Style
-                                        Selector="ToggleButton#Toggle:not(:disabled) /template/ ripple|RippleEffect#PART_Ripple ContentPresenter">
-                                        <Setter Property="Padding" Value="0" />
-                                    </Style>
-                                </ToggleButton.Styles>
-                            </ToggleButton>
-                            <Panel DockPanel.Dock="Right" VerticalAlignment="Stretch"
-                                   HorizontalAlignment="Stretch">
-                                <ComboBox SelectedIndex="{CompiledBinding AddonIndex,Mode=TwoWay}" Name="ChooseAddonComboBox" VerticalAlignment="Top" ItemsSource="{CompiledBinding Displayer.Addons}">
-                                    <ComboBox.ItemTemplate>
-                                        <DataTemplate>
-                                            <TextBlock Text="{CompiledBinding AddonName.Data}"></TextBlock>
+                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Name="PART_Grid">
+                        <corecontrols:ExpandBox Name="OperationContainerExpandBox" ExpandDirection="Right"
+                                                IsExpanded="{CompiledBinding #Toggle.IsChecked,Mode=OneWay}" Margin="0"
+                                                Padding="0">
+                            <Border Width="400" BorderThickness="0" BorderBrush="Gray" HorizontalAlignment="Left"
+                                    Name="OperationContainer"
+                                    Background="{DynamicResource CgTranslucentBackgroundBrush}">
+                                <TabControl Name="AddonsTabControl"
+                                            SelectedIndex="{CompiledBinding AddonIndex,Mode=OneWay}"
+                                            ItemsSource="{CompiledBinding Displayer.Addons}"
+                                            HorizontalAlignment="Stretch">
+                                    <TabControl.ContentTemplate>
+                                        <DataTemplate DataType="addons:Addon">
+                                            <ContentControl Content="{CompiledBinding .}"
+                                                            ContentTemplate="{CompiledBinding MainTemplate}">
+                                                <ContentControl.Resources>
+                                                    <ResourceDictionary>
+                                                        <ResourceDictionary.MergedDictionaries>
+                                                            <ResourceInclude
+                                                                Source="../Addons/GeometricPad/GeometricResources.axaml" />
+                                                        </ResourceDictionary.MergedDictionaries>
+                                                    </ResourceDictionary>
+                                                </ContentControl.Resources>
+                                            </ContentControl>
                                         </DataTemplate>
-                                    </ComboBox.ItemTemplate>
-                                </ComboBox>
-                            </Panel>
-                        </DockPanel>
-                    </Border>
-                </StackPanel>
+                                    </TabControl.ContentTemplate>
+                                    <TabControl.Styles>
+                                        <Style Selector="TabControl#AddonsTabControl">
+                                            <Style Selector="^ /template/ Panel#PART_TabsPanel">
+                                                <Setter Property="IsVisible" Value="False" />
+                                            </Style>
+                                        </Style>
+                                    </TabControl.Styles>
+                                </TabControl>
+                            </Border>
+                        </corecontrols:ExpandBox>
+                        <Border IsVisible="{CompiledBinding #Toggle.IsChecked,Mode=OneWay}" Width="8"
+                                VerticalAlignment="Stretch" Background="Transparent" Name="OuterBorder"
+                                Loaded="OuterBorderLoaded" PointerPressed="OuterBorderPressed"
+                                PointerReleased="OuterBorderReleased" PointerMoved="OuterBorderMoved">
+                            <Border.Styles>
+                                <Style Selector="Border#OuterBorder">
+                                    <Setter Property="Background"
+                                            Value="{DynamicResource CgOppositeTranslucentBackgroundBrush1}" />
+                                    <Style Selector="^ Border#InnerBorder">
+                                        <Setter Property="Width" Value="{CompiledBinding SplitterThicknessOff}" />
+                                        <Setter Property="Opacity" Value="0.2" />
+                                        <Setter Property="Transitions">
+                                            <Transitions>
+                                                <DoubleTransition Property="Width" Duration="0:0:0.1" />
+                                                <DoubleTransition Property="Opacity" Duration="0:0:0.1" />
+                                            </Transitions>
+                                        </Setter>
+                                        <Setter Property="Background" Value="{DynamicResource MaterialPrimaryMidBrush}" />
+                                    </Style>
+                                    <Style Selector="^:pointerover Border#InnerBorder">
+                                        <Setter Property="Width" Value="{CompiledBinding SplitterThicknessOn}" />
+                                    </Style>
+                                    <Style Selector="^:dragging Border#InnerBorder">
+                                        <Setter Property="Width" Value="{CompiledBinding SplitterThicknessOn}" />
+                                        <Setter Property="Opacity" Value="0.5" />
+                                    </Style>
+                                </Style>
+                            </Border.Styles>
+                            <Border HorizontalAlignment="Center" VerticalAlignment="Stretch" Name="InnerBorder" />
+                        </Border>
+                        <Border BorderThickness="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                BorderBrush="{DynamicResource CgOppositeTranslucentBackgroundBrush1}"
+                                Name="PART_CoverDisplayer">
+                            <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                <ToggleButton DockPanel.Dock="Left" Width="15" Height="40" VerticalAlignment="Center"
+                                              HorizontalAlignment="Left" IsChecked="True"
+                                              Name="Toggle"
+                                              Foreground="{DynamicResource MaterialPrimaryMidForegroundBrush}"
+                                              Background="{DynamicResource MaterialPrimaryMidBrush}">
+                                    <ToggleButton.Styles>
+                                        <Style Selector="ToggleButton#Toggle">
+                                            <Setter Property="Content" Value="&gt;" />
+                                        </Style>
+                                        <Style Selector="ToggleButton#Toggle:checked">
+                                            <Setter Property="Content" Value="&lt;" />
+                                        </Style>
+                                        <Style
+                                            Selector="ToggleButton#Toggle:not(:disabled) /template/ ripple|RippleEffect#PART_Ripple ContentPresenter">
+                                            <Setter Property="Padding" Value="0" />
+                                        </Style>
+                                    </ToggleButton.Styles>
+                                </ToggleButton>
+                                <Panel DockPanel.Dock="Right" VerticalAlignment="Stretch"
+                                       HorizontalAlignment="Stretch">
+                                    <ComboBox SelectedIndex="{CompiledBinding AddonIndex,Mode=TwoWay}"
+                                              Name="ChooseAddonComboBox" VerticalAlignment="Top"
+                                              ItemsSource="{CompiledBinding Displayer.Addons}">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{CompiledBinding AddonName.Data}" />
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                </Panel>
+                            </DockPanel>
+                        </Border>
+                    </StackPanel>
                 </DockPanel>
                 <!--设置层-->
                 <Grid ColumnDefinitions="*,52" RowDefinitions="*,52" ZIndex="15" Name="SettingDockPanel"
@@ -387,7 +393,7 @@
                                     <Path Name="ColorPathIcon" Classes="Icon Fill"
                                           Data="M3.839 5.858c2.94-3.916 9.03-5.055 13.364-2.36c4.28 2.66 5.854 7.777 4.1 12.577c-1.655 4.533-6.016 6.328-9.159 4.048c-1.177-.854-1.634-1.925-1.854-3.664l-.106-.987l-.045-.398c-.123-.934-.311-1.352-.705-1.572c-.535-.298-.892-.305-1.595-.033l-.351.146l-.179.078c-1.014.44-1.688.595-2.541.416l-.2-.047l-.164-.047c-2.789-.864-3.202-4.647-.565-8.157m.984 6.716l.123.037l.134.03c.439.087.814.015 1.437-.242l.602-.257c1.202-.493 1.985-.54 3.046.05c.917.512 1.275 1.298 1.457 2.66l.053.459l.055.532l.047.422c.172 1.361.485 2.09 1.248 2.644c2.275 1.65 5.534.309 6.87-3.349c1.516-4.152.174-8.514-3.484-10.789c-3.675-2.284-8.899-1.306-11.373 1.987c-2.075 2.763-1.82 5.28-.215 5.816m11.225-1.994a1.25 1.25 0 1 1 2.414-.647a1.25 1.25 0 0 1-2.414.647m.494 3.488a1.25 1.25 0 1 1 2.415-.647a1.25 1.25 0 0 1-2.415.647M14.07 7.577a1.25 1.25 0 1 1 2.415-.647a1.25 1.25 0 0 1-2.415.647m-.028 8.998a1.25 1.25 0 1 1 2.414-.647a1.25 1.25 0 0 1-2.414.647m-3.497-9.97a1.25 1.25 0 1 1 2.415-.646a1.25 1.25 0 0 1-2.415.646" />
                                 </Button>
-                                <views:MsgBoxButton ButtonDefinitions="OK" MsgBoxMinWidth="600" MsgBoxMaxWidth="600"
+                                <views:MsgBoxButton MsgBoxMinWidth="600" MsgBoxMaxWidth="600"
                                                     MsgBoxContentTemplateParam="{CompiledBinding .}">
                                     <ToolTip.Tip>
                                         <TextBlock Text="{CompiledBinding MultiLanguageResources.SettingText.Data}" />
@@ -397,14 +403,16 @@
                                     <views:MsgBoxButton.MsgBoxContentTemplate>
                                         <DataTemplate DataType="vm:DisplayerContainerViewModel">
                                             <TabControl VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                                                <TabItem Header="{CompiledBinding MultiLanguageResources.SettingText}">
+                                                <TabItem
+                                                    Header="{CompiledBinding MultiLanguageResources.SettingText.Data}">
                                                     <views1:SettingView />
                                                 </TabItem>
                                                 <TabItem
-                                                    Header="{CompiledBinding MultiLanguageResources.DescriptionText}">
+                                                    Header="{CompiledBinding MultiLanguageResources.DescriptionText.Data}">
                                                     <views1:DescriptionView />
                                                 </TabItem>
-                                                <TabItem Header="{CompiledBinding MultiLanguageResources.UsageText}">
+                                                <TabItem
+                                                    Header="{CompiledBinding MultiLanguageResources.UsageText.Data}">
                                                     <views1:UsageView />
                                                 </TabItem>
                                             </TabControl>

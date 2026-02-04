@@ -5,7 +5,7 @@
               xmlns:controls="clr-namespace:CsGrafeqApplication.Core.Controls"
               mc:Ignorable="d" d:DesignWidth="50" d:DesignHeight="50" ClipToBounds="False"
               FontFamily="{StaticResource MaplyMono}" Margin="0" Padding="2"
-              x:Class="CsGrafeqApplication.Core.Controls.TwoSymbolKeyButton" DataContext="{CompiledBinding $self}">
+              x:Class="CsGrafeqApplication.Core.Controls.TwoSymbolKeyButton" Name="UC">
     <Design.PreviewWith>
         <Border Width="50" Height="50">
             <controls:TwoSymbolKeyButtonInPlace Width="48" Height="48" FirstButton="G" SecondButton="Q"
@@ -35,22 +35,23 @@
             </Style>
         </Styles>
     </ToggleButton.Styles>
-    <RepeatButton Name="PART_Button" Background="{DynamicResource CgBackgroundBrush}" CornerRadius="4" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                  Focusable="False" BorderBrush="{DynamicResource CgForegroundBrush}" BorderThickness="1" Padding="0" x:DataType="controls:TwoSymbolKeyButton">
+    <RepeatButton Name="PART_Button" Background="{DynamicResource CgBackgroundBrush}" CornerRadius="4"
+                  HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                  Focusable="False" BorderBrush="{DynamicResource CgForegroundBrush}" BorderThickness="1" Padding="0">
         <Panel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <TextBlock Text="{CompiledBinding FirstButton}" IsVisible="{CompiledBinding IsChecked}"
+            <TextBlock Text="{CompiledBinding #UC.FirstButton}" IsVisible="{CompiledBinding #UC.IsChecked}"
                        Foreground="{DynamicResource CgForegroundBrush}" VerticalAlignment="Bottom"
-                       HorizontalAlignment="Left" FontSize="{CompiledBinding FontSize}" />
-            <TextBlock Text="{CompiledBinding SecondButton}" IsVisible="{CompiledBinding IsChecked}"
+                       HorizontalAlignment="Left" FontSize="{CompiledBinding #UC.FontSize}" />
+            <TextBlock Text="{CompiledBinding #UC.SecondButton}" IsVisible="{CompiledBinding #UC.IsChecked}"
                        Foreground="{DynamicResource CgHalfForegroundBrush}" VerticalAlignment="Top"
-                       HorizontalAlignment="Right" FontSize="{CompiledBinding SecondFontSize}" />
+                       HorizontalAlignment="Right" FontSize="{CompiledBinding #UC.SecondFontSize}" />
 
-            <TextBlock Text="{CompiledBinding SecondButton}" IsVisible="{CompiledBinding !IsChecked}"
+            <TextBlock Text="{CompiledBinding #UC.SecondButton}" IsVisible="{CompiledBinding !#UC.IsChecked}"
                        Foreground="{DynamicResource CgForegroundBrush}" VerticalAlignment="Bottom"
-                       HorizontalAlignment="Left" FontSize="{CompiledBinding FontSize}" />
-            <TextBlock Text="{CompiledBinding FirstButton}" IsVisible="{CompiledBinding !IsChecked}"
+                       HorizontalAlignment="Left" FontSize="{CompiledBinding #UC.FontSize}" />
+            <TextBlock Text="{CompiledBinding #UC.FirstButton}" IsVisible="{CompiledBinding !#UC.IsChecked}"
                        Foreground="{DynamicResource CgHalfForegroundBrush}" VerticalAlignment="Top"
-                       HorizontalAlignment="Right" FontSize="{CompiledBinding SecondFontSize}" />
+                       HorizontalAlignment="Right" FontSize="{CompiledBinding #UC.SecondFontSize}" />
         </Panel>
     </RepeatButton>
 </ToggleButton>

@@ -8,6 +8,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using CsGrafeq.Interval;
 using CsGrafeqApplication.Dialogs.InfoDialog;
+using CsGrafeqApplication.Dialogs.Params;
 using CsGrafeqApplication.Function;
 using CsGrafeqApplication.Utilities;
 
@@ -54,12 +55,15 @@ public partial class FunctionDisplayer : TemplatedControl
                 var newText = e.NewValue as string ?? "";
                 var oldText = e.OldValue as string ?? "";
                 if (func.IsCorrect)
+                {
                     DataValidationErrors.ClearErrors(tb);
+                }
                 else
                 {
                     DataValidationErrors.SetError(tb, new Exception());
-                    Dialogs.InfoDialog.Dialogs.Info(this,new TextBlock(){Text = func.LastError},InfoType.Error);
+                    this.Info(new TextBlock { Text = func.LastError }, InfoType.Error);
                 }
+
                 if (newText != oldText)
                     CommandHelper.DoTextBoxTextChange(tb, newText, oldText);
             }
@@ -71,7 +75,7 @@ public partial class FunctionDisplayer : TemplatedControl
         {
             tb.AddHandler(KeyDownEvent, TunnelTextBoxKeyDown, RoutingStrategies.Tunnel);
             tb.HorizontalAlignment = HorizontalAlignment.Stretch;
-            tb.HorizontalContentAlignment= HorizontalAlignment.Left;
+            tb.HorizontalContentAlignment = HorizontalAlignment.Left;
         }
     }
 
@@ -109,17 +113,20 @@ public partial class FunctionDisplayer : TemplatedControl
             if (e.Property == TextBox.TextProperty)
             {
                 var str = e.NewValue as string ?? "";
-                var res= IntervalCompiler
+                var res = IntervalCompiler
                     .TryCompile(str, Setting.Instance.EnableExpressionSimplification);
-                if (res.IsSuccessful||string.IsNullOrWhiteSpace(str))
+                if (res.IsSuccessful || string.IsNullOrWhiteSpace(str))
+                {
                     DataValidationErrors.ClearErrors(tb);
+                }
                 else
                 {
                     DataValidationErrors.SetError(tb, new Exception());
-                    Dialogs.InfoDialog.Dialogs.Info(this,new TextBlock(){Text = res.Error()!.Message},InfoType.Error);
+                    this.Info(new TextBlock { Text = res.Error()!.Message }, InfoType.Error);
                 }
             }
     }
+
     private void TemplateAppliedHandler(object? s, TemplateAppliedEventArgs e)
     {
         var tb = s as TextBox;
@@ -138,5 +145,19 @@ public partial class FunctionDisplayer : TemplatedControl
             borderelement.IsVisible = true;
             borderelement.Background = Brushes.Transparent;
         };
+    }
+
+    private void FunctionExampleClicked(object? sender, RoutedEventArgs e)
+    {
+    }
+
+    private void ExampleFuncItemPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (sender is Border ctl && ctl.Tag is MsgBoxParams pa && pa.Param is TextBox tb && ctl.Child is TextBlock tbl)
+        {
+            tb.Text = tbl.Text;
+            pa.CloseAction?.Invoke();
+            tb.Focus();
+        }
     }
 }

@@ -129,6 +129,7 @@ internal static class IntervalSetExtension
     /// </summary>
     /// <param name="ranges"></param>
     /// <param name="range"></param>
+    /// <param name="ifSetBounds"></param>
     /// <returns></returns>
     public static Span<Range> SetBounds(this Span<Range> ranges, Range range, out bool ifSetBounds)
     {
@@ -150,8 +151,29 @@ internal static class IntervalSetExtension
         if (right < left)
             return Span<Range>.Empty;
         var result = ranges.Slice(left, right - left + 1);
+        result[0]._Inf = sysMath.Max(result[0]._Inf, min);
+        result[^1]._Sup = sysMath.Min(result[^1]._Sup, max);
         return result;
     }
+    /*public static Span<Range> SetBounds(this Span<Range> ranges, Range range,out bool ifSetBounds)
+    {
+        ifSetBounds = false;
+        var writeIndex = 0;
+        for (var readIndex = 0; readIndex < ranges.Length; readIndex++)
+        {
+            var readCurrent = ranges[readIndex];
+            if (readCurrent._Sup < range._Inf)
+                continue;
+            if (readCurrent._Inf > range._Sup)
+                break;
+            readCurrent._Inf = sysMath.Max(readCurrent._Inf, range._Inf);
+            readCurrent._Sup = sysMath.Min(readCurrent._Sup, range._Sup);
+            ranges[writeIndex++] = readCurrent;
+        }
+        if(writeIndex != ranges.Length||ranges[0]._Inf!=range._Inf||ranges[^1]._Sup!=range._Sup)
+            ifSetBounds = true;
+        return ranges.Slice(0, writeIndex);
+    }*/
 
     public static IntervalSet IntervalAggregate(this IEnumerable<IntervalSet> ranges,
         Func<IntervalSet, IntervalSet, IntervalSet> aggregator)

@@ -1,44 +1,32 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Avalonia.Collections;
 using Avalonia.Controls;
 using CsGrafeq.Command;
 using CsGrafeq.Shapes;
 using CsGrafeq.Shapes.ShapeGetter;
-using CsGrafeqApplication.Addons.FunctionPad;
-using CsGrafeqApplication.Function;
 
 namespace CsGrafeqApplication.Utilities;
 
 public static class CommandHelper
 {
     public static CommandManager CommandManager { get; } = new();
-    
+
     /// <summary>
     ///     添加“添加图形”操作到CommandManager
     /// </summary>
     /// <param name="shape"></param>
-    public static void DoShapeAdd(ShapeList sl,GeoShape shape)
+    public static void DoShapeAdd(ShapeList sl, GeoShape shape)
     {
         CommandManager.Do(
             shape,
-            _ =>
-            {
-                sl.TryAdd(shape);  
-            },
-            o =>
-            {
-                shape.IsDeleted = false;
-            },
-            o =>
-            {
-                shape.IsDeleted = true;
-            },
+            _ => { sl.TryAdd(shape); },
+            o => { shape.IsDeleted = false; },
+            o => { shape.IsDeleted = true; },
             o =>
             {
                 sl.Remove(shape);
                 shape.Dispose();
-            }, true,$"ShapeAdd {shape.Name}"
+            }, true, $"ShapeAdd {shape.Name}"
         );
     }
 
@@ -53,21 +41,10 @@ public static class CommandHelper
         else
             CommandManager.Do(
                 shape,
-                _=>
-                {
-                    shape.IsDeleted = true;
-                },
-                o =>
-                {
-                    shape.IsDeleted = true;
-                },
-                o =>
-                {
-                    shape.IsDeleted = false;
-                },
-                o =>
-                {
-                }, false,$"ShapeDelete {shape.Name}"
+                _ => { shape.IsDeleted = true; },
+                o => { shape.IsDeleted = true; },
+                o => { shape.IsDeleted = false; },
+                o => { }, false, $"ShapeDelete {shape.Name}"
             );
     }
 
@@ -81,10 +58,7 @@ public static class CommandHelper
         var ss = shapes.Select(s => ShapeList.GetAllChildren(s)).SelectMany(o => o).Distinct().ToArray();
         CommandManager.Do(
             ss,
-            o =>
-            {
-                  
-            },
+            o => { },
             o =>
             {
                 foreach (var sh in ss)
@@ -101,24 +75,21 @@ public static class CommandHelper
                     sh.Selected = false;
                 }
             },
-            o =>
-            {
-            }, true,"ShapeDelete"+string.Join(",",ss.Select(s=>s.Name))
+            o => { }, true, "ShapeDelete" + string.Join(",", ss.Select(s => s.Name))
         );
     }
 
     public static void DoPointMove(GeoPoint point, Vector2<string> previous, Vector2<string> next)
     {
         if (point.PointGetter is PointGetter_Movable pg)
-            CommandManager.Do(pg,static _ =>{} ,o =>
-            {
-                pg.SetStringPoint(next);
-                point.RefreshValues();
-            }, o =>
-            {
-                pg.SetStringPoint(previous);
-                point.RefreshValues();
-            }, o => { },false,$"PointMove {point.Name} from {previous} to {next}");
+            CommandManager.Do(pg, static _ => { }, o =>
+                {
+                    pg.SetStringPoint(next);
+                    point.RefreshValues();
+                }, o =>
+                {
+                    pg.SetStringPoint(previous);
+                    point.RefreshValues();
+                }, o => { }, false, $"PointMove {point.Name} from {previous} to {next}");
     }
-    
 }

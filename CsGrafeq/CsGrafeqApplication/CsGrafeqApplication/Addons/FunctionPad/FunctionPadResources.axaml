@@ -2,8 +2,6 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:functionPad="clr-namespace:CsGrafeqApplication.Addons.FunctionPad"
                     xmlns:addons="clr-namespace:CsGrafeqApplication.Addons"
-                    xmlns:geometricPad="clr-namespace:CsGrafeqApplication.Addons.GeometricPad"
-                    xmlns:controls="clr-namespace:CsGrafeqApplication.Controls"
                     xmlns:function="clr-namespace:CsGrafeqApplication.Function">
     <DataTemplate x:Key="FunctionPadViewTemplate" DataType="functionPad:FunctionPad">
         <ContentControl>
@@ -21,7 +19,7 @@
                             </Canvas>
                         </Viewbox>
                     </TabItem.Header>
-                    <functionPad:FunctionDisplayer Target="{CompiledBinding .}"/>
+                    <functionPad:FunctionDisplayer Target="{CompiledBinding .}" />
                 </TabItem>
                 <TabItem>
                     <TabItem.Header>
@@ -59,8 +57,9 @@
                                                            Stroke="{DynamicResource CgForegroundBrush}" Width="15"
                                                            Height="15" StrokeThickness="1" />
                                             </Border>
-                                            <TextBlock HorizontalAlignment="Right" ClipToBounds="True" Text="{CompiledBinding Expression}" VerticalAlignment="Center"
-                                                                      Foreground="{DynamicResource CgForegroundBrush}" />
+                                            <TextBlock HorizontalAlignment="Right" ClipToBounds="True"
+                                                       Text="{CompiledBinding Expression}" VerticalAlignment="Center"
+                                                       Foreground="{DynamicResource CgForegroundBrush}" />
                                         </DockPanel>
                                     </Border>
                                 </Border>

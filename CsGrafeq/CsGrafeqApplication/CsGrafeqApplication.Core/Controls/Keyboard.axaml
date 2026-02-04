@@ -4,8 +4,9 @@
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                    xmlns:controls="clr-namespace:CsGrafeqApplication.Core.Controls"
                    xmlns:csGrafeq="clr-namespace:CsGrafeq;assembly=CsGrafeq.Base"
+                   xmlns:viewModel="clr-namespace:CsGrafeqApplication.Core.ViewModel"
                    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-                   x:Class="CsGrafeqApplication.Core.Controls.Keyboard">
+                   x:Class="CsGrafeqApplication.Core.Controls.Keyboard" x:DataType="viewModel:KeyboardViewModel">
     <Design.PreviewWith>
         <controls:Keyboard Width="600" Height="400" />
     </Design.PreviewWith>
@@ -17,7 +18,7 @@
         </ResourceDictionary>
     </controls:Keyboard.Resources>
     <controls:Keyboard.Styles>
-        <Style Selector="controls|TwoSymbolKeyButton">
+        <Style Selector="controls|TwoSymbolKeyButtonInPlace">
             <Setter Property="Focusable" Value="False" />
         </Style>
         <Style Selector="controls|OneSymbolKeyButton">
@@ -36,7 +37,7 @@
             <Setter Property="Template">
                 <ControlTemplate>
                     <DockPanel LastChildFill="True">
-                        <controls:ExpandBox BorderBrush="{DynamicResource MaterialPrimaryMidBrush}" IsVisible="False"
+                        <controls:ExpandBox BorderBrush="{DynamicResource MaterialPrimaryMidBrush}"
                                             BorderThickness="0,1,0,0" DockPanel.Dock="Bottom"
                                             DataContext="{x:Static csGrafeq:Setting.Instance}"
                                             IsExpanded="{CompiledBinding ShowKeyboard}" x:DataType="csGrafeq:Setting"
@@ -58,131 +59,381 @@
                                         <Setter Property="Focusable" Value="False" />
                                     </Style>
                                 </Expander.Styles>
-                                <ToggleButton Name="ToggleKeyboardContainer">
-                                    <ToggleButton.Styles>
-                                        <Style Selector="ToggleButton#ToggleKeyboardContainer">
-                                            <Style Selector="^">
-                                                <Setter Property="Template">
-                                                    <ControlTemplate>
-                                                        <Grid ColumnDefinitions="Auto,40,Auto,40,Auto" HorizontalAlignment="Center">
-                                                            <Grid Grid.Column="0" ColumnDefinitions="70,70,70,70" RowDefinitions="35,35,35,35">
-                                                                <Grid.Styles>
-                                                                    <Style Selector="controls|OneSymbolKeyButton">
-                                                                        <Setter Property="FontSize" Value="16"></Setter>
-                                                                    </Style>
-                                                                    <Style Selector="Button">
-                                                                        <Setter Property="Background" Value="{DynamicResource CgBackgroundBrush}" />
-                                                                        <Setter Property="CornerRadius" Value="4" />
-                                                                        <Setter Property="Focusable" Value="False" />
-                                                                        <Setter Property="BorderBrush" Value="{DynamicResource CgForegroundBrush}" />
-                                                                        <Setter Property="BorderThickness" Value="1" />
-                                                                        <Setter Property="HorizontalAlignment" Value="Stretch" />
-                                                                        <Setter Property="Margin" Value="2" />
-                                                                        <Setter Property="Padding" Value="0" />
-                                                                        <Setter Property="FontFamily" Value="{StaticResource MapleMono}"></Setter>
-                                                                    </Style>
-                                                                </Grid.Styles>
-                                                                <controls:OneSymbolKeyButton Grid.Column="0" Grid.Row="0" Button="x"></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="0" Button="y"></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="2" Grid.Row="0" Button="("></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="3" Grid.Row="0" Button=")"></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="0" Grid.Row="1" Button="&lt;"></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="1" Button="&gt;"></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="2" Grid.Row="1" Button="|"></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="3" Grid.Row="1" Button="&amp;"></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="0" Grid.Row="2" Button="^"></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="2" Button="%"></controls:OneSymbolKeyButton>
-                                                                
-                                                                <Button Grid.Column="2" Grid.Row="2" Name="TrigonometricFunction" Content="Tri">
-                                                                    <Button.Flyout>
-                                                                        <Flyout>
-                                                            <Grid ColumnDefinitions="90,90,90,90" RowDefinitions="35,35,35,35">
-                                                                <Grid.Styles>
-                                                                    <Style Selector="controls|OneSymbolKeyButton">
-                                                                        <Setter Property="FontSize" Value="16"></Setter>
-                                                                    </Style>
-                                                                </Grid.Styles>
-                                                                <controls:OneSymbolKeyButton Grid.Column="0" Grid.Row="0" Button="sin("></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="0" Button="cos("></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="2" Grid.Row="0" Button="tan("></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="3" Grid.Row="0" Button="cot("></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="0" Grid.Row="1" Button="arcsin("></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="1" Button="arccos("></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="2" Grid.Row="1" Button="arctan("></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="0" Grid.Row="2" Button="sinh("></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="2" Button="cosh("></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="2" Grid.Row="2" Button="tanh("></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="0" Grid.Row="3" Button="arcsinh("></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="3" Button="arccosh("></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="2" Grid.Row="3" Button="arctanh("></controls:OneSymbolKeyButton>
-                                                            </Grid>
-                                                                        </Flyout>
-                                                                    </Button.Flyout>
-                                                                </Button>
-                                                                
-                                                                <Button Grid.Column="3" Grid.Row="2" Name="ElseFunction">Func</Button>
-                                                                
-                                                                <Button Grid.Column="0" Grid.Row="3" Name="SwitchToABC">ABC</Button>
-                                                                
-                                                                <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="3" Button=","></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="2" Grid.Row="3" Button="e"></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="3" Grid.Row="3" Button="pi"></controls:OneSymbolKeyButton>
-                                                            </Grid>
-                                                            <Grid Grid.Column="2" ColumnDefinitions="70,70,70,70" RowDefinitions="35,35,35,35">
-                                                                <Grid.Styles>
-                                                                    <Style Selector="controls|OneSymbolKeyButton">
-                                                                        <Setter Property="FontSize" Value="16"></Setter>
-                                                                    </Style>
-                                                                </Grid.Styles>
-                                                                <controls:OneSymbolKeyButton Grid.Column="0" Grid.Row="0" Button="7"></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="0" Button="8"></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="2" Grid.Row="0" Button="9"></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="3" Grid.Row="0" Button="/"></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="0" Grid.Row="1" Button="4"></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="1" Button="5"></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="2" Grid.Row="1" Button="6"></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="3" Grid.Row="1" Button="*"></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="0" Grid.Row="2" Button="1"></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="2" Button="2"></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="2" Grid.Row="2" Button="3"></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="3" Grid.Row="2" Button="-"></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="0" Grid.Row="3" Button="0"></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="3" Button="."></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="2" Grid.Row="3" Button="="></controls:OneSymbolKeyButton>
-                                                                <controls:OneSymbolKeyButton Grid.Column="3" Grid.Row="3" Button="+"></controls:OneSymbolKeyButton>
-                                                            </Grid>
-                                                            <Grid Grid.Column="4" ColumnDefinitions="70,70" RowDefinitions="35,35,35,35">
-                                                                <Grid.Styles>
-                                                                    <Style Selector="Button">
-                                                                        <Setter Property="Background" Value="{DynamicResource CgBackgroundBrush}" />
-                                                                        <Setter Property="CornerRadius" Value="4" />
-                                                                        <Setter Property="Focusable" Value="False" />
-                                                                        <Setter Property="BorderBrush" Value="{DynamicResource CgForegroundBrush}" />
-                                                                        <Setter Property="BorderThickness" Value="1" />
-                                                                        <Setter Property="HorizontalAlignment" Value="Stretch" />
-                                                                        <Setter Property="Margin" Value="2" />
-                                                                        <Setter Property="Padding" Value="0" />
-                                                                        <Setter Property="FontSize" Value="20"></Setter>
-                                                                    </Style>
-                                                                    <Style Selector="TextBlock">
-                                                                        <Setter Property="HorizontalAlignment" Value="Center"></Setter>
-                                                                        <Setter Property="VerticalAlignment" Value="Center"></Setter>
-                                                                    </Style>
-                                                                </Grid.Styles>
-                                                                <Button Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" IsVisible="False"></Button>
-                                                                <Button Grid.Column="0" Grid.Row="1"><TextBlock Text="←"></TextBlock></Button>
-                                                                <Button Grid.Column="1" Grid.Row="1" ><TextBlock Text="→"></TextBlock></Button>
-                                                                <Button Grid.Column="1" Grid.Row="2" HorizontalAlignment="Right" Width="120"><TextBlock Text="⌫"></TextBlock></Button>
-                                                                <Button Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2"><TextBlock Text="↵"></TextBlock></Button>
-                                                                
-                                                            </Grid>
+                                <Panel Height="150">
+                                    <Grid VerticalAlignment="Center" ColumnDefinitions="Auto,40,Auto,40,Auto"
+                                          HorizontalAlignment="Center" Name="Container123" IsVisible="True">
+                                        <Grid Grid.Column="0" ColumnDefinitions="70,70,70,70"
+                                              RowDefinitions="35,35,35,35">
+                                            <Grid.Styles>
+                                                <Style Selector="controls|OneSymbolKeyButton">
+                                                    <Setter Property="FontSize" Value="16" />
+                                                </Style>
+                                                <Style Selector="Button">
+                                                    <Setter Property="Background"
+                                                            Value="{DynamicResource CgBackgroundBrush}" />
+                                                    <Setter Property="CornerRadius" Value="4" />
+                                                    <Setter Property="Focusable" Value="False" />
+                                                    <Setter Property="BorderBrush"
+                                                            Value="{DynamicResource CgForegroundBrush}" />
+                                                    <Setter Property="BorderThickness" Value="1" />
+                                                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                                    <Setter Property="Margin" Value="2" />
+                                                    <Setter Property="Padding" Value="0" />
+                                                    <Setter Property="FontFamily" Value="{StaticResource MapleMono}" />
+                                                </Style>
+                                            </Grid.Styles>
+                                            <controls:OneSymbolKeyButton Grid.Column="0" Grid.Row="0" Button="x" />
+                                            <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="0" Button="y" />
+                                            <controls:OneSymbolKeyButton Grid.Column="2" Grid.Row="0" Button="(" />
+                                            <controls:OneSymbolKeyButton Grid.Column="3" Grid.Row="0" Button=")" />
+                                            <controls:OneSymbolKeyButton Grid.Column="0" Grid.Row="1" Button="&lt;" />
+                                            <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="1" Button="&gt;" />
+                                            <controls:OneSymbolKeyButton Grid.Column="2" Grid.Row="1" Button="|" />
+                                            <controls:OneSymbolKeyButton Grid.Column="3" Grid.Row="1" Button="&amp;" />
+                                            <controls:OneSymbolKeyButton Grid.Column="0" Grid.Row="2" Button="^" />
+                                            <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="2" Button="%" />
+
+                                            <Button Grid.Column="2" Grid.Row="2" Name="TrigonometricFunction"
+                                                    Content="Tri">
+                                                <Button.Flyout>
+                                                    <Flyout>
+                                                        <Grid ColumnDefinitions="90,90,90,90"
+                                                              RowDefinitions="35,35,35,35">
+                                                            <Grid.Styles>
+                                                                <Style Selector="controls|OneSymbolKeyButton">
+                                                                    <Setter Property="FontSize" Value="16" />
+                                                                </Style>
+                                                            </Grid.Styles>
+                                                            <controls:OneSymbolKeyButton Grid.Column="0" Grid.Row="0"
+                                                                    Button="sin(" />
+                                                            <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="0"
+                                                                    Button="cos(" />
+                                                            <controls:OneSymbolKeyButton Grid.Column="2" Grid.Row="0"
+                                                                    Button="tan(" />
+                                                            <controls:OneSymbolKeyButton Grid.Column="3" Grid.Row="0"
+                                                                    Button="cot(" />
+                                                            <controls:OneSymbolKeyButton Grid.Column="0" Grid.Row="1"
+                                                                    Button="arcsin(" />
+                                                            <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="1"
+                                                                    Button="arccos(" />
+                                                            <controls:OneSymbolKeyButton Grid.Column="2" Grid.Row="1"
+                                                                    Button="arctan(" />
+                                                            <controls:OneSymbolKeyButton Grid.Column="3" Grid.Row="1"
+                                                                    Button="arctan2(" />
+                                                            <controls:OneSymbolKeyButton Grid.Column="0" Grid.Row="2"
+                                                                    Button="sinh(" />
+                                                            <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="2"
+                                                                    Button="cosh(" />
+                                                            <controls:OneSymbolKeyButton Grid.Column="2" Grid.Row="2"
+                                                                    Button="tanh(" />
+                                                            <controls:OneSymbolKeyButton Grid.Column="0" Grid.Row="3"
+                                                                    Button="arcsinh(" />
+                                                            <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="3"
+                                                                    Button="arccosh(" />
+                                                            <controls:OneSymbolKeyButton Grid.Column="2" Grid.Row="3"
+                                                                    Button="arctanh(" />
                                                         </Grid>
-                                                    </ControlTemplate>
-                                                </Setter>
+                                                    </Flyout>
+                                                </Button.Flyout>
+                                            </Button>
+
+                                            <Button Grid.Column="3" Grid.Row="2" Name="ElseFunction" Content="Func">
+                                                <Button.Flyout>
+                                                    <Flyout>
+                                                        <WrapPanel Orientation="Horizontal" Width="360">
+                                                            <WrapPanel.Styles>
+                                                                <Style Selector="controls|OneSymbolKeyButton">
+                                                                    <Setter Property="FontSize" Value="16" />
+                                                                    <Setter Property="Width" Value="90" />
+                                                                    <Setter Property="Height" Value="35" />
+                                                                </Style>
+                                                            </WrapPanel.Styles>
+                                                            <controls:OneSymbolKeyButton
+                                                                Button="sqrt(" />
+                                                            <controls:OneSymbolKeyButton
+                                                                Button="cbrt(" />
+                                                            <controls:OneSymbolKeyButton
+                                                                Button="pow(" />
+                                                            <controls:OneSymbolKeyButton
+                                                                Button="exp(" />
+                                                            <controls:OneSymbolKeyButton
+                                                                Button="log(" />
+                                                            <controls:OneSymbolKeyButton
+                                                                Button="lg(" />
+                                                            <controls:OneSymbolKeyButton
+                                                                Button="ln(" />
+                                                            <controls:OneSymbolKeyButton
+                                                                Button="floor(" />
+                                                            <controls:OneSymbolKeyButton
+                                                                Button="ceil(" />
+                                                            <controls:OneSymbolKeyButton
+                                                                Button="gcd(" />
+                                                            <controls:OneSymbolKeyButton
+                                                                Button="lcm(" />
+                                                            <controls:OneSymbolKeyButton
+                                                                Button="sgn(" />
+                                                            <controls:OneSymbolKeyButton
+                                                                Button="abs(" />
+                                                            <controls:OneSymbolKeyButton
+                                                                Button="median(" />
+                                                            <controls:OneSymbolKeyButton
+                                                                Button="min(" />
+                                                            <controls:OneSymbolKeyButton
+                                                                Button="max(" />
+                                                        </WrapPanel>
+                                                    </Flyout>
+                                                </Button.Flyout>
+
+                                            </Button>
+
+                                            <Button Grid.Column="0" Grid.Row="3" Name="SwitchToABC"
+                                                    Click="SwitchClicked">
+                                                ABC
+                                            </Button>
+
+                                            <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="3" Button="," />
+                                            <controls:OneSymbolKeyButton Grid.Column="2" Grid.Row="3" Button="e" />
+                                            <controls:OneSymbolKeyButton Grid.Column="3" Grid.Row="3" Button="pi" />
+                                        </Grid>
+                                        <Grid Grid.Column="2" ColumnDefinitions="70,70,70,70"
+                                              RowDefinitions="35,35,35,35">
+                                            <Grid.Styles>
+                                                <Style Selector="controls|OneSymbolKeyButton">
+                                                    <Setter Property="FontSize" Value="16" />
+                                                </Style>
+                                            </Grid.Styles>
+                                            <controls:OneSymbolKeyButton Grid.Column="0" Grid.Row="0" Button="7" />
+                                            <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="0" Button="8" />
+                                            <controls:OneSymbolKeyButton Grid.Column="2" Grid.Row="0" Button="9" />
+                                            <controls:OneSymbolKeyButton Grid.Column="3" Grid.Row="0" Button="/" />
+                                            <controls:OneSymbolKeyButton Grid.Column="0" Grid.Row="1" Button="4" />
+                                            <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="1" Button="5" />
+                                            <controls:OneSymbolKeyButton Grid.Column="2" Grid.Row="1" Button="6" />
+                                            <controls:OneSymbolKeyButton Grid.Column="3" Grid.Row="1" Button="*" />
+                                            <controls:OneSymbolKeyButton Grid.Column="0" Grid.Row="2" Button="1" />
+                                            <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="2" Button="2" />
+                                            <controls:OneSymbolKeyButton Grid.Column="2" Grid.Row="2" Button="3" />
+                                            <controls:OneSymbolKeyButton Grid.Column="3" Grid.Row="2" Button="-" />
+                                            <controls:OneSymbolKeyButton Grid.Column="0" Grid.Row="3" Button="0" />
+                                            <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="3" Button="." />
+                                            <controls:OneSymbolKeyButton Grid.Column="2" Grid.Row="3" Button="=" />
+                                            <controls:OneSymbolKeyButton Grid.Column="3" Grid.Row="3" Button="+" />
+                                        </Grid>
+                                        <Grid Grid.Column="4" ColumnDefinitions="70,70" RowDefinitions="35,35,35,35">
+                                            <Grid.Styles>
+                                                <Style Selector="Button">
+                                                    <Setter Property="Background"
+                                                            Value="{DynamicResource CgBackgroundBrush}" />
+                                                    <Setter Property="CornerRadius" Value="4" />
+                                                    <Setter Property="Focusable" Value="False" />
+                                                    <Setter Property="BorderBrush"
+                                                            Value="{DynamicResource CgForegroundBrush}" />
+                                                    <Setter Property="BorderThickness" Value="1" />
+                                                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                                    <Setter Property="Margin" Value="2" />
+                                                    <Setter Property="Padding" Value="0" />
+                                                    <Setter Property="FontSize" Value="20" />
+                                                </Style>
+                                                <Style Selector="TextBlock">
+                                                    <Setter Property="HorizontalAlignment" Value="Center" />
+                                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                                </Style>
+                                            </Grid.Styles>
+                                            <Button Grid.Column="0" Grid.Row="0" Click="CursorLeftClick">
+                                                <TextBlock Text="←" />
+                                            </Button>
+                                            <Button Grid.Column="1" Grid.Row="0" Click="CursorRightClick">
+                                                <TextBlock Text="→" />
+                                            </Button>
+                                            <Button Grid.Column="1" Grid.Row="1" HorizontalAlignment="Right"
+                                                    Width="120" Click="DeleteClick">
+                                                <TextBlock Text="⌦" />
+                                            </Button>
+                                            <Button Grid.Column="1" Grid.Row="2" HorizontalAlignment="Right"
+                                                    Width="120" Click="BackspaceClick">
+                                                <TextBlock Text="⌫" />
+                                            </Button>
+                                            <Button Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" Click="EnterClick">
+                                                <TextBlock Text="↵" />
+                                            </Button>
+
+                                        </Grid>
+                                    </Grid>
+                                    <StackPanel VerticalAlignment="Center" Spacing="3" Orientation="Vertical"
+                                                HorizontalAlignment="Center" Name="ContainerABC" IsVisible="False">
+                                        <StackPanel.Styles>
+                                            <Style Selector="controls|TwoSymbolKeyButtonInPlace">
+                                                <Setter Property="Width" Value="60" />
+                                                <Setter Property="FontSize" Value="16" />
+                                                <Setter Property="Height" Value="35" />
                                             </Style>
-                                        </Style>
-                                    </ToggleButton.Styles>
-                                </ToggleButton>
+                                            <Style Selector="controls|OneSymbolKeyButton">
+                                                <Setter Property="Width" Value="60" />
+                                                <Setter Property="FontSize" Value="16" />
+                                                <Setter Property="Height" Value="35" />
+                                            </Style>
+                                            <Style Selector="TextBlock">
+                                                <Setter Property="HorizontalAlignment" Value="Center" />
+                                                <Setter Property="VerticalAlignment" Value="Center" />
+                                            </Style>
+                                            <Style Selector="Button">
+                                                <Setter Property="Background"
+                                                        Value="{DynamicResource CgBackgroundBrush}" />
+                                                <Setter Property="CornerRadius" Value="4" />
+                                                <Setter Property="Focusable" Value="False" />
+                                                <Setter Property="BorderBrush"
+                                                        Value="{DynamicResource CgForegroundBrush}" />
+                                                <Setter Property="BorderThickness" Value="1" />
+                                                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                                <Setter Property="Margin" Value="2" />
+                                                <Setter Property="Padding" Value="0" />
+                                                <Setter Property="FontSize" Value="20" />
+                                            </Style>
+                                            <Style Selector="ToggleButton">
+                                                <Setter Property="Background"
+                                                        Value="{DynamicResource CgBackgroundBrush}" />
+                                                <Style Selector="^:checked">
+                                                    <Setter Property="Background"
+                                                            Value="{DynamicResource MaterialPrimaryMidBrush}" />
+                                                </Style>
+                                                <Setter Property="CornerRadius" Value="4" />
+                                                <Setter Property="Focusable" Value="False" />
+                                                <Setter Property="BorderBrush"
+                                                        Value="{DynamicResource CgForegroundBrush}" />
+                                                <Setter Property="BorderThickness" Value="1" />
+                                                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                                <Setter Property="Margin" Value="2" />
+                                                <Setter Property="Padding" Value="0" />
+                                                <Setter Property="FontSize" Value="20" />
+                                            </Style>
+                                        </StackPanel.Styles>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <controls:TwoSymbolKeyButtonInPlace
+                                                IsChecked="{CompiledBinding #ShiftButton.IsChecked}" FirstButton="("
+                                                SecondButton=")" />
+                                            <controls:OneSymbolKeyButton Button="1" />
+                                            <controls:OneSymbolKeyButton Button="2" />
+                                            <controls:OneSymbolKeyButton Button="3" />
+                                            <controls:OneSymbolKeyButton Button="4" />
+                                            <controls:OneSymbolKeyButton Button="5" />
+                                            <controls:OneSymbolKeyButton Button="6" />
+                                            <controls:OneSymbolKeyButton Button="7" />
+                                            <controls:OneSymbolKeyButton Button="8" />
+                                            <controls:OneSymbolKeyButton Button="9" />
+                                            <controls:OneSymbolKeyButton Button="0" />
+                                            <controls:TwoSymbolKeyButtonInPlace
+                                                IsChecked="{CompiledBinding #ShiftButton.IsChecked}" FirstButton="+"
+                                                SecondButton="-" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <controls:OneSymbolKeyButton Button="=" />
+                                            <controls:TwoSymbolKeyButtonInPlace
+                                                IsChecked="{CompiledBinding #ShiftButton.IsChecked}" FirstButton="q"
+                                                SecondButton="Q" />
+                                            <controls:TwoSymbolKeyButtonInPlace
+                                                IsChecked="{CompiledBinding #ShiftButton.IsChecked}" FirstButton="w"
+                                                SecondButton="W" />
+                                            <controls:TwoSymbolKeyButtonInPlace
+                                                IsChecked="{CompiledBinding #ShiftButton.IsChecked}" FirstButton="e"
+                                                SecondButton="E" />
+                                            <controls:TwoSymbolKeyButtonInPlace
+                                                IsChecked="{CompiledBinding #ShiftButton.IsChecked}" FirstButton="r"
+                                                SecondButton="R" />
+                                            <controls:TwoSymbolKeyButtonInPlace
+                                                IsChecked="{CompiledBinding #ShiftButton.IsChecked}" FirstButton="t"
+                                                SecondButton="T" />
+                                            <controls:TwoSymbolKeyButtonInPlace
+                                                IsChecked="{CompiledBinding #ShiftButton.IsChecked}" FirstButton="y"
+                                                SecondButton="Y" />
+                                            <controls:TwoSymbolKeyButtonInPlace
+                                                IsChecked="{CompiledBinding #ShiftButton.IsChecked}" FirstButton="u"
+                                                SecondButton="U" />
+                                            <controls:TwoSymbolKeyButtonInPlace
+                                                IsChecked="{CompiledBinding #ShiftButton.IsChecked}" FirstButton="i"
+                                                SecondButton="I" />
+                                            <controls:TwoSymbolKeyButtonInPlace
+                                                IsChecked="{CompiledBinding #ShiftButton.IsChecked}" FirstButton="o"
+                                                SecondButton="O" />
+                                            <controls:TwoSymbolKeyButtonInPlace
+                                                IsChecked="{CompiledBinding #ShiftButton.IsChecked}" FirstButton="p"
+                                                SecondButton="P" />
+                                            <controls:TwoSymbolKeyButtonInPlace
+                                                IsChecked="{CompiledBinding #ShiftButton.IsChecked}" FirstButton="*"
+                                                SecondButton="/" />
+                                        </StackPanel>
+
+                                        <!-- Row 2 -->
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <ToggleButton Width="86" Name="ShiftButton" IsChecked="True">
+                                                <TextBlock Text="⇧" />
+                                            </ToggleButton>
+                                            <controls:TwoSymbolKeyButtonInPlace
+                                                IsChecked="{CompiledBinding #ShiftButton.IsChecked}" FirstButton="a"
+                                                SecondButton="A" />
+                                            <controls:TwoSymbolKeyButtonInPlace
+                                                IsChecked="{CompiledBinding #ShiftButton.IsChecked}" FirstButton="s"
+                                                SecondButton="S" />
+                                            <controls:TwoSymbolKeyButtonInPlace
+                                                IsChecked="{CompiledBinding #ShiftButton.IsChecked}" FirstButton="d"
+                                                SecondButton="D" />
+                                            <controls:TwoSymbolKeyButtonInPlace
+                                                IsChecked="{CompiledBinding #ShiftButton.IsChecked}" FirstButton="f"
+                                                SecondButton="F" />
+                                            <controls:TwoSymbolKeyButtonInPlace
+                                                IsChecked="{CompiledBinding #ShiftButton.IsChecked}" FirstButton="g"
+                                                SecondButton="G" />
+                                            <controls:TwoSymbolKeyButtonInPlace
+                                                IsChecked="{CompiledBinding #ShiftButton.IsChecked}" FirstButton="h"
+                                                SecondButton="H" />
+                                            <controls:TwoSymbolKeyButtonInPlace
+                                                IsChecked="{CompiledBinding #ShiftButton.IsChecked}" FirstButton="j"
+                                                SecondButton="J" />
+                                            <controls:TwoSymbolKeyButtonInPlace
+                                                IsChecked="{CompiledBinding #ShiftButton.IsChecked}" FirstButton="k"
+                                                SecondButton="K" />
+                                            <controls:TwoSymbolKeyButtonInPlace
+                                                IsChecked="{CompiledBinding #ShiftButton.IsChecked}" FirstButton="l"
+                                                SecondButton="L" />
+                                            <Button Width="85" Click="BackspaceClick">
+                                                <TextBlock Text="⌫" />
+                                            </Button>
+                                        </StackPanel>
+
+                                        <!-- Row 3 -->
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <Button Width="100" Click="SwitchClicked">
+                                                <TextBlock Text="123" FontSize="16" />
+                                            </Button>
+                                            <controls:TwoSymbolKeyButtonInPlace
+                                                IsChecked="{CompiledBinding #ShiftButton.IsChecked}" FirstButton="z"
+                                                SecondButton="Z" />
+                                            <controls:TwoSymbolKeyButtonInPlace
+                                                IsChecked="{CompiledBinding #ShiftButton.IsChecked}" FirstButton="x"
+                                                SecondButton="X" />
+                                            <controls:TwoSymbolKeyButtonInPlace
+                                                IsChecked="{CompiledBinding #ShiftButton.IsChecked}" FirstButton="c"
+                                                SecondButton="C" />
+                                            <controls:TwoSymbolKeyButtonInPlace
+                                                IsChecked="{CompiledBinding #ShiftButton.IsChecked}" FirstButton="v"
+                                                SecondButton="V" />
+                                            <controls:TwoSymbolKeyButtonInPlace
+                                                IsChecked="{CompiledBinding #ShiftButton.IsChecked}" FirstButton="b"
+                                                SecondButton="B" />
+                                            <controls:TwoSymbolKeyButtonInPlace
+                                                IsChecked="{CompiledBinding #ShiftButton.IsChecked}" FirstButton="n"
+                                                SecondButton="N" />
+                                            <controls:TwoSymbolKeyButtonInPlace
+                                                IsChecked="{CompiledBinding #ShiftButton.IsChecked}" FirstButton="m"
+                                                SecondButton="M" />
+                                            <controls:TwoSymbolKeyButtonInPlace
+                                                IsChecked="{CompiledBinding #ShiftButton.IsChecked}" FirstButton=","
+                                                SecondButton="." />
+                                            <Button Width="133" Click="EnterClick">
+                                                <TextBlock Text="↵" />
+                                            </Button>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Panel>
                             </Expander>
                         </controls:ExpandBox>
                         <ContentPresenter Content="{TemplateBinding Content}" />

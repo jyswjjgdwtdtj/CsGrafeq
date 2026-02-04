@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Specialized;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -29,8 +28,6 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
     public List<Addon> NeedRenderingAddons = new();
     public bool NeedRenderingAll = false;
     public List<Renderable> NeedRenderingLayers = new();
-    protected SKBitmap TotalBuffer { get; set; } = new(1, 1);
-    protected SKBitmap TempBuffer { get; set; } = new(1, 1);
     protected object TotalBufferLock = new();
 
     public Displayer()
@@ -45,6 +42,9 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
         RenderClock.OnElapsed += Render;
         IsHitTestVisible = true;
     }
+
+    protected SKBitmap TotalBuffer { get; set; } = new(1, 1);
+    protected SKBitmap TempBuffer { get; set; } = new(1, 1);
 
     [Content] public AddonList Addons { get; } = new();
 
@@ -194,7 +194,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
                     TempBuffer = new SKBitmap((int)e.NewSize.Width, (int)e.NewSize.Height);
                     foreach (var adn in Addons)
                     foreach (var layer in adn.Layers)
-                        layer.RenderTargetSize=new SKSizeI((int)e.NewSize.Width, (int)e.NewSize.Height);
+                        layer.RenderTargetSize = new SKSizeI((int)e.NewSize.Width, (int)e.NewSize.Height);
                 }
 
                 ForceToRender();
@@ -290,9 +290,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
             {
                 adn.Owner = this;
                 foreach (var i in adn.Layers)
-                {
-                    i.RenderTargetSize=(new SKSizeI((int)Max(Bounds.Width, 1), (int)Max(Bounds.Height, 1)));
-                }
+                    i.RenderTargetSize = new SKSizeI((int)Max(Bounds.Width, 1), (int)Max(Bounds.Height, 1));
             }
     }
 

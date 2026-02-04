@@ -13,6 +13,7 @@ public static class MessageBoxManager
         {
             DataContext = msBoxStandardViewModel
         };
+        @params.CloseAction = msBoxStandardView.Close;
         return new Dialog<MsgBoxView, MsgBoxParams, string>(msBoxStandardView,
             msBoxStandardViewModel);
     }

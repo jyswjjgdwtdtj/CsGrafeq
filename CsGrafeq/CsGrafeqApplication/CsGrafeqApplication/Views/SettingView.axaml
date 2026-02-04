@@ -11,27 +11,27 @@
                 <Setter Property="Height">20</Setter>
                 <Setter Property="MinHeight">20</Setter>
             </Style>
+            <Style Selector="TextBox DataValidationErrors">
+                <Setter Property="Template">
+                    <ControlTemplate>
+                        <DockPanel LastChildFill="True">
+                            <ContentPresenter Background="{TemplateBinding Background}"
+                                              BorderThickness="{TemplateBinding BorderThickness}"
+                                              CornerRadius="{TemplateBinding CornerRadius}"
+                                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                                              Content="{TemplateBinding Content}"
+                                              Padding="{TemplateBinding Padding}" />
+                        </DockPanel>
+                    </ControlTemplate>
+                </Setter>
+            </Style>
         </TabControl.Styles>
-        <TabItem Header="{CompiledBinding MultiLanguageResources.GeneralText}">
+        <TabItem Header="{CompiledBinding MultiLanguageResources.GeneralText.Data}">
             <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
                 <StackPanel Margin="15">
                     <CheckBox IsChecked="{CompiledBinding ShowKeyboard,Mode=TwoWay}">
                         <TextBlock
                             Text="{CompiledBinding MultiLanguageResources.ShowKeyboardText.Data}" />
-                    </CheckBox>
-                </StackPanel>
-            </ScrollViewer>
-        </TabItem>
-        <TabItem Header="{CompiledBinding MultiLanguageResources.GraphText}">
-            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
-                <StackPanel Margin="15">
-                    <CheckBox Name="MoveOp" IsChecked="{CompiledBinding MoveOptimization,Mode=TwoWay}">
-                        <TextBlock
-                            Text="{CompiledBinding MultiLanguageResources.MoveOpText.Data}" />
-                    </CheckBox>
-                    <CheckBox Name="ZoomOp" IsChecked="{CompiledBinding ZoomOptimization,Mode=TwoWay}">
-                        <TextBlock
-                            Text="{CompiledBinding MultiLanguageResources.ZoomOpText.Data}" />
                     </CheckBox>
                     <CheckBox Name="ExpSim" IsChecked="{CompiledBinding EnableExpressionSimplification,Mode=TwoWay}">
                         <TextBlock
@@ -40,14 +40,55 @@
                 </StackPanel>
             </ScrollViewer>
         </TabItem>
-        <TabItem Header="{CompiledBinding MultiLanguageResources.ImplicitFunctionText}"
+        <TabItem Header="{CompiledBinding MultiLanguageResources.GraphText.Data}">
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
+                <StackPanel Margin="15">
+                    <CheckBox Name="MoveOp" IsChecked="{CompiledBinding MoveOptimization,Mode=TwoWay}"
+                              IsEnabled="{CompiledBinding MoveOptimizationUserEnabled,Mode=OneWay}">
+                        <TextBlock
+                            Text="{CompiledBinding MultiLanguageResources.MoveOpText.Data}" />
+                    </CheckBox>
+                    <CheckBox Name="ZoomOp" IsChecked="{CompiledBinding ZoomOptimization,Mode=TwoWay}"
+                              IsEnabled="{CompiledBinding ZoomOptimizationUserEnabled,Mode=OneWay}">
+                        <TextBlock
+                            Text="{CompiledBinding MultiLanguageResources.ZoomOpText.Data}" />
+                    </CheckBox>
+                    <CheckBox Name="ShowAxes" IsChecked="{CompiledBinding ShowAxes,Mode=TwoWay}">
+                        <TextBlock
+                            Text="{CompiledBinding MultiLanguageResources.ShowAxesText.Data}" />
+                    </CheckBox>
+                    <CheckBox Name="ShowAxesNumber" IsChecked="{CompiledBinding ShowAxesNumber,Mode=TwoWay}">
+                        <TextBlock
+                            Text="{CompiledBinding MultiLanguageResources.ShowAxesNumberText.Data}" />
+                    </CheckBox>
+                    <CheckBox Name="ShowAxesMajor" IsChecked="{CompiledBinding ShowAxesMajorGrid,Mode=TwoWay}">
+                        <TextBlock
+                            Text="{CompiledBinding MultiLanguageResources.ShowAxesMajorGridText.Data}" />
+                    </CheckBox>
+                    <CheckBox Name="ShowAxesMinor" IsChecked="{CompiledBinding ShowAxesMinorGrid,Mode=TwoWay}">
+                        <TextBlock
+                            Text="{CompiledBinding MultiLanguageResources.ShowAxesMinorGridText.Data}" />
+                    </CheckBox>
+                </StackPanel>
+            </ScrollViewer>
+        </TabItem>
+        <TabItem Header="{CompiledBinding MultiLanguageResources.ImplicitFunctionText.Data}"
                  IsVisible="{x:Static csGrafeq:Setting.CanDrawFunction}">
             <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
-                <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto" Margin="15"
-                      DataContext="{x:Static csGrafeq:Setting.Instance}">
-                    <TextBlock Grid.Row="0" Grid.Column="0">Default Opacity:</TextBlock>
-                    <TextBox Grid.Row="1" Grid.Column="0"
-                             Text="{CompiledBinding DefaultOpacity}" x:DataType="csGrafeq:Setting" />
+                <Grid RowDefinitions="Auto" ColumnDefinitions="Auto,Auto" Margin="15"
+                      DataContext="{x:Static csGrafeq:Setting.Instance}"
+                      x:DataType="csGrafeq:Setting">
+                    <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">
+                        <Run Text="{CompiledBinding MultiLanguageResources.DefaultOpacityText.Data}" />
+                        <Run Text=":" />
+                    </TextBlock>
+                    <TextBox Grid.Row="0" Grid.Column="1" TemplateApplied="TemplateAppliedHandler"
+                             VerticalAlignment="Center"
+                             Text="{CompiledBinding DefaultOpacity}" x:DataType="csGrafeq:Setting">
+                        <TextBox.Styles>
+                            <FluentTheme />
+                        </TextBox.Styles>
+                    </TextBox>
                 </Grid>
             </ScrollViewer>
         </TabItem>

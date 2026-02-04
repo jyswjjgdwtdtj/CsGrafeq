@@ -54,16 +54,15 @@ CsGrafeq.sln
 
 ### Short term plan
 
-1. Add implicit function supports
-2. Add text block supports
-3. Implement custom msgbox/inputbox
-4. Implement mathematical calculation (e.g. 0.5->1/2, 1.414->√2)
-5. Implement custom formula editor
+- Add text block supports
+- Implement custom msgbox/inputbox
+- Implement symbolic calculation (e.g. 0.5->1/2, 1.414->√2)
+- Implement custom formula editor
 
 ### Long term plan
 
-1. Add more shapes supports
-2. Fix bugs
+- Add more shapes supports
+- Fix bugs
 
 Welcome to any programming enthusiasts who wish to collaborate on development. 
 
