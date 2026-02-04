@@ -1,6 +1,3 @@
-using System;
-using System.Diagnostics;
-using System.Threading;
 using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Controls;
@@ -12,7 +9,7 @@ using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using CsGrafeq.I18N;
 using CsGrafeqApplication.Addons.GeometricPad;
-using CsGrafeqApplication.Addons.GeometricPad;
+using CsGrafeqApplication.Addons.FunctionPad;
 using CsGrafeqApplication.Controls.Displayers;
 using CsGrafeqApplication.Core.Utils;
 using CsGrafeqApplication.Dialogs.InfoDialog;
@@ -21,6 +18,9 @@ using CsGrafeqApplication.Utilities;
 using CsGrafeqApplication.ViewModels;
 using Material.Styles.Themes;
 using Microsoft.Win32;
+using System;
+using System.Diagnostics;
+using System.Threading;
 
 namespace CsGrafeqApplication.Controls;
 
@@ -47,7 +47,7 @@ public partial class DisplayerContainer : UserControl, IInfoDialog
     {
         KeyDown += GlobalKeyDown;
         DataContext = VM;
-        VM.Displayer = new DisplayControl { Addons = { new GeometricPad() } };
+        VM.Displayer = new DisplayControl { Addons = { new GeometricPad(),new FunctionPad()} };
         InitializeComponent();
         anim.Delay = TimeSpan.FromSeconds(3);
         anim.Duration = TimeSpan.FromSeconds(0.2);
@@ -198,29 +198,31 @@ public partial class DisplayerContainer : UserControl, IInfoDialog
 
     private void Delete_Clicked(object? sender, RoutedEventArgs e)
     {
-        VM.Displayer.Addons[0].Delete();
+        VM.Displayer.Addons[VM.AddonIndex].Delete();
     }
 
     private void SelectAll_Clicked(object? sender, RoutedEventArgs e)
     {
-        VM.Displayer.Addons[0].SelectAll();
+        VM.Displayer.Addons[VM.AddonIndex].SelectAll();
     }
 
     private void DeSelectAll_Clicked(object? sender, RoutedEventArgs e)
     {
-        VM.Displayer.Addons[0].DeSelectAll();
+        VM.Displayer.Addons[VM.AddonIndex].DeselectAll();
     }
 
     private void LanguageSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
         Languages.SetLanguage(Languages.AllowedLanguages[(sender as ComboBox)?.SelectedIndex ?? 0]);
     }
-
+    private const string githubRepUrl = "https://github.com/jyswjjgdwtdtj/CsGrafeq";
     private void Github_Clicked(object? sender, RoutedEventArgs e)
     {
-        var key = Registry.ClassesRoot.OpenSubKey(@"http\shell\open\command\");
-        var s = key.GetValue("").ToString();
-        Process.Start(s, "https://github.com/jyswjjgdwtdtj/CsGrafeq");
+        Process.Start(new ProcessStartInfo
+        {
+            FileName = new Uri(githubRepUrl).AbsoluteUri,
+            UseShellExecute = true
+        });
     }
 
     private void ThemeSelectionChanged(object? sender, SelectionChangedEventArgs e)
@@ -262,10 +264,10 @@ public partial class DisplayerContainer : UserControl, IInfoDialog
                     var rt = new RenderTargetBitmap(size);
                     rt.Render(VM.Displayer);
                     dc.DrawImage(rt, VM.Displayer.Bounds);
-                    rt = new RenderTargetBitmap(new PixelSize((int)InfoCanvas.Bounds.Width,
-                        (int)InfoCanvas.Bounds.Height));
-                    rt.Render(InfoCanvas);
-                    dc.DrawImage(rt, InfoCanvas.Bounds);
+                    rt = new RenderTargetBitmap(new PixelSize((int)InfoContainer.Bounds.Width,
+                        (int)InfoContainer.Bounds.Height));
+                    rt.Render(InfoContainer);
+                    dc.DrawImage(rt, InfoContainer.Bounds);
                 }
 
                 rr.Save(file.Path.AbsolutePath);

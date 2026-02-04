@@ -4,11 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:ctls="clr-namespace:CsGrafeqApplication.Controls"
              xmlns:csgrafeqbase="clr-namespace:CsGrafeq;assembly=CsGrafeq.Base"
-             xmlns:geometricPad="clr-namespace:CsGrafeqApplication.Addons.GeometricPad"
+             xmlns:addons="clr-namespace:CsGrafeqApplication.Addons"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="CsGrafeqApplication.Addons.GeometricPad.VariablesView">
+             x:Class="CsGrafeqApplication.Addons.VariablesView">
     <Design.PreviewWith>
-        <geometricPad:VariablesView />
+        <addons:VariablesView />
     </Design.PreviewWith>
     <ContentControl DataContext="{x:Static csgrafeqbase:EnglishChar.Instance}">
         <StackPanel Orientation="Vertical" x:DataType="csgrafeqbase:EnglishChar">

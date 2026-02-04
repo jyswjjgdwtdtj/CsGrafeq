@@ -26,7 +26,7 @@ public class Circle : FilledShape
         Current = CircleGetter.GetCircle();
         Description =
             $"{MultiLanguageResources.CircleCenterText}:({LocX},{LocY}),{MultiLanguageResources.RadiusText}:{Radius}";
-        InvokeShapeChanged();
+        InvokeChanged();
     }
 
     public override Vec DistanceTo(Vec vec)

@@ -64,7 +64,7 @@ public class CircleGetter_FromCenterAndRadius : CircleGetter
         Radius = new ExpNumber(1, this);
         Radius.ValueStr = "1";
         Center = center;
-        ExpNumbers = [new NumberParameter(Radius, MultiLanguageResources.RadiusText)];
+        NumberParameters = [new NumberParameter(Radius, MultiLanguageResources.RadiusText)];
         ShapeParameters = [Center];
     }
 
@@ -72,8 +72,6 @@ public class CircleGetter_FromCenterAndRadius : CircleGetter
 
     public Point Center { get; init; }
     public ExpNumber Radius { get; init; }
-
-    public IReadOnlyList<NumberParameter> ExpNumbers { get; init; }
 
     public override CircleStruct GetCircle()
     {

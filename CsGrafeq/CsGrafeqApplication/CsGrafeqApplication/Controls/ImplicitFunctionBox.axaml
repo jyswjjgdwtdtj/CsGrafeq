@@ -6,10 +6,10 @@
                   xmlns:shapes1="clr-namespace:CsGrafeq.Shapes"
                   xmlns:controls2="clr-namespace:CsGrafeqApplication.Controls"
                   xmlns:controls="clr-namespace:CsGrafeqApplication.Core.Controls;assembly=CsGrafeqApplication.Core"
+                  xmlns:function="clr-namespace:CsGrafeqApplication.Function"
                   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
                   x:Class="CsGrafeqApplication.Controls.ImplicitFunctionBox">
     <Design.PreviewWith>
-        <controls2:ImplicitFunctionBox Function="{x:Static shapes1:ImplicitFunction.DebugFunc}" />
 
     </Design.PreviewWith>
     <Control.Styles>
@@ -19,7 +19,7 @@
                     <Border DataContext="{TemplateBinding Function}">
                         <controls:PlainExpressionBox CanInput="{TemplateBinding CanInput}"
                                                      Expression="{CompiledBinding Expression,Mode=TwoWay}"
-                                                     x:DataType="shapes1:ImplicitFunction" />
+                                                     x:DataType="function:ImplicitFunction" />
                     </Border>
                 </ControlTemplate>
             </Setter>

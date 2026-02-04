@@ -36,7 +36,6 @@ public class Setting : ObservableObject
         set
         {
             this.RaiseAndSetIfChanged(ref field, value);
-            Console.WriteLine(123);
         }
     } = false;
 

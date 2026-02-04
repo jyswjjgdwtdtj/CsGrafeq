@@ -31,7 +31,7 @@ public class Point : GeometryShape
     {
         var loc = PointGetter.GetPoint();
         Location.SetValue(loc.X, loc.Y);
-        InvokeShapeChanged();
+        InvokeChanged();
     }
 
     public override Vec DistanceTo(Vec vec)

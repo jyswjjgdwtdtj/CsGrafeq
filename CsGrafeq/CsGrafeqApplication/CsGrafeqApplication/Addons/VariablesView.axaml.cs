@@ -1,6 +1,6 @@
 ﻿using Avalonia.Controls;
 
-namespace CsGrafeqApplication.Addons.GeometricPad;
+namespace CsGrafeqApplication.Addons;
 
 public partial class VariablesView : UserControl
 {

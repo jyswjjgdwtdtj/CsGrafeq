@@ -10,7 +10,7 @@
                         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
                         x:Class="CsGrafeqApplication.Addons.GeometricPad.ShapeView">
     <geometricpad:ShapeView.Styles>
-        <StyleInclude Source="GeometricPadStyles.axaml" />
+        <StyleInclude Source="../CommonStyle.axaml" />
     </geometricpad:ShapeView.Styles>
     <geometricpad:ShapeView.Template>
         <ControlTemplate>

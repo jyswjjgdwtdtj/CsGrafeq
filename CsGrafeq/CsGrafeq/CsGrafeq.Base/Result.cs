@@ -7,6 +7,9 @@ public class Result<TSuccess, TException> where TException : Exception
     private readonly bool _isSuccessful;
     private readonly string? _successMessage;
     private readonly TSuccess? _value;
+    
+    public bool IsSuccessful => _isSuccessful;
+    public bool IsError => !_isSuccessful;
 
     protected Result(TSuccess value, string? message = null)
     {
@@ -43,6 +46,17 @@ public class Result<TSuccess, TException> where TException : Exception
     {
         exception = _exception!;
         return !_isSuccessful;
+    }
+
+    public TException? Error()
+    {
+        return _isSuccessful ? null : _exception;
+    }
+
+    public void Throw()
+    {
+        if (!_isSuccessful)
+            throw _exception!;
     }
 
     public void Match(Action<TSuccess> successAction, Action<TException> errorAction)

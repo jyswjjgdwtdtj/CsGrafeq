@@ -1,4 +1,7 @@
-﻿using Avalonia.Platform;
+﻿using System.Reactive.Linq;
+using Avalonia.Platform;
+using CsGrafeq;
+using ReactiveUI;
 using SkiaSharp;
 using static CsGrafeqApplication.Core.Utils.PointRectHelper;
 
@@ -45,11 +48,10 @@ public static class StaticSkiaResources
 
     public static void DrawBubble(this SKCanvas dc, string s, SKPoint point, SKPaint back, SKPaint fore)
     {
-        var TextFont = MapleMono;
         var size = new SKSize();
-        size.Width = TextFont.MeasureText(s, FilledBlack);
-        size.Height = TextFont.Size;
+        size.Width = MapleMono.MeasureText(s, FilledBlack);
+        size.Height = MapleMono.Size;
         dc.DrawRoundRect(new SKRoundRect(CreateSKRectWH(point.X, point.Y, size.Width + 4, size.Height + 4), 4), back);
-        dc.DrawText(s, new SKPoint(point.X + 2, point.Y + 2 + size.Height / 2 + 4), TextFont, fore);
+        dc.DrawText(s, new SKPoint(point.X + 2, point.Y + 2 + size.Height / 2 + 4), MapleMono, fore);
     }
 }

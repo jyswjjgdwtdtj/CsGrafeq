@@ -46,8 +46,6 @@ public class GeometricPad : Addon
             });
         host.TryFindResource("GeometricPadViewTemplate", out obj);
         MainTemplate = (IDataTemplate)obj;
-        host.TryFindResource("GeometricPadInfoTemplate", out obj);
-        InfoTemplate = (IDataTemplate)obj;
         CurrentAction = GeometryActions.Actions.FirstOrDefault()?.FirstOrDefault()!;
         Layers.Add(MainRenderTarget);
         MainRenderTarget.OnRender += Renderable_OnRender;
@@ -113,34 +111,7 @@ public class GeometricPad : Addon
     /// </summary>
     internal ActionData CurrentAction { get; private set; }
 
-    /// <summary>
-    ///     所有者
-    /// </summary>
-    public override Displayer? Owner
-    {
-        get => base.Owner;
-        set
-        {
-            if (!(value is CartesianDisplayer))
-                throw new Exception();
-            if (value == null)
-                throw new ArgumentNullException(nameof(value));
-            base.Owner = value;
-            PixelToMathX = value.PixelToMathX;
-            PixelToMathY = value.PixelToMathY;
-            PixelToMath = value.PixelToMath;
-            PixelToMathSK = value.PixelToMath;
-            MathToPixelX = value.MathToPixelX;
-            MathToPixelY = value.MathToPixelY;
-            MathToPixel = value.MathToPixel;
-            MathToPixelSK = value.MathToPixelSK;
-            if (Shapes.GetShapes<ImplicitFunction>().Count() > 0)
-            {
-                Setting.Instance.ZoomOptimization = true;
-                Setting.Instance.MoveOptimization = true;
-            }
-        }
-    }
+    
 
 
     /// <summary>
@@ -169,34 +140,6 @@ public class GeometricPad : Addon
         return shape;
     }
 
-    #region CoordinateTransformFuncs
-
-    /// <summary>
-    ///     将数学坐标转换为像素坐标（Avalonia.Point） 来自Owner
-    /// </summary>
-    private Func<Vec, AvaPoint> MathToPixel = VoidFunc<Vec, AvaPoint>;
-
-    /// <summary>
-    ///     将数学坐标转换为像素坐标（SKPoint） 来自Owner
-    /// </summary>
-    protected Func<Vec, SKPoint> MathToPixelSK = VoidFunc<Vec, SKPoint>;
-
-    /// <summary>
-    ///     将像素坐标转换为数学坐标（Avalonia.Point） 来自Owner
-    /// </summary>
-    protected Func<AvaPoint, Vec> PixelToMath = VoidFunc<AvaPoint, Vec>;
-
-    /// <summary>
-    ///     将像素坐标转换为数学坐标（SKPoint） 来自Owner
-    /// </summary>
-    protected Func<SKPoint, Vec> PixelToMathSK = VoidFunc<SKPoint, Vec>;
-
-    protected Func<double, double> PixelToMathX = VoidFunc<double, double>,
-        PixelToMathY = VoidFunc<double, double>,
-        MathToPixelX = VoidFunc<double, double>,
-        MathToPixelY = VoidFunc<double, double>;
-
-    #endregion
 
 
     #region KeyAction
@@ -217,13 +160,13 @@ public class GeometricPad : Addon
             shape.Selected = true;
     }
 
-    public override void DeSelectAll()
+    public override void DeselectAll()
     {
         foreach (var shape in Shapes.OfType<GeometryShape>().ToArray())
             shape.Selected = false;
     }
 
-    protected override bool AddonKeyDown(KeyEventArgs e)
+    protected override bool OnKeyDown(KeyEventArgs e)
     {
         if (Owner == null) return DoNext;
         var res = DoNext;
@@ -256,7 +199,7 @@ public class GeometricPad : Addon
     /// </summary>
     private bool IsMovingPointMovable { get; set; }
 
-    protected override bool AddonPointerPressed(AddonPointerEventArgs e)
+    protected override bool OnPointerPressed(AddonPointerEventArgs e)
     {
         if (Owner == null) return DoNext;
         LastPointerProperties = e.Properties;
@@ -289,7 +232,7 @@ public class GeometricPad : Addon
         return DoNext;
     }
 
-    protected override bool AddonPointerMoved(AddonPointerEventArgs e)
+    protected override bool OnPointerMoved(AddonPointerEventArgs e)
     {
         if (Owner == null) return DoNext;
         LastPointerProperties = e.Properties;
@@ -360,7 +303,7 @@ public class GeometricPad : Addon
         return DoNext;
     }
 
-    protected override bool AddonPointerReleased(AddonPointerEventArgs e)
+    protected override bool OnPointerReleased(AddonPointerEventArgs e)
     {
         if (Owner == null) return DoNext;
         LastPointerProperties = e.Properties;
@@ -395,7 +338,7 @@ public class GeometricPad : Addon
         return Intercept;
     }
 
-    protected override bool AddonPointerTapped(AddonPointerEventArgsBase e)
+    protected override bool OnPointerTapped(AddonPointerEventArgsBase e)
     {
         if (Owner == null) return DoNext;
         {
@@ -509,7 +452,6 @@ public class GeometricPad : Addon
 
     protected void Renderable_OnRender(SKCanvas? dc, SKRect rect)
     {
-        Console.WriteLine(Shapes.Count);
         if (Owner is null || dc is null) return;
         dc.Save();
         dc.ClipRect(rect);
@@ -527,34 +469,32 @@ public class GeometricPad : Addon
 
     private void RenderShapes(SKCanvas dc, SKRect rect, IEnumerable<GeometryShape> shapes)
     {
-        var UnitLength = (Owner as CartesianDisplayer)!.UnitLength;
-        var LT = new Vec(PixelToMathX(rect.Left), PixelToMathY(rect.Bottom));
-        var RT = new Vec(PixelToMathX(rect.Right), PixelToMathY(rect.Bottom));
-        var RB = new Vec(PixelToMathX(rect.Right), PixelToMathY(rect.Top));
-        var LB = new Vec(PixelToMathX(rect.Left), PixelToMathY(rect.Top));
+        var unitLength = (Owner as CartesianDisplayer)!.UnitLength;
+        var lt = new Vec(PixelToMathX(rect.Left), PixelToMathY(rect.Bottom));
+        var rt = new Vec(PixelToMathX(rect.Right), PixelToMathY(rect.Bottom));
+        var rb = new Vec(PixelToMathX(rect.Right), PixelToMathY(rect.Top));
+        var lb = new Vec(PixelToMathX(rect.Left), PixelToMathY(rect.Top));
         var cd = (CartesianDisplayer)Owner;
-        using (SKPaint TPFilledPaint = new() { IsAntialias = true },
-               FilledPaint = new() { IsAntialias = true },
-               StrokePaint = new() { IsStroke = true, IsAntialias = true, StrokeWidth = 2 },
-               StrokePaint1 = new() { IsStroke = true, IsAntialias = true, StrokeWidth = 1 },
-               StrokeMain = new() { Color = cd.AxisPaintMain.Color, IsStroke = true, IsAntialias = true },
-               PaintMain = new() { Color = cd.AxisPaintMain.Color, IsAntialias = true },
-               StrokePaintMain = new() { Color = cd.AxisPaintMain.Color, IsAntialias = true, IsStroke = true },
-               BubbleBack = new() { Color = cd.AxisPaint1.Color.WithAlpha(90), IsAntialias = true })
+        using (SKPaint tpFilledPaint = new() { IsAntialias = true },
+               filledPaint = new() { IsAntialias = true },
+               strokePaint = new() { IsStroke = true, IsAntialias = true, StrokeWidth = 2 },
+               strokePaint1 = new() { IsStroke = true, IsAntialias = true, StrokeWidth = 1 },
+               strokeMain = new() { Color = cd.AxisPaintMain.Color, IsStroke = true, IsAntialias = true, StrokeWidth = 1 },
+               paintMain = new() { Color = cd.AxisPaintMain.Color, IsAntialias = true, StrokeWidth = 1},
+               strokePaintMain = new() { Color = cd.AxisPaintMain.Color, IsAntialias = true, IsStroke = true, StrokeWidth = 1 },
+               bubbleBack = new() { Color = cd.AxisPaint1.Color.WithAlpha(90), IsAntialias = true })
         {
             foreach (var shape in shapes)
             {
-                if (shape is null)
-                    continue;
                 if (shape.IsDeleted)
                     continue;
                 if (!shape.Visible)
                     continue;
                 if (shape is GeoPoint)
                     continue;
-                FilledPaint.Color = new SKColor(shape.Color).WithAlpha(255);
-                TPFilledPaint.Color = new SKColor(shape.Color).WithAlpha(90);
-                StrokePaint.Color = new SKColor(shape.Color).WithAlpha(255);
+                filledPaint.Color = new SKColor(shape.Color).WithAlpha(255);
+                tpFilledPaint.Color = new SKColor(shape.Color).WithAlpha(90);
+                strokePaint.Color = new SKColor(shape.Color).WithAlpha(255);
                 switch (shape)
                 {
                     case Straight s:
@@ -562,19 +502,19 @@ public class GeometricPad : Addon
                         var v1 = s.Current.Point1;
                         var v2 = s.Current.Point2;
                         var vs = GetValidVec(
-                            GetIntersectionOfSegmentAndLine(LT, RT, v1, v2),
-                            GetIntersectionOfSegmentAndLine(RT, RB, v1, v2),
-                            GetIntersectionOfSegmentAndLine(RB, LB, v1, v2),
-                            GetIntersectionOfSegmentAndLine(LB, LT, v1, v2)
+                            GetIntersectionOfSegmentAndLine(lt, rt, v1, v2),
+                            GetIntersectionOfSegmentAndLine(rt, rb, v1, v2),
+                            GetIntersectionOfSegmentAndLine(rb, lb, v1, v2),
+                            GetIntersectionOfSegmentAndLine(lb, lt, v1, v2)
                         );
                         if (s.Selected)
-                            dc.DrawLine(MathToPixelSK(vs.Item1), MathToPixelSK(vs.Item2), StrokePaint);
+                            dc.DrawLine(MathToPixelSK(vs.Item1), MathToPixelSK(vs.Item2), strokePaint);
                         else
-                            dc.DrawLine(MathToPixelSK(vs.Item1), MathToPixelSK(vs.Item2), StrokePaintMain);
+                            dc.DrawLine(MathToPixelSK(vs.Item1), MathToPixelSK(vs.Item2), strokePaintMain);
 
                         dc.DrawBubble($"{MultiLanguageResources.Instance.StraightText}:{s.Name}",
                             MathToPixelSK((s.Current.Point1 + s.Current.Point2) / 2),
-                            BubbleBack, PaintMain);
+                            bubbleBack, paintMain);
                     }
                         break;
                     case GeoSegment s:
@@ -582,13 +522,13 @@ public class GeometricPad : Addon
                         var v1 = s.Current.Point1;
                         var v2 = s.Current.Point2;
                         if (s.Selected)
-                            dc.DrawLine(MathToPixelSK(v1), MathToPixelSK(v2), StrokePaint);
+                            dc.DrawLine(MathToPixelSK(v1), MathToPixelSK(v2), strokePaint);
                         else
-                            dc.DrawLine(MathToPixelSK(v1), MathToPixelSK(v2), StrokePaintMain);
+                            dc.DrawLine(MathToPixelSK(v1), MathToPixelSK(v2), strokePaintMain);
 
                         dc.DrawBubble($"{MultiLanguageResources.Instance.SegmentText}:{s.Name}",
                             MathToPixelSK((s.Current.Point1 + s.Current.Point2) / 2),
-                            BubbleBack, PaintMain);
+                            bubbleBack, paintMain);
                     }
                         break;
                     case GeoHalf h:
@@ -596,10 +536,10 @@ public class GeometricPad : Addon
                         var v1 = h.Current.Point1;
                         var v2 = h.Current.Point2;
                         var vs = GetValidVec(
-                            GetIntersectionOfSegmentAndLine(LT, RT, v1, v2),
-                            GetIntersectionOfSegmentAndLine(RT, RB, v1, v2),
-                            GetIntersectionOfSegmentAndLine(RB, LB, v1, v2),
-                            GetIntersectionOfSegmentAndLine(LB, LT, v1, v2)
+                            GetIntersectionOfSegmentAndLine(lt, rt, v1, v2),
+                            GetIntersectionOfSegmentAndLine(rt, rb, v1, v2),
+                            GetIntersectionOfSegmentAndLine(rb, lb, v1, v2),
+                            GetIntersectionOfSegmentAndLine(lb, lt, v1, v2)
                         );
                         Vec p;
                         if (v1.X == v2.X)
@@ -618,13 +558,13 @@ public class GeometricPad : Addon
                         }
 
                         if (h.Selected)
-                            dc.DrawLine(MathToPixelSK(v1), MathToPixelSK(p), StrokePaint);
+                            dc.DrawLine(MathToPixelSK(v1), MathToPixelSK(p), strokePaint);
                         else
-                            dc.DrawLine(MathToPixelSK(v1), MathToPixelSK(p), StrokePaintMain);
+                            dc.DrawLine(MathToPixelSK(v1), MathToPixelSK(p), strokePaintMain);
 
                         dc.DrawBubble($"{MultiLanguageResources.Instance.HalfLineText}:{h.Name}",
                             MathToPixelSK((h.Current.Point1 + h.Current.Point2) / 2),
-                            BubbleBack, PaintMain);
+                            bubbleBack, paintMain);
                     }
                         break;
                     case GeoPolygon polygon:
@@ -639,41 +579,41 @@ public class GeometricPad : Addon
                         {
                             if (polygon.Selected)
                             {
-                                dc.DrawPath(path, TPFilledPaint);
-                                dc.DrawPath(path, StrokePaint);
+                                dc.DrawPath(path, tpFilledPaint);
+                                dc.DrawPath(path, strokePaint);
                             }
                             else
                             {
                                 dc.DrawPath(path, FilledTranparentGrey);
-                                dc.DrawPath(path, StrokeMain);
+                                dc.DrawPath(path, strokeMain);
                             }
                         }
                         else
                         {
                             if (polygon.Selected)
-                                dc.DrawPath(path, StrokePaint);
+                                dc.DrawPath(path, strokePaint);
                             else
-                                dc.DrawPath(path, StrokeMain);
+                                dc.DrawPath(path, strokeMain);
                         }
 
                         dc.DrawBubble($"{MultiLanguageResources.Instance.PolygonText}:{polygon.Name}",
                             MathToPixelSK((polygon.Locations[0] + polygon.Locations[1]) / 2) - new SKPoint(0, 20),
-                            BubbleBack, PaintMain);
+                            bubbleBack, paintMain);
                     }
                         break;
                     case GeoCircle circle:
                     {
                         var cs = circle.Current;
                         var pf = MathToPixelSK(cs.Center);
-                        var s = new SKSize((float)(cs.Radius * UnitLength), (float)(cs.Radius * UnitLength));
+                        var s = new SKSize((float)(cs.Radius * unitLength), (float)(cs.Radius * unitLength));
                         if (circle.Selected)
-                            dc.DrawOval(pf, s, StrokePaint);
+                            dc.DrawOval(pf, s, strokePaint);
                         else
-                            dc.DrawOval(pf, s, StrokeMain);
+                            dc.DrawOval(pf, s, strokeMain);
 
                         var r2 = cs.Radius * Sqrt(2) / 2;
                         dc.DrawBubble($"{MultiLanguageResources.Instance.CircleText}:{circle.Name}",
-                            MathToPixelSK(circle.Current.Center + new Vec(-r2, r2)), BubbleBack, PaintMain);
+                            MathToPixelSK(circle.Current.Center + new Vec(-r2, r2)), bubbleBack, paintMain);
                     }
                         break;
                     case Angle ang:
@@ -693,12 +633,12 @@ public class GeometricPad : Addon
                             a -= 360;
                         if (ang.Selected)
                             dc.DrawArc(CreateSKRectWH(pf.X - 20, pf.Y - 20, 40, 40), (float)arg1, (float)a, true,
-                                StrokePaint);
+                                strokePaint);
                         else
                             dc.DrawArc(CreateSKRectWH(pf.X - 20, pf.Y - 20, 40, 40), (float)arg1, (float)a, true,
-                                StrokeMain);
-                        dc.DrawBubble($"{Abs(aa).ToString("0.00")}°", pf.OffSetBy(2, 2 - 20), BubbleBack,
-                            PaintMain);
+                                strokeMain);
+                        dc.DrawBubble($"{Abs(aa).ToString("0.00")}°", pf.OffSetBy(2, 2 - 20), bubbleBack,
+                            paintMain);
                     }
                         break;
                 }
@@ -712,117 +652,38 @@ public class GeometricPad : Addon
                     continue;
                 if (!p.Visible)
                     continue;
-                FilledPaint.Color = new SKColor(p.Color).WithAlpha(255);
-                TPFilledPaint.Color = new SKColor(p.Color).WithAlpha(90);
-                StrokePaint1.Color = new SKColor(p.Color).WithAlpha(255);
+                filledPaint.Color = new SKColor(p.Color).WithAlpha(255);
+                tpFilledPaint.Color = new SKColor(p.Color).WithAlpha(90);
+                strokePaint1.Color = new SKColor(p.Color).WithAlpha(255);
                 var index = 0;
                 var loc = MathToPixelSK(p.Location);
                 dc.DrawBubble($"{MultiLanguageResources.Instance.PointText}:" + p.Name,
-                    loc.OffSetBy(2, 2 + 20 * index++), BubbleBack, PaintMain);
+                    loc.OffSetBy(2, 2 + 20 * index++), bubbleBack, paintMain);
                 if (p == MovingPoint)
                 {
                     dc.DrawOval(loc, new SKSize(4, 4), FilledMid);
                     dc.DrawOval(loc, new SKSize(7, 7), StrokeMid);
                     dc.DrawBubble(
                         $"({Round(MovingPoint.Location.X, 8)},{Round(MovingPoint.Location.Y, 8)}) {(MovingPoint.PointGetter is PointGetter_Movable && MovingPoint.IsUserEnabled ? "" : MultiLanguageResources.Instance.CantBeMovedText)}",
-                        loc.OffSetBy(2, 2 + 20 * index++), BubbleBack, PaintMain);
+                        loc.OffSetBy(2, 2 + 20 * index++), bubbleBack, paintMain);
                 }
                 else if (p.Selected)
                 {
-                    dc.DrawOval(loc, new SKSize(4, 4), FilledPaint);
-                    dc.DrawOval(loc, new SKSize(7, 7), StrokePaint1);
+                    dc.DrawOval(loc, new SKSize(4, 4), filledPaint);
+                    dc.DrawOval(loc, new SKSize(7, 7), strokePaint1);
                 }
                 else if (p.PointerOver)
                 {
-                    dc.DrawOval(loc, new SKSize(4, 4), FilledPaint);
+                    dc.DrawOval(loc, new SKSize(4, 4), filledPaint);
                 }
                 else
                 {
-                    dc.DrawOval(loc, new SKSize(3, 3), PaintMain);
+                    dc.DrawOval(loc, new SKSize(3, 3), paintMain);
                 }
 
                 foreach (var t in p.TextGetters)
                     if (!string.IsNullOrEmpty(t.GetText()))
-                        dc.DrawBubble(t.GetText(), loc.OffSetBy(2, 2 + 20 * index++), BubbleBack, PaintMain);
-            }
-        }
-    }
-
-    private void RenderFunction(SKCanvas dc, SKRectI rect, ImplicitFunction impFunc)
-    {
-        if (!impFunc.IsCorrect)
-            return;
-        if (impFunc.IsDeleted)
-            return;
-        lock (IntervalCompiler.SyncObjForIntervalSetCalc)
-        {
-            var RectToCalc = new ConcurrentBag<SKRectI> { rect };
-            var Points = new ConcurrentBag<SKPoint>();
-            var Rects = new ConcurrentBag<SKRectI>();
-            var paint = new SKPaint { Color = new SKColor(impFunc.Color).WithAlpha(impFunc.Opacity) };
-            var func = impFunc.Function.Function;
-            do
-            {
-                var rs = RectToCalc.ToArray();
-                RectToCalc.Clear();
-                Action<int> atn = idx => { RenderRectIntervalSet(rs[idx], RectToCalc, func, false, Points, Rects); };
-                for (var i = 0; i < rs.Length; i += 100)
-                {
-                    //此处不应使用并行
-                    //IntervalSet计算是完全线程不安全的
-                    for (var j = i; j < Min(i + 100, rs.Length); j++) atn(j);
-                    foreach (var rectToDraw in Rects) dc.DrawRect(rectToDraw, paint);
-                    Rects.Clear();
-                    dc.DrawPoints(SKPointMode.Points, Points.ToArray(), paint);
-                    Points.Clear();
-                }
-            } while (RectToCalc.Count != 0);
-
-            dc.Flush();
-        }
-    }
-
-    private void RenderRectIntervalSet(SKRectI r, ConcurrentBag<SKRectI> RectToCalc, IntervalHandler<IntervalSet> func,
-        bool checkpixel, ConcurrentBag<SKPoint> Points, ConcurrentBag<SKRectI> Rects)
-    {
-        if (r.Height == 0 || r.Width == 0)
-            return;
-        int xtimes = 2, ytimes = 2;
-        if (r.Width > r.Height)
-            ytimes = 1;
-        else if (r.Width < r.Height)
-            xtimes = 1;
-        var dx = (int)Ceiling((double)r.Width / xtimes);
-        var dy = (int)Ceiling((double)r.Height / ytimes);
-        var isPixel = dx == 1 && dy == 1;
-        for (var i = r.Left; i < r.Right; i += dx)
-        {
-            var di = i;
-            var xmin = PixelToMathX(i);
-            var xmax = PixelToMathX(i + dx);
-            var xi = IntervalSet.Create([new Range(xmin, xmax)], Def.TT);
-            for (var j = r.Top; j < r.Bottom; j += dy)
-            {
-                var dj = j;
-                var ymin = PixelToMathY(j);
-                var ymax = PixelToMathY(j + dy);
-                var yi = IntervalSet.Create([new Range(ymin, ymax)], Def.TT);
-                var result = func(xi, yi);
-                if (result == Def.TT)
-                {
-                    if (isPixel)
-                        Points.Add(new SKPoint(di, dj));
-                    else
-                        Rects.Add(new SKRectI(di, dj, di + dx, dj + dy));
-                }
-                else if (result == Def.FT)
-                {
-                    if (isPixel)
-                        Points.Add(new SKPoint(di, dj));
-                    else
-                        RectToCalc.Add(new SKRectI(i, j, Min(i + dx, r.Right),
-                            Min(j + dy, r.Bottom)));
-                }
+                        dc.DrawBubble(t.GetText(), loc.OffSetBy(2, 2 + 20 * index++), bubbleBack, paintMain);
             }
         }
     }

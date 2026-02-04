@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Reactive.Linq;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
@@ -35,6 +36,7 @@ public class ShapeParamsTemplate : IDataTemplate
             }
 
             var expns = getter.NumberParameters;
+            Console.WriteLine(expns is null);
             foreach (var expNumberData in expns ?? [])
             {
                 ctls.Add(new TextBlock

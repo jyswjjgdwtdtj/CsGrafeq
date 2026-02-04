@@ -500,7 +500,7 @@ public class CartesianDisplayer : Displayer
 
     protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
     {
-        if (CallAddonPointerWheeled(e) == DoNext)
+        if (CallPointerWheeled(e) == DoNext)
             Zoom(Pow(1.04, e.Delta.Y), e.GetPosition(this));
         else
             AskForRender();

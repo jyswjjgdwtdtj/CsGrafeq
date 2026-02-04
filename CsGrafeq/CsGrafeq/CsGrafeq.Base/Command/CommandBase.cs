@@ -10,4 +10,5 @@ public class CommandBase(object? tag,Action<object?>? initFunc, Action<object?>?
     private static void DoNothing(object? obj)
     {
     }
+    public string Description { get; set; } = string.Empty;
 }

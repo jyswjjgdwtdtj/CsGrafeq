@@ -33,7 +33,6 @@ public static class IntervalCompiler
         ilr.Emit(OpCodes.Call, GetInfo(StaticUnsafeMemoryList<Range>.Clear));
         CompileToILGenerator<IntervalSet>(ilr, expression.Body);
         ilr.Emit(OpCodes.Ret);
-        Console.WriteLine(ilr.GetRecord());
         var func = dynamicMethod.CreateDelegate<IntervalHandler<IntervalSet>>();
         try
         {

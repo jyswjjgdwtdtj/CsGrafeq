@@ -1,20 +1,21 @@
 using System;
+using CsGrafeq.I18N;
 using CsGrafeq.Interval;
+using CsGrafeq.Shapes;
 using CsGrafeqApplication.Addons;
+using CsGrafeqApplication.Addons.FunctionPad;
 using ReactiveUI;
 
-namespace CsGrafeq.Shapes;
+namespace CsGrafeqApplication.Function;
 
-public class ImplicitFunction : Shape
+public class ImplicitFunction : InteractiveObject
 {
-#if DEBUG
-    public static ImplicitFunction DebugFunc = new("y=sin(x)");
-#endif
     public readonly Renderable RenderTarget = new();
+    public FunctionPad Owner { get; init; }
 
-    public ImplicitFunction(string expression)
+    public ImplicitFunction(string expression,FunctionPad owner)
     {
-        TypeName = MultiLanguageResources.ImplicitFunctionText;
+        Owner = owner;
         Description = "ImplicitFunction";
         PropertyChanged += (s, e) =>
         {
@@ -23,17 +24,16 @@ public class ImplicitFunction : Shape
         };
         EnglishChar.Instance.CharValueChanged += CharValueChanged;
         Opacity = Setting.Instance.DefaultOpacity;
-
         Expression = expression;
     }
 
     public byte Opacity
     {
-        get => field;
+        get;
         set
         {
             this.RaiseAndSetIfChanged(ref field, value);
-            InvokeShapeChanged();
+            InvokeChanged();
         }
     }
 
@@ -49,6 +49,12 @@ public class ImplicitFunction : Shape
         private set => this.RaiseAndSetIfChanged(ref field, value);
     } = false;
 
+    public string LastError
+    {
+        get;
+        private set => this.RaiseAndSetIfChanged(ref field, value);
+    }
+
     public HasReferenceIntervalSetFunc<IntervalSet> Function
     {
         get => field;
@@ -61,19 +67,24 @@ public class ImplicitFunction : Shape
         set
         {
             this.RaiseAndSetIfChanged(ref field, value);
-            try
-            {
-                var last = Function;
-                Function = IntervalCompiler.Compile(Expression);
-                IsCorrect = true;
-                last.Dispose();
-            }
-            catch (Exception ex)
-            {
-                IsCorrect = false;
-            }
-
-            InvokeShapeChanged();
+            var last = Function;
+            var res=IntervalCompiler.TryCompile(Expression,Setting.Instance.EnableExpressionSimplification);
+            res.Match(
+                success  => 
+                {
+                    Function = success;
+                    LastError="No Error";
+                    IsCorrect = true;
+                    last.Dispose();
+                },
+                failure =>
+                {
+                    IsCorrect = false;
+                    LastError = failure.Message;
+                }
+            );
+            
+            InvokeChanged();
             Description = Expression;
         }
     }
@@ -103,6 +114,14 @@ public class ImplicitFunction : Shape
     {
         if (IsCorrect && !IsDeleted)
             if (Function.Reference.HasFlag(englishCharEnum))
-                InvokeShapeChanged();
+                InvokeChanged();
     }
+
+    public override void InvokeChanged()
+    {
+        FuncChanged?.Invoke(this);
+    }
+
+    public Action<ImplicitFunction>? FuncChanged;
+    
 }

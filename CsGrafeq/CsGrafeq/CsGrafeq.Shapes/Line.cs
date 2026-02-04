@@ -23,7 +23,7 @@ public abstract class Line : GeometryShape
     {
         Current = LineGetter.GetLine();
         Description = Current.ExpStr.Replace("x", "𝑥").Replace("y", "𝑦");
-        InvokeShapeChanged();
+        InvokeChanged();
     }
 
     public abstract bool CheckIsValid(Vec vec);
@@ -53,7 +53,7 @@ public class Segment : Line
     {
         Current = LineGetter.GetLine();
         Description = Current.ExpStr + " " + Current.Distance;
-        InvokeShapeChanged();
+        InvokeChanged();
     }
 
     public override bool CheckIsValid(Vec vec)

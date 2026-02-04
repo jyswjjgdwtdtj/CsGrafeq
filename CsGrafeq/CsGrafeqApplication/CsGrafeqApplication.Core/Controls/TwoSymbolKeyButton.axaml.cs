@@ -8,6 +8,14 @@ namespace CsGrafeqApplication.Core.Controls;
 
 public partial class TwoSymbolKeyButton : ToggleButton
 {
+    public static readonly StyledProperty<float> SecondFontSizeProperty = AvaloniaProperty.Register<TwoSymbolKeyButton, float>(
+        nameof(SecondFontSize));
+
+    public float SecondFontSize
+    {
+        get => GetValue(SecondFontSizeProperty);
+        set => SetValue(SecondFontSizeProperty, value);
+    }
     public static readonly DirectProperty<TwoSymbolKeyButton, string> FirstButtonProperty =
         AvaloniaProperty.RegisterDirect<TwoSymbolKeyButton, string>(
             nameof(FirstButton), o => o.FirstButton, (o, v) => o.FirstButton = v);

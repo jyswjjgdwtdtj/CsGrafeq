@@ -24,6 +24,24 @@
         <Border Name="DisplayerCon" ZIndex="0" BorderThickness="0">
             <ContentPresenter Content="{CompiledBinding Displayer}" />
         </Border>
+        <!--Info显示层-->
+        <Border Name="InfoContainer">
+            <TabControl Name="AddonInfoTabControl" SelectedIndex="{CompiledBinding AddonIndex,Mode=OneWay}" ItemsSource="{CompiledBinding Displayer.Addons}" HorizontalAlignment="Right">
+                <TabControl.ContentTemplate>
+                    <DataTemplate DataType="addons:Addon">
+                        <ContentControl Content="{CompiledBinding .}" ContentTemplate="{CompiledBinding InfoTemplate}">
+                        </ContentControl>
+                    </DataTemplate>
+                </TabControl.ContentTemplate>
+                <TabControl.Styles>
+                    <Style Selector="TabControl#AddonInfoTabControl">
+                        <Style Selector="^ /template/ Panel#PART_TabsPanel">
+                            <Setter Property="IsVisible" Value="False"></Setter>
+                        </Style>
+                    </Style>
+                </TabControl.Styles>
+            </TabControl>
+        </Border>
         <!--键盘-->
         <corecontrols:Keyboard>
             <Panel Name="PART_Container" IsTabStop="False">
@@ -95,10 +113,10 @@
                         </Border.Styles>
                         <Border HorizontalAlignment="Center" VerticalAlignment="Stretch" Name="InnerBorder" />
                     </Border>
-                    <Border BorderThickness="0"
+                    <Border BorderThickness="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                             BorderBrush="{DynamicResource CgOppositeTranslucentBackgroundBrush1}"
                             Name="PART_CoverDisplayer">
-                        <DockPanel>
+                        <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                             <ToggleButton DockPanel.Dock="Left" Width="15" Height="40" VerticalAlignment="Center"
                                           HorizontalAlignment="Left" IsChecked="True"
                                           Name="Toggle"
@@ -117,8 +135,7 @@
                                     </Style>
                                 </ToggleButton.Styles>
                             </ToggleButton>
-                            <Panel DockPanel.Dock="Right" ZIndex="5" Name="InfoCanvas"
-                                   VerticalAlignment="Stretch"
+                            <Panel DockPanel.Dock="Right" VerticalAlignment="Stretch"
                                    HorizontalAlignment="Stretch">
                                 <ComboBox SelectedIndex="{CompiledBinding AddonIndex,Mode=TwoWay}" Name="ChooseAddonComboBox" VerticalAlignment="Top" ItemsSource="{CompiledBinding Displayer.Addons}">
                                     <ComboBox.ItemTemplate>

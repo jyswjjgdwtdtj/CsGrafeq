@@ -5,7 +5,7 @@
                    xmlns:controls="clr-namespace:CsGrafeqApplication.Core.Controls"
                    xmlns:csGrafeq="clr-namespace:CsGrafeq;assembly=CsGrafeq.Base"
                    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-                   x:Class="CsGrafeqApplication.Core.Controls.Keyboard" x:Name="UC">
+                   x:Class="CsGrafeqApplication.Core.Controls.Keyboard">
     <Design.PreviewWith>
         <controls:Keyboard Width="600" Height="400" />
     </Design.PreviewWith>
@@ -36,7 +36,7 @@
             <Setter Property="Template">
                 <ControlTemplate>
                     <DockPanel LastChildFill="True">
-                        <controls:ExpandBox BorderBrush="{DynamicResource MaterialPrimaryMidBrush}"
+                        <controls:ExpandBox BorderBrush="{DynamicResource MaterialPrimaryMidBrush}" IsVisible="False"
                                             BorderThickness="0,1,0,0" DockPanel.Dock="Bottom"
                                             DataContext="{x:Static csGrafeq:Setting.Instance}"
                                             IsExpanded="{CompiledBinding ShowKeyboard}" x:DataType="csGrafeq:Setting"
@@ -58,224 +58,131 @@
                                         <Setter Property="Focusable" Value="False" />
                                     </Style>
                                 </Expander.Styles>
-                                <Grid RowDefinitions="50,50,50,50" RowSpacing="1">
-                                    <Grid.Styles>
-                                        <Style Selector="controls|TwoSymbolKeyButton.Char">
-                                            <Setter Property="Height" Value="48" />
-                                            <Setter Property="Width" Value="48" />
+                                <ToggleButton Name="ToggleKeyboardContainer">
+                                    <ToggleButton.Styles>
+                                        <Style Selector="ToggleButton#ToggleKeyboardContainer">
+                                            <Style Selector="^">
+                                                <Setter Property="Template">
+                                                    <ControlTemplate>
+                                                        <Grid ColumnDefinitions="Auto,40,Auto,40,Auto" HorizontalAlignment="Center">
+                                                            <Grid Grid.Column="0" ColumnDefinitions="70,70,70,70" RowDefinitions="35,35,35,35">
+                                                                <Grid.Styles>
+                                                                    <Style Selector="controls|OneSymbolKeyButton">
+                                                                        <Setter Property="FontSize" Value="16"></Setter>
+                                                                    </Style>
+                                                                    <Style Selector="Button">
+                                                                        <Setter Property="Background" Value="{DynamicResource CgBackgroundBrush}" />
+                                                                        <Setter Property="CornerRadius" Value="4" />
+                                                                        <Setter Property="Focusable" Value="False" />
+                                                                        <Setter Property="BorderBrush" Value="{DynamicResource CgForegroundBrush}" />
+                                                                        <Setter Property="BorderThickness" Value="1" />
+                                                                        <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                                                        <Setter Property="Margin" Value="2" />
+                                                                        <Setter Property="Padding" Value="0" />
+                                                                        <Setter Property="FontFamily" Value="{StaticResource MapleMono}"></Setter>
+                                                                    </Style>
+                                                                </Grid.Styles>
+                                                                <controls:OneSymbolKeyButton Grid.Column="0" Grid.Row="0" Button="x"></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="0" Button="y"></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="2" Grid.Row="0" Button="("></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="3" Grid.Row="0" Button=")"></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="0" Grid.Row="1" Button="&lt;"></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="1" Button="&gt;"></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="2" Grid.Row="1" Button="|"></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="3" Grid.Row="1" Button="&amp;"></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="0" Grid.Row="2" Button="^"></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="2" Button="%"></controls:OneSymbolKeyButton>
+                                                                
+                                                                <Button Grid.Column="2" Grid.Row="2" Name="TrigonometricFunction" Content="Tri">
+                                                                    <Button.Flyout>
+                                                                        <Flyout>
+                                                            <Grid ColumnDefinitions="90,90,90,90" RowDefinitions="35,35,35,35">
+                                                                <Grid.Styles>
+                                                                    <Style Selector="controls|OneSymbolKeyButton">
+                                                                        <Setter Property="FontSize" Value="16"></Setter>
+                                                                    </Style>
+                                                                </Grid.Styles>
+                                                                <controls:OneSymbolKeyButton Grid.Column="0" Grid.Row="0" Button="sin("></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="0" Button="cos("></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="2" Grid.Row="0" Button="tan("></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="3" Grid.Row="0" Button="cot("></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="0" Grid.Row="1" Button="arcsin("></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="1" Button="arccos("></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="2" Grid.Row="1" Button="arctan("></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="0" Grid.Row="2" Button="sinh("></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="2" Button="cosh("></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="2" Grid.Row="2" Button="tanh("></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="0" Grid.Row="3" Button="arcsinh("></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="3" Button="arccosh("></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="2" Grid.Row="3" Button="arctanh("></controls:OneSymbolKeyButton>
+                                                            </Grid>
+                                                                        </Flyout>
+                                                                    </Button.Flyout>
+                                                                </Button>
+                                                                
+                                                                <Button Grid.Column="3" Grid.Row="2" Name="ElseFunction">Func</Button>
+                                                                
+                                                                <Button Grid.Column="0" Grid.Row="3" Name="SwitchToABC">ABC</Button>
+                                                                
+                                                                <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="3" Button=","></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="2" Grid.Row="3" Button="e"></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="3" Grid.Row="3" Button="pi"></controls:OneSymbolKeyButton>
+                                                            </Grid>
+                                                            <Grid Grid.Column="2" ColumnDefinitions="70,70,70,70" RowDefinitions="35,35,35,35">
+                                                                <Grid.Styles>
+                                                                    <Style Selector="controls|OneSymbolKeyButton">
+                                                                        <Setter Property="FontSize" Value="16"></Setter>
+                                                                    </Style>
+                                                                </Grid.Styles>
+                                                                <controls:OneSymbolKeyButton Grid.Column="0" Grid.Row="0" Button="7"></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="0" Button="8"></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="2" Grid.Row="0" Button="9"></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="3" Grid.Row="0" Button="/"></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="0" Grid.Row="1" Button="4"></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="1" Button="5"></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="2" Grid.Row="1" Button="6"></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="3" Grid.Row="1" Button="*"></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="0" Grid.Row="2" Button="1"></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="2" Button="2"></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="2" Grid.Row="2" Button="3"></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="3" Grid.Row="2" Button="-"></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="0" Grid.Row="3" Button="0"></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="3" Button="."></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="2" Grid.Row="3" Button="="></controls:OneSymbolKeyButton>
+                                                                <controls:OneSymbolKeyButton Grid.Column="3" Grid.Row="3" Button="+"></controls:OneSymbolKeyButton>
+                                                            </Grid>
+                                                            <Grid Grid.Column="4" ColumnDefinitions="70,70" RowDefinitions="35,35,35,35">
+                                                                <Grid.Styles>
+                                                                    <Style Selector="Button">
+                                                                        <Setter Property="Background" Value="{DynamicResource CgBackgroundBrush}" />
+                                                                        <Setter Property="CornerRadius" Value="4" />
+                                                                        <Setter Property="Focusable" Value="False" />
+                                                                        <Setter Property="BorderBrush" Value="{DynamicResource CgForegroundBrush}" />
+                                                                        <Setter Property="BorderThickness" Value="1" />
+                                                                        <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                                                        <Setter Property="Margin" Value="2" />
+                                                                        <Setter Property="Padding" Value="0" />
+                                                                        <Setter Property="FontSize" Value="20"></Setter>
+                                                                    </Style>
+                                                                    <Style Selector="TextBlock">
+                                                                        <Setter Property="HorizontalAlignment" Value="Center"></Setter>
+                                                                        <Setter Property="VerticalAlignment" Value="Center"></Setter>
+                                                                    </Style>
+                                                                </Grid.Styles>
+                                                                <Button Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" IsVisible="False"></Button>
+                                                                <Button Grid.Column="0" Grid.Row="1"><TextBlock Text="←"></TextBlock></Button>
+                                                                <Button Grid.Column="1" Grid.Row="1" ><TextBlock Text="→"></TextBlock></Button>
+                                                                <Button Grid.Column="1" Grid.Row="2" HorizontalAlignment="Right" Width="120"><TextBlock Text="⌫"></TextBlock></Button>
+                                                                <Button Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2"><TextBlock Text="↵"></TextBlock></Button>
+                                                                
+                                                            </Grid>
+                                                        </Grid>
+                                                    </ControlTemplate>
+                                                </Setter>
+                                            </Style>
                                         </Style>
-                                    </Grid.Styles>
-                                    <StackPanel Orientation="Horizontal" Spacing="3" HorizontalAlignment="Center">
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="1" SecondButton="+"
-                                                                     FirstKeyboardInput="D1" SecondKeyboardInput="Plus"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="2" SecondButton="-"
-                                                                     FirstKeyboardInput="D2"
-                                                                     SecondKeyboardInput="Minus"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="3" SecondButton="*"
-                                                                     FirstKeyboardInput="D3"
-                                                                     SecondKeyboardInput="Multiply"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="4" SecondButton="/"
-                                                                     FirstKeyboardInput="D4"
-                                                                     SecondKeyboardInput="Slash"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="5" SecondButton="^"
-                                                                     FirstKeyboardInput="D5"
-                                                                     SecondKeyboardInput="Power"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="6" SecondButton="%"
-                                                                     FirstKeyboardInput="D6"
-                                                                     SecondKeyboardInput="Modulo"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="7" SecondButton="="
-                                                                     FirstKeyboardInput="D7"
-                                                                     SecondKeyboardInput="Equals"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="8" SecondButton="&lt;"
-                                                                     FirstKeyboardInput="D8"
-                                                                     SecondKeyboardInput="LessThan"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="9" SecondButton="&gt;"
-                                                                     FirstKeyboardInput="D9"
-                                                                     SecondKeyboardInput="GreaterThan"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="0" SecondButton="("
-                                                                     FirstKeyboardInput="D0"
-                                                                     SecondKeyboardInput="BothRoundBrackets"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="&lt;" SecondButton="⌊"
-                                                                     FirstKeyboardInput="LessThan"
-                                                                     SecondKeyboardInput="BothFloor"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="&gt;" SecondButton="⌈"
-                                                                     FirstKeyboardInput="GreaterThan"
-                                                                     SecondKeyboardInput="BothCeiling"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    </StackPanel>
-                                    <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="3"
-                                                HorizontalAlignment="Center">
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="∧" SecondButton="∨"
-                                                                     FirstKeyboardInput="Cap" SecondKeyboardInput="Cup"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="q" SecondButton="Q"
-                                                                     FirstKeyboardInput="SmallQ"
-                                                                     SecondKeyboardInput="Q"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="w" SecondButton="W"
-                                                                     FirstKeyboardInput="SmallW"
-                                                                     SecondKeyboardInput="W"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="e" SecondButton="E"
-                                                                     FirstKeyboardInput="SmallE"
-                                                                     SecondKeyboardInput="E"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="r" SecondButton="R"
-                                                                     FirstKeyboardInput="SmallR"
-                                                                     SecondKeyboardInput="R"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="t" SecondButton="T"
-                                                                     FirstKeyboardInput="SmallT"
-                                                                     SecondKeyboardInput="T"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="y" SecondButton="Y"
-                                                                     FirstKeyboardInput="SmallY"
-                                                                     SecondKeyboardInput="Y"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="u" SecondButton="U"
-                                                                     FirstKeyboardInput="SmallU"
-                                                                     SecondKeyboardInput="U"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="i" SecondButton="I"
-                                                                     FirstKeyboardInput="SmallI"
-                                                                     SecondKeyboardInput="I"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="o" SecondButton="O"
-                                                                     FirstKeyboardInput="SmallO"
-                                                                     SecondKeyboardInput="O"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="p" SecondButton="P"
-                                                                     FirstKeyboardInput="SmallP"
-                                                                     SecondKeyboardInput="P"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="," SecondButton="!"
-                                                                     FirstKeyboardInput="Comma"
-                                                                     SecondKeyboardInput="Factorial"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                    </StackPanel>
-                                    <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="3"
-                                                HorizontalAlignment="Center">
-                                        <ToggleButton Name="ShiftCheckBox" FontSize="20" Width="80"
-                                                      VerticalAlignment="Stretch"
-                                                      Focusable="False" IsChecked="False" Height="48"
-                                                      BorderThickness="1"
-                                                      BorderBrush="{DynamicResource CgForegroundBrush}"
-                                                      FontFamily="{StaticResource MapleMono}" Padding="0">
-                                            <ToggleButton.Transitions>
-                                                <Transitions>
-                                                    <BrushTransition Property="Background" Duration="0:0:0.2" />
-                                                </Transitions>
-                                            </ToggleButton.Transitions>
-                                            <ToggleButton.Styles>
-                                                <Style Selector="ToggleButton:checked">
-                                                    <Setter Property="Background"
-                                                            Value="{DynamicResource CgOppositeTranslucentBackgroundBrush0}" />
-                                                </Style>
-                                            </ToggleButton.Styles>
-                                            Shift
-                                        </ToggleButton>
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="a" SecondButton="A"
-                                                                     FirstKeyboardInput="SmallA"
-                                                                     SecondKeyboardInput="A"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="s" SecondButton="S"
-                                                                     FirstKeyboardInput="SmallS"
-                                                                     SecondKeyboardInput="S"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="d" SecondButton="D"
-                                                                     FirstKeyboardInput="SmallD"
-                                                                     SecondKeyboardInput="D"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="f" SecondButton="F"
-                                                                     FirstKeyboardInput="SmallF"
-                                                                     SecondKeyboardInput="F"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="g" SecondButton="G"
-                                                                     FirstKeyboardInput="SmallG"
-                                                                     SecondKeyboardInput="G"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="h" SecondButton="H"
-                                                                     FirstKeyboardInput="SmallH"
-                                                                     SecondKeyboardInput="H"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="j" SecondButton="J"
-                                                                     FirstKeyboardInput="SmallJ"
-                                                                     SecondKeyboardInput="J"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="k" SecondButton="K"
-                                                                     FirstKeyboardInput="SmallK"
-                                                                     SecondKeyboardInput="K"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="l" SecondButton="L"
-                                                                     FirstKeyboardInput="SmallL"
-                                                                     SecondKeyboardInput="L"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <RepeatButton CornerRadius="4"
-                                                      BorderBrush="{DynamicResource CgForegroundBrush}"
-                                                      BorderThickness="1" Width="55" Focusable="False"
-                                                      Name="BackspaceButton"
-                                                      Click="BackspaceButton_OnClick"
-                                                      Height="{CompiledBinding $parent[StackPanel].Height}"
-                                                      Background="{DynamicResource CgBackgroundBrush}" Padding="0">
-                                            <AccessText VerticalAlignment="Center" HorizontalAlignment="Center"
-                                                        Text="⌫"
-                                                        FontFamily="{StaticResource MapleMono}" FontSize="25" />
-                                        </RepeatButton>
-                                    </StackPanel>
-                                    <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="3"
-                                                HorizontalAlignment="Center">
-                                        <controls:TwoSymbolKeyButtonInPlace Classes="Char" FirstButton="√"
-                                                                            SecondButton="n√"
-                                                                            FirstKeyboardInput="SquareRoot"
-                                                                            SecondKeyboardInput="Z"
-                                                                            IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="." SecondButton="|"
-                                                                     FirstKeyboardInput="Decimal"
-                                                                     SecondKeyboardInput="Absolute"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="z" SecondButton="Z"
-                                                                     FirstKeyboardInput="SmallZ"
-                                                                     SecondKeyboardInput="Z"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="x" SecondButton="X"
-                                                                     FirstKeyboardInput="SmallX"
-                                                                     SecondKeyboardInput="X"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="c" SecondButton="C"
-                                                                     FirstKeyboardInput="SmallC"
-                                                                     SecondKeyboardInput="C"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="v" SecondButton="V"
-                                                                     FirstKeyboardInput="SmallV"
-                                                                     SecondKeyboardInput="V"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="b" SecondButton="B"
-                                                                     FirstKeyboardInput="SmallB"
-                                                                     SecondKeyboardInput="B"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="n" SecondButton="N"
-                                                                     FirstKeyboardInput="SmallN"
-                                                                     SecondKeyboardInput="N"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:TwoSymbolKeyButton Classes="Char" FirstButton="m" SecondButton="M"
-                                                                     FirstKeyboardInput="SmallM"
-                                                                     SecondKeyboardInput="M"
-                                                                     IsChecked="{CompiledBinding !#ShiftCheckBox.IsChecked}" />
-                                        <controls:OneSymbolKeyButton Classes="Char" Button="←" KeyboardInput="Left" />
-                                        <controls:OneSymbolKeyButton Classes="Char" Button="→" KeyboardInput="Right" />
-                                    </StackPanel>
-                                </Grid>
+                                    </ToggleButton.Styles>
+                                </ToggleButton>
                             </Expander>
                         </controls:ExpandBox>
                         <ContentPresenter Content="{TemplateBinding Content}" />

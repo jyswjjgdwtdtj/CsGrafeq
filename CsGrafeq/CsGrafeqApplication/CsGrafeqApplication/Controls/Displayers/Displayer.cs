@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -92,7 +93,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
         return new Vec(PixelToMathX(point.X), PixelToMathY(point.Y));
     }
 
-    protected bool CallAddonPointerPressed(PointerPressedEventArgs e)
+    protected bool CallPointerPressed(PointerPressedEventArgs e)
     {
         LastPoint = e.GetPosition(this);
         LastPointerProperties = e.Properties;
@@ -104,7 +105,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
         return DoNext;
     }
 
-    protected bool CallAddonPointerMoved(PointerEventArgs e)
+    protected bool CallPointerMoved(PointerEventArgs e)
     {
         LastPoint = e.GetPosition(this);
         LastPointerProperties = e.Properties;
@@ -116,7 +117,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
         return DoNext;
     }
 
-    protected bool CallAddonPointerReleased(PointerReleasedEventArgs e)
+    protected bool CallPointerReleased(PointerReleasedEventArgs e)
     {
         LastPoint = e.GetPosition(this);
         LastPointerProperties = e.Properties;
@@ -128,7 +129,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
         return DoNext;
     }
 
-    protected bool CallAddonPointerWheeled(PointerWheelEventArgs e)
+    protected bool CallPointerWheeled(PointerWheelEventArgs e)
     {
         LastPoint = e.GetPosition(this);
         LastPointerProperties = e.Properties;
@@ -143,7 +144,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
 
     public abstract void Zoom(double del, AvaPoint center);
 
-    protected bool CallAddonPointerTapped(TappedEventArgs e)
+    protected bool CallPointerTapped(TappedEventArgs e)
     {
         var loc = e.GetPosition(this);
         var args = new AddonPointerEventArgsBase(loc.X, loc.Y, e.KeyModifiers);
@@ -153,7 +154,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
         return DoNext;
     }
 
-    protected bool CallAddonPointerDoubleTapped(TappedEventArgs e)
+    protected bool CallPointerDoubleTapped(TappedEventArgs e)
     {
         var loc = e.GetPosition(this);
         var args = new AddonPointerEventArgsBase(loc.X, loc.Y, e.KeyModifiers);
@@ -163,7 +164,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
         return DoNext;
     }
 
-    protected bool CallAddonKeyDown(KeyEventArgs e)
+    protected bool CallKeyDown(KeyEventArgs e)
     {
         foreach (var addon in Addons)
             if (addon.CallKeyDown(e) == Intercept)
@@ -171,7 +172,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
         return DoNext;
     }
 
-    protected bool CallAddonKeyUp(KeyEventArgs e)
+    protected bool CallKeyUp(KeyEventArgs e)
     {
         foreach (var addon in Addons)
             if (addon.CallKeyUp(e) == Intercept)
@@ -286,11 +287,13 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
     {
         foreach (var adn in Addons)
             if (adn.Owner != this)
+            {
+                adn.Owner = this;
                 foreach (var i in adn.Layers)
                 {
                     i.RenderTargetSize=(new SKSizeI((int)Max(Bounds.Width, 1), (int)Max(Bounds.Height, 1)));
-                    adn.Owner = this;
                 }
+            }
     }
 
     /// <summary>

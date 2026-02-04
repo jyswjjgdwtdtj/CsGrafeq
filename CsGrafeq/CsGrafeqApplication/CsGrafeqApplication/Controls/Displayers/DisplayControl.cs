@@ -35,7 +35,7 @@ public class DisplayControl : CartesianDisplayer
         Debug.LogPointer("PointerPressed");
         if (!e.Pointer.IsPrimary) return;
         StopWheeling();
-        if (CallAddonPointerPressed(e) == DoNext)
+        if (CallPointerPressed(e) == DoNext)
         {
             if (e.Properties.IsLeftButtonPressed)
             {
@@ -58,7 +58,7 @@ public class DisplayControl : CartesianDisplayer
         Debug.LogPointer("PointerMoved");
         if (!e.Pointer.IsPrimary) return;
         StopWheeling();
-        if (CallAddonPointerMoved(e) == DoNext)
+        if (CallPointerMoved(e) == DoNext)
         {
             var current = e.GetPosition(this);
             bool l = MouseOnYAxis, ll = MouseOnXAxis;
@@ -90,7 +90,7 @@ public class DisplayControl : CartesianDisplayer
                                 var size = rt.RenderTargetSize;
                                 if (size.Width != TotalBuffer.Width || size.Height != TotalBuffer.Height)
                                 {
-                                    Throw("Bitmap size mismatch");
+                                    Throw($"Bitmap size mismatch TotalBufferSize:{TotalBuffer.Width},{TotalBuffer.Height} RTSize:{size.Width},{size.Height}");
                                     return;
                                 }
                                 rt.CopyRenderTargetTo(TempBuffer);
@@ -138,7 +138,7 @@ public class DisplayControl : CartesianDisplayer
         if (!e.Pointer.IsPrimary) return;
         Focus();
         StopWheeling();
-        if (CallAddonPointerReleased(e) == DoNext)
+        if (CallPointerReleased(e) == DoNext)
         {
             if (LastZeroPos != Zero) ForceToRender();
             LastZeroPos = Zero;
@@ -153,13 +153,13 @@ public class DisplayControl : CartesianDisplayer
     protected virtual void OnPointerTapped(TappedEventArgs e)
     {
         if (!e.Pointer.IsPrimary) return;
-        CallAddonPointerTapped(e);
+        CallPointerTapped(e);
     }
 
     protected virtual void OnPointerDoubleTapped(TappedEventArgs e)
     {
         if (!e.Pointer.IsPrimary) return;
-        CallAddonPointerDoubleTapped(e);
+        CallPointerDoubleTapped(e);
     }
 
     private void RenderMovedPlace(SKCanvas dc, RenderHandler rm)
@@ -170,7 +170,7 @@ public class DisplayControl : CartesianDisplayer
 
     protected override void OnKeyDown(KeyEventArgs e)
     {
-        if (CallAddonKeyDown(e) == DoNext)
+        if (CallKeyDown(e) == DoNext)
         {
             base.OnKeyDown(e);
         }
@@ -183,7 +183,7 @@ public class DisplayControl : CartesianDisplayer
 
     protected override void OnKeyUp(KeyEventArgs e)
     {
-        if (CallAddonKeyUp(e) == DoNext)
+        if (CallKeyUp(e) == DoNext)
         {
             base.OnKeyUp(e);
         }

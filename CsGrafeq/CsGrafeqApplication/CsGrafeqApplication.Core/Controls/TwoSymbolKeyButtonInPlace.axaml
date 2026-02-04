@@ -4,7 +4,7 @@
               xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
               xmlns:controls="clr-namespace:CsGrafeqApplication.Core.Controls"
               mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450" ClipToBounds="False"
-              FontFamily="{StaticResource MaplyMono}"
+              FontFamily="{StaticResource MaplyMono}" Margin="0" Padding="2"
               x:Class="CsGrafeqApplication.Core.Controls.TwoSymbolKeyButtonInPlace" x:Name="UC">
     <Design.PreviewWith>
         <Border Width="60" Height="60">
@@ -26,8 +26,6 @@
                 <Setter Property="HorizontalAlignment" Value="Stretch" />
                 <Setter Property="Margin" Value="0" />
                 <Setter Property="Padding" Value="0" />
-                <Setter Property="Height" Value="46" />
-                <Setter Property="Width" Value="46" />
                 <Style Selector="^ TextBlock">
                     <Setter Property="Focusable" Value="False" />
                     <Setter Property="Margin" Value="5,0" />
@@ -36,16 +34,16 @@
             </Style>
         </Styles>
     </ToggleButton.Styles>
-    <RepeatButton Name="PART_Button" Background="{DynamicResource CgBackgroundBrush}" CornerRadius="4"
+    <RepeatButton Name="PART_Button" Background="{DynamicResource CgBackgroundBrush}" CornerRadius="4" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                   Focusable="False" BorderBrush="{DynamicResource CgForegroundBrush}">
         <Panel Width="{CompiledBinding #PART_Button.Width}" Height="{CompiledBinding #PART_Button.Height}">
             <TextBlock
                 Text="{CompiledBinding #UC.FirstButton}" IsVisible="{CompiledBinding #UC.IsChecked}"
                 Foreground="{DynamicResource CgForegroundBrush}" VerticalAlignment="Center"
-                HorizontalAlignment="Center" FontSize="30" />
+                HorizontalAlignment="Center" FontSize="{CompiledBinding #UC.FontSize}" />
             <TextBlock Text="{CompiledBinding #UC.SecondButton}" IsVisible="{CompiledBinding !#UC.IsChecked}"
                        Foreground="{DynamicResource CgForegroundBrush}" VerticalAlignment="Center"
-                       HorizontalAlignment="Center" FontSize="30" />
+                       HorizontalAlignment="Center" FontSize="{CompiledBinding #UC.FontSize}" />
         </Panel>
     </RepeatButton>
 </ToggleButton>

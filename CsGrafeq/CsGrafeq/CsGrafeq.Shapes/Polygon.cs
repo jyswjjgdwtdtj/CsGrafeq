@@ -22,7 +22,7 @@ public class Polygon : FilledShape
     public override void RefreshValues()
     {
         Locations = PolygonGetter.GetPolygon();
-        InvokeShapeChanged();
+        InvokeChanged();
     }
 
     public override Vec DistanceTo(Vec vec)

@@ -1,9 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Avalonia.Collections;
 using Avalonia.Controls;
 using CsGrafeq.Command;
 using CsGrafeq.Shapes;
 using CsGrafeq.Shapes.ShapeGetter;
+using CsGrafeqApplication.Addons.FunctionPad;
+using CsGrafeqApplication.Function;
 
 namespace CsGrafeqApplication.Utilities;
 
@@ -35,7 +38,7 @@ public static class CommandHelper
             {
                 sl.Remove(shape);
                 shape.Dispose();
-            }, true
+            }, true,$"ShapeAdd {shape.Name}"
         );
     }
 
@@ -64,15 +67,13 @@ public static class CommandHelper
                 },
                 o =>
                 {
-                    shape.Owner?.Remove(shape);
-                    shape.Dispose();
-                }, false
+                }, false,$"ShapeDelete {shape.Name}"
             );
     }
 
     public static void DoTextBoxTextChange(TextBox tb, string newtext, string oldtext)
     {
-        CommandManager.Do(null, o => { },o => { tb.Text = newtext; }, o => { tb.Text = oldtext; }, o => { });
+        //CommandManager.Do(null, o => { },o => { tb.Text = newtext; }, o => { tb.Text = oldtext; }, o => { },false,$"TextBoxChange new:{{{newtext??"$null"}}} old:{{{oldtext??"$null"}}}");
     }
 
     public static void DoGeoShapesDelete(IEnumerable<GeometryShape> shapes)
@@ -102,12 +103,7 @@ public static class CommandHelper
             },
             o =>
             {
-                foreach (var geometryShape in ss)
-                {
-                    geometryShape.Owner?.Remove(geometryShape);
-                    geometryShape.Dispose();
-                }
-            }, true
+            }, true,"ShapeDelete"+string.Join(",",ss.Select(s=>s.Name))
         );
     }
 
@@ -122,7 +118,7 @@ public static class CommandHelper
             {
                 pg.SetStringPoint(previous);
                 point.RefreshValues();
-            }, o => { });
+            }, o => { },false,$"PointMove {point.Name} from {previous} to {next}");
     }
     
 }

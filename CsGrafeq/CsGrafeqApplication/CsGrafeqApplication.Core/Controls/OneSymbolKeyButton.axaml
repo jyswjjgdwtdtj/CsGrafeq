@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="clr-namespace:CsGrafeqApplication.Core.Controls"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450" Margin="0" Padding="2"
              x:Class="CsGrafeqApplication.Core.Controls.OneSymbolKeyButton" Name="UserControl">
     <Design.PreviewWith>
         <Border Width="60" Height="60">
@@ -24,8 +24,6 @@
                 <Setter Property="HorizontalAlignment" Value="Stretch" />
                 <Setter Property="Margin" Value="0" />
                 <Setter Property="Padding" Value="0" />
-                <Setter Property="Width">46</Setter>
-                <Setter Property="Height">46</Setter>
                 <Style Selector="^ TextBlock">
                     <Setter Property="Focusable" Value="False" />
                     <Setter Property="Margin" Value="5,0" />
@@ -38,6 +36,6 @@
                   HorizontalAlignment="Stretch">
         <TextBlock Text="{CompiledBinding #UserControl.Button}"
                    Foreground="{DynamicResource CgForegroundBrush}" VerticalAlignment="Center"
-                   HorizontalAlignment="Center" FontSize="33" />
+                   HorizontalAlignment="Center" FontSize="{CompiledBinding #UserControl.FontSize}" />
     </RepeatButton>
 </UserControl>

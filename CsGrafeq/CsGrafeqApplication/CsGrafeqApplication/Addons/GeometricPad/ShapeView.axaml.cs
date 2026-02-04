@@ -195,8 +195,7 @@ public partial class ShapeView : TemplatedControl
                         DataValidationErrors.ClearErrors(tb);
                     }
 
-                    CommandHelper.CommandManager.Do(
-                        new TextChangedCommand((string?)e.OldValue ?? "", (string?)e.NewValue ?? "", n, tb));
+                    CommandHelper.DoTextBoxTextChange(tb, e.NewValue as string ?? "", e.OldValue as string ?? "");
                 }
             }
     }
