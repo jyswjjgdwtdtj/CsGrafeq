@@ -9,14 +9,14 @@
 
     <ItemGroup>
         <ProjectReference Include="..\CsGrafeq.Base\CsGrafeq.Base.csproj"/>
-        <ProjectReference Include="..\CsGrafeq.MVVM\CsGrafeq.MVVM.csproj" />
-        <ProjectReference Include="..\CsGrafeq.Numeric\CsGrafeq.Numeric.csproj" />
+        <ProjectReference Include="..\CsGrafeq.MVVM\CsGrafeq.MVVM.csproj"/>
+        <ProjectReference Include="..\CsGrafeq.Numeric\CsGrafeq.Numeric.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="FastExpressionCompiler" Version="5.3.0"/>
-        <PackageReference Include="MathNet.Symbolics" Version="0.25.0" />
-        <PackageReference Include="ReactiveUI" Version="22.3.1" />
+        <PackageReference Include="MathNet.Symbolics" Version="0.25.0"/>
+        <PackageReference Include="ReactiveUI" Version="22.3.1"/>
     </ItemGroup>
 
 </Project>

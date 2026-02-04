@@ -1,0 +1,155 @@
+﻿<functionPad:FunctionDisplayer xmlns="https://github.com/avaloniaui"
+                               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                               xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                               xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                               xmlns:functionPad="clr-namespace:CsGrafeqApplication.Addons.FunctionPad"
+                               xmlns:function="clr-namespace:CsGrafeqApplication.Function"
+                               xmlns:views="clr-namespace:CsGrafeqApplication.Dialogs.Views;assembly=CsGrafeqApplication.Dialogs"
+                               mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+                               x:Class="CsGrafeqApplication.Addons.FunctionPad.FunctionDisplayer">
+    <TemplatedControl.Styles>
+        <StyleInclude Source="../CommonStyle.axaml" />
+    </TemplatedControl.Styles>
+    <functionPad:FunctionDisplayer.Template>
+        <ControlTemplate TargetType="functionPad:FunctionDisplayer">
+            <DockPanel ZIndex="1" LastChildFill="True">
+                <Border DockPanel.Dock="Top" HorizontalAlignment="Stretch">
+                    <DockPanel LastChildFill="True" HorizontalAlignment="Stretch" Margin="5">
+                        <Border Width="30" Height="30" DockPanel.Dock="Left">
+                            <TextBlock Text="+" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <Border Width="30" Height="30" DockPanel.Dock="Right">
+                            <views:MsgBoxButton FontSize="17" Padding="0" Margin="0" Width="30" Height="30"
+                                                ToolTip.Tip="Example Function"
+                                                MsgBoxContentTemplateParam="{CompiledBinding #NewFuncTextBox}">
+                                <TextBlock Text="?" FontSize="30" HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                                <views:MsgBoxButton.MsgBoxContentTemplate>
+                                    <DataTemplate DataType="x:Object">
+                                        <ScrollViewer Tag="{CompiledBinding .}">
+                                            <ListBox
+                                                ItemsSource="{x:Static functionPad:ImplicitFunctionExamples.Examples}">
+                                                <ListBox.ItemContainerTheme>
+                                                    <ControlTheme TargetType="ListBoxItem"
+                                                                  BasedOn="{StaticResource MaterialListBoxItem}">
+                                                        <Setter Property="Padding" Value="0" />
+                                                    </ControlTheme>
+                                                </ListBox.ItemContainerTheme>
+                                                <ListBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Border Padding="8" PointerPressed="ExampleFuncItemPressed"
+                                                                Tag="{CompiledBinding $parent[ScrollViewer].Tag}"
+                                                                Background="Transparent">
+                                                            <TextBlock HorizontalAlignment="Stretch"
+                                                                       VerticalAlignment="Stretch"
+                                                                       Text="{CompiledBinding .}" />
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </ListBox.ItemTemplate>
+                                            </ListBox>
+                                        </ScrollViewer>
+                                    </DataTemplate>
+                                </views:MsgBoxButton.MsgBoxContentTemplate>
+                            </views:MsgBoxButton>
+                        </Border>
+                        <Border Background="{DynamicResource CgBackgroundBrush}"
+                                BorderBrush="{DynamicResource CgTranslucentBackgroundBrush}" BorderThickness="1"
+                                CornerRadius="5">
+                            <TextBox BorderThickness="0" AcceptsReturn="False" VerticalAlignment="Stretch"
+                                     HorizontalContentAlignment="Stretch"
+                                     AcceptsTab="False" KeyUp="NewFuncKeyUp" Name="NewFuncTextBox"
+                                     TemplateApplied="TemplateAppliedHandler"
+                                     PropertyChanged="NewFuncPropertyChanged">
+                                <TextBox.Styles>
+                                    <FluentTheme />
+                                </TextBox.Styles>
+                            </TextBox>
+                        </Border>
+                    </DockPanel>
+                </Border>
+                <ScrollViewer ZIndex="1" DataContext="{TemplateBinding Target}">
+                    <ItemsControl ItemsSource="{CompiledBinding Functions}" Padding="0,0,0,5" Name="ShapeItemsControl"
+                                  x:DataType="functionPad:FunctionPad">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel Orientation="Vertical" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemContainerTheme>
+                            <ControlTheme TargetType="ContentPresenter">
+                                <Setter Property="CornerRadius" Value="3" />
+                            </ControlTheme>
+                        </ItemsControl.ItemContainerTheme>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="function:ImplicitFunction">
+                                <Border
+                                    Background="{CompiledBinding Color,Converter={StaticResource UIntColorToBrush},ConverterParameter=140}"
+                                    Height="{CompiledBinding IsDeleted,Converter={StaticResource BoolToDouble},ConverterParameter='70',Mode=OneWay}"
+                                    IsVisible="{CompiledBinding IsDeleted,Converter={StaticResource Not}}"
+                                    CornerRadius="5" BorderThickness="0" Tapped="ImpFuncOnTapped">
+                                    <FlyoutBase.AttachedFlyout>
+                                        <Flyout ShowMode="Standard" Placement="BottomEdgeAlignedLeft">
+                                            <Grid ColumnDefinitions="120,120" RowDefinitions="30,30,30"
+                                                  RowSpacing="3">
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Foreground="Black"
+                                                           VerticalAlignment="Center">
+                                                    Color:
+                                                </TextBlock>
+                                                <ColorPicker HorizontalAlignment="Stretch" Grid.Column="1"
+                                                             Grid.Row="0"
+                                                             Color="{CompiledBinding Color,Converter={StaticResource UIntToColor}}"
+                                                             IsAlphaVisible="False"
+                                                             IsAccentColorsVisible="False" />
+                                                <TextBlock Grid.Row="1" Grid.Column="0" Foreground="Black"
+                                                           VerticalAlignment="Center">
+                                                    Show Formula:
+                                                </TextBlock>
+                                                <CheckBox Grid.Row="1" Grid.Column="1" Foreground="Black"
+                                                          IsChecked="{CompiledBinding ShowFormula}"
+                                                          VerticalAlignment="Center"
+                                                          HorizontalAlignment="Center" />
+                                                <TextBlock Grid.Row="2" Grid.Column="0" Foreground="Black"
+                                                           VerticalAlignment="Center">
+                                                    Opacity:
+                                                </TextBlock>
+                                                <Slider Grid.Row="2" Grid.Column="1" Foreground="Black"
+                                                        Value="{CompiledBinding Opacity}" Minimum="0"
+                                                        Maximum="255" VerticalAlignment="Center"
+                                                        HorizontalAlignment="Stretch" />
+                                            </Grid>
+                                        </Flyout>
+                                    </FlyoutBase.AttachedFlyout>
+                                    <DockPanel>
+                                        <CheckBox
+                                            IsChecked="{CompiledBinding Visible,Mode=TwoWay}"
+                                            Classes="VisibilityCheckBox"
+                                            VerticalAlignment="Center" Margin="5" Tapped="EventHandledTrue"
+                                            DoubleTapped="EventHandledTrue" />
+                                        <Button DockPanel.Dock="Right" VerticalAlignment="Center" Width="30"
+                                                Height="30" Margin="4"
+                                                Tag="{CompiledBinding .}" Click="DeleteButtonClicked"
+                                                Tapped="EventHandledTrue"
+                                                Background="{StaticResource MaterialPrimaryMidBrush}">
+                                            <Path Classes="Icon Fill" Width="15" Height="15" Margin="0"
+                                                  Name="DeletePathIcon"
+                                                  Data="m12.12 10l3.53 3.53l-2.12 2.12L10 12.12l-3.54 3.54l-2.12-2.12L7.88 10L4.34 6.46l2.12-2.12L10 7.88l3.54-3.53l2.12 2.12z" />
+                                        </Button>
+                                        <TextBox VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                                                 Text="{CompiledBinding Expression,Mode=TwoWay}"
+                                                 Tapped="EventHandledTrue" PropertyChanged="ImpFuncPropertyChanged"
+                                                 Tag="{CompiledBinding .}" Loaded="ImpFuncLoaded"
+                                                 Classes="CommonTextBox Big">
+                                            <TextBox.Styles>
+                                                <FluentTheme />
+                                            </TextBox.Styles>
+                                        </TextBox>
+                                    </DockPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </DockPanel>
+        </ControlTemplate>
+    </functionPad:FunctionDisplayer.Template>
+</functionPad:FunctionDisplayer>

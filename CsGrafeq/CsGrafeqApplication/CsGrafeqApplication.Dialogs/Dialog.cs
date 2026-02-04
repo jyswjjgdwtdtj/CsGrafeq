@@ -2,16 +2,18 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using CsGrafeqApplication.Dialogs.Interfaces;
-using CsGrafeqApplication.Dialogs.Params;
 using CsGrafeqApplication.Dialogs.Windows;
 using DialogHostAvalonia;
 
 namespace CsGrafeqApplication.Dialogs;
 
-public class Dialog<V, VM, T> : IDialog<T> where V : UserControl, IClosable,IDialogResult<T> where VM : IMakeDialogResult<T>
+public class Dialog<V, VM, T> : IDialog<T> where V : UserControl, IClosable, IDialogResult<T>
+    where VM : IMakeDialogResult<T>
 {
     private readonly V _view;
     private readonly VM _viewModel;
+
+    private readonly string ClickAwayParam = "MsBoxIdentifier_Cancel";
 
     public Dialog(V view, VM viewModel)
     {
@@ -20,9 +22,9 @@ public class Dialog<V, VM, T> : IDialog<T> where V : UserControl, IClosable,IDia
     }
 
     /// <summary>
-    /// Show messagebox depending on the type of application
-    /// If application is SingleViewApplicationLifetime (Mobile or Browses) then show messagebox as popup
-    /// If application is ClassicDesktopStyleApplicationLifetime (Desktop) then show messagebox as window
+    ///     Show messagebox depending on the type of application
+    ///     If application is SingleViewApplicationLifetime (Mobile or Browses) then show messagebox as popup
+    ///     If application is ClassicDesktopStyleApplicationLifetime (Desktop) then show messagebox as window
     /// </summary>
     /// <returns></returns>
     /// <exception cref="NotSupportedException"></exception>
@@ -30,21 +32,17 @@ public class Dialog<V, VM, T> : IDialog<T> where V : UserControl, IClosable,IDia
     {
         if (Application.Current != null &&
             Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-        {
             return ShowWindowAsync();
-        }
 
         if (Application.Current != null &&
             Application.Current.ApplicationLifetime is ISingleViewApplicationLifetime lifetime)
-        {
             return ShowAsPopupAsync(lifetime.MainView as ContentControl);
-        }
 
         throw new NotSupportedException("ApplicationLifetime is not supported");
     }
 
     /// <summary>
-    ///  Show messagebox as window
+    ///     Show messagebox as window
     /// </summary>
     /// <returns></returns>
     public Task<T> ShowWindowAsync()
@@ -70,7 +68,7 @@ public class Dialog<V, VM, T> : IDialog<T> where V : UserControl, IClosable,IDia
     }
 
     /// <summary>
-    ///  Show messagebox as window with owner
+    ///     Show messagebox as window with owner
     /// </summary>
     /// <param name="owner">Window owner </param>
     /// <returns></returns>
@@ -85,7 +83,7 @@ public class Dialog<V, VM, T> : IDialog<T> where V : UserControl, IClosable,IDia
         window.Closed += _view.CloseWindow;
         var tcs = new TaskCompletionSource<T>();
 
-        _view.Closing+=(_,_) =>
+        _view.Closing += (_, _) =>
         {
             tcs.TrySetResult(_view.DialogResult);
             window.Close();
@@ -95,9 +93,8 @@ public class Dialog<V, VM, T> : IDialog<T> where V : UserControl, IClosable,IDia
         return await tcs.Task;
     }
 
-    private readonly string ClickAwayParam = "MsBoxIdentifier_Cancel";
     /// <summary>
-    ///  Show messagebox as popup
+    ///     Show messagebox as popup
     /// </summary>
     /// <param name="owner"></param>
     /// <returns></returns>
@@ -124,30 +121,21 @@ public class Dialog<V, VM, T> : IDialog<T> where V : UserControl, IClosable,IDia
         dh.CloseOnClickAwayParameter = ClickAwayParam;
         dh.DialogClosing += (ss, ee) =>
         {
-            if (ee.Parameter?.ToString() == ClickAwayParam)
-            {
-                _view.Close();
-            }
+            if (ee.Parameter?.ToString() == ClickAwayParam) _view.Close();
         };
 
         owner.Content = dh;
         var tcs = new TaskCompletionSource<T>();
-        _view.Closing+=(_,_) =>
+        _view.Closing += (_, _) =>
         {
             var r = _view.DialogResult;
 
-            if (dh.CurrentSession != null && dh.CurrentSession.IsEnded == false)
-            {
-                DialogHost.Close(dh.Identifier);
-            }
+            if (dh.CurrentSession != null && !dh.CurrentSession.IsEnded) DialogHost.Close(dh.Identifier);
 
             owner.Content = null;
             dh.Content = null;
             owner.Content = parentContent;
-            if (style != null)
-            {
-                owner.Styles.Remove(style);
-            }
+            if (style != null) owner.Styles.Remove(style);
             tcs.TrySetResult(r);
         };
         DialogHost.Show(_view, dh.Identifier);
@@ -155,7 +143,7 @@ public class Dialog<V, VM, T> : IDialog<T> where V : UserControl, IClosable,IDia
     }
 
     /// <summary>
-    /// Show messagebox as popup with owner
+    ///     Show messagebox as popup with owner
     /// </summary>
     /// <param name="owner"></param>
     /// <returns></returns>

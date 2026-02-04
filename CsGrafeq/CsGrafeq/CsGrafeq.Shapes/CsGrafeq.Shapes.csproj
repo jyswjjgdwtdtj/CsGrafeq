@@ -13,13 +13,13 @@
         <ProjectReference Include="..\CsGrafeq.I18N\CsGrafeq.I18N.csproj"/>
         <ProjectReference Include="..\CsGrafeq.Interval\CsGrafeq.Interval.csproj"/>
         <ProjectReference Include="..\CsGrafeq.MVVM\CsGrafeq.MVVM.csproj"/>
-        <ProjectReference Include="..\CsGrafeq.Numeric\CsGrafeq.Numeric.csproj" />
+        <ProjectReference Include="..\CsGrafeq.Numeric\CsGrafeq.Numeric.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="CSharpMath.Evaluation" Version="0.5.1"/>
         <PackageReference Include="DialogHost.Avalonia" Version="0.10.0"/>
-        <PackageReference Include="ReactiveUI" Version="22.3.1" />
+        <PackageReference Include="ReactiveUI" Version="22.3.1"/>
     </ItemGroup>
 
 </Project>

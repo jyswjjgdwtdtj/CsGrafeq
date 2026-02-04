@@ -7,11 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\CsGrafeq.Base\CsGrafeq.Base.csproj" />
+        <ProjectReference Include="..\CsGrafeq.Base\CsGrafeq.Base.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="MathNet.Symbolics" Version="0.25.0" />
+        <PackageReference Include="MathNet.Symbolics" Version="0.25.0"/>
     </ItemGroup>
 
 </Project>

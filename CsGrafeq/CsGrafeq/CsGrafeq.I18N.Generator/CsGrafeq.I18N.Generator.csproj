@@ -6,13 +6,13 @@
         <Nullable>enable</Nullable>
         <EnForceExtendedAnalyzerRules>true</EnForceExtendedAnalyzerRules>
     </PropertyGroup>
-	<PropertyGroup>
-		<PublishTrimmed>false</PublishTrimmed>
-		<PublishReadyToRun>false</PublishReadyToRun>
-		<PublishSingleFile>false</PublishSingleFile>
-		<IsTrimmable>false</IsTrimmable>
-		<RunILLink>false</RunILLink>
-	</PropertyGroup>
+    <PropertyGroup>
+        <PublishTrimmed>false</PublishTrimmed>
+        <PublishReadyToRun>false</PublishReadyToRun>
+        <PublishSingleFile>false</PublishSingleFile>
+        <IsTrimmable>false</IsTrimmable>
+        <RunILLink>false</RunILLink>
+    </PropertyGroup>
 
 
     <ItemGroup>

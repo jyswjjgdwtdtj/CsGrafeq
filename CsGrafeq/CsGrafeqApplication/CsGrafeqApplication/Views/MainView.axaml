@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:CsGrafeqApplication.ViewModels"
              xmlns:ctls="clr-namespace:CsGrafeqApplication.Controls"
-             xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CsGrafeqApplication.Views.MainView"
              x:DataType="vm:MainViewModel">
@@ -14,7 +13,9 @@
         </Style>
         <Style Selector="TextBox">
             <Setter Property="FontFamily" Value="{StaticResource MapleMono}" />
+            <Setter Property="IsUndoEnabled" Value="False" />
         </Style>
+
     </UserControl.Styles>
     <Design.DataContext>
         <vm:MainViewModel />

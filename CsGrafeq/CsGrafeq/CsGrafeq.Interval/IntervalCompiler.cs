@@ -1,19 +1,22 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
+using CsGrafeq.Collections;
 using CsGrafeq.Interval.Interface;
 
 namespace CsGrafeq.Interval;
 
 public static class IntervalCompiler
 {
-    public static HasReferenceIntervalSetFunc<IntervalSet> Compile(string expression)
+    public static readonly object SyncObjForIntervalSetCalc = new();
+
+    public static HasReferenceIntervalSetFunc<IntervalSet> Compile(string expression, bool enableSimplification = false)
     {
         if (string.IsNullOrEmpty(expression))
             throw new ArgumentNullException("expression");
         var exptree =
             Compiler.Compiler.ConstructExpTree<IntervalSet>(expression, 2, out var xVar, out var yVar, out _,
-                out var reference).Reduce();
+                out var reference, enableSimplification).Reduce();
         return new HasReferenceIntervalSetFunc<IntervalSet>(
             CompileByDynamicMethod(Expression.Lambda<IntervalHandler<IntervalSet>>(exptree, xVar, yVar)), reference);
     }
@@ -22,11 +25,12 @@ public static class IntervalCompiler
         Expression<IntervalHandler<IntervalSet>> expression)
     {
         if (expression == null)
-            throw new ArgumentNullException("expression");
-        var dynamicMethod = new DynamicMethod("dynamicmethod", typeof(Def),
-            new[] { typeof(IntervalSet), typeof(IntervalSet) }, typeof(IntervalSet).Module, true);
+            throw new ArgumentNullException(nameof(expression));
+        var dynamicMethod = new DynamicMethod(nameof(DynamicMethod), typeof(Def),
+            [typeof(IntervalSet), typeof(IntervalSet)], typeof(IntervalSet).Module, true);
         var ilg = dynamicMethod.GetILGenerator();
         var ilr = new ILRecorder(ilg);
+        ilr.Emit(OpCodes.Call, GetInfo(StaticUnsafeMemoryList<Range>.Clear));
         CompileToILGenerator<IntervalSet>(ilr, expression.Body);
         ilr.Emit(OpCodes.Ret);
         var func = dynamicMethod.CreateDelegate<IntervalHandler<IntervalSet>>();
@@ -43,7 +47,8 @@ public static class IntervalCompiler
         return func;
     }
 
-    public static void CompileToILGenerator<T>(ILRecorder ilGenerator, Expression expression) where T : IInterval<T>
+    public static void CompileToILGenerator<T>(ILRecorder ilGenerator, Expression expression)
+        where T : IInterval<T>, allows ref struct
     {
         switch (expression.NodeType)
         {
@@ -77,7 +82,7 @@ public static class IntervalCompiler
             case ExpressionType.Call:
             {
                 var exp = (MethodCallExpression)expression;
-                var method = exp.Method!;
+                var method = exp.Method;
                 foreach (var arg in exp.Arguments) CompileToILGenerator<T>(ilGenerator, arg);
                 EmitExpressionMethod<T>(ilGenerator, method);
             }
@@ -116,14 +121,12 @@ public static class IntervalCompiler
         }
     }
 
-    public static void EmitExpressionMethod<T>(ILRecorder ilGenerator, MethodInfo? mi) where T : IInterval<T>
+    public static void EmitExpressionMethod<T>(ILRecorder ilGenerator, MethodInfo? mi)
+        where T : IInterval<T>, allows ref struct
     {
         if (mi is null)
             throw new ArgumentNullException(nameof(mi));
         var name = mi.Name.ToLower();
-        var ts = new Type[mi.GetParameters().Length];
-        for (var i = 0; i < ts.Length; i++)
-            ts[i] = typeof(T);
         if (name.StartsWith("op_")) //like op_Addition...... the operator overload method
             ilGenerator.Emit(OpCodes.Call, mi);
         /*if (IHasOperatorNumber<T>.HasOperatorNumberPtrMethodDictionary.TryGetValue(name, out var ptr))
@@ -152,15 +155,21 @@ public static class IntervalCompiler
             ilGenerator.Emit(OpCodes.Call, mi);
     }
 
-    public static Result<HasReferenceIntervalSetFunc<IntervalSet>> TryCompile(string expression)
+    public static Result<HasReferenceIntervalSetFunc<IntervalSet>> TryCompile(string expression,
+        bool enableSimplification)
     {
         try
         {
-            return Result<HasReferenceIntervalSetFunc<IntervalSet>>.Success(Compile(expression));
+            return Result<HasReferenceIntervalSetFunc<IntervalSet>>.Success(Compile(expression, enableSimplification));
         }
         catch (Exception e)
         {
             return Result<HasReferenceIntervalSetFunc<IntervalSet>>.Error(e);
         }
+    }
+
+    private static MethodInfo GetInfo(Delegate action)
+    {
+        return action.Method;
     }
 }

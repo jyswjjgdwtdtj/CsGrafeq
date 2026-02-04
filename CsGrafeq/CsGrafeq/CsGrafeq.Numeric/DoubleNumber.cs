@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
+using MathNet.Numerics;
 using CGMath = CsGrafeq.Numeric.CsGrafeqMath;
-using MathNet.Symbolics;
+
 namespace CsGrafeq.Numeric;
 
 public struct DoubleNumber : IComputableNumber<DoubleNumber>
@@ -187,6 +188,102 @@ public struct DoubleNumber : IComputableNumber<DoubleNumber>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static DoubleNumber MaxOf(IEnumerable<DoubleNumber> nums)
+    {
+        return new DoubleNumber(nums.Select(static o => o.Value).Max());
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static DoubleNumber MinOf(IEnumerable<DoubleNumber> nums)
+    {
+        return new DoubleNumber(nums.Select(static o => o.Value).Min());
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static DoubleNumber ArcTan2(DoubleNumber y, DoubleNumber x)
+    {
+        return new DoubleNumber(Math.Atan2(y.Value, x.Value));
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static DoubleNumber Mod(DoubleNumber num1, DoubleNumber num2)
+    {
+        return new DoubleNumber(num1.Value % num2.Value);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static DoubleNumber Gamma(DoubleNumber num)
+    {
+        return new DoubleNumber(SpecialFunctions.Gamma(num.Value));
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static DoubleNumber LnGamma(DoubleNumber num)
+    {
+        return new DoubleNumber(SpecialFunctions.GammaLn(num.Value));
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static DoubleNumber Psi(DoubleNumber num)
+    {
+        return new DoubleNumber(SpecialFunctions.DiGamma(num.Value));
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static DoubleNumber Erf(DoubleNumber num)
+    {
+        return new DoubleNumber(SpecialFunctions.Erf(num.Value));
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static DoubleNumber Erfc(DoubleNumber num)
+    {
+        return new DoubleNumber(SpecialFunctions.Erfc(num.Value));
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static DoubleNumber Erfinv(DoubleNumber num)
+    {
+        return new DoubleNumber(SpecialFunctions.ErfInv(num.Value));
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static DoubleNumber Erfcinv(DoubleNumber num)
+    {
+        return new DoubleNumber(SpecialFunctions.ErfcInv(num.Value));
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static DoubleNumber Digamma(DoubleNumber num)
+    {
+        return new DoubleNumber(SpecialFunctions.DiGamma(num.Value));
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static DoubleNumber BesselJ(DoubleNumber num1, DoubleNumber num2)
+    {
+        return new DoubleNumber(SpecialFunctions.BesselJ(num1.Value, num2.Value));
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static DoubleNumber BesselY(DoubleNumber num1, DoubleNumber num2)
+    {
+        return new DoubleNumber(SpecialFunctions.BesselY(num1.Value, num2.Value));
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static DoubleNumber BesselI(DoubleNumber num1, DoubleNumber num2)
+    {
+        return new DoubleNumber(SpecialFunctions.BesselI(num1.Value, num2.Value));
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static DoubleNumber BesselK(DoubleNumber num1, DoubleNumber num2)
+    {
+        return new DoubleNumber(SpecialFunctions.BesselK(num1.Value, num2.Value));
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static DoubleNumber operator +(DoubleNumber a, DoubleNumber b)
     {
         return new DoubleNumber(a.Value + b.Value);
@@ -228,9 +325,10 @@ public struct DoubleNumber : IComputableNumber<DoubleNumber>
         return new DoubleNumber(num);
     }
 
-    public static DoubleNumber Clone(DoubleNumber Value)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static DoubleNumber Clone(DoubleNumber source)
     {
-        throw new NotImplementedException();
+        return source;
     }
 
     public static bool NeedClone => false;

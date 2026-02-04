@@ -14,7 +14,7 @@ public class EnglishChar : ObservableObject
     {
         PropertyChanged += (s, e) =>
         {
-            if (e.PropertyName.Length == 1)
+            if (e.PropertyName?.Length == 1)
             {
                 var c = e.PropertyName[0];
                 if ('A' <= c && c <= 'Z') CharValueChanged?.Invoke((EnglishCharEnum)Pow(2, c - 'A'));
@@ -181,25 +181,7 @@ public class EnglishChar : ObservableObject
         set => this.RaiseAndSetIfChanged(ref CharsValue[22], value);
     }
 
-    public double X
-    {
-        get => CharsValue[23];
-        set => this.RaiseAndSetIfChanged(ref CharsValue[23], value);
-    }
-
-    public double Y
-    {
-        get => CharsValue[24];
-        set => this.RaiseAndSetIfChanged(ref CharsValue[24], value);
-    }
-
-    public double Z
-    {
-        get => CharsValue[25];
-        set => this.RaiseAndSetIfChanged(ref CharsValue[25], value);
-    }
-
-    public event Action<EnglishCharEnum> CharValueChanged;
+    public event Action<EnglishCharEnum>? CharValueChanged;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public double GetValue(char c)

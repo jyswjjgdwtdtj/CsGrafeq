@@ -5,7 +5,8 @@ namespace CsGrafeq.Utilities;
 public class ThrowHelper
 {
     [DoesNotReturn]
-    public static TResult Throw<TException, TResult>(TException exception) where TException : Exception
+    public static TResult Throw<TException, TResult>(TException exception)
+        where TException : Exception where TResult : allows ref struct
     {
         throw exception;
     }
@@ -16,13 +17,14 @@ public class ThrowHelper
     }
 
     [DoesNotReturn]
-    public static TResult Throw<TException, TResult>() where TException : Exception, new()
+    public static TResult Throw<TException, TResult>()
+        where TException : Exception, new() where TResult : allows ref struct
     {
         throw new TException();
     }
 
     [DoesNotReturn]
-    public static TResult Throw<TResult>(string message)
+    public static TResult Throw<TResult>(string message) where TResult : allows ref struct
     {
         throw new Exception(message);
     }

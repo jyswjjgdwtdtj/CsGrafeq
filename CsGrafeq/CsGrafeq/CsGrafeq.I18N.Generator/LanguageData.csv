@@ -43,8 +43,8 @@ Undo,撤销,Undo
 ZoomIn,放大,Zoom In
 ZoomOut,缩小,Zoom Out
 CantBeMoved,控制,Controlled
-MovingOp,移动优化,Moving Optimization
-ZoomingOp,缩放优化,Zooming Optimization
+MoveOp,移动优化,Moving Optimization
+ZoomOp,缩放优化,Zooming Optimization
 On,位于,On
 Color,颜色,Color
 PerpendicularBisector,垂直平分线,PerpendicularBisector
@@ -68,7 +68,23 @@ NearestPoint,最近点,NearestPoint
 Radius,半径,Radius
 Ratio,比率,Ratio
 Line,线,Line
-ImplicitFunction,隐函数,ImplicitFunction
+ImplicitFunction,隐函数,Implicit Function
 CircleCenter,圆心,Center
+ExpSimplification,表达式优化,Expression Simplification
+Save,保存,Save
+OpenGithub,打开 Github 页面,Open Github Site
+Description,关于,Description
+Usage,使用方法,Usage
+General,全局,General
+ShowKeyboard,显示屏幕键盘,Show Keyboard
+Graph,图表,Graph
+GeometricPad,几何画板,Geometric Pad
+FunctionPad,函数画板,Function Pad
+ShowAxes,显示坐标轴,Show Axes
+ShowAxesNumber,显示坐标数字,Show Axes Number
+ShowAxesMajorGrid,显示主要网格,Show Axes Major Grid
+ShowAxesMinorGrid,显示次要网格,Show Axes Minor Grid
+DefaultOpacity,默认透明度,Default Opacity
+,,
 ,,
 ,,

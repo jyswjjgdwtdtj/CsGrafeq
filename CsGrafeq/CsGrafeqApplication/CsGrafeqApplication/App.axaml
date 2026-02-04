@@ -1,6 +1,5 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:themes="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
              x:Class="CsGrafeqApplication.App"
              RequestedThemeVariant="Default">
@@ -12,7 +11,6 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceInclude Source="/Controls/ToggleBox.axaml" />
                 <ResourceInclude Source="avares://CsGrafeqApplication.Core/Resources/ConverterResource.axaml" />
                 <ResourceInclude Source="avares://CsGrafeqApplication.Core/Resources/CustomColorResource.axaml" />
                 <ResourceInclude Source="/Themes/Theme.axaml" />
@@ -21,9 +19,7 @@
         <FontFamily x:Key="MapleMono">avares://CsGrafeqApplication.Core/Fonts/MapleMono-CN-Regular.ttf#Maple Mono CN</FontFamily>
     </Application.Resources>
     <Application.Styles>
-        <StyleInclude Source="/Controls/ShownControl.axaml" />
         <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" />
-        <StyleInclude Source="avares://LiveMarkdown.Avalonia/Styles.axaml" />
-        <StyleInclude Source="avares://CsGrafeqApplication.Core/Styles/ControlsStyles.axaml"/>
+        <StyleInclude Source="avares://CsGrafeqApplication.Core/Styles/ControlsStyles.axaml" />
     </Application.Styles>
 </Application>

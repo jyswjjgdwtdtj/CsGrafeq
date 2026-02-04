@@ -1,13 +1,10 @@
-﻿using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Input;
+﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Avalonia.Markup.Xaml;
 using CsGrafeqApplication.Dialogs.Interfaces;
 
 namespace CsGrafeqApplication.Dialogs.Views;
 
-public partial class MsgBoxView : UserControl, IClosable,IDialogResult<string>
+public partial class MsgBoxView : UserControl, IClosable, IDialogResult<string>
 {
     public MsgBoxView()
     {
@@ -18,7 +15,7 @@ public partial class MsgBoxView : UserControl, IClosable,IDialogResult<string>
 
     public void Close()
     {
-        Closing?.Invoke(null,EventArgs.Empty);
+        Closing?.Invoke(null, EventArgs.Empty);
     }
 
     public void CloseWindow(object sender, EventArgs eventArgs)

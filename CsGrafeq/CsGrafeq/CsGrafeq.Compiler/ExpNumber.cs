@@ -1,7 +1,6 @@
 ﻿using CsGrafeq.Compiler;
 using CsGrafeq.MVVM;
 using CsGrafeq.Numeric;
-using CsGrafeq.Utilities;
 using ReactiveUI;
 using static CsGrafeq.Utilities.DoubleCompareHelper;
 
@@ -16,13 +15,13 @@ public class ExpNumber : ObservableObject
     private readonly HasReferenceFunction<Func<DoubleNumber>> Direct;
 
     private readonly HasReferenceFunction<Func<DoubleNumber>> None = new(NoneFunc, EnglishCharEnum.None);
-    public readonly object Owner;
+    public readonly object? Owner;
     private HasReferenceFunction<Func<DoubleNumber>> Func;
     private DoubleNumber Number;
     private int NumberChangedSuspended;
     private string ShownText = "0";
 
-    public ExpNumber(double initialNumber = 0, object owner = null)
+    public ExpNumber(double initialNumber = 0, object? owner = null)
     {
         Owner = owner;
         Direct = new HasReferenceFunction<Func<DoubleNumber>>(DirectFunc, EnglishCharEnum.None);
@@ -59,8 +58,8 @@ public class ExpNumber : ObservableObject
         private set => this.RaiseAndSetIfChanged(ref field, value);
     } = new();
 
-    public event Action NumberChanged;
-    public event Action UserSetValueStr;
+    public event Action? NumberChanged;
+    public event Action? UserSetValueStr;
 
     private void CallNumberChanged()
     {
@@ -111,24 +110,25 @@ public class ExpNumber : ObservableObject
             IsError = false;
             return;
         }
+
         Func.Dispose();
         IsExpression = true;
-        Compiler.Compiler.TryCompile<DoubleNumber>(expression, 0,true).Match(funcTuple =>
-        {
-            Func = new HasReferenceFunction<Func<DoubleNumber>>((Func<DoubleNumber>)funcTuple.func, funcTuple.usedVars);
-            IsError = false;
-            SetValue(Func.Function().Value);
-            UserSetValueStr?.Invoke();
-            return;
-        }, ex =>
-        {
-            Func = None;
-            SetValue(double.NaN);
-            IsError = true;
-            Error = ex;
-            UserSetValueStr?.Invoke();
-            
-        });
+        Compiler.Compiler.TryCompile<DoubleNumber>(expression, 0, Setting.Instance.EnableExpressionSimplification)
+            .Match(funcTuple =>
+            {
+                Func = new HasReferenceFunction<Func<DoubleNumber>>((Func<DoubleNumber>)funcTuple.func,
+                    funcTuple.usedVars);
+                IsError = false;
+                SetValue(Func.Function().Value);
+                UserSetValueStr?.Invoke();
+            }, ex =>
+            {
+                Func = None;
+                SetValue(double.NaN);
+                IsError = true;
+                Error = ex;
+                UserSetValueStr?.Invoke();
+            });
     }
 
     private void SetValue(double value)

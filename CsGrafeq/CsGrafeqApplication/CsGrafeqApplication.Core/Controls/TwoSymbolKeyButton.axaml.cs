@@ -1,13 +1,17 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
-using CsGrafeq.CSharpMath.Editor;
+using CsGrafeq.Keyboard;
 using CsGrafeqApplication.Core.Utils;
 
 namespace CsGrafeqApplication.Core.Controls;
 
 public partial class TwoSymbolKeyButton : ToggleButton
 {
+    public static readonly StyledProperty<float> SecondFontSizeProperty =
+        AvaloniaProperty.Register<TwoSymbolKeyButton, float>(
+            nameof(SecondFontSize));
+
     public static readonly DirectProperty<TwoSymbolKeyButton, string> FirstButtonProperty =
         AvaloniaProperty.RegisterDirect<TwoSymbolKeyButton, string>(
             nameof(FirstButton), o => o.FirstButton, (o, v) => o.FirstButton = v);
@@ -16,13 +20,15 @@ public partial class TwoSymbolKeyButton : ToggleButton
         AvaloniaProperty.RegisterDirect<TwoSymbolKeyButton, string>(
             nameof(SecondButton), o => o.SecondButton, (o, v) => o.SecondButton = v);
 
-    public static readonly DirectProperty<TwoSymbolKeyButton, CgMathKeyboardInput> FirstKeyboardInputProperty =
-        AvaloniaProperty.RegisterDirect<TwoSymbolKeyButton, CgMathKeyboardInput>(
-            nameof(FirstKeyboardInput), o => o.FirstKeyboardInput, (o, v) => o.FirstKeyboardInput = v);
+    public static readonly DirectProperty<TwoSymbolKeyButton, KeyboardInput> FirstKeyboardInputProperty =
+        AvaloniaProperty.RegisterDirect<TwoSymbolKeyButton, KeyboardInput>(
+            nameof(FirstKeyboardInput), o => o.FirstKeyboardInput, (o, v) => o.FirstKeyboardInput = v,
+            KeyboardInput.None);
 
-    public static readonly DirectProperty<TwoSymbolKeyButton, CgMathKeyboardInput> SecondKeyboardInputProperty =
-        AvaloniaProperty.RegisterDirect<TwoSymbolKeyButton, CgMathKeyboardInput>(
-            nameof(SecondKeyboardInput), o => o.SecondKeyboardInput, (o, v) => o.SecondKeyboardInput = v);
+    public static readonly DirectProperty<TwoSymbolKeyButton, KeyboardInput> SecondKeyboardInputProperty =
+        AvaloniaProperty.RegisterDirect<TwoSymbolKeyButton, KeyboardInput>(
+            nameof(SecondKeyboardInput), o => o.SecondKeyboardInput, (o, v) => o.SecondKeyboardInput = v,
+            KeyboardInput.None);
 
     public static readonly DirectProperty<TwoSymbolKeyButton, string> CurrentButtonProperty =
         AvaloniaProperty.RegisterDirect<TwoSymbolKeyButton, string>(
@@ -36,8 +42,14 @@ public partial class TwoSymbolKeyButton : ToggleButton
         CurrentButton = FirstButton;
         PART_Button.Click += (s, e) =>
         {
-            TopLevel.GetTopLevel(this)?.Input(IsChecked ?? false ? FirstKeyboardInput : SecondKeyboardInput);
+            TopLevel.GetTopLevel(this)?.Input(IsChecked ?? false ? FirstButton : SecondButton);
         };
+    }
+
+    public float SecondFontSize
+    {
+        get => GetValue(SecondFontSizeProperty);
+        set => SetValue(SecondFontSizeProperty, value);
     }
 
     public string CurrentButton
@@ -58,13 +70,13 @@ public partial class TwoSymbolKeyButton : ToggleButton
         set => SetAndRaise(FirstButtonProperty, ref field, value);
     } = "";
 
-    public CgMathKeyboardInput FirstKeyboardInput
+    public KeyboardInput FirstKeyboardInput
     {
         get => field;
         set => SetAndRaise(FirstKeyboardInputProperty, ref field, value);
     }
 
-    public CgMathKeyboardInput SecondKeyboardInput
+    public KeyboardInput SecondKeyboardInput
     {
         get => field;
         set => SetAndRaise(SecondKeyboardInputProperty, ref field, value);

@@ -10,8 +10,19 @@ public delegate void RenderHandler(SKCanvas dc, SKRect bounds);
 
 public class DisplayControl : CartesianDisplayer
 {
+    /// <summary>
+    ///     上一时刻的零点位置
+    /// </summary>
     private PointL LastZeroPos;
+
+    /// <summary>
+    ///     鼠标按下时的位置
+    /// </summary>
     private PointL MouseDownPos = new() { X = 0, Y = 0 };
+
+    /// <summary>
+    ///     鼠标按下时的零点位置
+    /// </summary>
     private PointL MouseDownZeroPos = new() { X = 0, Y = 0 };
 
     public DisplayControl()
@@ -26,7 +37,7 @@ public class DisplayControl : CartesianDisplayer
         Debug.LogPointer("PointerPressed");
         if (!e.Pointer.IsPrimary) return;
         StopWheeling();
-        if (CallAddonPointerPressed(e) == DoNext)
+        if (CallPointerPressed(e) == DoNext)
         {
             if (e.Properties.IsLeftButtonPressed)
             {
@@ -49,7 +60,7 @@ public class DisplayControl : CartesianDisplayer
         Debug.LogPointer("PointerMoved");
         if (!e.Pointer.IsPrimary) return;
         StopWheeling();
-        if (CallAddonPointerMoved(e) == DoNext)
+        if (CallPointerMoved(e) == DoNext)
         {
             var current = e.GetPosition(this);
             bool l = MouseOnYAxis, ll = MouseOnXAxis;
@@ -68,53 +79,52 @@ public class DisplayControl : CartesianDisplayer
                     Zero = newZero;
                     lock (TotalBufferLock)
                     {
-                        using (var dc = new SKCanvas(TotalBuffer))
+                        using var dc = new SKCanvas(TotalBuffer);
+                        dc.Clear(AxisBackground);
+                        RenderAxes(dc);
+                        if (!Setting.Instance.MoveOptimization || (LastZeroPos - Zero).Length > 50)
                         {
-                            dc.Clear(AxisBackground);
-                            RenderAxisLine(dc);
-                            if (!MovingOptimization || (LastZeroPos - Zero).Length > 50)
+                            foreach (var adn in Addons)
+                            foreach (var rt in adn.Layers)
                             {
-                                foreach (var adn in Addons)
-                                foreach (var rt in adn.Layers)
+                                if (!rt.IsActive)
+                                    continue;
+                                var size = rt.RenderTargetSize;
+                                if (size.Width != TotalBuffer.Width || size.Height != TotalBuffer.Height)
                                 {
-                                    if (!rt.IsActive)
-                                        continue;
-                                    var size = rt.GetSize();
-                                    if (size.Width != TotalBuffer.Width || size.Height != TotalBuffer.Height)
-                                    {
-                                        Throw("Bitmap size mismatch");
-                                        return;
-                                    }
-
-                                    var newbmp = rt.GetCopy();
-                                    using (var canvas = rt.GetBitmapCanvas())
-                                    {
-                                        canvas.Clear(SKColors.Transparent);
-                                        canvas.DrawBitmap(newbmp, Zero.X - LastZeroPos.X,
-                                            Zero.Y - LastZeroPos.Y);
-                                        RenderMovedPlace(canvas, rt.Render);
-                                    }
-
-                                    newbmp.Dispose();
-                                    rt.DrawBitmap(dc, 0, 0);
+                                    Throw(
+                                        $"Bitmap size mismatch TotalBufferSize:{TotalBuffer.Width},{TotalBuffer.Height} RTSize:{size.Width},{size.Height}");
+                                    return;
                                 }
 
-                                LastZeroPos = Zero;
-                            }
-                            else
-                            {
-                                foreach (var adn in Addons)
-                                foreach (var layer in adn.Layers)
+                                rt.CopyRenderTargetTo(TempBuffer);
+                                using (var canvas = rt.GetBitmapCanvas()!)
                                 {
-                                    if (!layer.IsActive)
-                                        continue;
-                                    layer.DrawBitmap(dc, (int)(Zero.X - LastZeroPos.X), (int)(Zero.Y - LastZeroPos.Y));
-                                    //RenderMovedPlace(dc, layer.Render);
+                                    canvas.Clear(SKColors.Transparent);
+                                    canvas.DrawBitmap(TempBuffer, Zero.X - LastZeroPos.X,
+                                        Zero.Y - LastZeroPos.Y);
+                                    RenderMovedPlace(canvas, rt.Render);
                                 }
+
+                                rt.DrawRenderTargetTo(dc, 0, 0);
                             }
 
-                            RenderAxisNumber(dc);
+                            LastZeroPos = Zero;
                         }
+                        else
+                        {
+                            foreach (var adn in Addons)
+                            foreach (var layer in adn.Layers)
+                            {
+                                if (!layer.IsActive)
+                                    continue;
+                                layer.DrawRenderTargetTo(dc, (int)(Zero.X - LastZeroPos.X),
+                                    (int)(Zero.Y - LastZeroPos.Y));
+                                //RenderMovedPlace(dc, layer.Render);
+                            }
+                        }
+
+                        RenderAxesNumber(dc);
                     }
 
                     InvalidateVisual();
@@ -135,7 +145,7 @@ public class DisplayControl : CartesianDisplayer
         if (!e.Pointer.IsPrimary) return;
         Focus();
         StopWheeling();
-        if (CallAddonPointerReleased(e) == DoNext)
+        if (CallPointerReleased(e) == DoNext)
         {
             if (LastZeroPos != Zero) ForceToRender();
             LastZeroPos = Zero;
@@ -150,13 +160,13 @@ public class DisplayControl : CartesianDisplayer
     protected virtual void OnPointerTapped(TappedEventArgs e)
     {
         if (!e.Pointer.IsPrimary) return;
-        CallAddonPointerTapped(e);
+        CallPointerTapped(e);
     }
 
     protected virtual void OnPointerDoubleTapped(TappedEventArgs e)
     {
         if (!e.Pointer.IsPrimary) return;
-        CallAddonPointerDoubleTapped(e);
+        CallPointerDoubleTapped(e);
     }
 
     private void RenderMovedPlace(SKCanvas dc, RenderHandler rm)
@@ -167,7 +177,7 @@ public class DisplayControl : CartesianDisplayer
 
     protected override void OnKeyDown(KeyEventArgs e)
     {
-        if (CallAddonKeyDown(e) == DoNext)
+        if (CallKeyDown(e) == DoNext)
         {
             base.OnKeyDown(e);
         }
@@ -180,7 +190,7 @@ public class DisplayControl : CartesianDisplayer
 
     protected override void OnKeyUp(KeyEventArgs e)
     {
-        if (CallAddonKeyUp(e) == DoNext)
+        if (CallKeyUp(e) == DoNext)
         {
             base.OnKeyUp(e);
         }

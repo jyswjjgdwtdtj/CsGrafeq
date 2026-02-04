@@ -15,6 +15,7 @@ public class Circle : FilledShape
         cg.Attach(this);
         RefreshValues();
     }
+
     public double Radius => Current.Radius;
     public double LocY => Current.Center.Y;
     public double LocX => Current.Center.X;
@@ -23,8 +24,9 @@ public class Circle : FilledShape
     public override void RefreshValues()
     {
         Current = CircleGetter.GetCircle();
-        Description = $"{MultiLanguageResources.CircleCenterText}:({LocX},{LocY}),{MultiLanguageResources.RadiusText}:{Radius}";
-        InvokeShapeChanged();
+        Description =
+            $"{MultiLanguageResources.CircleCenterText}:({LocX},{LocY}),{MultiLanguageResources.RadiusText}:{Radius}";
+        InvokeChanged();
     }
 
     public override Vec DistanceTo(Vec vec)

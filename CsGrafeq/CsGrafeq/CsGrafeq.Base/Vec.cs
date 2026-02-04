@@ -136,4 +136,9 @@ public struct Vec : IEquatable<Vec>
     {
         return X.Equals(other.X) && Y.Equals(other.Y);
     }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(X, Y);
+    }
 }

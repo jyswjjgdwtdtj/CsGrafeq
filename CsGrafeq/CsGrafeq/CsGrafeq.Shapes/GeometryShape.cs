@@ -42,7 +42,7 @@ public abstract class GeometryShape : RefreshableShape
             var v = field;
             this.RaiseAndSetIfChanged(ref field, value);
             if (v != value) SelectedChanged?.Invoke(this, value);
-            InvokeShapeChanged();
+            InvokeChanged();
         }
     } = false;
 

@@ -1,0 +1,27 @@
+﻿<!-- ReSharper disable once Xaml.PossibleNullReferenceException -->
+<TemplatedControl xmlns="https://github.com/avaloniaui"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                  xmlns:controls2="clr-namespace:CsGrafeqApplication.Controls"
+                  xmlns:controls="clr-namespace:CsGrafeqApplication.Core.Controls;assembly=CsGrafeqApplication.Core"
+                  xmlns:function="clr-namespace:CsGrafeqApplication.Function"
+                  mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+                  x:Class="CsGrafeqApplication.Controls.ImplicitFunctionBox">
+    <Design.PreviewWith>
+
+    </Design.PreviewWith>
+    <Control.Styles>
+        <Style Selector="controls2|ImplicitFunctionBox">
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border DataContext="{TemplateBinding Function}">
+                        <controls:PlainExpressionBox CanInput="{TemplateBinding CanInput}"
+                                                     Expression="{CompiledBinding Expression,Mode=TwoWay}"
+                                                     x:DataType="function:ImplicitFunction" />
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+    </Control.Styles>
+</TemplatedControl>

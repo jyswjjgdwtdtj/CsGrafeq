@@ -18,12 +18,12 @@ public abstract class Line : GeometryShape
     }
 
     public override LineGetter Getter => LineGetter;
-    
+
     public override void RefreshValues()
     {
         Current = LineGetter.GetLine();
         Description = Current.ExpStr.Replace("x", "𝑥").Replace("y", "𝑦");
-        InvokeShapeChanged();
+        InvokeChanged();
     }
 
     public abstract bool CheckIsValid(Vec vec);
@@ -53,7 +53,7 @@ public class Segment : Line
     {
         Current = LineGetter.GetLine();
         Description = Current.ExpStr + " " + Current.Distance;
-        InvokeShapeChanged();
+        InvokeChanged();
     }
 
     public override bool CheckIsValid(Vec vec)
@@ -97,6 +97,7 @@ public readonly struct LineStruct
         Point1 = point1;
         Point2 = point2;
     }
+
     //ax+by+c=0
     public (double a, double b, double c) GetNormal()
     {
@@ -106,6 +107,7 @@ public readonly struct LineStruct
             return (0, 1, -Point2.Y);
         return (Point2.Y - Point1.Y, Point1.X - Point2.X, Point2.X * Point1.Y - Point1.X * Point2.Y);
     }
+
     public string GetNormalStr()
     {
         var (a, b, c) = GetNormal();
@@ -176,10 +178,7 @@ public readonly struct LineStruct
     public string GetSlopeInterceptStr()
     {
         var (a, b, c) = GetNormal();
-        if (b == 0)
-        {
-            return $"x={-c / a}";
-        }
+        if (b == 0) return $"x={-c / a}";
         var slope = -a / b;
         var intercept = -c / b;
         var slopeStr = slope switch

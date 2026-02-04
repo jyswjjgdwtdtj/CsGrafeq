@@ -4,8 +4,7 @@
         <TargetFramework>net10.0</TargetFramework>
         <InvariantGlobalization>false</InvariantGlobalization>
         <Nullable>enable</Nullable>
-        <PublishAOT>true</PublishAOT>
-		<PublishTrimmed>true</PublishTrimmed>
+        <PublishTrimmed>true</PublishTrimmed>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
         <LangVersion>Preview</LangVersion>
     </PropertyGroup>
@@ -16,7 +15,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.CSharpMath.Editor\CsGrafeq.CSharpMath.Editor.csproj"/>
         <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.Windows\CsGrafeq.Windows.csproj"/>
         <ProjectReference Include="..\CsGrafeqApplication\CsGrafeqApplication.csproj"/>
     </ItemGroup>
@@ -25,7 +23,6 @@
         <PackageReference Remove="Packaging.Targets"/>
         <PackageReference Include="Avalonia"/>
         <PackageReference Include="Avalonia.Diagnostics"/>
-        <PackageReference Include="LiveMarkdown.Avalonia"/>
     </ItemGroup>
 
     <ItemGroup>

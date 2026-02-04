@@ -7,28 +7,28 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Compile Update="View\MsgBoxButton.axaml.cs">
-        <DependentUpon>MsgBoxButton.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Update="View\MsgBoxView.axaml.cs">
-        <DependentUpon>MsgBoxView.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
+        <Compile Update="View\MsgBoxButton.axaml.cs">
+            <DependentUpon>MsgBoxButton.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="View\MsgBoxView.axaml.cs">
+            <DependentUpon>MsgBoxView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Avalonia" />
-      <PackageReference Include="ReactiveUI" />
+        <PackageReference Include="Avalonia"/>
+        <PackageReference Include="ReactiveUI"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.MVVM\CsGrafeq.MVVM.csproj" />
-      <ProjectReference Include="..\CsGrafeqApplication.Core\CsGrafeqApplication.Core.csproj" />
+        <ProjectReference Include="..\..\CsGrafeq\CsGrafeq.MVVM\CsGrafeq.MVVM.csproj"/>
+        <ProjectReference Include="..\CsGrafeqApplication.Core\CsGrafeqApplication.Core.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="ViewModels\" />
+        <Folder Include="ViewModels\"/>
     </ItemGroup>
 
 </Project>

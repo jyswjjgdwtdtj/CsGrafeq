@@ -5,8 +5,11 @@ using Avalonia.Input;
 using Avalonia.Input.GestureRecognizers;
 using Avalonia.Metadata;
 using Avalonia.Rendering;
+using Avalonia.Skia;
 using Avalonia.Threading;
+using CsGrafeq.I18N;
 using CsGrafeqApplication.Addons;
+using CsGrafeqApplication.Core.Controls;
 using SkiaSharp;
 using AddonPointerEventArgs = CsGrafeqApplication.Addons.Addon.AddonPointerEventArgs;
 using AddonPointerEventArgsBase = CsGrafeqApplication.Addons.Addon.AddonPointerEventArgsBase;
@@ -25,7 +28,6 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
     public List<Addon> NeedRenderingAddons = new();
     public bool NeedRenderingAll = false;
     public List<Renderable> NeedRenderingLayers = new();
-    protected SKBitmap TotalBuffer = new(1, 1);
     protected object TotalBufferLock = new();
 
     public Displayer()
@@ -41,22 +43,10 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
         IsHitTestVisible = true;
     }
 
-    /// <summary>
-    ///     缩放优化
-    /// </summary>
-    public bool ZoomingOptimization { get; set; } = false;
-
-    /// <summary>
-    ///     移动优化
-    /// </summary>
-    public bool MovingOptimization { get; set; } = false;
-
-    public bool ZOPEnable { get; set; } = true;
-    public bool MOPEnable { get; set; } = true;
+    protected SKBitmap TotalBuffer { get; set; } = new(1, 1);
+    protected SKBitmap TempBuffer { get; set; } = new(1, 1);
 
     [Content] public AddonList Addons { get; } = new();
-
-    public DisplayerContainer Owner { get; set; }
 
     /// <summary>
     ///     并无卵用
@@ -103,7 +93,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
         return new Vec(PixelToMathX(point.X), PixelToMathY(point.Y));
     }
 
-    protected bool CallAddonPointerPressed(PointerPressedEventArgs e)
+    protected bool CallPointerPressed(PointerPressedEventArgs e)
     {
         LastPoint = e.GetPosition(this);
         LastPointerProperties = e.Properties;
@@ -115,7 +105,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
         return DoNext;
     }
 
-    protected bool CallAddonPointerMoved(PointerEventArgs e)
+    protected bool CallPointerMoved(PointerEventArgs e)
     {
         LastPoint = e.GetPosition(this);
         LastPointerProperties = e.Properties;
@@ -127,7 +117,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
         return DoNext;
     }
 
-    protected bool CallAddonPointerReleased(PointerReleasedEventArgs e)
+    protected bool CallPointerReleased(PointerReleasedEventArgs e)
     {
         LastPoint = e.GetPosition(this);
         LastPointerProperties = e.Properties;
@@ -139,7 +129,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
         return DoNext;
     }
 
-    protected bool CallAddonPointerWheeled(PointerWheelEventArgs e)
+    protected bool CallPointerWheeled(PointerWheelEventArgs e)
     {
         LastPoint = e.GetPosition(this);
         LastPointerProperties = e.Properties;
@@ -154,7 +144,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
 
     public abstract void Zoom(double del, AvaPoint center);
 
-    protected bool CallAddonPointerTapped(TappedEventArgs e)
+    protected bool CallPointerTapped(TappedEventArgs e)
     {
         var loc = e.GetPosition(this);
         var args = new AddonPointerEventArgsBase(loc.X, loc.Y, e.KeyModifiers);
@@ -164,7 +154,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
         return DoNext;
     }
 
-    protected bool CallAddonPointerDoubleTapped(TappedEventArgs e)
+    protected bool CallPointerDoubleTapped(TappedEventArgs e)
     {
         var loc = e.GetPosition(this);
         var args = new AddonPointerEventArgsBase(loc.X, loc.Y, e.KeyModifiers);
@@ -174,7 +164,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
         return DoNext;
     }
 
-    protected bool CallAddonKeyDown(KeyEventArgs e)
+    protected bool CallKeyDown(KeyEventArgs e)
     {
         foreach (var addon in Addons)
             if (addon.CallKeyDown(e) == Intercept)
@@ -182,7 +172,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
         return DoNext;
     }
 
-    protected bool CallAddonKeyUp(KeyEventArgs e)
+    protected bool CallKeyUp(KeyEventArgs e)
     {
         foreach (var addon in Addons)
             if (addon.CallKeyUp(e) == Intercept)
@@ -199,10 +189,12 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
                 lock (TotalBufferLock)
                 {
                     TotalBuffer.Dispose();
+                    TempBuffer.Dispose();
                     TotalBuffer = new SKBitmap((int)e.NewSize.Width, (int)e.NewSize.Height);
+                    TempBuffer = new SKBitmap((int)e.NewSize.Width, (int)e.NewSize.Height);
                     foreach (var adn in Addons)
                     foreach (var layer in adn.Layers)
-                        layer.SetBitmapSize(new SKSizeI((int)e.NewSize.Width, (int)e.NewSize.Height));
+                        layer.RenderTargetSize = new SKSizeI((int)e.NewSize.Width, (int)e.NewSize.Height);
                 }
 
                 ForceToRender();
@@ -241,7 +233,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
     {
         foreach (var layer in adn.Layers)
             Invalidate(layer);
-        adn.Changed = false;
+        adn.AddonChanged = false;
     }
 
     /// <summary>
@@ -259,10 +251,10 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
     {
         var paintflag = false;
         foreach (var adn in Addons)
-            if (adn.Changed)
+            if (adn.AddonChanged)
             {
                 paintflag = true;
-                adn.Changed = false;
+                adn.AddonChanged = false;
                 Invalidate(adn);
             }
             else
@@ -295,11 +287,11 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
     {
         foreach (var adn in Addons)
             if (adn.Owner != this)
+            {
+                adn.Owner = this;
                 foreach (var i in adn.Layers)
-                {
-                    i.SetBitmapSize(new SKSizeI((int)Max(Bounds.Width, 1), (int)Max(Bounds.Height, 1)));
-                    adn.Owner = this;
-                }
+                    i.RenderTargetSize = new SKSizeI((int)Max(Bounds.Width, 1), (int)Max(Bounds.Height, 1));
+            }
     }
 
     /// <summary>

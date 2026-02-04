@@ -1,5 +1,4 @@
 ﻿using System;
-using Avalonia;
 using Avalonia.Skia;
 using Material.Styles.Themes;
 using SkiaSharp;
@@ -8,15 +7,12 @@ namespace CsGrafeqApplication;
 
 public static class SkiaHelper
 {
-    public static SKColor Light=SKColors.Cyan;
-    public static SKColor Mid=SKColors.Cyan;
+    public static SKColor Light = SKColors.Cyan;
+    public static SKColor Mid = SKColors.Cyan;
 
     static SkiaHelper()
     {
-        Themes.Theme.ThemeChangedEndObservable.Subscribe(t =>
-        {
-            Refresh(t);
-        });
+        Themes.Theme.ThemeChangedEndObservable.Subscribe(t => { Refresh(t); });
         Refresh(Themes.Theme);
     }
 
@@ -63,5 +59,19 @@ public static class SkiaHelper
             Light
         );
         FilledTpMid.Color = Mid.WithAlpha(90);
+    }
+
+    /// <summary>
+    ///     基于内存拷贝的位图复制 用以替换超低效率超高内存分配的SKBitmap.CopyTo
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="dest"></param>
+    /// <returns></returns>
+    public static bool TryRealCopyTo(this SKBitmap source, SKBitmap dest)
+    {
+        if (source.Width != dest.Width || source.Height != dest.Height)
+            return false;
+        source.GetPixelSpan().CopyTo(dest.GetPixelSpan());
+        return true;
     }
 }

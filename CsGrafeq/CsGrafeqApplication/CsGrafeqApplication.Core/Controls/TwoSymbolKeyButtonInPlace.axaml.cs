@@ -1,7 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
-using CsGrafeq.CSharpMath.Editor;
+using CsGrafeq.Keyboard;
 using CsGrafeqApplication.Core.Utils;
 
 namespace CsGrafeqApplication.Core.Controls;
@@ -16,12 +16,12 @@ public partial class TwoSymbolKeyButtonInPlace : ToggleButton
         AvaloniaProperty.RegisterDirect<TwoSymbolKeyButtonInPlace, string>(
             nameof(SecondButton), o => o.SecondButton, (o, v) => o.SecondButton = v);
 
-    public static readonly DirectProperty<TwoSymbolKeyButtonInPlace, CgMathKeyboardInput> FirstKeyboardInputProperty =
-        AvaloniaProperty.RegisterDirect<TwoSymbolKeyButtonInPlace, CgMathKeyboardInput>(
+    public static readonly DirectProperty<TwoSymbolKeyButtonInPlace, KeyboardInput> FirstKeyboardInputProperty =
+        AvaloniaProperty.RegisterDirect<TwoSymbolKeyButtonInPlace, KeyboardInput>(
             nameof(FirstKeyboardInput), o => o.FirstKeyboardInput, (o, v) => o.FirstKeyboardInput = v);
 
-    public static readonly DirectProperty<TwoSymbolKeyButtonInPlace, CgMathKeyboardInput> SecondKeyboardInputProperty =
-        AvaloniaProperty.RegisterDirect<TwoSymbolKeyButtonInPlace, CgMathKeyboardInput>(
+    public static readonly DirectProperty<TwoSymbolKeyButtonInPlace, KeyboardInput> SecondKeyboardInputProperty =
+        AvaloniaProperty.RegisterDirect<TwoSymbolKeyButtonInPlace, KeyboardInput>(
             nameof(SecondKeyboardInput), o => o.SecondKeyboardInput, (o, v) => o.SecondKeyboardInput = v);
 
     public static readonly DirectProperty<TwoSymbolKeyButtonInPlace, string> CurrentButtonProperty =
@@ -36,7 +36,7 @@ public partial class TwoSymbolKeyButtonInPlace : ToggleButton
         CurrentButton = FirstButton;
         PART_Button.Click += (s, e) =>
         {
-            TopLevel.GetTopLevel(this)?.Input(IsChecked ?? false ? FirstKeyboardInput : SecondKeyboardInput);
+            TopLevel.GetTopLevel(this)?.Input(IsChecked ?? false ? FirstButton : SecondButton);
         };
     }
 
@@ -58,13 +58,13 @@ public partial class TwoSymbolKeyButtonInPlace : ToggleButton
         set => SetAndRaise(FirstButtonProperty, ref field, value);
     } = "";
 
-    public CgMathKeyboardInput FirstKeyboardInput
+    public KeyboardInput FirstKeyboardInput
     {
         get => field;
         set => SetAndRaise(FirstKeyboardInputProperty, ref field, value);
     }
 
-    public CgMathKeyboardInput SecondKeyboardInput
+    public KeyboardInput SecondKeyboardInput
     {
         get => field;
         set => SetAndRaise(SecondKeyboardInputProperty, ref field, value);

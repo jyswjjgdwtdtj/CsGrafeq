@@ -11,7 +11,7 @@ public class Point : GeometryShape
 
     public Point(PointGetter pointgetter)
     {
-        TypeName =MultiLanguageResources.PointText;
+        TypeName = MultiLanguageResources.PointText;
         PointGetter = pointgetter;
         PointGetter.Attach(this);
         RefreshValues();
@@ -31,7 +31,7 @@ public class Point : GeometryShape
     {
         var loc = PointGetter.GetPoint();
         Location.SetValue(loc.X, loc.Y);
-        InvokeShapeChanged();
+        InvokeChanged();
     }
 
     public override Vec DistanceTo(Vec vec)

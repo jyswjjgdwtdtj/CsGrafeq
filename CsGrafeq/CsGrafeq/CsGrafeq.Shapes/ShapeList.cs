@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Text;
 using CsGrafeq.Collections;
+using CsGrafeq.I18N;
 
 namespace CsGrafeq.Shapes;
 
@@ -8,6 +9,16 @@ public class ShapeList : ObservableCollection<Shape>
 {
     private static readonly StringBuilder sb = new();
     private readonly DistinctList<GeometryShape> SelectedShapes = new();
+
+    public ShapeList()
+    {
+        Languages.LanguageChanged += () =>
+        {
+            foreach (var i in GetShapes<GeometryShape>())
+                i.RefreshValues();
+        };
+    }
+
     public event Action<Shape>? OnShapeChanged;
 
     private void ShapeChanged(Shape sp)
@@ -26,13 +37,26 @@ public class ShapeList : ObservableCollection<Shape>
             i.Selected = false;
     }
 
+    [Obsolete("", true)]
     public new void Add(Shape shape)
     {
-        shape.ShapeChanged += () => ShapeChanged(shape);
-        if (shape is GeometryShape s)
-            AddGeometry(s);
-        else
-            AddNotGeometry(shape);
+        throw new NotImplementedException("Not yet implemented");
+    }
+
+    public Result<Shape> TryAdd(Shape shape)
+    {
+        if (shape.Owner == null)
+        {
+            shape.ShapeChanged += () => ShapeChanged(shape);
+            if (shape is GeometryShape s)
+                AddGeometry(s);
+            else
+                AddNotGeometry(shape);
+            shape.Owner = this;
+            return Result<Shape>.Success(shape);
+        }
+
+        return Result<Shape>.Error("Shape already added to another ShapeList");
     }
 
     public void Delete(Shape shape)
@@ -83,6 +107,7 @@ public class ShapeList : ObservableCollection<Shape>
     {
         base.Remove(shape);
         shape.Selected = false;
+        shape.Owner = null;
         foreach (var i in shape.SubShapes)
             RemoveGeometry(i);
     }
@@ -94,6 +119,7 @@ public class ShapeList : ObservableCollection<Shape>
     private void RemoveNotGeometry(Shape shape)
     {
         base.Remove(shape);
+        shape.Owner = null;
     }
 
     /// <summary>

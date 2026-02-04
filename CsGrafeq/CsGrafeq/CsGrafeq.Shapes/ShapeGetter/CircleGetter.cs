@@ -19,7 +19,7 @@ public class CircleGetter_FromThreePoint : CircleGetter
         Point1 = point1;
         Point2 = point2;
         Point3 = point3;
-        ShapeParameters=[Point1, Point2, Point3];
+        ShapeParameters = [Point1, Point2, Point3];
     }
 
     public override MultiLanguageData ActionName => MultiLanguageResources.CircleText;
@@ -64,7 +64,7 @@ public class CircleGetter_FromCenterAndRadius : CircleGetter
         Radius = new ExpNumber(1, this);
         Radius.ValueStr = "1";
         Center = center;
-        ExpNumbers = [new( Radius,MultiLanguageResources.RadiusText )];
+        NumberParameters = [new NumberParameter(Radius, MultiLanguageResources.RadiusText)];
         ShapeParameters = [Center];
     }
 
@@ -72,8 +72,6 @@ public class CircleGetter_FromCenterAndRadius : CircleGetter
 
     public Point Center { get; init; }
     public ExpNumber Radius { get; init; }
-
-    public IReadOnlyList<NumberParameter> ExpNumbers { get; init; }
 
     public override CircleStruct GetCircle()
     {
@@ -118,8 +116,6 @@ public class CircleGetter_FromCenterAndPoint : CircleGetter
     {
         Center.AddSubShape(subShape);
         Point.AddSubShape(subShape);
-        ;
-        ;
     }
 
     public override void UnAttach(GeometryShape subShape)
@@ -140,7 +136,7 @@ public class CircleGetter_Apollonius : CircleGetter
         PointB = b;
         Ratio = new ExpNumber(1, this);
         Ratio.ValueStr = "1";
-        NumberParameters = [new(Ratio, MultiLanguageResources.RatioText)];
+        NumberParameters = [new NumberParameter(Ratio, MultiLanguageResources.RatioText)];
         ShapeParameters = [PointA, PointB];
     }
 

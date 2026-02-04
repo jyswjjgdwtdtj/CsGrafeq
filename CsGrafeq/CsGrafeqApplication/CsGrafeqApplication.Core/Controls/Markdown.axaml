@@ -1,14 +1,11 @@
-﻿<Border xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:md="clr-namespace:LiveMarkdown.Avalonia;assembly=LiveMarkdown.Avalonia"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="CsGrafeqApplication.Core.Controls.Markdown">
-    <Border.Child>
-        <md:MarkdownRenderer x:Name="MdRender" />
-    </Border.Child>
-    <Border.Styles>
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:md="clr-namespace:LiveMarkdown.Avalonia;assembly=LiveMarkdown.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="CsGrafeqApplication.Core.Controls.Markdown">
+    <UserControl.Styles>
         <Style Selector="md|MarkdownTextBlock">
             <Setter Property="Cursor" Value="IBeam" />
             <Setter Property="FontFamily" Value="{StaticResource MapleMono}" />
@@ -16,5 +13,7 @@
             <Setter Property="SelectionBrush" Value="CornflowerBlue" />
             <Setter Property="SelectionForegroundBrush" Value="{DynamicResource CgForegroundBrush}" />
         </Style>
-    </Border.Styles>
-</Border>
+        <FluentTheme />
+    </UserControl.Styles>
+
+</UserControl>

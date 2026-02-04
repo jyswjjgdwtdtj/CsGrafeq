@@ -129,4 +129,14 @@
             PublicKeyToken=b77a5c561934e089;utf-8
         </value>
     </data>
+    <data name="README" type="System.Resources.ResXFileRef, System.Windows.Forms">
+        <value>..\..\..\..\README.md;System.String, mscorlib, Version=4.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089;utf-8
+        </value>
+    </data>
+    <data name="README_ZH" type="System.Resources.ResXFileRef, System.Windows.Forms">
+        <value>..\..\..\..\README_ZH.md;System.String, mscorlib, Version=4.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089;utf-8
+        </value>
+    </data>
 </root>

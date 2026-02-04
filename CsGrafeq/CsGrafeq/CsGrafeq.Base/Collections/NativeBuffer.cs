@@ -59,7 +59,7 @@ public class NativeBuffer<T> : IDisposable where T : struct
         unsafe
         {
             // 判断内存是否有效
-            if (pointer != (T*)0)
+            if ((int)pointer != 0)
             {
                 NativeMemory.Free(pointer);
                 pointer = (T*)0;
@@ -90,10 +90,10 @@ public class NativeBuffer<T> : IDisposable where T : struct
 
     public NativeBuffer<T> Clone()
     {
-        return Slice(0, Length);
+        return Clone(0, Length);
     }
 
-    public unsafe NativeBuffer<T> Slice(nuint start, nuint length)
+    public unsafe NativeBuffer<T> Clone(nuint start, nuint length)
     {
         NativeBuffer<T> buffer = new(length);
         Buffer.MemoryCopy(pointer + start, buffer.pointer, Size * length, Size * length);
@@ -102,9 +102,17 @@ public class NativeBuffer<T> : IDisposable where T : struct
 
     public NativeBuffer<T> SliceAndDispose(nuint start, nuint length)
     {
-        var res = Slice(start, length);
+        var res = Clone(start, length);
         Dispose();
         return res;
+    }
+
+    public Span<T> AsSpan()
+    {
+        unsafe
+        {
+            return new Span<T>(pointer, (int)Length);
+        }
     }
 
     public ref struct NativeBufferEnumerator

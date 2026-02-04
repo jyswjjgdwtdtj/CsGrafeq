@@ -1,158 +1,173 @@
 ﻿using System;
 using System.Collections.Generic;
-using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Templates;
 using Avalonia.Input;
+using CsGrafeq.I18N;
 using CsGrafeqApplication.Controls.Displayers;
+using ReactiveUI;
 using SkiaSharp;
+using AvaPoint = Avalonia.Point;
+using static CsGrafeqApplication.Extension;
 
 namespace CsGrafeqApplication.Addons;
 
-public abstract class Addon : UserControl
+public abstract class Addon : ReactiveObject
 {
     public const bool DoNext = true;
     public const bool Intercept = false;
-    public readonly CommandManager CmdManager = new();
-    private readonly OnceLock IsAddonLoaded = new();
     internal readonly List<Renderable> Layers = new();
 
-    public bool Changed { get; set; } = false;
+    public EventHandler? OwnerChanged;
+
+    public Addon()
+    {
+        AddonName = new MultiLanguageData { Chinese = "", English = "" };
+        InfoTemplate = MainTemplate = new FuncDataTemplate<object?>(o => true, o => new Control());
+    }
+
+    public IDataTemplate? InfoTemplate { get; init; }
+    public IDataTemplate? MainTemplate { get; init; }
+
+    public bool AddonChanged { get; set; } = false;
 
     //Addon内部勿动
     public bool IsAddonEnabled { get; set; } = true;
 
+    /// <summary>
+    ///     所有者
+    /// </summary>
     public virtual Displayer? Owner
     {
         get => field;
         set
         {
+            if (!(value is CartesianDisplayer))
+                throw new Exception();
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
             field = value;
-            IsAddonLoaded.SetValueTrue();
+            PixelToMathX = value.PixelToMathX;
+            PixelToMathY = value.PixelToMathY;
+            PixelToMath = value.PixelToMath;
+            PixelToMathSK = value.PixelToMath;
+            MathToPixelX = value.MathToPixelX;
+            MathToPixelY = value.MathToPixelY;
+            MathToPixel = value.MathToPixel;
+            MathToPixelSK = value.MathToPixelSK;
+            OwnerChanged?.Invoke(this, new EventArgs());
         }
     }
 
-    public abstract string AddonName { get; }
-
-    public Control? Setting { get; init; }
+    public MultiLanguageData AddonName { get; init; }
 
     internal void CallRender(SKCanvas dc, SKRect rect)
     {
-        if (IsAddonLoaded.Value)
-            foreach (var layer in Layers)
-                layer.Render(dc, rect);
+        foreach (var layer in Layers)
+            layer.Render(dc, rect);
     }
 
     internal bool CallKeyDown(KeyEventArgs e)
     {
-        if (!IsAddonLoaded.Value || !IsAddonEnabled || Owner == null)
+        if (!IsAddonEnabled || Owner == null)
             return DoNext;
-        return AddonKeyDown(e);
+        return OnKeyDown(e);
     }
 
     internal bool CallKeyUp(KeyEventArgs e)
     {
-        if (!IsAddonLoaded.Value || !IsAddonEnabled || Owner == null)
+        if (!IsAddonEnabled || Owner == null)
             return DoNext;
-        return AddonKeyUp(e);
+        return OnKeyUp(e);
     }
 
     internal bool CallPointerMoved(AddonPointerEventArgs e)
     {
-        if (!IsAddonLoaded.Value || !IsAddonEnabled || Owner == null)
+        if (!IsAddonEnabled || Owner == null)
             return DoNext;
-        return AddonPointerMoved(e);
+        return OnPointerMoved(e);
     }
 
     internal bool CallPointerPressed(AddonPointerEventArgs e)
     {
-        if (!IsAddonLoaded.Value || !IsAddonEnabled || Owner == null)
+        if (!IsAddonEnabled || Owner == null)
             return DoNext;
-        return AddonPointerPressed(e);
+        return OnPointerPressed(e);
     }
 
     internal bool CallPointerReleased(AddonPointerEventArgs e)
     {
-        if (!IsAddonLoaded.Value || !IsAddonEnabled || Owner == null)
+        if (!IsAddonEnabled || Owner == null)
             return DoNext;
-        return AddonPointerReleased(e);
+        return OnPointerReleased(e);
     }
 
     internal bool CallPointerWheeled(AddonPointerWheelEventArgs e)
     {
-        if (!IsAddonLoaded.Value || !IsAddonEnabled || Owner == null)
+        if (!IsAddonEnabled || Owner == null)
             return DoNext;
-        return AddonPointerWheeled(e);
+        return OnPointerWheeled(e);
     }
 
     internal bool CallPointerTapped(AddonPointerEventArgsBase e)
     {
-        if (!IsAddonLoaded.Value || !IsAddonEnabled || Owner == null)
+        if (!IsAddonEnabled || Owner == null)
             return DoNext;
-        return AddonPointerTapped(e);
+        return OnPointerTapped(e);
     }
 
     internal bool CallPointerDoubleTapped(AddonPointerEventArgsBase e)
     {
-        if (!IsAddonLoaded.Value || !IsAddonEnabled || Owner == null)
+        if (!IsAddonEnabled || Owner == null)
             return DoNext;
-        return AddonPointerDoubleTapped(e);
+        return OnPointerDoubleTapped(e);
     }
 
     //true代表可继续传递
     //false代表拦截
-    protected virtual bool AddonKeyDown(KeyEventArgs e)
+    protected virtual bool OnKeyDown(KeyEventArgs e)
     {
         return DoNext;
     }
 
-    protected virtual bool AddonKeyUp(KeyEventArgs e)
+    protected virtual bool OnKeyUp(KeyEventArgs e)
     {
         return DoNext;
     }
 
-    protected virtual bool AddonPointerReleased(AddonPointerEventArgs e)
+    protected virtual bool OnPointerReleased(AddonPointerEventArgs e)
     {
         return DoNext;
     }
 
-    protected virtual bool AddonPointerPressed(AddonPointerEventArgs e)
+    protected virtual bool OnPointerPressed(AddonPointerEventArgs e)
     {
         return DoNext;
     }
 
-    protected virtual bool AddonPointerMoved(AddonPointerEventArgs e)
+    protected virtual bool OnPointerMoved(AddonPointerEventArgs e)
     {
         return DoNext;
     }
 
-    protected virtual bool AddonPointerTapped(AddonPointerEventArgsBase e)
+    protected virtual bool OnPointerTapped(AddonPointerEventArgsBase e)
     {
         return DoNext;
     }
 
-    protected virtual bool AddonPointerDoubleTapped(AddonPointerEventArgsBase e)
+    protected virtual bool OnPointerDoubleTapped(AddonPointerEventArgsBase e)
     {
         return DoNext;
     }
 
-    protected virtual bool AddonPointerWheeled(AddonPointerWheelEventArgs e)
+    protected virtual bool OnPointerWheeled(AddonPointerWheelEventArgs e)
     {
         return DoNext;
-    }
-
-    public void Undo()
-    {
-        CmdManager.UnDo();
-    }
-
-    public void Redo()
-    {
-        CmdManager.ReDo();
     }
 
     public abstract void Delete();
     public abstract void SelectAll();
-    public abstract void DeSelectAll();
+    public abstract void DeselectAll();
 
     private class OnceLock
     {
@@ -164,40 +179,57 @@ public abstract class Addon : UserControl
         }
     }
 
-    public class AddonPointerEventArgsBase : EventArgs
+    public class AddonPointerEventArgsBase(double x, double y, KeyModifiers modifiers) : EventArgs
     {
-        public readonly KeyModifiers KeyModifiers;
-        public readonly double X, Y;
+        public readonly KeyModifiers KeyModifiers = modifiers;
+        public readonly double X = x, Y = y;
 
-        public AddonPointerEventArgsBase(double x, double y, KeyModifiers modifiers)
-        {
-            X = x;
-            Y = y;
-            KeyModifiers = modifiers;
-        }
-
-        public Point Location => new(X, Y);
+        public AvaPoint Location => new(X, Y);
     }
 
-    public class AddonPointerEventArgs : AddonPointerEventArgsBase
+    public class AddonPointerEventArgs(double x, double y, PointerPointProperties properties, KeyModifiers modifiers)
+        : AddonPointerEventArgsBase(x, y, modifiers)
     {
-        public readonly PointerPointProperties Properties;
-
-        public AddonPointerEventArgs(double x, double y, PointerPointProperties properties, KeyModifiers modifiers) :
-            base(x, y, modifiers)
-        {
-            Properties = properties;
-        }
+        public readonly PointerPointProperties Properties = properties;
     }
 
-    public class AddonPointerWheelEventArgs : AddonPointerEventArgs
+    public class AddonPointerWheelEventArgs(
+        double x,
+        double y,
+        PointerPointProperties properties,
+        KeyModifiers modifiers,
+        Vec delta)
+        : AddonPointerEventArgs(x, y, properties, modifiers)
     {
-        public readonly Vec Delta;
-
-        public AddonPointerWheelEventArgs(double x, double y, PointerPointProperties properties, KeyModifiers modifiers,
-            Vec delta) : base(x, y, properties, modifiers)
-        {
-            Delta = delta;
-        }
+        public readonly Vec Delta = delta;
     }
+
+    #region CoordinateTransformFuncs
+
+    /// <summary>
+    ///     将数学坐标转换为像素坐标（Avalonia.Point） 来自Owner
+    /// </summary>
+    protected Func<Vec, AvaPoint> MathToPixel = VoidFunc<Vec, AvaPoint>;
+
+    /// <summary>
+    ///     将数学坐标转换为像素坐标（SKPoint） 来自Owner
+    /// </summary>
+    protected Func<Vec, SKPoint> MathToPixelSK = VoidFunc<Vec, SKPoint>;
+
+    /// <summary>
+    ///     将像素坐标转换为数学坐标（Avalonia.Point） 来自Owner
+    /// </summary>
+    protected Func<AvaPoint, Vec> PixelToMath = VoidFunc<AvaPoint, Vec>;
+
+    /// <summary>
+    ///     将像素坐标转换为数学坐标（SKPoint） 来自Owner
+    /// </summary>
+    protected Func<SKPoint, Vec> PixelToMathSK = VoidFunc<SKPoint, Vec>;
+
+    protected Func<double, double> PixelToMathX = VoidFunc<double, double>,
+        PixelToMathY = VoidFunc<double, double>,
+        MathToPixelX = VoidFunc<double, double>,
+        MathToPixelY = VoidFunc<double, double>;
+
+    #endregion
 }

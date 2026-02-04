@@ -3,7 +3,7 @@ using Avalonia.Threading;
 
 namespace CsGrafeqApplication.Dialogs.Windows;
 
-public partial class MsgBoxWindow : Avalonia.Controls.Window
+public partial class MsgBoxWindow : Window
 {
     public MsgBoxWindow()
     {

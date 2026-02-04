@@ -4,12 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:CsGrafeqApplication.ViewModels"
              xmlns:addons="clr-namespace:CsGrafeqApplication.Addons"
-             xmlns:geopad="clr-namespace:CsGrafeqApplication.Addons.GeometryPad"
-             xmlns:controls="clr-namespace:CsGrafeqApplication.Controls"
              xmlns:i18N="clr-namespace:CsGrafeq.I18N;assembly=CsGrafeq.I18N"
-             xmlns:controls1="clr-namespace:CsGrafeqApplication.Core.Controls;assembly=CsGrafeqApplication.Core"
+             xmlns:corecontrols="clr-namespace:CsGrafeqApplication.Core.Controls;assembly=CsGrafeqApplication.Core"
              xmlns:views="clr-namespace:CsGrafeqApplication.Dialogs.Views;assembly=CsGrafeqApplication.Dialogs"
-             xmlns:cga="clr-namespace:CsGrafeqApplication"
+             xmlns:views1="clr-namespace:CsGrafeqApplication.Views"
+             xmlns:ripple="clr-namespace:Material.Ripple;assembly=Material.Ripple"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CsGrafeqApplication.Controls.DisplayerContainer"
              x:DataType="vm:DisplayerContainerViewModel" Foreground="{DynamicResource CgForegroundBrush}"
@@ -17,116 +16,146 @@
     <UserControl.Styles>
         <Styles>
             <StyleInclude Source="avares://CsGrafeqApplication.Core/Styles/PathStyles.axaml" />
-            <Style Selector="Path.Icon">
-                <Setter Property="Width" Value="22" />
-                <Setter Property="Height" Value="22" />
-            </Style>
         </Styles>
     </UserControl.Styles>
     <Panel Focusable="False">
+        <!--绘制层-->
         <Border Name="DisplayerCon" ZIndex="0" BorderThickness="0">
             <ContentPresenter Content="{CompiledBinding Displayer}" />
         </Border>
-        <controls1:Keyboard>
+        <!--Info显示层-->
+        <Border Name="InfoContainer">
+            <TabControl Name="AddonInfoTabControl" SelectedIndex="{CompiledBinding AddonIndex,Mode=OneWay}"
+                        ItemsSource="{CompiledBinding Displayer.Addons}" HorizontalAlignment="Right">
+                <TabControl.ContentTemplate>
+                    <DataTemplate DataType="addons:Addon">
+                        <ContentControl Content="{CompiledBinding .}" ContentTemplate="{CompiledBinding InfoTemplate}" />
+                    </DataTemplate>
+                </TabControl.ContentTemplate>
+                <TabControl.Styles>
+                    <Style Selector="TabControl#AddonInfoTabControl">
+                        <Style Selector="^ /template/ Panel#PART_TabsPanel">
+                            <Setter Property="IsVisible" Value="False" />
+                        </Style>
+                    </Style>
+                </TabControl.Styles>
+            </TabControl>
+        </Border>
+        <!--键盘-->
+        <corecontrols:Keyboard>
             <Panel Name="PART_Container" IsTabStop="False">
                 <Panel.Styles>
                     <Style Selector="Control">
                         <Setter Property="IsTabStop" Value="False" />
                     </Style>
-                    <Style Selector="GridSplitter#Splitter">
-                        <Setter Property="Background" Value="{DynamicResource CgOppositeTranslucentBackgroundBrush1}" />
-                        <Style Selector="^ Border">
-                            <Setter Property="Width" Value="{CompiledBinding SplitterThicknessOff}" />
-                            <Setter Property="Transitions">
-                                <Transitions>
-                                    <DoubleTransition Property="Width" Duration="0:0:0.1" />
-                                </Transitions>
-                            </Setter>
-                        </Style>
-                        <Style Selector="^:pointerover Border">
-                            <Setter Property="Width" Value="{CompiledBinding SplitterThicknessOn}" />
-                        </Style>
-                        <Style Selector="^:pressed Border">
-                            <Setter Property="Width" Value="{CompiledBinding SplitterThicknessOn}" />
-                        </Style>
-                    </Style>
                 </Panel.Styles>
-                <Grid ZIndex="10" Name="PART_Grid">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="300" />
-                        <ColumnDefinition Width="6" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Border Grid.Column="0" Grid.Row="0" BorderThickness="0" BorderBrush="Gray"
-                            Name="OperationContainer"
-                            DataContext="{CompiledBinding Displayer}"
-                            Background="{DynamicResource CgTranslucentBackgroundBrush}">
-                        <ItemsControl ItemsSource="{CompiledBinding Addons}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <VirtualizingStackPanel Orientation="Vertical" />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate DataType="addons:Addon">
-                                    <ContentPresenter Content="{CompiledBinding .}" />
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </Border>
-                    <GridSplitter Grid.Column="1" ResizeDirection="Columns" Name="Splitter" ClipToBounds="False"
-                                  Width="1" />
-                    <Border BorderThickness="0,0,0,1"
-                            BorderBrush="{DynamicResource CgOppositeTranslucentBackgroundBrush1}" Grid.Column="2"
-                            Grid.Row="0" Name="PART_CoverDisplayer">
-                        <DockPanel>
-                        <CheckBox DockPanel.Dock="Left" Width="15" Height="40" VerticalAlignment="Center" HorizontalAlignment="Left"
-                                  Name="Toggle" Foreground="{DynamicResource MaterialPrimaryMidForegroundBrush}">
-                            <CheckBox.Template>
-                                <ControlTemplate>
-                                    <Border>
-                                        <Border Name="Border" CornerRadius="4" BorderThickness="0"
-                                                Background="{DynamicResource MaterialPrimaryMidBrush}"
-                                                VerticalAlignment="Center" HorizontalAlignment="Center">
-                                            <TextBlock Name="TextBlock" MinWidth="0" MinHeight="0"
-                                                       VerticalAlignment="Center" HorizontalAlignment="Center" />
-                                        </Border>
-                                    </Border>
-                                </ControlTemplate>
-                            </CheckBox.Template>
-                            <CheckBox.Styles>
-                                <Style Selector="CheckBox#Toggle TextBlock#TextBlock">
-                                    <Setter Property="Text" Value="&lt;" />
+                <!--Addon显示层-->
+                <DockPanel ZIndex="10">
+                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Name="PART_Grid">
+                        <corecontrols:ExpandBox Name="OperationContainerExpandBox" ExpandDirection="Right"
+                                                IsExpanded="{CompiledBinding #Toggle.IsChecked,Mode=OneWay}" Margin="0"
+                                                Padding="0">
+                            <Border Width="400" BorderThickness="0" BorderBrush="Gray" HorizontalAlignment="Left"
+                                    Name="OperationContainer"
+                                    Background="{DynamicResource CgTranslucentBackgroundBrush}">
+                                <TabControl Name="AddonsTabControl"
+                                            SelectedIndex="{CompiledBinding AddonIndex,Mode=OneWay}"
+                                            ItemsSource="{CompiledBinding Displayer.Addons}"
+                                            HorizontalAlignment="Stretch">
+                                    <TabControl.ContentTemplate>
+                                        <DataTemplate DataType="addons:Addon">
+                                            <ContentControl Content="{CompiledBinding .}"
+                                                            ContentTemplate="{CompiledBinding MainTemplate}">
+                                                <ContentControl.Resources>
+                                                    <ResourceDictionary>
+                                                        <ResourceDictionary.MergedDictionaries>
+                                                            <ResourceInclude
+                                                                Source="../Addons/GeometricPad/GeometricResources.axaml" />
+                                                        </ResourceDictionary.MergedDictionaries>
+                                                    </ResourceDictionary>
+                                                </ContentControl.Resources>
+                                            </ContentControl>
+                                        </DataTemplate>
+                                    </TabControl.ContentTemplate>
+                                    <TabControl.Styles>
+                                        <Style Selector="TabControl#AddonsTabControl">
+                                            <Style Selector="^ /template/ Panel#PART_TabsPanel">
+                                                <Setter Property="IsVisible" Value="False" />
+                                            </Style>
+                                        </Style>
+                                    </TabControl.Styles>
+                                </TabControl>
+                            </Border>
+                        </corecontrols:ExpandBox>
+                        <Border IsVisible="{CompiledBinding #Toggle.IsChecked,Mode=OneWay}" Width="8"
+                                VerticalAlignment="Stretch" Background="Transparent" Name="OuterBorder"
+                                Loaded="OuterBorderLoaded" PointerPressed="OuterBorderPressed"
+                                PointerReleased="OuterBorderReleased" PointerMoved="OuterBorderMoved">
+                            <Border.Styles>
+                                <Style Selector="Border#OuterBorder">
+                                    <Setter Property="Background"
+                                            Value="{DynamicResource CgOppositeTranslucentBackgroundBrush1}" />
+                                    <Style Selector="^ Border#InnerBorder">
+                                        <Setter Property="Width" Value="{CompiledBinding SplitterThicknessOff}" />
+                                        <Setter Property="Opacity" Value="0.2" />
+                                        <Setter Property="Transitions">
+                                            <Transitions>
+                                                <DoubleTransition Property="Width" Duration="0:0:0.1" />
+                                                <DoubleTransition Property="Opacity" Duration="0:0:0.1" />
+                                            </Transitions>
+                                        </Setter>
+                                        <Setter Property="Background" Value="{DynamicResource MaterialPrimaryMidBrush}" />
+                                    </Style>
+                                    <Style Selector="^:pointerover Border#InnerBorder">
+                                        <Setter Property="Width" Value="{CompiledBinding SplitterThicknessOn}" />
+                                    </Style>
+                                    <Style Selector="^:dragging Border#InnerBorder">
+                                        <Setter Property="Width" Value="{CompiledBinding SplitterThicknessOn}" />
+                                        <Setter Property="Opacity" Value="0.5" />
+                                    </Style>
                                 </Style>
-                                <Style Selector="CheckBox#Toggle:checked TextBlock#TextBlock">
-                                    <Setter Property="Text" Value="&gt;" />
-                                </Style>
-                                <Style Selector="CheckBox#Toggle Border#Border">
-                                    <Setter Property="Width" Value="15" />
-                                    <Setter Property="Height" Value="40" />
-                                </Style>
-                                <Style Selector="CheckBox#Toggle:pressed Border#Border">
-                                    <Setter Property="Width"
-                                            Value="13" />
-                                    <Setter Property="Height"
-                                            Value="38" />
-                                </Style>
-                            </CheckBox.Styles>
-                            <CheckBox.Transitions>
-                                <Transitions>
-                                    <DoubleTransition Property="Width" Duration="0:0:0.2" />
-                                    <DoubleTransition Property="Height" Duration="0:0:0.2" />
-                                </Transitions>
-                            </CheckBox.Transitions>
-                        </CheckBox>
-                            <Panel DockPanel.Dock="Right" ZIndex="5" IsHitTestVisible="False" Name="InfoCanvas" VerticalAlignment="Stretch"
-                                   HorizontalAlignment="Stretch">
-                                <geopad:GeoPadInfo DataContext="{CompiledBinding  Displayer.Addons[0].DataContext}"
-                                                   HorizontalAlignment="Stretch" />
-                            </Panel>
-                        </DockPanel>
-                    </Border>
-                </Grid>
+                            </Border.Styles>
+                            <Border HorizontalAlignment="Center" VerticalAlignment="Stretch" Name="InnerBorder" />
+                        </Border>
+                        <Border BorderThickness="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                BorderBrush="{DynamicResource CgOppositeTranslucentBackgroundBrush1}"
+                                Name="PART_CoverDisplayer">
+                            <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                <ToggleButton DockPanel.Dock="Left" Width="15" Height="40" VerticalAlignment="Center"
+                                              HorizontalAlignment="Left" IsChecked="True"
+                                              Name="Toggle"
+                                              Foreground="{DynamicResource MaterialPrimaryMidForegroundBrush}"
+                                              Background="{DynamicResource MaterialPrimaryMidBrush}">
+                                    <ToggleButton.Styles>
+                                        <Style Selector="ToggleButton#Toggle">
+                                            <Setter Property="Content" Value="&gt;" />
+                                        </Style>
+                                        <Style Selector="ToggleButton#Toggle:checked">
+                                            <Setter Property="Content" Value="&lt;" />
+                                        </Style>
+                                        <Style
+                                            Selector="ToggleButton#Toggle:not(:disabled) /template/ ripple|RippleEffect#PART_Ripple ContentPresenter">
+                                            <Setter Property="Padding" Value="0" />
+                                        </Style>
+                                    </ToggleButton.Styles>
+                                </ToggleButton>
+                                <Panel DockPanel.Dock="Right" VerticalAlignment="Stretch"
+                                       HorizontalAlignment="Stretch">
+                                    <ComboBox SelectedIndex="{CompiledBinding AddonIndex,Mode=TwoWay}"
+                                              Name="ChooseAddonComboBox" VerticalAlignment="Top"
+                                              ItemsSource="{CompiledBinding Displayer.Addons}">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{CompiledBinding AddonName.Data}" />
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                </Panel>
+                            </DockPanel>
+                        </Border>
+                    </StackPanel>
+                </DockPanel>
+                <!--设置层-->
                 <Grid ColumnDefinitions="*,52" RowDefinitions="*,52" ZIndex="15" Name="SettingDockPanel"
                       VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                     <Grid.Styles>
@@ -138,6 +167,10 @@
                             <Style Selector="RepeatButton">
                                 <Setter Property="Width" Value="32" />
                                 <Setter Property="Height" Value="32" />
+                            </Style>
+                            <Style Selector="Path.Icon">
+                                <Setter Property="Width" Value="22" />
+                                <Setter Property="Height" Value="22" />
                             </Style>
                         </Styles>
                     </Grid.Styles>
@@ -180,9 +213,9 @@
                         </ToggleButton>
                     </Border>
                     <Border Grid.Column="0" Grid.Row="1">
-                        <controls:ShownControl
-                            IsShown="{CompiledBinding #SettingToggle.IsChecked,Mode=OneWay}"
-                            Margin="0" Padding="0" Duration="0.2" HorizontalAlignment="Right" Orientation="Horizontal">
+                        <corecontrols:ExpandBox ExpandDirection="Left"
+                                                IsExpanded="{CompiledBinding #SettingToggle.IsChecked,Mode=OneWay}"
+                                                Margin="0" Padding="0" HorizontalAlignment="Right">
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch"
                                         Name="SettingStackPanelHor"
                                         Spacing="5" Margin="0" HorizontalAlignment="Stretch">
@@ -276,12 +309,12 @@
 
                                 </Button>
                             </StackPanel>
-                        </controls:ShownControl>
+                        </corecontrols:ExpandBox>
                     </Border>
                     <Border Grid.Column="1" Grid.Row="0">
-                        <controls:ShownControl VerticalAlignment="Bottom" Orientation="Vertical"
-                                               IsShown="{CompiledBinding #SettingToggle.IsChecked,Mode=OneWay}"
-                                               Margin="0" Padding="0" Duration="0.2">
+                        <corecontrols:ExpandBox VerticalAlignment="Bottom"
+                                                IsExpanded="{CompiledBinding #SettingToggle.IsChecked,Mode=OneWay}"
+                                                Margin="0" Padding="0" ExpandDirection="Up">
                             <StackPanel Orientation="Vertical" Name="SettingStackPanel"
                                         Spacing="5" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Stretch">
                                 <StackPanel.Styles>
@@ -308,14 +341,14 @@
                                 </StackPanel.Styles>
                                 <Button Click="SaveClicked">
                                     <ToolTip.Tip>
-                                        <TextBlock Text="Save" />
+                                        <TextBlock Text="{CompiledBinding MultiLanguageResources.SaveText.Data}" />
                                     </ToolTip.Tip>
                                     <Path Name="Save" Classes="Icon Fill"
                                           Data="M13 14a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2zM3 6a3 3 0 0 1 3-3h20a3 3 0 0 1 3 3v2a3 3 0 0 1-1 2.236V23.5a5.5 5.5 0 0 1-5.5 5.5h-13A5.5 5.5 0 0 1 4 23.5V10.236C3.386 9.686 3 8.888 3 8zm3 5v12.5A3.5 3.5 0 0 0 9.5 27h13a3.5 3.5 0 0 0 3.5-3.5V11zm0-6a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h20a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1z" />
                                 </Button>
                                 <Button Click="Github_Clicked">
                                     <ToolTip.Tip>
-                                        <TextBlock Text="Open Github Site" />
+                                        <TextBlock Text="{CompiledBinding MultiLanguageResources.OpenGithubText.Data}" />
                                     </ToolTip.Tip>
                                     <Path Name="Github" Classes="Icon Fill"
                                           Data="M448 96c0-35.3-28.7-64-64-64H64C28.7 32 0 60.7 0 96v320c0 35.3 28.7 64 64 64h320c35.3 0 64-28.7 64-64zM265.8 407.7c0-1.8 0-6 .1-11.6c.1-11.4.1-28.8.1-43.7c0-15.6-5.2-25.5-11.3-30.7c37-4.1 76-9.2 76-73.1c0-18.2-6.5-27.3-17.1-39c1.7-4.3 7.4-22-1.7-45c-13.9-4.3-45.7 17.9-45.7 17.9c-26.6-7.5-56.6-7.5-83.2 0c0 0-31.8-22.2-45.7-17.9c-9.1 22.9-3.5 40.6-1.7 45c-10.6 11.7-15.6 20.8-15.6 39c0 63.6 37.3 69 74.3 73.1c-4.8 4.3-9.1 11.7-10.6 22.3c-9.5 4.3-33.8 11.7-48.3-13.9c-9.1-15.8-25.5-17.1-25.5-17.1c-16.2-.2-1.1 10.2-1.1 10.2c10.8 5 18.4 24.2 18.4 24.2c9.7 29.7 56.1 19.7 56.1 19.7c0 9 .1 21.7.1 30.6c0 4.8.1 8.6.1 10c0 4.3-3 9.5-11.5 8c-66-22.1-112.2-84.9-112.2-158.3c0-91.8 70.2-161.5 162-161.5S388 165.6 388 257.4c.1 73.4-44.7 136.3-110.7 158.3c-8.4 1.5-11.5-3.7-11.5-8m-90.5-54.8c-.2-1.5 1.1-2.8 3-3.2c1.9-.2 3.7.6 3.9 1.9c.3 1.3-1 2.6-3 3c-1.9.4-3.7-.4-3.9-1.7m-9.1 3.2c-2.2.2-3.7-.9-3.7-2.4c0-1.3 1.5-2.4 3.5-2.4c1.9-.2 3.7.9 3.7 2.4c0 1.3-1.5 2.4-3.5 2.4m-14.3-2.2c-1.9-.4-3.2-1.9-2.8-3.2s2.4-1.9 4.1-1.5c2 .6 3.3 2.1 2.8 3.4c-.4 1.3-2.4 1.9-4.1 1.3m-12.5-7.3c-1.5-1.3-1.9-3.2-.9-4.1c.9-1.1 2.8-.9 4.3.6c1.3 1.3 1.8 3.3.9 4.1c-.9 1.1-2.8.9-4.3-.6m-8.5-10c-1.1-1.5-1.1-3.2 0-3.9c1.1-.9 2.8-.2 3.7 1.3c1.1 1.5 1.1 3.3 0 4.1c-.9.6-2.6 0-3.7-1.5m-6.3-8.8c-1.1-1.3-1.3-2.8-.4-3.5c.9-.9 2.4-.4 3.5.6c1.1 1.3 1.3 2.8.4 3.5c-.9.9-2.4.4-3.5-.6m-6-6.4c-1.3-.6-1.9-1.7-1.5-2.6c.4-.6 1.5-.9 2.8-.4c1.3.7 1.9 1.8 1.5 2.6c-.4.9-1.7 1.1-2.8.4" />
@@ -323,7 +356,8 @@
                                 <Button>
                                     <Button.Flyout>
                                         <Flyout Placement="Left">
-                                            <ComboBox Foreground="Black" SelectionChanged="ThemeSelectionChanged" SelectedIndex="2">
+                                            <ComboBox Foreground="Black" SelectionChanged="ThemeSelectionChanged"
+                                                      SelectedIndex="2">
                                                 <ComboBoxItem>
                                                     <TextBlock
                                                         Text="{CompiledBinding MultiLanguageResources.LightText.Data}" />
@@ -348,7 +382,8 @@
                                 <Button>
                                     <Button.Flyout>
                                         <Flyout Placement="Left">
-                                            <ColorPicker Foreground="Black"  IsAlphaVisible="False" IsAlphaEnabled="False"
+                                            <ColorPicker Foreground="Black" IsAlphaVisible="False"
+                                                         IsAlphaEnabled="False"
                                                          ColorChanged="ColorSettingColorChanged" />
                                         </Flyout>
                                     </Button.Flyout>
@@ -358,7 +393,8 @@
                                     <Path Name="ColorPathIcon" Classes="Icon Fill"
                                           Data="M3.839 5.858c2.94-3.916 9.03-5.055 13.364-2.36c4.28 2.66 5.854 7.777 4.1 12.577c-1.655 4.533-6.016 6.328-9.159 4.048c-1.177-.854-1.634-1.925-1.854-3.664l-.106-.987l-.045-.398c-.123-.934-.311-1.352-.705-1.572c-.535-.298-.892-.305-1.595-.033l-.351.146l-.179.078c-1.014.44-1.688.595-2.541.416l-.2-.047l-.164-.047c-2.789-.864-3.202-4.647-.565-8.157m.984 6.716l.123.037l.134.03c.439.087.814.015 1.437-.242l.602-.257c1.202-.493 1.985-.54 3.046.05c.917.512 1.275 1.298 1.457 2.66l.053.459l.055.532l.047.422c.172 1.361.485 2.09 1.248 2.644c2.275 1.65 5.534.309 6.87-3.349c1.516-4.152.174-8.514-3.484-10.789c-3.675-2.284-8.899-1.306-11.373 1.987c-2.075 2.763-1.82 5.28-.215 5.816m11.225-1.994a1.25 1.25 0 1 1 2.414-.647a1.25 1.25 0 0 1-2.414.647m.494 3.488a1.25 1.25 0 1 1 2.415-.647a1.25 1.25 0 0 1-2.415.647M14.07 7.577a1.25 1.25 0 1 1 2.415-.647a1.25 1.25 0 0 1-2.415.647m-.028 8.998a1.25 1.25 0 1 1 2.414-.647a1.25 1.25 0 0 1-2.414.647m-3.497-9.97a1.25 1.25 0 1 1 2.415-.646a1.25 1.25 0 0 1-2.415.646" />
                                 </Button>
-                                <views:MsgBoxButton ButtonDefinitions="OK" MsgBoxMinWidth="600" MsgBoxMaxWidth="600" MsgBoxContentTemplateParam="{CompiledBinding .}">
+                                <views:MsgBoxButton MsgBoxMinWidth="600" MsgBoxMaxWidth="600"
+                                                    MsgBoxContentTemplateParam="{CompiledBinding .}">
                                     <ToolTip.Tip>
                                         <TextBlock Text="{CompiledBinding MultiLanguageResources.SettingText.Data}" />
                                     </ToolTip.Tip>
@@ -366,102 +402,20 @@
                                           Data="M2.5 2A1.5 1.5 0 0 0 1 3.5v1a1.5 1.5 0 0 0 1 1.415V11.5A2.5 2.5 0 0 0 4.5 14h2.1a5.5 5.5 0 0 1-.393-1H4.5A1.5 1.5 0 0 1 3 11.5V6h10.5A1.5 1.5 0 0 0 15 4.5v-1A1.5 1.5 0 0 0 13.5 2zM2 3.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5zm7.067 4.943a2 2 0 0 1-1.431 2.478l-.461.118a4.7 4.7 0 0 0 .01 1.016l.35.083a2 2 0 0 1 1.456 2.519l-.127.422q.387.307.835.518l.325-.344a2 2 0 0 1 2.91.002l.337.358q.44-.204.822-.498l-.156-.556a2 2 0 0 1 1.43-2.478l.46-.118a4.7 4.7 0 0 0-.01-1.017l-.348-.082a2 2 0 0 1-1.456-2.52l.126-.422a4.3 4.3 0 0 0-.835-.518l-.325.344a2 2 0 0 1-2.91-.001l-.337-.358a4.3 4.3 0 0 0-.821.497zM11.5 12.5a1 1 0 1 1 0-2a1 1 0 0 1 0 2" />
                                     <views:MsgBoxButton.MsgBoxContentTemplate>
                                         <DataTemplate DataType="vm:DisplayerContainerViewModel">
-                                        <TabControl VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                                            <TabItem Header="Setting">
-                                                <TabControl TabStripPlacement="Left" Margin="0,15">
-                                                    <TabControl.Styles>
-                                                        <Style Selector="TabItem">
-                                                            <Setter Property="Height">20</Setter>
-                                                            <Setter Property="MinHeight">20</Setter>
-                                                        </Style>
-                                                    </TabControl.Styles>
-                                                    <TabItem Header="General">
-                                                        <TextBlock xml:space="preserve">Nothing currently...</TextBlock>
-                                                    </TabItem>
-                                                    <TabItem Header="Graph"
-                                                             IsVisible="{x:Static cga:Setting.CanDrawFunction}">
-                                                        <StackPanel>
-                                                            <CheckBox Name="MovingOp" IsChecked="{CompiledBinding Displayer.MovingOptimization}">
-                                                                <CheckBox.Styles>
-                                                                    <Style Selector="Border#NormalRectangle">
-                                                                        <Setter Property="BorderBrush" Value="Black" />
-                                                                    </Style>
-                                                                </CheckBox.Styles>
-                                                                <TextBlock
-                                                                    Text="{CompiledBinding MultiLanguageResources.MovingOpText.Data}" />
-                                                            </CheckBox>
-                                                            <CheckBox Name="ZoomingOp"  IsChecked="{CompiledBinding Displayer.ZoomingOptimization}">
-                                                                <CheckBox.Styles>
-                                                                    <Style Selector="Border#NormalRectangle">
-                                                                        <Setter Property="BorderBrush" Value="Black" />
-                                                                    </Style>
-                                                                </CheckBox.Styles>
-                                                                <TextBlock
-                                                                    Text="{CompiledBinding MultiLanguageResources.ZoomingOpText.Data}" />
-                                                            </CheckBox>
-                                                        </StackPanel>
-                                                    </TabItem>
-                                                    <TabItem Header="Implicit Function"
-                                                             IsVisible="{x:Static cga:Setting.CanDrawFunction}">
-                                                        <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto"
-                                                              DataContext="{x:Static cga:Setting.Instance}">
-                                                            <TextBlock Grid.Row="0" Grid.Column="0">Default Opacity:</TextBlock>
-                                                            <TextBox Grid.Row="1" Grid.Column="0"
-                                                                     Text="{CompiledBinding DefaultOpacity}" x:DataType="cga:Setting"/>
-                                                        </Grid>
-                                                    </TabItem>
-                                                </TabControl>
-                                            </TabItem>
-                                            <TabItem Header="Description">
-                                                <ScrollViewer VerticalScrollBarVisibility="Visible"
-                                                              HorizontalScrollBarVisibility="Disabled">
-                                                    <controls1:Markdown xml:space="preserve">
-# CsGrafeq
-
-## Description
-
-CsGrafeq is a geometry sketchpad. It's made by Avalonia and use Material.Avalonia as its theme. For the sake that JIT is unavailable in mobile platforms and browser, CsGrafeq now only support Desktop (now only Windows). 
-
-Project in old version folder is for stably implicit function plotting, which is made by .NET Framework. The function of Implicit function plotting
-is being made now.
-
-## Features
-
-- ReadyToRun compiled, no .Net Runtime environment required.
-- High quality function image plotting.
-- Beautiful UI
-
-
-## Future and Plan
-
-### Short term plan
-
-1. Add implicit function supports
-2. Add text block supports
-3. Implement custom msgbox/inputbox
-4. Implement mathematical calculation (e.g. 0.5->1/2, 1.414->√2)
-
-### Long term plan
-
-1. Add more shapes supports
-2. Fix bugs
-
-Welcome to any programming enthusiasts who wish to collaborate on development. \
-You can put forward your opinions and suggestions in [Issues](https://github.com/jyswjjgdwtdtj/CsGrafeq/issues), I will
-reply as soon as possible. \
-Due to the pressure of high school academic studies, I will engage in development during the winter and summer holidays.
-Each of your stars🌟 is the motivation for my development. Thank you🙏😊.
-
-                                                    </controls1:Markdown>
-                                                </ScrollViewer>
-                                            </TabItem>
-                                            <TabItem Header="Usage">
-                                                <ScrollViewer VerticalScrollBarVisibility="Visible"
-                                                              HorizontalScrollBarVisibility="Hidden">
-                                                    <controls1:Markdown xml:space="preserve" />
-                                                </ScrollViewer>
-                                            </TabItem>
-                                        </TabControl>
+                                            <TabControl VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                                                <TabItem
+                                                    Header="{CompiledBinding MultiLanguageResources.SettingText.Data}">
+                                                    <views1:SettingView />
+                                                </TabItem>
+                                                <TabItem
+                                                    Header="{CompiledBinding MultiLanguageResources.DescriptionText.Data}">
+                                                    <views1:DescriptionView />
+                                                </TabItem>
+                                                <TabItem
+                                                    Header="{CompiledBinding MultiLanguageResources.UsageText.Data}">
+                                                    <views1:UsageView />
+                                                </TabItem>
+                                            </TabControl>
                                         </DataTemplate>
                                     </views:MsgBoxButton.MsgBoxContentTemplate>
                                 </views:MsgBoxButton>
@@ -487,7 +441,7 @@ Each of your stars🌟 is the motivation for my development. Thank you🙏😊.
                                           Data="M17.25 1a.75.75 0 0 1 .75.75V3h4.5a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0V4.5h-9.5v.75a.75.75 0 0 1-1.5 0v-1.5A.75.75 0 0 1 11.5 3h5V1.75a.75.75 0 0 1 .75-.75zm-3.5 5a.75.75 0 0 0 0 1.5h4.428L16.77 8.674a.75.75 0 0 0-.27.576v.25h-4.75a.75.75 0 0 0 0 1.5h4.75v2.734a.75.75 0 0 1-.966.718l-.569-.17a.75.75 0 0 0-.43 1.436l.569.171A2.25 2.25 0 0 0 18 13.734V11h4.25a.75.75 0 0 0 0-1.5h-4.128l2.608-2.174A.75.75 0 0 0 20.25 6h-6.5zm-5.361.477l-.049-.104a.73.73 0 0 0-1.315.087l-5.964 14.5l-.032.096a.754.754 0 0 0 .426.886a.73.73 0 0 0 .963-.402l1.547-3.76l.094.006h7.087l1.433 3.737l.042.092a.73.73 0 0 0 .91.334a.755.755 0 0 0 .418-.972l-5.56-14.5zm-3.74 9.809L7.81 8.747l2.947 7.539h-6.11z" />
                                 </Button>
                             </StackPanel>
-                        </controls:ShownControl>
+                        </corecontrols:ExpandBox>
                     </Border>
                 </Grid>
                 <Border ZIndex="20" Name="PopupBack">
@@ -507,12 +461,22 @@ Each of your stars🌟 is the motivation for my development. Thank you🙏😊.
                                 Background="{DynamicResource MaterialPrimaryMidBrush}" Padding="15" Opacity="0"
                                 CornerRadius="4"
                                 Name="InfoOuterContainer">
-                            <ContentPresenter Name="InfoPresenter"
-                                              Foreground="{DynamicResource MaterialPrimaryMidForegroundBrush}" />
+                            <StackPanel Orientation="Horizontal">
+                                <PathIcon Margin="5,0" Width="15" Height="15"
+                                          Foreground="{DynamicResource CgForegroundBrush}"
+                                          Data="M12 2c5.523 0 10 4.478 10 10s-4.477 10-10 10S2 17.522 2 12S6.477 2 12 2m0 1.667c-4.595 0-8.333 3.738-8.333 8.333S7.405 20.333 12 20.333s8.333-3.738 8.333-8.333S16.595 3.667 12 3.667m-.001 10.835a.999.999 0 1 1 0 1.998a.999.999 0 0 1 0-1.998M11.994 7a.75.75 0 0 1 .744.648l.007.101l.004 4.502a.75.75 0 0 1-1.493.103l-.007-.102l-.004-4.501a.75.75 0 0 1 .75-.751"
+                                          Name="ErrorIcon" />
+                                <PathIcon Margin="5,0" Width="15" Height="15"
+                                          Foreground="{DynamicResource CgForegroundBrush}"
+                                          Data="M17.25 22a1.25 1.25 0 1 1-2.5 0a1.25 1.25 0 0 1 2.5 0M16 9a1 1 0 0 0-1 1v8a1 1 0 1 0 2 0v-8a1 1 0 0 0-1-1m-3.064-5.191c1.332-2.41 4.796-2.41 6.128 0l10.493 18.999C30.846 25.14 29.158 28 26.494 28H5.507c-2.665 0-4.352-2.86-3.064-5.192zm4.377.967a1.5 1.5 0 0 0-2.626 0L4.194 23.775A1.5 1.5 0 0 0 5.507 26h20.987a1.5 1.5 0 0 0 1.313-2.225z"
+                                          Name="WarningIcon" />
+                                <ContentPresenter Name="InfoPresenter"
+                                                  Foreground="{DynamicResource CgForegroundBrush}" />
+                            </StackPanel>
                         </Border>
                     </Grid>
                 </Border>
             </Panel>
-        </controls1:Keyboard>
+        </corecontrols:Keyboard>
     </Panel>
 </UserControl>
