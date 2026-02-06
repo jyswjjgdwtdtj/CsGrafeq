@@ -1,5 +1,6 @@
 using System;
 using CsGrafeq.Interval;
+using CsGrafeq.Numeric;
 using CsGrafeq.Shapes;
 using CsGrafeqApplication.Addons;
 using CsGrafeqApplication.Addons.FunctionPad;
@@ -26,6 +27,12 @@ public class ImplicitFunction : InteractiveObject
         Opacity = Setting.Instance.DefaultOpacity;
         Expression = expression;
     }
+
+    public bool IsSelected
+    {
+        get;
+        set => this.RaiseAndSetIfChanged(ref field, value);
+    } = false;
 
     public FunctionPad Owner { get; init; }
 
@@ -55,13 +62,21 @@ public class ImplicitFunction : InteractiveObject
     {
         get;
         private set => this.RaiseAndSetIfChanged(ref field, value);
-    }
+    } = "";
+
+    public bool NeedCheckPixel
+    {
+        get;
+        set => this.RaiseAndSetIfChanged(ref field, value);
+    } = false;
 
     public HasReferenceIntervalSetFunc<IntervalSet> Function
     {
         get => field;
         private set => this.RaiseAndSetIfChanged(ref field, value);
     } = new((x, y) => Def.FF, EnglishCharEnum.None);
+
+    public Func<double,double,double,double, bool> MsFunction=static (_,_,_,_)=>false;
 
     public string Expression
     {
@@ -70,11 +85,12 @@ public class ImplicitFunction : InteractiveObject
         {
             this.RaiseAndSetIfChanged(ref field, value);
             var last = Function;
-            var res = IntervalCompiler.TryCompile(Expression, Setting.Instance.EnableExpressionSimplification);
+            var res = IntervalCompiler.TryCompile(field, Setting.Instance.EnableExpressionSimplification);
             res.Match(
                 success =>
                 {
                     Function = success;
+                    MsFunction = IntervalCompiler.GetMSDelegate(field);
                     LastError = "No Error";
                     IsCorrect = true;
                     last.Dispose();

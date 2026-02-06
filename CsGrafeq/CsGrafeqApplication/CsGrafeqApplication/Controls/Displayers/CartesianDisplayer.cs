@@ -33,7 +33,7 @@ public class CartesianDisplayer : Displayer
         App.Current.ActualThemeVariantChanged += (s, e) =>
         {
             RefreshPaint();
-            ForceToRender();
+            ForceToRender(CancellationToken.None);
         };
         RefreshPaint();
     }
@@ -427,7 +427,7 @@ public class CartesianDisplayer : Displayer
         {
             WheelingStopWatch.Stop();
             WheelingStopWatch.Reset();
-            Dispatcher.UIThread.InvokeAsync(ForceToRender);
+            Dispatcher.UIThread.InvokeAsync((() => ForceToRender(CancellationToken.None)));
         }
     }
 
@@ -437,7 +437,7 @@ public class CartesianDisplayer : Displayer
         {
             WheelingStopWatch.Stop();
             WheelingStopWatch.Reset();
-            ForceToRender();
+            ForceToRender(CancellationToken.None);
         }
     }
 
@@ -487,7 +487,7 @@ public class CartesianDisplayer : Displayer
             PreviousUnitLength = UnitLength;
             PreviousUnitLength = UnitLength;
             PreviousZero = Zero;
-            ForceToRender();
+            ForceToRender(CancellationToken.None);
             return;
         }
 

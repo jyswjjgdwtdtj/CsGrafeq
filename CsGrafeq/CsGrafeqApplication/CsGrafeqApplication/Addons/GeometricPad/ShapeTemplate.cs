@@ -14,7 +14,7 @@ public class ShapeTemplate : IDataTemplate
 
     public Control? Build(object? param)
     {
-        if (param is GeometryShape item)
+        if (param is GeometricShape item)
             switch (item)
             {
                 case GeoPoint point:

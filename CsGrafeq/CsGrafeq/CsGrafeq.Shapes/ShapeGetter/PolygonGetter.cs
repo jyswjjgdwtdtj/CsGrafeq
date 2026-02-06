@@ -14,7 +14,7 @@ public class PolygonGetter : GeometryGetter
 
     public override MultiLanguageData ActionName { get; } = MultiLanguageResources.Instance.PolygonText;
 
-    public override void Attach(GeometryShape subShape)
+    public override void Attach(GeometricShape subShape)
     {
         foreach (var i in Points)
         {
@@ -23,7 +23,7 @@ public class PolygonGetter : GeometryGetter
         }
     }
 
-    public override void UnAttach(GeometryShape subShape)
+    public override void UnAttach(GeometricShape subShape)
     {
         foreach (var i in Points) i.RemoveSubShape(subShape);
     }

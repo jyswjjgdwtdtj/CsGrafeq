@@ -2,7 +2,10 @@
 using System.Reflection;
 using System.Reflection.Emit;
 using CsGrafeq.Collections;
+using CsGrafeq.Interval.Extensions;
 using CsGrafeq.Interval.Interface;
+using CsGrafeq.Numeric;
+using FastExpressionCompiler;
 
 namespace CsGrafeq.Interval;
 
@@ -168,6 +171,71 @@ public static class IntervalCompiler
         }
     }
 
+    public static Func<double,double,double,double,bool> GetMSDelegate(string expression)
+    {
+        var xParams = (new int[4]).Select(i => Expression.Parameter(typeof(DoubleNumber), "x" + i)).ToArray();
+        var yParams = (new int[4]).Select(i => Expression.Parameter(typeof(DoubleNumber), "y" + i)).ToArray();
+        var exp=Compiler.Compiler.ConstructExpTree<DoubleNumber>(expression, 2, out var xVar, out var yVar, out _, out var chars,
+            Setting.Instance.EnableExpressionSimplification);
+        var regulatedExp=RegulateExpression(exp, xVar, yVar, xParams, yParams);
+        Console.WriteLine(regulatedExp.ToCSharpString());
+        var lambda=Expression.Lambda<Func<DoubleNumber,DoubleNumber,DoubleNumber,DoubleNumber,DoubleNumber,DoubleNumber,DoubleNumber,DoubleNumber,bool>>(regulatedExp,xParams.Concat(yParams)).Compile();
+        return ((left, top, right, bottom) =>
+        {
+            var xStep = (right - left) / 3;
+            var yStep = (bottom - top) / 3;
+            var midX1 = new DoubleNumber(left + xStep);
+            var midY1 = new DoubleNumber(top + yStep);
+            var midX2 = new DoubleNumber(right - xStep);
+            var midY2 = new DoubleNumber(bottom - yStep);
+            return lambda.Invoke(new DoubleNumber(left), midX1, midX2,new DoubleNumber(right), new DoubleNumber(top), midY1, midY2, new DoubleNumber(bottom));
+        });
+    }
+
+    private static Expression RegulateExpression(Expression expression,ParameterExpression originalX,ParameterExpression originalY,ParameterExpression[] xParams,ParameterExpression[] yParams)
+    {
+        if (expression is BinaryExpression binaryExpression)
+        {
+            if (binaryExpression.NodeType == ExpressionType.Or)
+            {
+                return Expression.Or(RegulateExpression(binaryExpression.Left, originalX, originalY, xParams, yParams),
+                    RegulateExpression(binaryExpression.Right, originalX, originalY, xParams, yParams));//均为bool
+            }if (binaryExpression.NodeType == ExpressionType.And)
+            {
+                return Expression.And(RegulateExpression(binaryExpression.Left, originalX, originalY, xParams, yParams),
+                    RegulateExpression(binaryExpression.Right, originalX, originalY, xParams, yParams));//均为bool
+            } if (binaryExpression.NodeType == ExpressionType.Equal)
+            {
+                var res=RegulateExpression(Expression.Subtract(binaryExpression.Left,binaryExpression.Right), originalX, originalY, xParams, yParams);
+                return Expression.Call(((Func<DoubleNumber[],bool>)NumberHelper.IsSomeGreaterAndSomeLessThanZero).Method,res);
+            } if (binaryExpression.NodeType == ExpressionType.LessThan||binaryExpression.NodeType == ExpressionType.LessThanOrEqual)
+            {
+                var res=RegulateExpression(Expression.Subtract(binaryExpression.Left,binaryExpression.Right), originalX, originalY, xParams, yParams);
+                return Expression.Call(((Func<DoubleNumber[],bool>)NumberHelper.IsAllLessThanZero).Method,res);
+            } if (binaryExpression.NodeType == ExpressionType.GreaterThan||binaryExpression.NodeType == ExpressionType.GreaterThanOrEqual)
+            {
+                var res=RegulateExpression(Expression.Subtract(binaryExpression.Left,binaryExpression.Right), originalX, originalY, xParams, yParams);
+                return Expression.Call(((Func<DoubleNumber[],bool>)NumberHelper.IsAllGreaterThanZero).Method,res);
+            }
+        }
+        // Todo:使用Vector SIMD优化计算 
+        // 这里太TM适合用SIMD了
+        // 计算16个点的值，然后返回一个bool结果
+        // 但怎么实现呢？
+        
+        var func=Expression.Lambda<Func<DoubleNumber,DoubleNumber,DoubleNumber>>(expression,originalX,originalY);
+        int idx = 0;
+        var exps = new Expression[16];
+        foreach (var xParam in xParams)
+        {
+            foreach (var yParam in yParams)
+            {
+                var callExp=Expression.Invoke(func, xParam, yParam);
+                exps[idx++] = callExp;
+            }
+        }
+        return Expression.NewArrayInit(typeof(DoubleNumber), exps);
+    }
     private static MethodInfo GetInfo(Delegate action)
     {
         return action.Method;

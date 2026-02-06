@@ -28,20 +28,20 @@ public partial class DisplayerContainer : UserControl, IInfoDialog
     // 可按需调整
     private const double MinOperationWidth = 50;
     private const double ReserveRightMin = 300; // 右侧至少保留空间，避免盖住Displayer等
-    private const string githubRepUrl = "https://github.com/jyswjjgdwtdtj/CsGrafeq";
+    private const string GithubRepUrl = "https://github.com/jyswjjgdwtdtj/CsGrafeq";
 
     public static readonly DirectProperty<DisplayerContainer, bool> IsOperationVisibleProperty =
         AvaloniaProperty.RegisterDirect<DisplayerContainer, bool>(nameof(VM.IsOperationVisible),
             o => o.VM.IsOperationVisible,
             (o, v) => o.VM.IsOperationVisible = v);
 
-    private readonly Animation anim = new();
+    private readonly Animation _infoDialogAnimation = new();
     private readonly DisplayerContainerViewModel VM = new();
     private double _dragStartWidth;
     private double _dragStartX;
 
     private bool _isDragging;
-    private CancellationTokenSource InfoCancellation = new();
+    private CancellationTokenSource _infoCancellation = new();
 
     public DisplayerContainer()
     {
@@ -49,17 +49,17 @@ public partial class DisplayerContainer : UserControl, IInfoDialog
         DataContext = VM;
         VM.Displayer = new DisplayControl { Addons = { new GeometricPad(), new FunctionPad() } };
         InitializeComponent();
-        anim.Delay = TimeSpan.FromSeconds(3);
-        anim.Duration = TimeSpan.FromSeconds(0.2);
-        anim.FillMode = FillMode.Forward;
+        _infoDialogAnimation.Delay = TimeSpan.FromSeconds(3);
+        _infoDialogAnimation.Duration = TimeSpan.FromSeconds(0.2);
+        _infoDialogAnimation.FillMode = FillMode.Forward;
         var keyframe1 = new KeyFrame();
         keyframe1.Cue = new Cue(0);
         keyframe1.Setters.Add(new Setter(OpacityProperty, 1.0));
         var keyframe2 = new KeyFrame();
         keyframe2.Cue = new Cue(1);
         keyframe2.Setters.Add(new Setter(OpacityProperty, 0.0));
-        anim.Children.Add(keyframe1);
-        anim.Children.Add(keyframe2);
+        _infoDialogAnimation.Children.Add(keyframe1);
+        _infoDialogAnimation.Children.Add(keyframe2);
     }
 
     public async void Info(object content, InfoType infotype)
@@ -73,11 +73,11 @@ public partial class DisplayerContainer : UserControl, IInfoDialog
         ErrorIcon.IsVisible = infotype == InfoType.Error;
         WarningIcon.IsVisible = infotype == InfoType.Warning;
         InfoOuterContainer.Background = new SolidColorBrush(Color.FromArgb(128, color.R, color.G, color.B));
-        InfoCancellation.Cancel();
-        InfoCancellation = new CancellationTokenSource();
+        _infoCancellation.Cancel();
+        _infoCancellation = new CancellationTokenSource();
         InfoPresenter.Content = content;
         InfoOuterContainer.Opacity = 1;
-        await anim.RunAsync(InfoOuterContainer, InfoCancellation.Token);
+        await _infoDialogAnimation.RunAsync(InfoOuterContainer, _infoCancellation.Token);
     }
 
     private void GlobalKeyDown(object? sender, KeyEventArgs e)
@@ -188,27 +188,36 @@ public partial class DisplayerContainer : UserControl, IInfoDialog
 
     private void ZoomOut_Clicked(object? sender, RoutedEventArgs e)
     {
-        VM.Displayer.Zoom(1 / 1.05, Bounds.Center);
+        VM.Displayer?.Zoom(1 / 1.05, Bounds.Center);
     }
 
     private void ZoomIn_Clicked(object? sender, RoutedEventArgs e)
     {
-        VM.Displayer.Zoom(1.05, Bounds.Center);
+        VM.Displayer?.Zoom(1.05, Bounds.Center);
     }
 
     private void Delete_Clicked(object? sender, RoutedEventArgs e)
     {
-        VM.Displayer.Addons[VM.AddonIndex].Delete();
+        foreach (var displayerAddon in VM.Displayer?.Addons??[])
+        {
+            displayerAddon.Delete();
+        }
     }
 
     private void SelectAll_Clicked(object? sender, RoutedEventArgs e)
     {
-        VM.Displayer.Addons[VM.AddonIndex].SelectAll();
+        foreach (var displayerAddon in VM.Displayer?.Addons??[])
+        {
+            displayerAddon.SelectAll();
+        }
     }
 
     private void DeSelectAll_Clicked(object? sender, RoutedEventArgs e)
     {
-        VM.Displayer.Addons[VM.AddonIndex].DeselectAll();
+        foreach (var displayerAddon in VM.Displayer?.Addons??[])
+        {
+            displayerAddon.DeselectAll();
+        }
     }
 
     private void LanguageSelectionChanged(object? sender, SelectionChangedEventArgs e)
@@ -220,7 +229,7 @@ public partial class DisplayerContainer : UserControl, IInfoDialog
     {
         Process.Start(new ProcessStartInfo
         {
-            FileName = new Uri(githubRepUrl).AbsoluteUri,
+            FileName = new Uri(GithubRepUrl).AbsoluteUri,
             UseShellExecute = true
         });
     }
@@ -232,13 +241,13 @@ public partial class DisplayerContainer : UserControl, IInfoDialog
             switch (comboBox.SelectedIndex)
             {
                 case 0:
-                    Application.Current.RequestedThemeVariant = ThemeVariant.Light;
+                    Application.Current?.RequestedThemeVariant = ThemeVariant.Light;
                     break;
                 case 1:
-                    Application.Current.RequestedThemeVariant = ThemeVariant.Dark;
+                    Application.Current?.RequestedThemeVariant = ThemeVariant.Dark;
                     break;
                 case 2:
-                    Application.Current.RequestedThemeVariant = ThemeVariant.Default;
+                    Application.Current?.RequestedThemeVariant = ThemeVariant.Default;
                     break;
             }
     }
@@ -250,21 +259,26 @@ public partial class DisplayerContainer : UserControl, IInfoDialog
         {
             var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
             {
-                Title = "Open Text File",
+                Title = "Save Image",
                 FileTypeChoices = [FilePickerFileTypes.ImageAll],
-                DefaultExtension = ".jpg",
+                DefaultExtension = ".png",
                 ShowOverwritePrompt = true
             });
-            if (file != null)
+            if (file != null&&VM.Displayer is {} displayer)
             {
-                var size = new PixelSize((int)VM.Displayer.Bounds.Width, (int)VM.Displayer.Bounds.Height);
+                var size = new PixelSize((int)displayer.Bounds.Width, (int)displayer.Bounds.Height);
                 var rr = new RenderTargetBitmap(size);
                 using (var dc = rr.CreateDrawingContext())
                 {
-                    var rt = new RenderTargetBitmap(size);
-                    rt.Render(VM.Displayer);
-                    dc.DrawImage(rt, VM.Displayer.Bounds);
-                    rt = new RenderTargetBitmap(new PixelSize((int)InfoContainer.Bounds.Width,
+                    dc.DrawRectangle(Brushes.Transparent, null, Bounds);
+                    foreach (var adn in VM.Displayer?.Addons??[])
+                    {
+                        foreach (var renderable in adn.Layers)
+                        {
+                            renderable.DrawBitmapTo(dc, Bounds,Bounds);
+                        }
+                    }
+                    var rt = new RenderTargetBitmap(new PixelSize((int)InfoContainer.Bounds.Width,
                         (int)InfoContainer.Bounds.Height));
                     rt.Render(InfoContainer);
                     dc.DrawImage(rt, InfoContainer.Bounds);
@@ -277,9 +291,9 @@ public partial class DisplayerContainer : UserControl, IInfoDialog
 
     private void ColorSettingColorChanged(object? sender, ColorChangedEventArgs e)
     {
-        var newtheme = Material.Styles.Themes.Theme.Create(Themes.Theme.CurrentTheme);
-        newtheme.SetPrimaryColor(e.NewColor);
-        Themes.Theme.CurrentTheme = newtheme;
+        var theme = Material.Styles.Themes.Theme.Create(Themes.Theme.CurrentTheme);
+        theme.SetPrimaryColor(e.NewColor);
+        Themes.Theme.CurrentTheme = theme;
     }
 
     private void OuterBorderPressed(object? sender, PointerPressedEventArgs e)
@@ -332,7 +346,7 @@ public partial class DisplayerContainer : UserControl, IInfoDialog
         pseudoClasses.Set(":dragging", false);
 
 
-        if (e.Pointer.Captured == c)
+        if (ReferenceEquals(e.Pointer.Captured, c))
             e.Pointer.Capture(null);
         OperationContainer.InvalidateArrange();
         OperationContainer.InvalidateMeasure();

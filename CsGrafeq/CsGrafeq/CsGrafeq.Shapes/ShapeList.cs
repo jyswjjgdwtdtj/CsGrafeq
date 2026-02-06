@@ -8,13 +8,13 @@ namespace CsGrafeq.Shapes;
 public class ShapeList : ObservableCollection<Shape>
 {
     private static readonly StringBuilder sb = new();
-    private readonly DistinctList<GeometryShape> SelectedShapes = new();
+    private readonly DistinctList<GeometricShape> SelectedShapes = new();
 
     public ShapeList()
     {
         Languages.LanguageChanged += () =>
         {
-            foreach (var i in GetShapes<GeometryShape>())
+            foreach (var i in GetShapes<GeometricShape>())
                 i.RefreshValues();
         };
     }
@@ -28,10 +28,10 @@ public class ShapeList : ObservableCollection<Shape>
 
     public void ClearSelected()
     {
-        ClearSelected<GeometryShape>();
+        ClearSelected<GeometricShape>();
     }
 
-    public void ClearSelected<T>() where T : GeometryShape
+    public void ClearSelected<T>() where T : GeometricShape
     {
         foreach (var i in this.OfType<T>())
             i.Selected = false;
@@ -48,7 +48,7 @@ public class ShapeList : ObservableCollection<Shape>
         if (shape.Owner == null)
         {
             shape.ShapeChanged += () => ShapeChanged(shape);
-            if (shape is GeometryShape s)
+            if (shape is GeometricShape s)
                 AddGeometry(s);
             else
                 AddNotGeometry(shape);
@@ -61,13 +61,13 @@ public class ShapeList : ObservableCollection<Shape>
 
     public void Delete(Shape shape)
     {
-        if (shape is GeometryShape s)
+        if (shape is GeometricShape s)
             DeleteGeometry(s);
         else
             shape.IsDeleted = true;
     }
 
-    private void DeleteGeometry(GeometryShape shape)
+    private void DeleteGeometry(GeometricShape shape)
     {
         shape.IsDeleted = true;
         foreach (var i in shape.SubShapes) DeleteGeometry(i);
@@ -75,13 +75,13 @@ public class ShapeList : ObservableCollection<Shape>
 
     public new void Remove(Shape shape)
     {
-        if (shape is GeometryShape s)
+        if (shape is GeometricShape s)
             RemoveGeometry(s);
         else
             RemoveNotGeometry(shape);
     }
 
-    private void AddGeometry(GeometryShape shape)
+    private void AddGeometry(GeometricShape shape)
     {
         base.Add(shape);
         shape.Name = GetFirstNameNotDistributed().ToUpper();
@@ -103,7 +103,7 @@ public class ShapeList : ObservableCollection<Shape>
     ///     移除几何图形
     /// </summary>
     /// <param name="shape"></param>
-    private void RemoveGeometry(GeometryShape shape)
+    private void RemoveGeometry(GeometricShape shape)
     {
         base.Remove(shape);
         shape.Selected = false;
@@ -181,7 +181,7 @@ public class ShapeList : ObservableCollection<Shape>
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    public IEnumerable<T> GetSelectedShapes<T>() where T : GeometryShape
+    public IEnumerable<T> GetSelectedShapes<T>() where T : GeometricShape
     {
         foreach (var i in SelectedShapes.OfType<T>())
             yield return i;
@@ -192,7 +192,7 @@ public class ShapeList : ObservableCollection<Shape>
     /// </summary>
     /// <param name="shape"></param>
     /// <returns></returns>
-    public static IEnumerable<GeometryShape> GetAllChildren(GeometryShape shape)
+    public static IEnumerable<GeometricShape> GetAllChildren(GeometricShape shape)
     {
         if (!shape.IsDeleted)
         {

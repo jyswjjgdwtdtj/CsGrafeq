@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Threading;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Input.GestureRecognizers;
@@ -29,6 +30,8 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
     public bool NeedRenderingAll = false;
     public List<Renderable> NeedRenderingLayers = new();
     protected object TotalBufferLock = new();
+    
+    protected CancellationTokenSource RenderCts = new();
 
     public Displayer()
     {
@@ -38,7 +41,10 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
         GestureRecognizers.Add(new PinchGestureRecognizer());
         AddHandler(Gestures.ScrollGestureEvent, (s, e) => { Zoom(Pow(1.04, e.Delta.Y), Bounds.Center); });
         AddHandler(Gestures.PinchEvent, (s, e) => { Zoom(e.Scale, e.ScaleOrigin); });
-        Languages.LanguageChanged += ForceToRender;
+        Languages.LanguageChanged += () =>
+        {
+            ForceToRender(CancellationToken.None);
+        };
         RenderClock.OnElapsed += Render;
         IsHitTestVisible = true;
     }
@@ -197,31 +203,31 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
                         layer.RenderTargetSize = new SKSizeI((int)e.NewSize.Width, (int)e.NewSize.Height);
                 }
 
-                ForceToRender();
+                ForceToRender(CancellationToken.None);
             }
     }
 
     /// <summary>
     ///     使所有层无效
     /// </summary>
-    protected void Invalidate()
+    protected void Invalidate(CancellationToken ct)
     {
-        foreach (var i in Addons) Invalidate(i);
+        if(ct.IsCancellationRequested)
+            return;
+        foreach (var i in Addons) Invalidate(i,ct);
     }
 
     /// <summary>
     ///     使Renderable层无效
     /// </summary>
     /// <param name="layer"></param>
-    protected void Invalidate(Renderable layer)
+    /// <param name="ct"></param>
+    protected void Invalidate(Renderable layer,CancellationToken ct)
     {
-        using (var dc = layer.GetBitmapCanvas())
-        {
-            dc?.Clear();
-            dc?.Flush();
-            layer.Render(dc, Bounds.ToSKRect());
-        }
-
+        if(ct.IsCancellationRequested)
+            return;
+        layer.ClearAndFlush();
+        layer.Render(Bounds.ToSKRect(),ct);
         layer.Changed = false;
     }
 
@@ -229,33 +235,42 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
     ///     使Addon中的所有层无效
     /// </summary>
     /// <param name="adn"></param>
-    protected void Invalidate(Addon adn)
+    /// <param name="ct"></param>
+    protected void Invalidate(Addon adn,CancellationToken ct)
     {
+        if(ct.IsCancellationRequested)
+            return;
         foreach (var layer in adn.Layers)
-            Invalidate(layer);
+            Invalidate(layer,ct);
         adn.AddonChanged = false;
     }
 
     /// <summary>
     ///     强制重绘
     /// </summary>
-    protected void ForceToRender()
+    protected void ForceToRender(CancellationToken ct)
     {
         RenderClock.Cancel();
-        Invalidate();
+        Invalidate(ct);
         CompoundBuffers();
         InvalidateVisual();
     }
 
     private void Render()
     {
+        Render(CancellationToken.None);
+    }
+    private void Render(CancellationToken ct)
+    {
+        if(ct.IsCancellationRequested)
+            return;
         var paintflag = false;
         foreach (var adn in Addons)
             if (adn.AddonChanged)
             {
                 paintflag = true;
                 adn.AddonChanged = false;
-                Invalidate(adn);
+                Invalidate(adn,ct);
             }
             else
             {
@@ -264,7 +279,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
                     {
                         paintflag = true;
                         layer.Changed = false;
-                        Invalidate(layer);
+                        Invalidate(layer,ct);
                     }
             }
 

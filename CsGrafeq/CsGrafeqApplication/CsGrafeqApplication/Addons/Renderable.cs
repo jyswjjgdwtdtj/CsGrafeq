@@ -1,4 +1,10 @@
 ﻿using System;
+using System.IO;
+using System.Threading;
+using Avalonia;
+using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using Avalonia.Skia;
 using SkiaSharp;
 
 namespace CsGrafeqApplication.Addons;
@@ -8,17 +14,17 @@ public class Renderable : IDisposable
     /// <summary>
     ///     缓冲区的同步锁
     /// </summary>
-    private readonly object BitmapLock = new();
+    private readonly Lock _bitmapLock = new();
 
     /// <summary>
     ///     缓冲区
     /// </summary>
-    private SKBitmap Bitmap = new(1, 1);
+    private SKBitmap _bitmap = new(1, 1);
 
     /// <summary>
     ///     缓冲区大小
     /// </summary>
-    private SKSizeI Size = new(1, 1);
+    private SKSizeI _size = new(1, 1);
 
     /// <summary>
     ///     指示是否处于活动
@@ -31,7 +37,7 @@ public class Renderable : IDisposable
             var flag = value && !field;
             field = value;
             Changed = true;
-            if (flag) RenderTargetSize = Size;
+            if (flag) RenderTargetSize = _size;
         }
     } = true;
 
@@ -42,14 +48,14 @@ public class Renderable : IDisposable
 
     public SKSizeI RenderTargetSize
     {
-        get => Size;
+        get => _size;
         set
         {
-            Size = value;
-            lock (BitmapLock)
+            _size = value;
+            lock (_bitmapLock)
             {
-                Bitmap.Dispose();
-                Bitmap = new SKBitmap(int.Max(value.Width, 1), int.Max(value.Height, 1));
+                _bitmap.Dispose();
+                _bitmap = new SKBitmap(int.Max(value.Width, 1), int.Max(value.Height, 1));
             }
         }
     }
@@ -59,7 +65,7 @@ public class Renderable : IDisposable
     /// </summary>
     public void Dispose()
     {
-        Bitmap?.Dispose();
+        _bitmap.Dispose();
         GC.SuppressFinalize(this);
     }
 
@@ -71,9 +77,21 @@ public class Renderable : IDisposable
     {
         if (!IsActive)
             return null;
-        lock (BitmapLock)
+        lock (_bitmapLock)
         {
-            return new SKCanvas(Bitmap);
+            return new SKCanvas(_bitmap);
+        }
+    }
+
+    public void ClearAndFlush()
+    {
+        if (!IsActive)
+            return;
+        lock (_bitmapLock)
+        {
+            using var canvas = new SKCanvas(_bitmap);
+            canvas.Clear(SKColors.Transparent);
+            canvas.Flush();
         }
     }
 
@@ -85,10 +103,8 @@ public class Renderable : IDisposable
     {
         if (!IsActive)
             return;
-        lock (BitmapLock)
-        {
-            Bitmap.TryRealCopyTo(bitmap);
-        }
+        lock (_bitmapLock)
+            _bitmap.TryRealCopyTo(bitmap);
     }
 
     /// <summary>
@@ -101,27 +117,56 @@ public class Renderable : IDisposable
     {
         if (!IsActive)
             return;
-        lock (BitmapLock)
+        lock (_bitmapLock)
         {
-            canvas.DrawBitmap(Bitmap, x, y);
+            canvas.DrawBitmap(_bitmap, x, y);
         }
     }
 
     /// <summary>
     ///     绘制事件
     /// </summary>
-    public event Action<SKCanvas?, SKRect>? OnRender;
+    public event Action<SKCanvas?, SKRect,CancellationToken>? OnRenderCanvas;
+    /// <summary>
+    ///     绘制事件
+    /// </summary>
+    public event Action<SKBitmap, SKRect, CancellationToken>? OnRender;
 
     /// <summary>
-    ///     在指定Canvas上绘制
+    ///     当前缓冲区上绘制
     /// </summary>
-    /// <param name="dc"></param>
     /// <param name="rect"></param>
-    public void Render(SKCanvas? dc, SKRect rect)
+    /// <param name="ct"></param>
+    public void Render(SKRect rect,CancellationToken ct)
     {
         if (!IsActive)
             return;
-        OnRender?.Invoke(dc, rect);
+        lock (_bitmapLock)
+        {
+            OnRender?.Invoke(_bitmap, rect,ct);
+            OnRenderCanvas?.Invoke(GetBitmapCanvas(), rect, ct);
+        }
+    }
+    public void Render(SKRect rect){
+        Render(rect, CancellationToken.None);
+    }
+    public void DrawBitmapTo(DrawingContext dc, Rect destRect, Rect sourceRect)
+    {
+        if (!IsActive)
+            return;
+        lock (_bitmapLock)
+        {
+            dc.DrawImage(ToAvaloniaImage(_bitmap),sourceRect, destRect);
+        }
+    }
+    public static Bitmap ToAvaloniaImage(SKBitmap bitmap)
+    {
+        using (var memoryStream = new MemoryStream())
+        {
+            bitmap.Encode(memoryStream, SKEncodedImageFormat.Png, 100);
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            return new Bitmap(memoryStream);
+        }
     }
 
     ~Renderable()

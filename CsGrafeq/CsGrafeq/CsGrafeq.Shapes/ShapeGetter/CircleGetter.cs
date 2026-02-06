@@ -42,14 +42,14 @@ public class CircleGetter_FromThreePoint : CircleGetter
         return new CircleStruct { Center = c, Radius = (c - Point1.Location).GetLength() };
     }
 
-    public override void Attach(GeometryShape subShape)
+    public override void Attach(GeometricShape subShape)
     {
         Point1.AddSubShape(subShape);
         Point2.AddSubShape(subShape);
         Point3.AddSubShape(subShape);
     }
 
-    public override void UnAttach(GeometryShape subShape)
+    public override void UnAttach(GeometricShape subShape)
     {
         Point1.RemoveSubShape(subShape);
         Point2.RemoveSubShape(subShape);
@@ -78,14 +78,14 @@ public class CircleGetter_FromCenterAndRadius : CircleGetter
         return new CircleStruct { Center = Center.Location, Radius = Radius.Value };
     }
 
-    public override void Attach(GeometryShape subShape)
+    public override void Attach(GeometricShape subShape)
     {
         Center.AddSubShape(subShape);
         ;
         Radius.NumberChanged += subShape.RefreshValues;
     }
 
-    public override void UnAttach(GeometryShape subShape)
+    public override void UnAttach(GeometricShape subShape)
     {
         Center.RemoveSubShape(subShape);
         Radius.NumberChanged -= subShape.RefreshValues;
@@ -112,13 +112,13 @@ public class CircleGetter_FromCenterAndPoint : CircleGetter
             { Center = Center.Location, Radius = ((Vec)Center.Location - Point.Location).GetLength() };
     }
 
-    public override void Attach(GeometryShape subShape)
+    public override void Attach(GeometricShape subShape)
     {
         Center.AddSubShape(subShape);
         Point.AddSubShape(subShape);
     }
 
-    public override void UnAttach(GeometryShape subShape)
+    public override void UnAttach(GeometricShape subShape)
     {
         Center.RemoveSubShape(subShape);
         Point.RemoveSubShape(subShape);
@@ -173,14 +173,14 @@ public class CircleGetter_Apollonius : CircleGetter
         return new CircleStruct { Center = new Vec(cx, cy), Radius = radius };
     }
 
-    public override void Attach(GeometryShape subShape)
+    public override void Attach(GeometricShape subShape)
     {
         PointA.AddSubShape(subShape);
         PointB.AddSubShape(subShape);
         Ratio.NumberChanged += subShape.RefreshValues;
     }
 
-    public override void UnAttach(GeometryShape subShape)
+    public override void UnAttach(GeometricShape subShape)
     {
         PointA.RemoveSubShape(subShape);
         PointB.RemoveSubShape(subShape);

@@ -37,13 +37,13 @@
         <AvaloniaResource Include="Assets\avalonia-logo.ico"/>
         <AvaloniaResource Include="Assets\calc.svg"/>
         <AvaloniaResource Include="Assets\camera.svg"/>
-        <AvaloniaResource Include="Assets\favicon.ico"/>
         <None Remove="Assets\csharp.svg"/>
         <AvaloniaResource Include="Assets\csharp.svg"/>
         <None Remove="Assets\error.svg"/>
         <AvaloniaResource Include="Assets\error.svg"/>
         <None Remove="Assets\folder.svg"/>
         <AvaloniaResource Include="Assets\folder.svg"/>
+        <None Remove="Assets\favicon.ico" />
     </ItemGroup>
 
     <ItemGroup>
@@ -100,5 +100,9 @@
     <ItemGroup>
         <Folder Include="DataTemplates\"/>
         <Folder Include="Resources\"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <AvaloniaResource Include="Assets\favicon.ico" />
     </ItemGroup>
 </Project>

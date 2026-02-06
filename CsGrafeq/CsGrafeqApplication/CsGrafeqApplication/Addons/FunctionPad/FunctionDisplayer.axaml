@@ -5,6 +5,7 @@
                                xmlns:functionPad="clr-namespace:CsGrafeqApplication.Addons.FunctionPad"
                                xmlns:function="clr-namespace:CsGrafeqApplication.Function"
                                xmlns:views="clr-namespace:CsGrafeqApplication.Dialogs.Views;assembly=CsGrafeqApplication.Dialogs"
+                               xmlns:i18N="clr-namespace:CsGrafeq.I18N;assembly=CsGrafeq.I18N"
                                mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
                                x:Class="CsGrafeqApplication.Addons.FunctionPad.FunctionDisplayer">
     <TemplatedControl.Styles>
@@ -12,15 +13,15 @@
     </TemplatedControl.Styles>
     <functionPad:FunctionDisplayer.Template>
         <ControlTemplate TargetType="functionPad:FunctionDisplayer">
-            <DockPanel ZIndex="1" LastChildFill="True">
+            <DockPanel ZIndex="1" LastChildFill="True" DataContext="{x:Static i18N:MultiLanguageResources.Instance}">
                 <Border DockPanel.Dock="Top" HorizontalAlignment="Stretch">
                     <DockPanel LastChildFill="True" HorizontalAlignment="Stretch" Margin="5">
                         <Border Width="30" Height="30" DockPanel.Dock="Left">
                             <TextBlock Text="+" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
                         <Border Width="30" Height="30" DockPanel.Dock="Right">
-                            <views:MsgBoxButton FontSize="17" Padding="0" Margin="0" Width="30" Height="30"
-                                                ToolTip.Tip="Example Function"
+                            <views:MsgBoxButton FontSize="17" Padding="0" Margin="0" Width="30" Height="30" x:DataType="i18N:MultiLanguageResources"
+                                                ToolTip.Tip="{CompiledBinding ExampleText}"
                                                 MsgBoxContentTemplateParam="{CompiledBinding #NewFuncTextBox}">
                                 <TextBlock Text="?" FontSize="30" HorizontalAlignment="Center"
                                            VerticalAlignment="Center" />
@@ -89,33 +90,52 @@
                                     CornerRadius="5" BorderThickness="0" Tapped="ImpFuncOnTapped">
                                     <FlyoutBase.AttachedFlyout>
                                         <Flyout ShowMode="Standard" Placement="BottomEdgeAlignedLeft">
-                                            <Grid ColumnDefinitions="120,120" RowDefinitions="30,30,30"
+                                            <Grid ColumnDefinitions="120,120" RowDefinitions="30,30,30,30"
                                                   RowSpacing="3">
                                                 <TextBlock Grid.Row="0" Grid.Column="0" Foreground="Black"
                                                            VerticalAlignment="Center">
-                                                    Color:
+                                                    <Run Text="{CompiledBinding MultiLanguageResources.ColorText}"></Run>
+                                                    <Run Text=":"></Run>
                                                 </TextBlock>
                                                 <ColorPicker HorizontalAlignment="Stretch" Grid.Column="1"
                                                              Grid.Row="0"
                                                              Color="{CompiledBinding Color,Converter={StaticResource UIntToColor}}"
                                                              IsAlphaVisible="False"
                                                              IsAccentColorsVisible="False" />
+                                                
+                                                
                                                 <TextBlock Grid.Row="1" Grid.Column="0" Foreground="Black"
                                                            VerticalAlignment="Center">
-                                                    Show Formula:
+                                                    <Run Text="{CompiledBinding MultiLanguageResources.ShowFormulaText}"></Run>
+                                                    <Run Text=":"></Run>
                                                 </TextBlock>
                                                 <CheckBox Grid.Row="1" Grid.Column="1" Foreground="Black"
                                                           IsChecked="{CompiledBinding ShowFormula}"
                                                           VerticalAlignment="Center"
                                                           HorizontalAlignment="Center" />
+                                                
+                                                
                                                 <TextBlock Grid.Row="2" Grid.Column="0" Foreground="Black"
                                                            VerticalAlignment="Center">
-                                                    Opacity:
+                                                    <Run Text="{CompiledBinding MultiLanguageResources.OpacityText}"></Run>
+                                                    <Run Text=":"></Run>
                                                 </TextBlock>
                                                 <Slider Grid.Row="2" Grid.Column="1" Foreground="Black"
                                                         Value="{CompiledBinding Opacity}" Minimum="0"
                                                         Maximum="255" VerticalAlignment="Center"
                                                         HorizontalAlignment="Stretch" />
+                                                
+                                                
+                                                
+                                                <TextBlock Grid.Row="3" Grid.Column="0" Foreground="Black"
+                                                           VerticalAlignment="Center">
+                                                    <Run Text="{CompiledBinding MultiLanguageResources.CheckPixelsText}"></Run>
+                                                    <Run Text=":"></Run>
+                                                </TextBlock>
+                                                <CheckBox Grid.Row="3" Grid.Column="1" Foreground="Black"
+                                                          IsChecked="{CompiledBinding NeedCheckPixel}"
+                                                          VerticalAlignment="Center"
+                                                          HorizontalAlignment="Center" />
                                             </Grid>
                                         </Flyout>
                                     </FlyoutBase.AttachedFlyout>

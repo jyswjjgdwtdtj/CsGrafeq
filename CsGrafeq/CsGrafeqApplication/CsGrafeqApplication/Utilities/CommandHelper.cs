@@ -36,7 +36,7 @@ public static class CommandHelper
     /// <param name="shape"></param>
     public static void DoShapeDelete(GeoShape shape)
     {
-        if (shape is GeometryShape geo)
+        if (shape is GeometricShape geo)
             DoGeoShapesDelete([geo]);
         else
             CommandManager.Do(
@@ -53,7 +53,7 @@ public static class CommandHelper
         //CommandManager.Do(null, o => { },o => { tb.Text = newtext; }, o => { tb.Text = oldtext; }, o => { },false,$"TextBoxChange new:{{{newtext??"$null"}}} old:{{{oldtext??"$null"}}}");
     }
 
-    public static void DoGeoShapesDelete(IEnumerable<GeometryShape> shapes)
+    public static void DoGeoShapesDelete(IEnumerable<GeometricShape> shapes)
     {
         var ss = shapes.Select(s => ShapeList.GetAllChildren(s)).SelectMany(o => o).Distinct().ToArray();
         CommandManager.Do(

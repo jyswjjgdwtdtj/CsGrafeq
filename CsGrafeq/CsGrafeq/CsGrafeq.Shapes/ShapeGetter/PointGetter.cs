@@ -37,7 +37,7 @@ public abstract class PointGetter_Movable : PointGetter
         ShapeParameters = [];
     }
 
-    public abstract GeometryShape? On { get; }
+    public abstract GeometricShape? On { get; }
 
     public ExpNumber PointX { get; init; }
     public ExpNumber PointY { get; init; }
@@ -47,13 +47,13 @@ public abstract class PointGetter_Movable : PointGetter
     public abstract void SetPoint(Vec controlPoint);
     public abstract void SetStringPoint(Vector2<string> point);
 
-    public override void Attach(GeometryShape subShape)
+    public override void Attach(GeometricShape subShape)
     {
         PointX.NumberChanged += subShape.RefreshValues;
         PointY.NumberChanged += subShape.RefreshValues;
     }
 
-    public override void UnAttach(GeometryShape subShape)
+    public override void UnAttach(GeometricShape subShape)
     {
         PointX.NumberChanged -= subShape.RefreshValues;
         PointY.NumberChanged -= subShape.RefreshValues;
@@ -77,7 +77,7 @@ public class PointGetter_FromLocation : PointGetter_Movable
     }
 
     public override MultiLanguageData ActionName => MultiLanguageResources.PointText;
-    public override GeometryShape? On => null;
+    public override GeometricShape? On => null;
 
     public override Vec GetPoint()
     {
@@ -109,7 +109,7 @@ public class PointGetter_FromLocation : PointGetter_Movable
     }
 }
 
-public abstract class PointGetter_OnShape<T> : PointGetter_Movable where T : GeometryShape
+public abstract class PointGetter_OnShape<T> : PointGetter_Movable where T : GeometricShape
 {
     protected bool IsPointXPrior = true;
     protected bool UseExpression;
@@ -121,7 +121,7 @@ public abstract class PointGetter_OnShape<T> : PointGetter_Movable where T : Geo
     }
 
     protected T OnShape { get; init; }
-    public override GeometryShape On => OnShape;
+    public override GeometricShape On => OnShape;
     public override MultiLanguageData ActionName => MultiLanguageResources.PointText;
 
     public sealed override Vec GetPoint()
@@ -152,13 +152,13 @@ public abstract class PointGetter_OnShape<T> : PointGetter_Movable where T : Geo
     protected abstract double YFromX(double x);
     protected abstract Vec GetPointWithoutExpression();
 
-    public override void Attach(GeometryShape subShape)
+    public override void Attach(GeometricShape subShape)
     {
         base.Attach(subShape);
         OnShape.AddSubShape(subShape);
     }
 
-    public override void UnAttach(GeometryShape subShape)
+    public override void UnAttach(GeometricShape subShape)
     {
         base.UnAttach(subShape);
         OnShape.RemoveSubShape(subShape);
@@ -419,13 +419,13 @@ public class PointGetter_NearestPointOnLine : PointGetter
         return new Vec(v1.X + t * dx, v1.Y + t * dy);
     }
 
-    public override void Attach(GeometryShape subShape)
+    public override void Attach(GeometricShape subShape)
     {
         Line.AddSubShape(subShape);
         Point.AddSubShape(subShape);
     }
 
-    public override void UnAttach(GeometryShape subShape)
+    public override void UnAttach(GeometricShape subShape)
     {
         Line.RemoveSubShape(subShape);
         Point.RemoveSubShape(subShape);
@@ -460,13 +460,13 @@ public class PointGetter_AxialSymmetryPoint : PointGetter
         return new Vec(v1.X + t * dx, v1.Y + t * dy) * 2 - ControlPoint;
     }
 
-    public override void Attach(GeometryShape subShape)
+    public override void Attach(GeometricShape subShape)
     {
         Point.AddSubShape(subShape);
         Line.AddSubShape(subShape);
     }
 
-    public override void UnAttach(GeometryShape subShape)
+    public override void UnAttach(GeometricShape subShape)
     {
         Point.RemoveSubShape(subShape);
         Line.RemoveSubShape(subShape);
@@ -488,7 +488,7 @@ public abstract class PointGetter_FromTwoPoint : PointGetter
         ShapeParameters = [point1, point2];
     }
 
-    public override void Attach(GeometryShape subShape)
+    public override void Attach(GeometricShape subShape)
     {
         Point1.AddSubShape(subShape);
         Point2.AddSubShape(subShape);
@@ -497,7 +497,7 @@ public abstract class PointGetter_FromTwoPoint : PointGetter
         ;
     }
 
-    public override void UnAttach(GeometryShape subShape)
+    public override void UnAttach(GeometricShape subShape)
     {
         Point1.RemoveSubShape(subShape);
         Point2.RemoveSubShape(subShape);
@@ -528,13 +528,13 @@ public class PointGetter_EndOfLine : PointGetter
         return line.Current.Point2;
     }
 
-    public override void Attach(GeometryShape subShape)
+    public override void Attach(GeometricShape subShape)
     {
         line.AddSubShape(subShape);
         ;
     }
 
-    public override void UnAttach(GeometryShape subShape)
+    public override void UnAttach(GeometricShape subShape)
     {
         line.RemoveSubShape(subShape);
     }
@@ -593,14 +593,14 @@ public abstract class PointGetter_FromThreePoint : PointGetter
 
     public abstract override Vec GetPoint();
 
-    public override void Attach(GeometryShape subShape)
+    public override void Attach(GeometricShape subShape)
     {
         Point1.AddSubShape(subShape);
         Point2.AddSubShape(subShape);
         Point3.AddSubShape(subShape);
     }
 
-    public override void UnAttach(GeometryShape subShape)
+    public override void UnAttach(GeometricShape subShape)
     {
         Point1.RemoveSubShape(subShape);
         Point2.RemoveSubShape(subShape);
@@ -697,8 +697,8 @@ public class PointGetter_Circumcenter : PointGetter_FromThreePoint
 
 public abstract class PointGetter_Intersection<TShape1, TShape2>
     : PointGetter
-    where TShape1 : GeometryShape
-    where TShape2 : GeometryShape
+    where TShape1 : GeometricShape
+    where TShape2 : GeometricShape
 {
     protected readonly bool IsFirst;
     protected readonly TShape1 Shape1;
@@ -714,7 +714,7 @@ public abstract class PointGetter_Intersection<TShape1, TShape2>
 
     public override MultiLanguageData ActionName { get; } = MultiLanguageResources.Instance.IntersectText;
 
-    public override void Attach(GeometryShape subShape)
+    public override void Attach(GeometricShape subShape)
     {
         Shape1.AddSubShape(subShape);
         Shape1.AddSubShape(subShape);
@@ -722,7 +722,7 @@ public abstract class PointGetter_Intersection<TShape1, TShape2>
         Shape2.AddSubShape(subShape);
     }
 
-    public override void UnAttach(GeometryShape subShape)
+    public override void UnAttach(GeometricShape subShape)
     {
         Shape1.RemoveSubShape(subShape);
         Shape1.RemoveSubShape(subShape);

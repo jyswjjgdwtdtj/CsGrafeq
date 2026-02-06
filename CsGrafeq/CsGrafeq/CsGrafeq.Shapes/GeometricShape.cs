@@ -6,9 +6,9 @@ namespace CsGrafeq.Shapes;
 /// <summary>
 ///     代表会被直接绘制的几何图形
 /// </summary>
-public abstract class GeometryShape : RefreshableShape
+public abstract class GeometricShape : RefreshableShape
 {
-    public List<GeometryShape> SubShapes = new();
+    public List<GeometricShape> SubShapes = new();
 
     /// <summary>
     ///     代表其Getter
@@ -50,7 +50,7 @@ public abstract class GeometryShape : RefreshableShape
     ///     添加子几何图形
     /// </summary>
     /// <param name="subShape"></param>
-    public void AddSubShape(GeometryShape subShape)
+    public void AddSubShape(GeometricShape subShape)
     {
         SubShapes.Add(subShape);
         ShapeChanged += subShape.RefreshValues;
@@ -60,7 +60,7 @@ public abstract class GeometryShape : RefreshableShape
     ///     移除子几何图形
     /// </summary>
     /// <param name="subShape"></param>
-    public void RemoveSubShape(GeometryShape subShape)
+    public void RemoveSubShape(GeometricShape subShape)
     {
         SubShapes.Remove(subShape);
         ShapeChanged -= subShape.RefreshValues;

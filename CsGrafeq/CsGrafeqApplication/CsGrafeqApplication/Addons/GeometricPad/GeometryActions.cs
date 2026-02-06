@@ -293,7 +293,7 @@ internal static class GeometryActions
         }
     };
 
-    public static GeometryShape CreateShape(ShownShapeArg target, Getter getter)
+    public static GeometricShape CreateShape(ShownShapeArg target, Getter getter)
     {
         switch (target)
         {
@@ -312,7 +312,7 @@ internal static class GeometryActions
             case ShownShapeArg.Angle:
                 return new Angle((AngleGetter)getter);
             default:
-                return Throw<GeometryShape>("Shape not supported:" + target);
+                return Throw<GeometricShape>("Shape not supported:" + target);
         }
     }
 }

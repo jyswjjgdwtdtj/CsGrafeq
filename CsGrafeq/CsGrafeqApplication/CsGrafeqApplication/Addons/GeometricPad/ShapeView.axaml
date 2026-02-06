@@ -16,7 +16,7 @@
         <ControlTemplate>
             <ContentPresenter Content="{TemplateBinding Shape}">
                 <ContentPresenter.ContentTemplate>
-                    <DataTemplate DataType="shapes:GeometryShape">
+                    <DataTemplate DataType="shapes:GeometricShape">
                         <controls:ToggleBox
                             IsChecked="{CompiledBinding Selected, Mode=TwoWay}"
                             IsOver="{CompiledBinding PointerOver, Mode=OneWayToSource}"
@@ -29,7 +29,8 @@
                                         <TextBlock Grid.Row="0" Grid.Column="0"
                                                    Foreground="Black"
                                                    VerticalAlignment="Center">
-                                            Color:
+                                            <Run Text="{CompiledBinding MultiLanguageResources.ColorText}"></Run>
+                                            <Run Text=":"></Run>
                                         </TextBlock>
                                         <ColorPicker Grid.Column="1" Grid.Row="0"
                                                      Color="{CompiledBinding Color,Converter={StaticResource UIntToColor}}"
@@ -38,7 +39,8 @@
                                         <TextBlock Grid.Row="1" Grid.Column="0"
                                                    Foreground="Black"
                                                    VerticalAlignment="Center">
-                                            Enabled
+                                            <Run Text="{CompiledBinding MultiLanguageResources.EnabledText}"></Run>
+                                            <Run Text=":"></Run>
                                         </TextBlock>
                                         <CheckBox Grid.Row="1" Grid.Column="1"
                                                   Foreground="Black"
@@ -276,7 +278,7 @@
                                                                     <geometricpad:ShapeParamsTemplate>
                                                                         <geometricpad:ShapeParamsTemplate.ShapeTemplate>
                                                                             <DataTemplate
-                                                                                DataType="shapes:GeometryShape">
+                                                                                DataType="shapes:GeometricShape">
                                                                                 <controls:ToggleBox
                                                                                     IsChecked="{CompiledBinding Selected, Mode=TwoWay}"
                                                                                     IsOver="{CompiledBinding PointerOver, Mode=OneWayToSource}"
@@ -323,7 +325,7 @@
                                             </geometricpad:ShapeTemplate.CommonPoint>
                                             <!--普通图形-->
                                             <geometricpad:ShapeTemplate.Common>
-                                                <DataTemplate DataType="shapes:GeometryShape">
+                                                <DataTemplate DataType="shapes:GeometricShape">
                                                     <Grid ColumnDefinitions="Auto,Auto"
                                                           RowDefinitions="Auto,Auto"
                                                           VerticalAlignment="Center">
@@ -358,7 +360,7 @@
                                                                     <geometricpad:ShapeParamsTemplate>
                                                                         <geometricpad:ShapeParamsTemplate.ShapeTemplate>
                                                                             <DataTemplate
-                                                                                DataType="shapes:GeometryShape">
+                                                                                DataType="shapes:GeometricShape">
                                                                                 <controls:ToggleBox
                                                                                     IsChecked="{CompiledBinding Selected, Mode=TwoWay}"
                                                                                     IsOver="{CompiledBinding PointerOver, Mode=OneWayToSource}"
@@ -378,7 +380,7 @@
                                                                                     Tag="{CompiledBinding .}"
                                                                                     PropertyChanged="Number_OnPropertyChanged"
                                                                                     Tapped="EventHandledTrue"
-                                                                                    IsReadOnly="{CompiledBinding !((shapes:GeometryShape)DataContext).IsUserEnabled,RelativeSource={RelativeSource FindAncestor, AncestorType=Grid}}">
+                                                                                    IsReadOnly="{CompiledBinding !((shapes:GeometricShape)DataContext).IsUserEnabled,RelativeSource={RelativeSource FindAncestor, AncestorType=Grid}}">
                                                                                     <TextBox.Styles>
                                                                                         <FluentTheme />
                                                                                     </TextBox.Styles>

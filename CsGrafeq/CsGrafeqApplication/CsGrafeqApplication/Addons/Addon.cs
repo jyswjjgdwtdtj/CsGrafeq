@@ -61,12 +61,6 @@ public abstract class Addon : ReactiveObject
 
     public MultiLanguageData AddonName { get; init; }
 
-    internal void CallRender(SKCanvas dc, SKRect rect)
-    {
-        foreach (var layer in Layers)
-            layer.Render(dc, rect);
-    }
-
     internal bool CallKeyDown(KeyEventArgs e)
     {
         if (!IsAddonEnabled || Owner == null)

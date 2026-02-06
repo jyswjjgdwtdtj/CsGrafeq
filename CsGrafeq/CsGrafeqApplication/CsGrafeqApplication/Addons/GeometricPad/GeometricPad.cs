@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Avalonia.Input;
@@ -43,7 +44,7 @@ public class GeometricPad : Addon
         MainTemplate = (IDataTemplate)obj;
         CurrentAction = GeometryActions.Actions.FirstOrDefault()?.FirstOrDefault()!;
         Layers.Add(MainRenderTarget);
-        MainRenderTarget.OnRender += Renderable_OnRender;
+        MainRenderTarget.OnRenderCanvas += Renderable_OnRender;
         Shapes.CollectionChanged += (s, e) =>
         {
             MainRenderTarget.Changed = true;
@@ -138,8 +139,8 @@ public class GeometricPad : Addon
 
     public override void Delete()
     {
-        List<GeometryShape> todelete = new();
-        foreach (var shape in Shapes.GetSelectedShapes<GeometryShape>().ToArray())
+        List<GeometricShape> todelete = new();
+        foreach (var shape in Shapes.GetSelectedShapes<GeometricShape>().ToArray())
             if (shape.Selected)
                 todelete.Add(shape);
 
@@ -148,13 +149,13 @@ public class GeometricPad : Addon
 
     public override void SelectAll()
     {
-        foreach (var shape in Shapes.OfType<GeometryShape>().ToArray())
+        foreach (var shape in Shapes.OfType<GeometricShape>().ToArray())
             shape.Selected = true;
     }
 
     public override void DeselectAll()
     {
-        foreach (var shape in Shapes.OfType<GeometryShape>().ToArray())
+        foreach (var shape in Shapes.OfType<GeometricShape>().ToArray())
             shape.Selected = false;
     }
 
@@ -166,7 +167,7 @@ public class GeometricPad : Addon
         {
             case Key.Tab:
             {
-                foreach (var shape in Shapes.GetSelectedShapes<GeometryShape>().ToArray())
+                foreach (var shape in Shapes.GetSelectedShapes<GeometricShape>().ToArray())
                     if (shape.Selected)
                     {
                         res = Intercept;
@@ -308,7 +309,7 @@ public class GeometricPad : Addon
                     PointerReleasedPosition.Y - PointerPressedPosition.Y)).RegulateRectangle();
             var mathrect = new CgRectangle(Owner.PixelToMath(new AvaPoint(rect.Left, rect.Top + rect.Height)),
                 new Vec(rect.Width, rect.Height) / disp.UnitLength);
-            foreach (var s in Shapes.GetShapes<GeometryShape>())
+            foreach (var s in Shapes.GetShapes<GeometricShape>())
                 s.Selected = s.IsIntersectedWithRect(mathrect);
             MainRenderTarget.Changed = true;
             PointerPressedPosition = new AvaPoint(double.NaN, double.NaN);
@@ -385,7 +386,7 @@ public class GeometricPad : Addon
                     Shapes.ClearSelected<GeoPolygon>();
             }
 
-            var SAll = Shapes.GetSelectedShapes<GeometryShape>().ToList();
+            var SAll = Shapes.GetSelectedShapes<GeometricShape>().ToList();
             var SPoints = Shapes.GetSelectedShapes<GeoPoint>().ToArray();
             var SLines = Shapes.GetSelectedShapes<GeoLine>().ToArray();
             var SCircles = Shapes.GetSelectedShapes<GeoCircle>().ToArray();
@@ -442,12 +443,12 @@ public class GeometricPad : Addon
 
     #region RenderAction
 
-    protected void Renderable_OnRender(SKCanvas? dc, SKRect rect)
+    protected void Renderable_OnRender(SKCanvas? dc, SKRect rect,CancellationToken ct)
     {
         if (Owner is null || dc is null) return;
         dc.Save();
         dc.ClipRect(rect);
-        RenderShapes(dc, rect, Shapes.GetShapes<GeometryShape>());
+        RenderShapes(dc, rect, Shapes.GetShapes<GeometricShape>());
         if (CurrentAction.Name.English == "Select" && LastPointerProperties.IsLeftButtonPressed)
         {
             var selrect = new AvaRect(PointerPressedPosition,
@@ -459,7 +460,7 @@ public class GeometricPad : Addon
         dc.Restore();
     }
 
-    private void RenderShapes(SKCanvas dc, SKRect rect, IEnumerable<GeometryShape> shapes)
+    private void RenderShapes(SKCanvas dc, SKRect rect, IEnumerable<GeometricShape> shapes)
     {
         var unitLength = (Owner as CartesianDisplayer)!.UnitLength;
         var lt = new Vec(PixelToMathX(rect.Left), PixelToMathY(rect.Bottom));
@@ -711,7 +712,7 @@ public class GeometricPad : Addon
         var disp = (Owner as DisplayControl)!;
         var mathcursor = PixelToMath(Location);
         var shapes = new List<(double, GeoShape)>();
-        foreach (var geoshape in Shapes.GetShapes<GeometryShape>())
+        foreach (var geoshape in Shapes.GetShapes<GeometricShape>())
             if (geoshape is GeoLine || geoshape is Circle)
             {
                 var dist = ((geoshape.DistanceTo(mathcursor) - mathcursor) * disp.UnitLength).GetLength();
@@ -829,7 +830,7 @@ public class GeometricPad : Addon
     /// <param name="Location"></param>
     /// <param name="shape"></param>
     /// <returns></returns>
-    public bool TryGetShape<T>(AvaPoint Location, out T shape) where T : GeometryShape
+    public bool TryGetShape<T>(AvaPoint Location, out T shape) where T : GeometricShape
     {
         var disp = (Owner as DisplayControl)!;
         var v = Owner!.PixelToMath(Location);

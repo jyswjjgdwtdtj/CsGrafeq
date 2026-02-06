@@ -1,6 +1,11 @@
-﻿using Avalonia;
+﻿using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Input;
 using CsGrafeq.Debug;
+using CsGrafeq.Utilities;
 using SkiaSharp;
 using static CsGrafeq.Utilities.ThrowHelper;
 
@@ -34,7 +39,6 @@ public class DisplayControl : CartesianDisplayer
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
-        Debug.LogPointer("PointerPressed");
         if (!e.Pointer.IsPrimary) return;
         StopWheeling();
         if (CallPointerPressed(e) == DoNext)
@@ -57,7 +61,6 @@ public class DisplayControl : CartesianDisplayer
 
     protected override void OnPointerMoved(PointerEventArgs e)
     {
-        Debug.LogPointer("PointerMoved");
         if (!e.Pointer.IsPrimary) return;
         StopWheeling();
         if (CallPointerMoved(e) == DoNext)
@@ -84,11 +87,11 @@ public class DisplayControl : CartesianDisplayer
                         RenderAxes(dc);
                         if (!Setting.Instance.MoveOptimization || (LastZeroPos - Zero).Length > 50)
                         {
-                            foreach (var adn in Addons)
-                            foreach (var rt in adn.Layers)
+                            foreach (var rt in Addons.SelectMany(adn=>adn.Layers))
                             {
+                                
                                 if (!rt.IsActive)
-                                    continue;
+                                    return;
                                 var size = rt.RenderTargetSize;
                                 if (size.Width != TotalBuffer.Width || size.Height != TotalBuffer.Height)
                                 {
@@ -103,12 +106,13 @@ public class DisplayControl : CartesianDisplayer
                                     canvas.Clear(SKColors.Transparent);
                                     canvas.DrawBitmap(TempBuffer, Zero.X - LastZeroPos.X,
                                         Zero.Y - LastZeroPos.Y);
-                                    RenderMovedPlace(canvas, rt.Render);
+                                    canvas.Flush();
+                                    RenderExtension.RenderMovedPlace(rt.Render, Bounds.Size,
+                                        new Point(Zero.X, Zero.Y),
+                                        new Point(LastZeroPos.X, LastZeroPos.Y));
                                 }
-
                                 rt.DrawRenderTargetTo(dc, 0, 0);
                             }
-
                             LastZeroPos = Zero;
                         }
                         else
@@ -147,7 +151,7 @@ public class DisplayControl : CartesianDisplayer
         StopWheeling();
         if (CallPointerReleased(e) == DoNext)
         {
-            if (LastZeroPos != Zero) ForceToRender();
+            if (LastZeroPos != Zero) ForceToRender(CancellationToken.None);
             LastZeroPos = Zero;
             base.OnPointerReleased(e);
         }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Avalonia.Skia;
 using Material.Styles.Themes;
 using SkiaSharp;
@@ -73,5 +75,14 @@ public static class SkiaHelper
             return false;
         source.GetPixelSpan().CopyTo(dest.GetPixelSpan());
         return true;
+    }
+    public unsafe static uint ToUint(this SKColor color)
+    {
+        return (*(uint*)Unsafe.AsPointer(ref color));
+    }
+    private struct TwoUInt
+    {
+        public uint Low;
+        public uint High;
     }
 }
