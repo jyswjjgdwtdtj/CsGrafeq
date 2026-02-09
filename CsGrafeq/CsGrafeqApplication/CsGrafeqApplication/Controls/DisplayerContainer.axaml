@@ -50,8 +50,8 @@
                     </Style>
                 </Panel.Styles>
                 <!--Addon显示层-->
-                <DockPanel ZIndex="10">
-                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Name="PART_Grid">
+                <DockPanel ZIndex="10" LastChildFill="True" Name="PART_OperationContainer">
+                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
                         <corecontrols:ExpandBox Name="OperationContainerExpandBox" ExpandDirection="Right"
                                                 IsExpanded="{CompiledBinding #Toggle.IsChecked,Mode=OneWay}" Margin="0"
                                                 Padding="0">
@@ -154,6 +154,9 @@
                             </DockPanel>
                         </Border>
                     </StackPanel>
+                    <Border Name="RenderingInfoBox" IsHitTestVisible="False" IsVisible="{CompiledBinding Displayer.IsRendering}">
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">Rendering</TextBlock>
+                    </Border>
                 </DockPanel>
                 <!--设置层-->
                 <Grid ColumnDefinitions="*,52" RowDefinitions="*,52" ZIndex="15" Name="SettingDockPanel"

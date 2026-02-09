@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Avalonia.Skia;
 using Material.Styles.Themes;
+using ReactiveUI;
 using SkiaSharp;
 
 namespace CsGrafeqApplication;
@@ -16,8 +17,13 @@ public static class SkiaHelper
     {
         Themes.Theme.ThemeChangedEndObservable.Subscribe(t => { Refresh(t); });
         Refresh(Themes.Theme);
+        Setting.Instance.WhenAnyValue((setting => setting.CompoundBlendMode)).Subscribe((s) =>
+        {
+            CompoundBufferPaint.BlendMode = s;
+        });
     }
-
+    
+    public static SKPaint CompoundBufferPaint { get; } = new() {};
     public static SKPaint FilledMid { get; } = new() { IsAntialias = true };
     public static SKPaint ShadowFilledMid { get; } = new() { IsAntialias = true };
     public static SKPaint StrokeMid { get; } = new() { IsAntialias = true, IsStroke = true };

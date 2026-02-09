@@ -151,16 +151,17 @@ public class FunctionPad : Addon
         func.Dispose();
     }
 
-    private void RenderFunction(SKBitmap dc, SKRectI rect, ImplicitFunction impFunc,CancellationToken ct)
+    private void RenderFunction(PixelBitmap dc, SKRectI rect, ImplicitFunction impFunc,CancellationToken ct)
     {
+        Console.WriteLine(rect);
         if (!impFunc.IsCorrect)
             return;
         if (impFunc.IsDeleted)
             return;
-        var rectToCalc = new List<SKRectI> { rect };
+        var rectToCalc = new ConcurrentBag<SKRectI> { rect };
         var pointColor=new SKColor(impFunc.Color).WithAlpha(impFunc.Opacity).ToUint();
-        var bitmap = new CgBitmap(dc.Width, dc.Height, System.Runtime.InteropServices.MemoryMarshal.Cast<byte, uint>(dc.GetPixelSpan()));
         var func = impFunc.Function.Function;
+        dc.Color=pointColor;
         Func<double,double,double,double,bool> msFunc =impFunc.NeedCheckPixel?impFunc.MsFunction: static (_,_,_,_ )=> true;
         do
         {
@@ -171,20 +172,23 @@ public class FunctionPad : Addon
             {
                 for(var j=i;j<Min(i+100,len);j++)
                 {
+                    if (ct.IsCancellationRequested)
+                        return;
                     RenderAction(rs[j]);
                 }
                 if(ct.IsCancellationRequested)
                     return;
             }
+            dc.Flush();
             continue;
             void RenderAction(SKRectI r)
             {
-                RenderRectIntervalSet(r, rectToCalc, func, msFunc, bitmap, pointColor);
+                RenderRectIntervalSet(r, rectToCalc, func, msFunc, dc, pointColor);
             }   
         } while (rectToCalc.Count != 0);
     }
 
-    private void RenderRectIntervalSet(SKRectI r, List<SKRectI> rectToCalc, IntervalHandler<IntervalSet> func,Func<double,double,double,double,bool> msFunc,CgBitmap bmp,uint color)
+    private void RenderRectIntervalSet(SKRectI r, ConcurrentBag<SKRectI> rectToCalc, IntervalHandler<IntervalSet> func,Func<double,double,double,double,bool> msFunc,PixelBitmap bmp,uint color)
     {
         if (r.Height == 0 || r.Width == 0)
             return;
@@ -210,7 +214,7 @@ public class FunctionPad : Addon
                 if (result == Def.TT)
                 {
                     if (isPixel)
-                        bmp.SetPixel(i,j,color);
+                        bmp.SetPixel_Buffered(i,j);
                     else
                         bmp.SetRectangle(i, j, dx, dy, color);
                 }
@@ -218,11 +222,14 @@ public class FunctionPad : Addon
                 {
                     if (isPixel)
                     {
-                        bmp.SetPixel(i,j,color);
+                        bmp.SetPixel_Buffered(i,j);
                     }
                     else
+                    {
+                        //bmp.SetRectangle(i, j, dx, dy, ((uint)Random.Shared.NextInt64(0xFFFFFF))|0xFF000000);
                         rectToCalc.Add(new SKRectI(i, j, Min(i + dx, r.Right),
                             Min(j + dy, r.Bottom)));
+                    }
                 }
             }
         }

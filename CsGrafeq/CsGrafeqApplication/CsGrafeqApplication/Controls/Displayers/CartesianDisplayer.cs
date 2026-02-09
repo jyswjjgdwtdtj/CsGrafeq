@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -7,6 +8,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Styling;
 using Avalonia.Threading;
+using CsGrafeqApplication.Events;
 using SkiaSharp;
 using static CsGrafeqApplication.Core.Utils.StaticSkiaResources;
 using static CsGrafeqApplication.Core.Utils.PointRectHelper;
@@ -413,8 +415,13 @@ public class CartesianDisplayer : Displayer
             {
                 dc.Clear(AxisBackground);
                 RenderAxes(dc);
-                foreach (var i in Addons)
-                foreach (var layer in i.Layers)
+                for (var i = 0; i < Addons.Count; i++)
+                {
+                    if(i!=ContainerViewModel.AddonIndex)
+                        foreach (var layer in Addons[i].Layers)
+                            layer.DrawRenderTargetTo(dc, 0, 0);
+                }
+                foreach (var layer in Addons[ContainerViewModel.AddonIndex].Layers)
                     layer.DrawRenderTargetTo(dc, 0, 0);
                 RenderAxesNumber(dc);
             }
@@ -459,8 +466,13 @@ public class CartesianDisplayer : Displayer
                 {
                     lock (TotalBufferLock)
                     {
-                        PreviousBuffer.Dispose();
-                        PreviousBuffer = TotalBuffer.Copy();
+                        if (PreviousBuffer.Width != TotalBuffer.Width || PreviousBuffer.Height != TotalBuffer.Height)
+                        {
+                            PreviousBuffer.Dispose();
+                            PreviousBuffer = new SKBitmap(TotalBuffer.Width, TotalBuffer.Height);
+                        }
+
+                        TotalBuffer.TryRealCopyTo(PreviousBuffer);
                     }
                 }
         }
@@ -509,7 +521,7 @@ public class CartesianDisplayer : Displayer
 
     protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
     {
-        if (CallPointerWheeled(e) == DoNext)
+        if (CallPointerWheeled(e.Cast(this)) == DoNext)
             Zoom(Pow(1.04, e.Delta.Y), e.GetPosition(this));
         else
             AskForRender();

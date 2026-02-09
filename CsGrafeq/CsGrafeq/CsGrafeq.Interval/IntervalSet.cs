@@ -9,10 +9,6 @@ using Ranges = System.Span<CsGrafeq.Interval.Range>;
 
 namespace CsGrafeq.Interval;
 
-/// <summary>
-///     禁止多线程允许 只允许允许再单个线程！！！
-///     Pool只使用不Return释放 释放统一到最后结束运行 Pool容量足够大不会有问题 除非确保无问题
-/// </summary>
 public readonly ref struct IntervalSet : IInterval<IntervalSet>
 {
     #region 静态定义

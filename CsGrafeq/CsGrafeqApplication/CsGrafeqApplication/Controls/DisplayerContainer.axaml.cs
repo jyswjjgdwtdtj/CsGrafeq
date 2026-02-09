@@ -47,7 +47,7 @@ public partial class DisplayerContainer : UserControl, IInfoDialog
     {
         KeyDown += GlobalKeyDown;
         DataContext = VM;
-        VM.Displayer = new DisplayControl { Addons = { new GeometricPad(), new FunctionPad() } };
+        VM.Displayer = new DisplayControl { Addons = { new GeometricPad(), new FunctionPad() },ContainerViewModel = VM};
         InitializeComponent();
         _infoDialogAnimation.Delay = TimeSpan.FromSeconds(3);
         _infoDialogAnimation.Duration = TimeSpan.FromSeconds(0.2);
@@ -307,7 +307,7 @@ public partial class DisplayerContainer : UserControl, IInfoDialog
         // 捕获指针，保证拖到控件外也能继续收到Moved/Released
         e.Pointer.Capture(c);
 
-        var pos = e.GetPosition(PART_Grid); // 相对包含OperationContainer的布局取坐标
+        var pos = e.GetPosition(PART_OperationContainer); // 相对包含OperationContainer的布局取坐标
         _dragStartX = pos.X;
         _dragStartWidth = OperationContainer.Bounds.Width;
 
@@ -319,13 +319,13 @@ public partial class DisplayerContainer : UserControl, IInfoDialog
         if (!_isDragging)
             return;
 
-        var pos = e.GetPosition(PART_Grid);
+        var pos = e.GetPosition(PART_OperationContainer);
         var delta = pos.X - _dragStartX;
 
         var target = _dragStartWidth + delta;
 
         // 最大宽度：不超过容器宽度 - 预留右侧空间
-        var containerWidth = PART_Grid.Bounds.Width;
+        var containerWidth = PART_OperationContainer.Bounds.Width;
         var max = Max(MinOperationWidth, containerWidth - ReserveRightMin);
 
         target = Clamp(target, MinOperationWidth, max);

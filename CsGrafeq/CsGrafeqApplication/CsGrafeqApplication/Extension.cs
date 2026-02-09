@@ -11,6 +11,7 @@ global using GeoSegment = CsGrafeq.Shapes.Segment;
 global using CsGrafeq;
 global using static CsGrafeq.Numeric.CsGrafeqMath;
 global using static System.Math;
+global using static CsGrafeq.Utilities.CancellationHelper;
 using System.Runtime.CompilerServices;
 using Avalonia.Interactivity;
 

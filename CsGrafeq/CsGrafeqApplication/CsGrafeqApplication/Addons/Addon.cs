@@ -5,6 +5,7 @@ using Avalonia.Controls.Templates;
 using Avalonia.Input;
 using CsGrafeq.I18N;
 using CsGrafeqApplication.Controls.Displayers;
+using CsGrafeqApplication.Events;
 using ReactiveUI;
 using SkiaSharp;
 using AvaPoint = Avalonia.Point;
@@ -75,42 +76,42 @@ public abstract class Addon : ReactiveObject
         return OnKeyUp(e);
     }
 
-    internal bool CallPointerMoved(AddonPointerEventArgs e)
+    internal bool CallPointerMoved(MouseEventArgs e)
     {
         if (!IsAddonEnabled || Owner == null)
             return DoNext;
         return OnPointerMoved(e);
     }
 
-    internal bool CallPointerPressed(AddonPointerEventArgs e)
+    internal bool CallPointerPressed(MouseEventArgs e)
     {
         if (!IsAddonEnabled || Owner == null)
             return DoNext;
         return OnPointerPressed(e);
     }
 
-    internal bool CallPointerReleased(AddonPointerEventArgs e)
+    internal bool CallPointerReleased(MouseEventArgs e)
     {
         if (!IsAddonEnabled || Owner == null)
             return DoNext;
         return OnPointerReleased(e);
     }
 
-    internal bool CallPointerWheeled(AddonPointerWheelEventArgs e)
+    internal bool CallPointerWheeled(MouseEventArgs e)
     {
         if (!IsAddonEnabled || Owner == null)
             return DoNext;
         return OnPointerWheeled(e);
     }
 
-    internal bool CallPointerTapped(AddonPointerEventArgsBase e)
+    internal bool CallPointerTapped(MouseEventArgs e)
     {
         if (!IsAddonEnabled || Owner == null)
             return DoNext;
         return OnPointerTapped(e);
     }
 
-    internal bool CallPointerDoubleTapped(AddonPointerEventArgsBase e)
+    internal bool CallPointerDoubleTapped(MouseEventArgs e)
     {
         if (!IsAddonEnabled || Owner == null)
             return DoNext;
@@ -129,32 +130,32 @@ public abstract class Addon : ReactiveObject
         return DoNext;
     }
 
-    protected virtual bool OnPointerReleased(AddonPointerEventArgs e)
+    protected virtual bool OnPointerReleased(MouseEventArgs e)
     {
         return DoNext;
     }
 
-    protected virtual bool OnPointerPressed(AddonPointerEventArgs e)
+    protected virtual bool OnPointerPressed(MouseEventArgs e)
     {
         return DoNext;
     }
 
-    protected virtual bool OnPointerMoved(AddonPointerEventArgs e)
+    protected virtual bool OnPointerMoved(MouseEventArgs e)
     {
         return DoNext;
     }
 
-    protected virtual bool OnPointerTapped(AddonPointerEventArgsBase e)
+    protected virtual bool OnPointerTapped(MouseEventArgs e)
     {
         return DoNext;
     }
 
-    protected virtual bool OnPointerDoubleTapped(AddonPointerEventArgsBase e)
+    protected virtual bool OnPointerDoubleTapped(MouseEventArgs e)
     {
         return DoNext;
     }
 
-    protected virtual bool OnPointerWheeled(AddonPointerWheelEventArgs e)
+    protected virtual bool OnPointerWheeled(MouseEventArgs e)
     {
         return DoNext;
     }
@@ -171,31 +172,6 @@ public abstract class Addon : ReactiveObject
         {
             Value = true;
         }
-    }
-
-    public class AddonPointerEventArgsBase(double x, double y, KeyModifiers modifiers) : EventArgs
-    {
-        public readonly KeyModifiers KeyModifiers = modifiers;
-        public readonly double X = x, Y = y;
-
-        public AvaPoint Location => new(X, Y);
-    }
-
-    public class AddonPointerEventArgs(double x, double y, PointerPointProperties properties, KeyModifiers modifiers)
-        : AddonPointerEventArgsBase(x, y, modifiers)
-    {
-        public readonly PointerPointProperties Properties = properties;
-    }
-
-    public class AddonPointerWheelEventArgs(
-        double x,
-        double y,
-        PointerPointProperties properties,
-        KeyModifiers modifiers,
-        Vec delta)
-        : AddonPointerEventArgs(x, y, properties, modifiers)
-    {
-        public readonly Vec Delta = delta;
     }
 
     #region CoordinateTransformFuncs

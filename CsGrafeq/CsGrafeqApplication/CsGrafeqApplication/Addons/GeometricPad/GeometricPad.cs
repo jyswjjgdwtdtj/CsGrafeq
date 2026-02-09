@@ -10,6 +10,7 @@ using CsGrafeq.I18N;
 using CsGrafeq.Shapes;
 using CsGrafeq.Shapes.ShapeGetter;
 using CsGrafeqApplication.Controls.Displayers;
+using CsGrafeqApplication.Events;
 using CsGrafeqApplication.Utilities;
 using SkiaSharp;
 using static CsGrafeq.Shapes.GeometryMath;
@@ -192,18 +193,18 @@ public class GeometricPad : Addon
     /// </summary>
     private bool IsMovingPointMovable { get; set; }
 
-    protected override bool OnPointerPressed(AddonPointerEventArgs e)
+    protected override bool OnPointerPressed(MouseEventArgs e)
     {
         if (Owner == null) return DoNext;
         LastPointerProperties = e.Properties;
-        PointerPressedPosition = e.Location;
+        PointerPressedPosition = e.Position;
         if (CurrentAction.Name.English == "Select")
         {
             Shapes.ClearSelected();
         }
         else
         {
-            TryGetShape<GeoPoint>(e.Location, out var mp);
+            TryGetShape<GeoPoint>(e.Position, out var mp);
             MovingPoint = mp;
             if (MovingPoint != null)
             {
@@ -225,11 +226,11 @@ public class GeometricPad : Addon
         return DoNext;
     }
 
-    protected override bool OnPointerMoved(AddonPointerEventArgs e)
+    protected override bool OnPointerMoved(MouseEventArgs e)
     {
         if (Owner == null) return DoNext;
         LastPointerProperties = e.Properties;
-        PointerMovedPosition = e.Location;
+        PointerMovedPosition = e.Position;
         if (CurrentAction.Name.English == "Select" && e.Properties.IsLeftButtonPressed)
         {
             MainRenderTarget.Changed = true;
@@ -296,11 +297,11 @@ public class GeometricPad : Addon
         return DoNext;
     }
 
-    protected override bool OnPointerReleased(AddonPointerEventArgs e)
+    protected override bool OnPointerReleased(MouseEventArgs e)
     {
         if (Owner == null) return DoNext;
         LastPointerProperties = e.Properties;
-        PointerReleasedPosition = e.Location;
+        PointerReleasedPosition = e.Position;
         var disp = (Owner as DisplayControl)!;
         if (CurrentAction.Name.English == "Select")
         {
@@ -331,7 +332,7 @@ public class GeometricPad : Addon
         return Intercept;
     }
 
-    protected override bool OnPointerTapped(AddonPointerEventArgsBase e)
+    protected override bool OnPointerTapped(MouseEventArgs e)
     {
         if (Owner == null) return DoNext;
         {
@@ -339,14 +340,14 @@ public class GeometricPad : Addon
             if (CurrentAction.Name.English == "Put")
             {
                 Shapes.ClearSelected();
-                PutPoint(e.Location)?.Selected = true;
+                PutPoint(e.Position)?.Selected = true;
                 return Intercept;
             }
 
             var first = Shapes.GetSelectedShapes<GeoPoint>().FirstOrDefault();
             var selectfirst = false;
             if (CurrentAction.Args.Contains(ShapeArg.Point) &&
-                TryGetShape<GeoPoint>(e.Location, out var point))
+                TryGetShape<GeoPoint>(e.Position, out var point))
             {
                 if (first == point)
                     selectfirst = true;
@@ -354,24 +355,24 @@ public class GeometricPad : Addon
                     point.Selected = !point.Selected;
             }
             else if (CurrentAction.Args.Contains(ShapeArg.Line) &&
-                     TryGetShape<GeoLine>(e.Location, out var line))
+                     TryGetShape<GeoLine>(e.Position, out var line))
             {
                 line.Selected = !line.Selected;
             }
             else if (CurrentAction.Args.Contains(ShapeArg.Circle) &&
-                     TryGetShape<GeoCircle>(e.Location, out var circle))
+                     TryGetShape<GeoCircle>(e.Position, out var circle))
             {
                 circle.Selected = !circle.Selected;
             }
             else if (CurrentAction.Args.Contains(ShapeArg.Polygon) &&
-                     TryGetShape<GeoPolygon>(e.Location, out var polygon))
+                     TryGetShape<GeoPolygon>(e.Position, out var polygon))
             {
                 polygon.Selected = !polygon.Selected;
             }
             else if (CurrentAction.Args.Contains(ShapeArg.Point) && CurrentAction.Name.English != "Move" &&
                      CurrentAction.Name.English != "Select")
             {
-                PutPoint(e.Location)?.Selected = true;
+                PutPoint(e.Position)?.Selected = true;
             }
 
             if (CurrentAction.Name.English != "Move" && CurrentAction.Name.English != "Select")
