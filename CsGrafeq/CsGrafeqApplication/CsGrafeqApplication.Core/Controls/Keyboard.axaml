@@ -5,7 +5,7 @@
                    xmlns:controls="clr-namespace:CsGrafeqApplication.Core.Controls"
                    xmlns:csGrafeq="clr-namespace:CsGrafeq;assembly=CsGrafeq.Base"
                    xmlns:viewModel="clr-namespace:CsGrafeqApplication.Core.ViewModel"
-                   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+                   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450" 
                    x:Class="CsGrafeqApplication.Core.Controls.Keyboard" x:DataType="viewModel:KeyboardViewModel">
     <Design.PreviewWith>
         <controls:Keyboard Width="600" Height="400" />
@@ -52,11 +52,17 @@
                                             <Setter Property="RenderTransform">
                                                 <RotateTransform Angle="180" />
                                             </Setter>
-                                            <Style Selector="^ Path">
+                                            <Style Selector="^:not(:empty) Path">
                                                 <Setter Property="Fill" Value="{DynamicResource CgForegroundBrush}" />
                                             </Style>
                                         </Style>
                                         <Setter Property="Focusable" Value="False" />
+                                    </Style>
+                                    <Style Selector="TextBlock">
+                                        <Setter Property="Foreground" Value="{DynamicResource CgForegroundBrush}"/>
+                                    </Style>
+                                    <Style Selector="AccessText">
+                                        <Setter Property="Foreground" Value="{DynamicResource CgForegroundBrush}"/>
                                     </Style>
                                 </Expander.Styles>
                                 <Panel Height="150">
@@ -73,6 +79,7 @@
                                                             Value="{DynamicResource CgBackgroundBrush}" />
                                                     <Setter Property="CornerRadius" Value="4" />
                                                     <Setter Property="Focusable" Value="False" />
+                                                    <Setter Property="Foreground" Value="{DynamicResource CgForegroundBrush}"/>
                                                     <Setter Property="BorderBrush"
                                                             Value="{DynamicResource CgForegroundBrush}" />
                                                     <Setter Property="BorderThickness" Value="1" />
@@ -186,7 +193,7 @@
 
                                             </Button>
 
-                                            <Button Grid.Column="0" Grid.Row="3" Name="SwitchToABC"
+                                            <Button Grid.Column="0" Grid.Row="3" Name="SwitchToABC"  
                                                     Click="SwitchClicked">
                                                 ABC
                                             </Button>
@@ -364,7 +371,7 @@
 
                                         <!-- Row 2 -->
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                            <ToggleButton Width="86" Name="ShiftButton" IsChecked="True">
+                                            <ToggleButton Width="86" Name="ShiftButton" IsChecked="True" >
                                                 <TextBlock Text="⇧" />
                                             </ToggleButton>
                                             <controls:TwoSymbolKeyButtonInPlace
@@ -394,14 +401,14 @@
                                             <controls:TwoSymbolKeyButtonInPlace
                                                 IsChecked="{CompiledBinding #ShiftButton.IsChecked}" FirstButton="l"
                                                 SecondButton="L" />
-                                            <Button Width="85" Click="BackspaceClick">
+                                            <Button Width="85" Click="BackspaceClick" >
                                                 <TextBlock Text="⌫" />
                                             </Button>
                                         </StackPanel>
 
                                         <!-- Row 3 -->
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                            <Button Width="100" Click="SwitchClicked">
+                                            <Button Width="100" Click="SwitchClicked" >
                                                 <TextBlock Text="123" FontSize="16" />
                                             </Button>
                                             <controls:TwoSymbolKeyButtonInPlace
@@ -428,7 +435,7 @@
                                             <controls:TwoSymbolKeyButtonInPlace
                                                 IsChecked="{CompiledBinding #ShiftButton.IsChecked}" FirstButton=","
                                                 SecondButton="." />
-                                            <Button Width="133" Click="EnterClick">
+                                            <Button Width="133" Click="EnterClick" >
                                                 <TextBlock Text="↵" />
                                             </Button>
                                         </StackPanel>

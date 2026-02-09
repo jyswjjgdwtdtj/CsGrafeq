@@ -3,6 +3,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:csGrafeq="clr-namespace:CsGrafeq;assembly=CsGrafeq.Base"
+             xmlns:controls="clr-namespace:CsGrafeqApplication.Core.Controls;assembly=CsGrafeqApplication.Core"
+             xmlns:skiaSharp="clr-namespace:SkiaSharp;assembly=SkiaSharp"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CsGrafeqApplication.Views.SettingView" x:DataType="csGrafeq:Setting">
     <TabControl TabStripPlacement="Left" Margin="0,15" MinHeight="350">
@@ -38,6 +40,22 @@
                             Text="{CompiledBinding MultiLanguageResources.ExpSimplificationText.Data}" />
                     </CheckBox>
                 </StackPanel>
+            </ScrollViewer>
+        </TabItem>
+        <TabItem Header="{CompiledBinding MultiLanguageResources.RenderText.Data}">
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
+                <Grid RowDefinitions="Auto" ColumnDefinitions="Auto,Auto" Margin="15,0"
+                      DataContext="{x:Static csGrafeq:Setting.Instance}"
+                      x:DataType="csGrafeq:Setting">
+                    <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center">
+                        <Run Text="{CompiledBinding MultiLanguageResources.BlendModeText}"></Run>
+                        <Run Text=":"></Run>
+                    </TextBlock>
+                    <controls:EnumSelector x:TypeArguments="skiaSharp:SKBlendMode" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Width="140"
+                                           EnumValue="{CompiledBinding CompoundBlendMode,Mode=TwoWay}">
+                        
+                    </controls:EnumSelector>
+                </Grid>
             </ScrollViewer>
         </TabItem>
         <TabItem Header="{CompiledBinding MultiLanguageResources.WindowText.Data}">

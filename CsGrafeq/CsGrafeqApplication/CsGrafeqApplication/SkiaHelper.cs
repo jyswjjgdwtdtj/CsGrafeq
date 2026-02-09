@@ -20,10 +20,11 @@ public static class SkiaHelper
         Setting.Instance.WhenAnyValue((setting => setting.CompoundBlendMode)).Subscribe((s) =>
         {
             CompoundBufferPaint.BlendMode = s;
+            Console.WriteLine(s);
         });
     }
     
-    public static SKPaint CompoundBufferPaint { get; } = new() {};
+    public static SKPaint CompoundBufferPaint { get; } = new() {IsAntialias = true};
     public static SKPaint FilledMid { get; } = new() { IsAntialias = true };
     public static SKPaint ShadowFilledMid { get; } = new() { IsAntialias = true };
     public static SKPaint StrokeMid { get; } = new() { IsAntialias = true, IsStroke = true };

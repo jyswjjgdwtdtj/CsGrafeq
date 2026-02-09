@@ -108,7 +108,7 @@ public class DisplayControl : CartesianDisplayer
                                 using var canvas = rt.GetBitmapCanvas()!;
                                 canvas.Clear(SKColors.Transparent);
                                 canvas.DrawBitmap(TempBuffer, Zero.X - lastZero.X,
-                                    Zero.Y - lastZero.Y);
+                                    Zero.Y - lastZero.Y,SkiaHelper.CompoundBufferPaint);
                                 canvas.Flush();
                                 return Task.Run(() =>
                                 {

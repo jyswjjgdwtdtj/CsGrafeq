@@ -95,4 +95,9 @@ ClientSize,用户区大小,ClientSize
 Width,宽,Width
 Height,高,Height
 Apply,应用,Apply
+Render,渲染,Render
+BlendMode,混合模式,Blend Mode
+,,
+,,
+,,
 ,,

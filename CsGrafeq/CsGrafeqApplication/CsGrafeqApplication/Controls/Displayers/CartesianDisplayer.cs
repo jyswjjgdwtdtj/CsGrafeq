@@ -512,7 +512,7 @@ public class CartesianDisplayer : Displayer
                     (float)(Zero.X - PreviousZero.X * ratioX),
                     (float)(Zero.Y - PreviousZero.Y * ratioY),
                     (float)(ratioX * PreviousBuffer.Width),
-                    (float)(ratioY * PreviousBuffer.Height)), AntiAlias);
+                    (float)(ratioY * PreviousBuffer.Height)), SkiaHelper.CompoundBufferPaint);
             }
         }
 

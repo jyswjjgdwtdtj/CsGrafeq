@@ -98,7 +98,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
         var dc = e.Canvas;
         lock (TotalBufferLock)
         {
-            dc.DrawBitmap(TotalBuffer, SKPoint.Empty);
+            dc.DrawBitmap(TotalBuffer, SKPoint.Empty,SkiaHelper.CompoundBufferPaint);
         }
     }
 
