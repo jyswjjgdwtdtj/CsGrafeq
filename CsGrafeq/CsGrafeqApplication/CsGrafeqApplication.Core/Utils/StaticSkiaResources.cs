@@ -1,4 +1,5 @@
 ﻿using Avalonia.Platform;
+using CsGrafeq.Numeric;
 using SkiaSharp;
 using static CsGrafeqApplication.Core.Utils.PointRectHelper;
 

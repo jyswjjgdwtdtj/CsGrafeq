@@ -493,20 +493,25 @@ public class GeometricPad : Addon
                     {
                         var v1 = s.Current.Point1;
                         var v2 = s.Current.Point2;
-                        var vs = GetValidVec(
+                        var rs = TryGetValidVec(
                             GetIntersectionOfSegmentAndLine(lt, rt, v1, v2),
                             GetIntersectionOfSegmentAndLine(rt, rb, v1, v2),
                             GetIntersectionOfSegmentAndLine(rb, lb, v1, v2),
                             GetIntersectionOfSegmentAndLine(lb, lt, v1, v2)
                         );
+                        if (rs.IsError)
+                            continue;
+                        rs.Success(out var vs,out _);
+                        var p1 = MathToPixelSK(vs.Item1);
+                        var p2 = MathToPixelSK(vs.Item2);
                         if (s.Selected)
-                            dc.DrawLine(MathToPixelSK(vs.Item1), MathToPixelSK(vs.Item2), strokePaint);
+                            dc.DrawLine(p1,p2, strokePaint);
                         else
-                            dc.DrawLine(MathToPixelSK(vs.Item1), MathToPixelSK(vs.Item2), strokePaintMain);
+                            dc.DrawLine(p1,p2, strokePaintMain);
 
-                        dc.DrawBubble($"{MultiLanguageResources.Instance.StraightText}:{s.Name}",
-                            MathToPixelSK((s.Current.Point1 + s.Current.Point2) / 2),
-                            bubbleBack, paintMain);
+                        dc.DrawBubble(
+                            $"{MultiLanguageResources.Instance.StraightText}:{s.Name}",
+                            MathToPixelSK((s.Current.Point1 + s.Current.Point2) / 2), bubbleBack, paintMain);
                     }
                         break;
                     case GeoSegment s:
@@ -527,12 +532,15 @@ public class GeometricPad : Addon
                     {
                         var v1 = h.Current.Point1;
                         var v2 = h.Current.Point2;
-                        var vs = GetValidVec(
+                        var rs = TryGetValidVec(
                             GetIntersectionOfSegmentAndLine(lt, rt, v1, v2),
                             GetIntersectionOfSegmentAndLine(rt, rb, v1, v2),
                             GetIntersectionOfSegmentAndLine(rb, lb, v1, v2),
                             GetIntersectionOfSegmentAndLine(lb, lt, v1, v2)
                         );
+                        if(rs.IsError)
+                            continue;
+                        rs.Success(out var vs,out _);
                         Vec p;
                         if (v1.X == v2.X)
                         {

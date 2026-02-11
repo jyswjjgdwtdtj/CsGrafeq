@@ -48,12 +48,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
     private readonly Clock RenderClock = new(1);
     protected AvaPoint LastPoint;
     protected PointerPointProperties LastPointerProperties = new();
-    public List<Addon> NeedRenderingAddons = new();
-    public bool NeedRenderingAll = false;
-    public List<Renderable> NeedRenderingLayers = new();
-    protected object TotalBufferLock = new();
-    
-    protected CancellationTokenSource RenderCts = new();
+    protected object TotalBufferLock { get; } = new();
 
     public Displayer()
     {
