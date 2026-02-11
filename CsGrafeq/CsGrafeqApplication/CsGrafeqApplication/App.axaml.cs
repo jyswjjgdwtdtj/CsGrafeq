@@ -28,7 +28,6 @@ public class App : Application
         {
             desktop.MainWindow = new MainWindow();
             desktop.MainWindow.DataContext = new MainWindowViewModel(desktop.MainWindow);
-            IME.DisableIme(desktop.MainWindow);
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
         {
