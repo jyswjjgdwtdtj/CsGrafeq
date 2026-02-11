@@ -43,7 +43,7 @@ public class GeometricPad : Addon
             });
         host.TryFindResource("GeometricPadViewTemplate", out obj);
         MainTemplate = (IDataTemplate)obj;
-        CurrentAction = GeometryActions.Actions.FirstOrDefault()?.FirstOrDefault()!;
+        CurrentAction = GeometricActions.Actions.FirstOrDefault()?.FirstOrDefault()!;
         Layers.Add(MainRenderTarget);
         MainRenderTarget.OnRenderCanvas += Renderable_OnRender;
         Shapes.CollectionChanged += (s, e) =>
@@ -401,7 +401,7 @@ public class GeometricPad : Addon
                 if (plen > 2)
                     if (selectfirst)
                     {
-                        var shape = GeometryActions.CreateShape(CurrentAction.Self,
+                        var shape = GeometricActions.CreateShape(CurrentAction.Self,
                             (Getter)CurrentAction.GetterConstructor.Invoke(SPoints.ToArray()));
                         AddShape(shape);
                         Shapes.ClearSelected();
@@ -425,7 +425,7 @@ public class GeometricPad : Addon
 
             if (needplen == plen && needclen == clen && needllen == llen && needpolen == polen)
             {
-                var shape = GeometryActions.CreateShape(CurrentAction.Self,
+                var shape = GeometricActions.CreateShape(CurrentAction.Self,
                     (Getter)CurrentAction.GetterConstructor.Invoke(
                         SAll?.SortShape().Select(o => (object?)o)?.ToArray() ?? []));
                 AddShape(shape);
