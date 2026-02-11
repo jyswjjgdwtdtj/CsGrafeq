@@ -126,13 +126,14 @@ public class SKCanvasView : Control
             return false;
         }
 
-        public void Render(ImmediateDrawingContext context)
+        public unsafe void Render(ImmediateDrawingContext context)
         {
-            context.DrawRectangle(new ImmutableSolidColorBrush(Colors.Green), null, new Rect(Bounds.Size));
+            context.DrawRectangle(new ImmutableSolidColorBrush(Colors.Transparent), null, new Rect(Bounds.Size));
             lock (BufferLock)
             {
                 using (var lb = Buffer.Lock())
                 {
+                    new Span<byte>(lb.Address.ToPointer(), lb.RowBytes * lb.Size.Height).Clear();
                     var info = new SKImageInfo(lb.Size.Width, lb.Size.Height, lb.Format.ToSkColorType(),
                         SKAlphaType.Premul);
                     using (var surface = SKSurface.Create(info, lb.Address, lb.RowBytes))

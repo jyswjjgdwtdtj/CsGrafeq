@@ -76,13 +76,6 @@ public abstract class Addon : ReactiveObject
         return OnKeyUp(e);
     }
 
-    internal bool CallPointerMoved(MouseEventArgs e)
-    {
-        if (!IsAddonEnabled || Owner == null)
-            return DoNext;
-        return OnPointerMoved(e);
-    }
-
     internal bool CallPointerPressed(MouseEventArgs e)
     {
         if (!IsAddonEnabled || Owner == null)
@@ -90,11 +83,18 @@ public abstract class Addon : ReactiveObject
         return OnPointerPressed(e);
     }
 
-    internal bool CallPointerReleased(MouseEventArgs e)
+    internal void CallPointerMoved(MouseEventArgs e)
     {
         if (!IsAddonEnabled || Owner == null)
-            return DoNext;
-        return OnPointerReleased(e);
+            return;
+        OnPointerMoved(e);
+    }
+
+    internal void CallPointerReleased(MouseEventArgs e)
+    {
+        if (!IsAddonEnabled || Owner == null)
+            return;
+        OnPointerReleased(e);
     }
 
     internal bool CallPointerWheeled(MouseEventArgs e)
@@ -130,19 +130,20 @@ public abstract class Addon : ReactiveObject
         return DoNext;
     }
 
-    protected virtual bool OnPointerReleased(MouseEventArgs e)
-    {
-        return DoNext;
-    }
 
     protected virtual bool OnPointerPressed(MouseEventArgs e)
     {
         return DoNext;
     }
 
-    protected virtual bool OnPointerMoved(MouseEventArgs e)
+    protected virtual void OnPointerMoved(MouseEventArgs e)
     {
-        return DoNext;
+        return;
+    }
+    
+    protected virtual void OnPointerReleased(MouseEventArgs e)
+    {
+        return;
     }
 
     protected virtual bool OnPointerTapped(MouseEventArgs e)

@@ -20,7 +20,6 @@ public static class SkiaHelper
         Setting.Instance.WhenAnyValue((setting => setting.CompoundBlendMode)).Subscribe((s) =>
         {
             CompoundBufferPaint.BlendMode = s;
-            Console.WriteLine(s);
         });
     }
     

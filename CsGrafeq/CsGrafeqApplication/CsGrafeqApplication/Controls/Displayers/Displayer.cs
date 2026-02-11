@@ -126,14 +126,17 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
     {
         return new Vec(PixelToMathX(point.X), PixelToMathY(point.Y));
     }
-
+    protected Addon? PointerCapturedAddon = null;
     protected bool CallPointerPressed(MouseEventArgs e)
     {
         LastPoint = e.Position;
         LastPointerProperties = e.Properties;
         foreach (var addon in Addons)
             if (addon.CallPointerPressed(e) == Intercept)
+            {
+                PointerCapturedAddon = addon;
                 return Intercept;
+            }
         return DoNext;
     }
 
@@ -141,9 +144,12 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
     {
         LastPoint = e.Position;
         LastPointerProperties = e.Properties;
-        foreach (var addon in Addons)
-            if (addon.CallPointerMoved(e) == Intercept)
-                return Intercept;
+        if (PointerCapturedAddon != null)
+        {
+            PointerCapturedAddon.CallPointerMoved(e);
+            return Intercept;
+        }
+
         return DoNext;
     }
 
@@ -151,9 +157,12 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
     {
         LastPoint = e.Position;
         LastPointerProperties = e.Properties;
-        foreach (var addon in Addons)
-            if (addon.CallPointerReleased(e) == Intercept)
-                return Intercept;
+        if (PointerCapturedAddon != null)
+        {
+            PointerCapturedAddon.CallPointerReleased(e);
+            PointerCapturedAddon = null;
+            return Intercept;
+        }
         return DoNext;
     }
 

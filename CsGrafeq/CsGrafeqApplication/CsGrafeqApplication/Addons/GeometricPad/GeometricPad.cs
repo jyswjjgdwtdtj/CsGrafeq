@@ -226,18 +226,18 @@ public class GeometricPad : Addon
         return DoNext;
     }
 
-    protected override bool OnPointerMoved(MouseEventArgs e)
+    protected override void OnPointerMoved(MouseEventArgs e)
     {
-        if (Owner == null) return DoNext;
+        if (Owner == null) return;
         LastPointerProperties = e.Properties;
         PointerMovedPosition = e.Position;
         if (CurrentAction.Name.English == "Select" && e.Properties.IsLeftButtonPressed)
         {
             MainRenderTarget.Changed = true;
-            return Intercept;
+            return;
         }
 
-        if (MovingPoint == null) return DoNext;
+        if (MovingPoint == null) return;
 
         if (e.Properties.IsLeftButtonPressed)
         {
@@ -291,15 +291,12 @@ public class GeometricPad : Addon
             }
 
             MainRenderTarget.Changed = true;
-            return Intercept;
         }
-
-        return DoNext;
     }
 
-    protected override bool OnPointerReleased(MouseEventArgs e)
+    protected override void OnPointerReleased(MouseEventArgs e)
     {
-        if (Owner == null) return DoNext;
+        if (Owner == null) return;
         LastPointerProperties = e.Properties;
         PointerReleasedPosition = e.Position;
         var disp = (Owner as DisplayControl)!;
@@ -314,10 +311,10 @@ public class GeometricPad : Addon
                 s.Selected = s.IsIntersectedWithRect(mathrect);
             MainRenderTarget.Changed = true;
             PointerPressedPosition = new AvaPoint(double.NaN, double.NaN);
-            return Intercept;
+            return;
         }
 
-        if (MovingPoint == null) return DoNext;
+        if (MovingPoint == null) return;
 
         if (PointerReleasedPosition != PointerPressedPosition)
             Shapes.ClearSelected();
@@ -329,7 +326,6 @@ public class GeometricPad : Addon
         }
 
         MovingPoint = null;
-        return Intercept;
     }
 
     protected override bool OnPointerTapped(MouseEventArgs e)
