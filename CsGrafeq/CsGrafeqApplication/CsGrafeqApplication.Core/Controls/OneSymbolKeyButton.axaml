@@ -17,6 +17,12 @@
             <Setter Property="FontFamily" Value="{StaticResource MapleMono}" />
             <Style Selector="^ RepeatButton">
                 <Setter Property="Background" Value="{DynamicResource CgBackgroundBrush}" />
+                <Setter Property="Transitions">
+                    <Transitions>
+                        <BrushTransition Property="Background" Duration="0.1"/>
+                        <BrushTransition Property="Foreground" Duration="0.1"/>
+                    </Transitions>
+                </Setter>
                 <Setter Property="CornerRadius" Value="4" />
                 <Setter Property="Focusable" Value="False" />
                 <Setter Property="BorderBrush" Value="{DynamicResource CgForegroundBrush}" />

@@ -333,7 +333,7 @@ public class GeometricPad : Addon
         if (Owner == null) return DoNext;
         {
             // 放置点
-            if (CurrentAction.Name.English == "Put")
+            if (CurrentAction.Name.English=="Place")
             {
                 Shapes.ClearSelected();
                 PutPoint(e.Position)?.Selected = true;
