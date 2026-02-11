@@ -8,10 +8,12 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Styling;
 using Avalonia.Threading;
+using CsGrafeq.Numeric;
 using CsGrafeqApplication.Events;
 using SkiaSharp;
 using static CsGrafeqApplication.Core.Utils.StaticSkiaResources;
 using static CsGrafeqApplication.Core.Utils.PointRectHelper;
+using BigPoint= CsGrafeq.PointBase<CsGrafeq.Numeric.BigNumber<long,double>>;
 
 
 namespace CsGrafeqApplication.Controls.Displayers;
@@ -23,16 +25,21 @@ public class CartesianDisplayer : Displayer
     private readonly Timer WheelingTimer;
     protected bool MouseOnYAxis, MouseOnXAxis;
     private SKBitmap PreviousBuffer = new(1, 1);
-
-    private double PreviousUnitLength;
-    private PointL PreviousZero;
+    /// <summary>
+    /// 代表上一次Zoom时单位长度，用于优化滚轮缩放和拖动时的连续绘制
+    /// </summary>
+    private double PreviousZoomUnitLength { get; set; }
+    /// <summary>
+    /// 代表上一次Zoom时原点位置，用于优化滚轮缩放和拖动时的连续绘制
+    /// </summary>
+    private BigPoint PreviousZoomZero { get; set; }
 
     public CartesianDisplayer()
     {
-        ZeroPos = new PointL { X = 500, Y = 250 };
+        ZeroPos = new(){ X = 500, Y = 250 };
         UnitLength = 20;
         WheelingTimer = new Timer(TimerElapsed, null, 0, 500);
-        App.Current.ActualThemeVariantChanged += (s, e) =>
+        Application.Current?.ActualThemeVariantChanged += (s, e) =>
         {
             RefreshPaint();
             ForceToRender(CancellationToken.None);
@@ -43,7 +50,7 @@ public class CartesianDisplayer : Displayer
     /// <summary>
     ///     数学坐标原点的像素位置
     /// </summary>
-    public PointL ZeroPos
+    public BigPoint ZeroPos
     {
         get => field;
         set
@@ -230,12 +237,12 @@ public class CartesianDisplayer : Displayer
             return;
         //y
         if (RangeIn(ValidRect.Left, ValidRect.Right, ZeroPos.X))
-            dc.DrawLine(new SKPoint(ZeroPos.X, (float)ValidRect.Top),
-                new SKPoint(ZeroPos.X, (float)ValidRect.Bottom), AxisPaintMain);
+            dc.DrawLine(new SKPoint((float)ZeroPos.X.ToDecimal(), (float)ValidRect.Top),
+                new SKPoint((float)ZeroPos.X.ToDecimal(), (float)ValidRect.Bottom), AxisPaintMain);
 
         if (RangeIn(0, height, ZeroPos.Y))
-            dc.DrawLine(new SKPoint((float)ValidRect.Left, ZeroPos.Y),
-                new SKPoint((float)ValidRect.Right, ZeroPos.Y), AxisPaintMain);
+            dc.DrawLine(new SKPoint((float)ValidRect.Left, (float)ZeroPos.Y.ToDecimal()),
+                new SKPoint((float)ValidRect.Right, (float)ZeroPos.Y.ToDecimal()), AxisPaintMain);
         var zsX = (int)Floor(Log(350 / UnitLength, 10));
         var zsY = (int)Floor(Log(350 / UnitLength, 10));
         var addnumX = SpecialPow(10D, zsX);
@@ -381,7 +388,7 @@ public class CartesianDisplayer : Displayer
                     new SKPoint((float)width - num.ToString().Length * textFont.Size / 2 - 5, (float)(i + 4)),
                     SKTextAlign.Left, textFont, AxisPaintMain);
             else
-                dc.DrawText(num.ToString(), new SKPoint(ZeroPos.X, (float)(i + 4)), SKTextAlign.Left, textFont,
+                dc.DrawText(num.ToString(), new SKPoint((float)ZeroPos.X.ToDecimal(), (float)(i + 4)), SKTextAlign.Left, textFont,
                     AxisPaintMain);
         }
 
@@ -399,11 +406,11 @@ public class CartesianDisplayer : Displayer
                     new SKPoint((float)width - num.ToString().Length * textFont.Size / 2 - 5, (float)(i + 4)),
                     SKTextAlign.Left, textFont, AxisPaintMain);
             else
-                dc.DrawText(num.ToString(), new SKPoint(ZeroPos.X, (float)(i + 4)), SKTextAlign.Left, textFont,
+                dc.DrawText(num.ToString(), new SKPoint((float)ZeroPos.X.ToDecimal(), (float)(i + 4)), SKTextAlign.Left, textFont,
                     AxisPaintMain);
         }
 
-        dc.DrawText("0", new SKPoint(ZeroPos.X + 3, ZeroPos.Y + textFont.Size), SKTextAlign.Left, textFont,
+        dc.DrawText("0", new SKPoint((float)ZeroPos.X.ToDecimal() + 3, (float)ZeroPos.Y .ToDecimal()+ textFont.Size), SKTextAlign.Left, textFont,
             AxisPaintMain);
     }
 
@@ -457,9 +464,9 @@ public class CartesianDisplayer : Displayer
     {
         if (!WheelingStopWatch.IsRunning)
         {
-            PreviousUnitLength = UnitLength;
-            PreviousUnitLength = UnitLength;
-            PreviousZero = ZeroPos;
+            PreviousZoomUnitLength = UnitLength;
+            PreviousZoomUnitLength = UnitLength;
+            PreviousZoomZero = ZeroPos;
             WheelingStopWatch.Restart();
             if (Setting.Instance.ZoomOptimization)
                 lock (LockTargetForPreviousBuffer)
@@ -477,28 +484,27 @@ public class CartesianDisplayer : Displayer
                 }
         }
 
-        var (x, y) = point;
-        var bzero = ZeroPos;
-        var times_x = (ZeroPos.X - x) / UnitLength;
-        var times_y = (ZeroPos.Y - y) / UnitLength;
+        var (dx, dy) = point;
+        var x = new BigNumber<long, double>(0,dx);
+        var y = new BigNumber<long, double>(0,dy);
         UnitLength *= delta;
         UnitLength *= delta;
         UnitLength = RangeTo(0.01, 1000000, UnitLength);
         UnitLength = RangeTo(0.01, 1000000, UnitLength);
-        var ratioX = UnitLength / PreviousUnitLength;
-        var ratioY = UnitLength / PreviousUnitLength;
-        ZeroPos = new PointL
+        var ratioX = UnitLength / PreviousZoomUnitLength;
+        var ratioY = UnitLength / PreviousZoomUnitLength;
+        ZeroPos = new()
         {
-            X = (long)((long)x - ((long)x - PreviousZero.X) * ratioX),
-            Y = (long)((long)y - ((long)y - PreviousZero.Y) * ratioY)
+            X = (x - (x - PreviousZoomZero.X) * ratioX),
+            Y = (y - (y - PreviousZoomZero.Y) * ratioY)
         };
         if (!Setting.Instance.ZoomOptimization || ratioX > 2 || ratioX < 0.5 || ratioY > 2 || ratioY < 0.5)
         {
             WheelingStopWatch.Stop();
             WheelingStopWatch.Reset();
-            PreviousUnitLength = UnitLength;
-            PreviousUnitLength = UnitLength;
-            PreviousZero = ZeroPos;
+            PreviousZoomUnitLength = UnitLength;
+            PreviousZoomUnitLength = UnitLength;
+            PreviousZoomZero = ZeroPos;
             ForceToRender(CancellationToken.None);
             return;
         }
@@ -509,8 +515,8 @@ public class CartesianDisplayer : Displayer
             {
                 dc.Clear(AxisBackground);
                 dc.DrawBitmap(PreviousBuffer, CreateSKRectWH(
-                    (float)(ZeroPos.X - PreviousZero.X * ratioX),
-                    (float)(ZeroPos.Y - PreviousZero.Y * ratioY),
+                    (float)(ZeroPos.X - PreviousZoomZero.X * ratioX),
+                    (float)(ZeroPos.Y - PreviousZoomZero.Y * ratioY),
                     (float)(ratioX * PreviousBuffer.Width),
                     (float)(ratioY * PreviousBuffer.Height)), SkiaHelper.CompoundBufferPaint);
             }

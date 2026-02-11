@@ -1,4 +1,5 @@
 ﻿global using BigNumber = CsGrafeq.Numeric.BigNumber<long, decimal>;
+global using BigPoint = CsGrafeq.PointBase<CsGrafeq.Numeric.BigNumber<long, decimal>>;
 using System;
 using System.Globalization;
 using System.Numerics;
@@ -58,10 +59,10 @@ public readonly struct BigNumber<TInteger, TDecimal> :
         return (integerPart, decimalPart);
     }
 
-    private static TDecimal ToDecimal(BigNumber<TInteger, TDecimal> value)
+    public static TDecimal ToDecimal(BigNumber<TInteger, TDecimal> value)
         => TDecimal.CreateChecked(value.IntegerPart) + value.DecimalPart;
 
-    private static BigNumber<TInteger, TDecimal> FromDecimal(TDecimal value)
+    public static BigNumber<TInteger, TDecimal> FromDecimal(TDecimal value)
     {
         var i = TDecimal.Truncate(value);
         return CreateNormalized(TInteger.CreateChecked(i), value - i);
@@ -82,21 +83,15 @@ public readonly struct BigNumber<TInteger, TDecimal> :
 
     public static BigNumber<TInteger, TDecimal> operator *(BigNumber<TInteger, TDecimal> a, BigNumber<TInteger, TDecimal> b)
     {
-        // (I1+D1)*(I2+D2) = I1I2 + I1D2 + I2D1 + D1D2
-        var i1 = TDecimal.CreateChecked(a.IntegerPart);
-        var i2 = TDecimal.CreateChecked(b.IntegerPart);
-
-        var dec =
-            (i1 * i2) +
-            (i1 * b.DecimalPart) +
-            (i2 * a.DecimalPart) +
-            (a.DecimalPart * b.DecimalPart);
-
-        var intFromDec = TDecimal.Truncate(dec);
-        var integerPart = TInteger.CreateChecked(intFromDec);
-        var decimalPart = dec - intFromDec;
-
+        var integerPart = a.IntegerPart * b.IntegerPart;
+        var decimalPart = (TDecimal.CreateChecked(a.IntegerPart) * b.DecimalPart) +
+                          (TDecimal.CreateChecked(b.IntegerPart) * a.DecimalPart) +
+                          (a.DecimalPart * b.DecimalPart);
         return CreateNormalized(integerPart, decimalPart);
+    }
+    public static BigNumber<TInteger, TDecimal> operator *(BigNumber<TInteger, TDecimal> a, TDecimal b)
+    {
+        return a * new BigNumber<TInteger, TDecimal>(TInteger.Zero, b);
     }
 
     public static BigNumber<TInteger, TDecimal> operator /(BigNumber<TInteger, TDecimal> a, BigNumber<TInteger, TDecimal> b)
@@ -339,7 +334,8 @@ public readonly struct BigNumber<TInteger, TDecimal> :
 
     public override int GetHashCode()
         => HashCode.Combine(IntegerPart, DecimalPart);
-
+    public static implicit operator TDecimal(BigNumber<TInteger,TDecimal> value) => ToDecimal(value);
+    public TDecimal ToDecimal() => ToDecimal(this);
     public static bool operator ==(BigNumber<TInteger, TDecimal> left, BigNumber<TInteger, TDecimal> right) => left.Equals(right);
     public static bool operator !=(BigNumber<TInteger, TDecimal> left, BigNumber<TInteger, TDecimal> right) => !left.Equals(right);
     public static bool operator <(BigNumber<TInteger, TDecimal> left, BigNumber<TInteger, TDecimal> right) => left.CompareTo(right) < 0;

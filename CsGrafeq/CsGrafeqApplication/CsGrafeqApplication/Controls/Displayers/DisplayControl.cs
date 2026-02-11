@@ -8,8 +8,10 @@ using Avalonia.Threading;
 using CsGrafeq.Debug;
 using CsGrafeq.Utilities;
 using CsGrafeqApplication.Events;
+using CsGrafeqApplication.Utilities;
 using SkiaSharp;
 using static CsGrafeq.Utilities.ThrowHelper;
+using BigPoint= CsGrafeq.PointBase<CsGrafeq.Numeric.BigNumber<long,double>>;
 
 namespace CsGrafeqApplication.Controls.Displayers;
 
@@ -20,17 +22,17 @@ public class DisplayControl : CartesianDisplayer
     /// <summary>
     ///     上一时刻的零点位置
     /// </summary>
-    private PointL LastZeroPos;
+    private BigPoint PreviousPointerMovedZero;
 
     /// <summary>
     ///     鼠标按下时的位置
     /// </summary>
-    private PointL PointerDownPointerPos = new() { X = 0, Y = 0 };
+    private BigPoint PointerDownPointerPos = new() { X = 0, Y = 0 };
 
     /// <summary>
     ///     鼠标按下时的零点位置
     /// </summary>
-    private PointL PointerDownZeroPos = new() { X = 0, Y = 0 };
+    private BigPoint PointerDownZeroPos = new() { X = 0, Y = 0 };
 
     public DisplayControl()
     {
@@ -48,10 +50,10 @@ public class DisplayControl : CartesianDisplayer
             if (e.Properties.IsLeftButtonPressed)
             {
                 var p = e.GetPosition(this);
-                PointerDownPointerPos = new PointL { X = (long)p.X, Y = (long)p.Y };
+                PointerDownPointerPos = p.ToBigPoint();
                 PointerDownZeroPos = ZeroPos;
             }
-            LastZeroPos = ZeroPos;
+            PreviousPointerMovedZero = ZeroPos;
             base.OnPointerPressed(e);
         }
         else
@@ -75,16 +77,16 @@ public class DisplayControl : CartesianDisplayer
             return;
         if (CallPointerMoved(e) == DoNext)
         {
-            var current = e.Position;
+            var current = e.Position.ToBigPoint();
             MouseOnYAxis = Abs(current.X - ZeroPos.X) < 3;
             MouseOnXAxis = Abs(current.Y - ZeroPos.Y) < 3;
             if (e.Properties.IsLeftButtonPressed)
             {
                 //移动零点
-                var newZero = new PointL
+                var newZero = new BigPoint
                 {
-                    X = PointerDownZeroPos.X + (long)current.X - PointerDownPointerPos.X,
-                    Y = PointerDownZeroPos.Y + (long)current.Y - PointerDownPointerPos.Y
+                    X = PointerDownZeroPos.X + current.X - PointerDownPointerPos.X,
+                    Y = PointerDownZeroPos.Y + current.Y - PointerDownPointerPos.Y
                 };
                 if (newZero != ZeroPos)
                 {
@@ -94,17 +96,17 @@ public class DisplayControl : CartesianDisplayer
                         var dc = new SKCanvas(TotalBuffer);
                         dc.Clear(AxisBackground);
                         RenderAxes(dc);
-                        if (!Setting.Instance.MoveOptimization || (LastZeroPos - ZeroPos).Length > 50)
+                        if (!Setting.Instance.MoveOptimization || (PreviousPointerMovedZero - ZeroPos).Length > 50)
                         {
-                            var lastZero = LastZeroPos;
-                            LastZeroPos = ZeroPos;
+                            var lastZero = PreviousPointerMovedZero;
+                            PreviousPointerMovedZero = ZeroPos;
                             foreach (var rt in Addons.SelectMany(adn => adn.Layers).Where(rt => rt.IsActive))
                             {
                                 rt.CopyRenderTargetTo(TempBuffer);
                                 using var canvas = rt.GetBitmapCanvas()!;
                                 canvas.Clear(SKColors.Transparent);
-                                canvas.DrawBitmap(TempBuffer, ZeroPos.X - lastZero.X,
-                                    ZeroPos.Y - lastZero.Y, SkiaHelper.CompoundBufferPaint);
+                                canvas.DrawBitmap(TempBuffer, (int)((ZeroPos.X - lastZero.X).ToDecimal()),
+                                    (int)((ZeroPos.Y - lastZero.Y).ToDecimal()), SkiaHelper.CompoundBufferPaint);
                                 canvas.Flush();
                                 RenderExtension.RenderMovedPlace(rt.Render, Bounds.Size,
                                     new Point(ZeroPos.X, ZeroPos.Y),
@@ -116,8 +118,8 @@ public class DisplayControl : CartesianDisplayer
                         {
                             foreach (var layer in Addons.SelectMany(adn => adn.Layers).Where(rt=>rt.IsActive))
                             {
-                                layer.DrawRenderTargetTo(dc, (int)(ZeroPos.X - LastZeroPos.X),
-                                    (int)(ZeroPos.Y - LastZeroPos.Y));
+                                layer.DrawRenderTargetTo(dc, (int)(ZeroPos.X - PreviousPointerMovedZero.X),
+                                    (int)(ZeroPos.Y - PreviousPointerMovedZero.Y));
                             }
                         }
                         RenderAxesNumber(dc);
@@ -140,16 +142,16 @@ public class DisplayControl : CartesianDisplayer
         StopWheeling();
         if (CallPointerReleased(e) == DoNext)
         {
-            var current = e.Position;
+            var current = e.Position.ToBigPoint();
             MouseOnYAxis = Abs(current.X - ZeroPos.X) < 3;
             MouseOnXAxis = Abs(current.Y - ZeroPos.Y) < 3;
             if (e.Properties.IsLeftButtonPressed)
             {
                 //移动零点
-                var newZero = new PointL
+                var newZero = new BigPoint
                 {
-                    X = PointerDownZeroPos.X + (long)current.X - PointerDownPointerPos.X,
-                    Y = PointerDownZeroPos.Y + (long)current.Y - PointerDownPointerPos.Y
+                    X = PointerDownZeroPos.X + current.X - PointerDownPointerPos.X,
+                    Y = PointerDownZeroPos.Y + current.Y - PointerDownPointerPos.Y
                 };
                 if (newZero != ZeroPos)
                 {
@@ -160,15 +162,15 @@ public class DisplayControl : CartesianDisplayer
                             var dc = new SKCanvas(TotalBuffer);
                             dc.Clear(AxisBackground);
                             RenderAxes(dc);
-                            var lastZero = LastZeroPos;
-                            LastZeroPos = ZeroPos;
+                            var lastZero = PreviousPointerMovedZero;
+                            PreviousPointerMovedZero = ZeroPos;
                             foreach (var rt in Addons.SelectMany(adn => adn.Layers).Where(rt => rt.IsActive))
                             {
                                 rt.CopyRenderTargetTo(TempBuffer);
                                 using var canvas = rt.GetBitmapCanvas()!;
                                 canvas.Clear(SKColors.Transparent);
-                                canvas.DrawBitmap(TempBuffer, ZeroPos.X - lastZero.X,
-                                    ZeroPos.Y - lastZero.Y, SkiaHelper.CompoundBufferPaint);
+                                canvas.DrawBitmap(TempBuffer, (int)((ZeroPos.X - lastZero.X).ToDecimal()),
+                                    (int)((ZeroPos.Y - lastZero.Y).ToDecimal()), SkiaHelper.CompoundBufferPaint);
                                 canvas.Flush();
                                 RenderExtension.RenderMovedPlace(rt.Render, Bounds.Size,
                                     new Point(ZeroPos.X, ZeroPos.Y),
