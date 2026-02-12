@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Avalonia.Skia;
 using Material.Styles.Themes;
+using ReactiveUI;
 using SkiaSharp;
 
 namespace CsGrafeqApplication;
@@ -14,8 +17,13 @@ public static class SkiaHelper
     {
         Themes.Theme.ThemeChangedEndObservable.Subscribe(t => { Refresh(t); });
         Refresh(Themes.Theme);
+        Setting.Instance.WhenAnyValue((setting => setting.CompoundBlendMode)).Subscribe((s) =>
+        {
+            CompoundBufferPaint.BlendMode = s;
+        });
     }
-
+    
+    public static SKPaint CompoundBufferPaint { get; } = new() {IsAntialias = true};
     public static SKPaint FilledMid { get; } = new() { IsAntialias = true };
     public static SKPaint ShadowFilledMid { get; } = new() { IsAntialias = true };
     public static SKPaint StrokeMid { get; } = new() { IsAntialias = true, IsStroke = true };
@@ -73,5 +81,14 @@ public static class SkiaHelper
             return false;
         source.GetPixelSpan().CopyTo(dest.GetPixelSpan());
         return true;
+    }
+    public unsafe static uint ToUint(this SKColor color)
+    {
+        return (*(uint*)Unsafe.AsPointer(ref color));
+    }
+    private struct TwoUInt
+    {
+        public uint Low;
+        public uint High;
     }
 }

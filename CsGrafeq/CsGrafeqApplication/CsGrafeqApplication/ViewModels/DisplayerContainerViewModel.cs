@@ -26,4 +26,5 @@ public class DisplayerContainerViewModel : ViewModelBase
         get;
         set => this.RaiseAndSetIfChanged(ref field, value);
     } = 0;
+
 }

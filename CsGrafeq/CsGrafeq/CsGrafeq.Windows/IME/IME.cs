@@ -14,19 +14,33 @@ public static class IME
         var handle = window.TryGetPlatformHandle()?.Handle ?? IntPtr.Zero;
         if (handle == IntPtr.Zero)
             return;
-        if (Environment.OSVersion.Platform != PlatformID.Win32NT)
-            return;
-        if (IsOpen(handle)) SetOpenStatus(false, handle);
+        switch (Environment.OSVersion.Platform)
+        {
+            case PlatformID.Win32NT:
+            case PlatformID.Win32S:
+            case PlatformID.Win32Windows:
+                Disable(handle);
+                break;
+        }
+        
+    }
+    public static void Disable(IntPtr handle)
+    {
+
+        // Close the IME if necessary
+        if (IsOpen(handle))
+        {
+            SetOpenStatus(false, handle);
+        }
         ImePInvoke.ImmAssociateContext(handle, IntPtr.Zero);
     }
-
-    private static void SetOpenStatus(bool open, IntPtr handle)
+    public static void SetOpenStatus(bool open, IntPtr handle)
     {
         var inputContext = ImePInvoke.ImmGetContext(handle);
 
         if (inputContext != IntPtr.Zero)
         {
-            var succeeded = ImePInvoke.ImmSetOpenStatus(inputContext, open ? 1 : 0);
+            bool succeeded = ImePInvoke.ImmSetOpenStatus(inputContext, open?1:0);
             Debug.Assert(succeeded, "Could not set the IME open status.");
 
             if (succeeded)
@@ -36,12 +50,11 @@ public static class IME
             }
         }
     }
-
-    internal static bool IsOpen(IntPtr handle)
+    public static bool IsOpen(IntPtr handle)
     {
-        var inputContext = ImePInvoke.ImmGetContext(handle);
+        IntPtr inputContext = ImePInvoke.ImmGetContext(handle);
 
-        var retval = false;
+        bool retval = false;
 
         if (inputContext != IntPtr.Zero)
         {

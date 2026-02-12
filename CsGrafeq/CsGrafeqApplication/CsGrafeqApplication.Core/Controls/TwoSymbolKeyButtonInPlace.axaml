@@ -22,6 +22,12 @@
     <ToggleButton.Styles>
         <Styles>
             <Style Selector="RepeatButton">
+                <Setter Property="Transitions">
+                    <Transitions>
+                        <BrushTransition Property="Background" Duration="0.1"/>
+                        <BrushTransition Property="Foreground" Duration="0.1"/>
+                    </Transitions>
+                </Setter>
                 <Setter Property="BorderThickness" Value="1" />
                 <Setter Property="HorizontalAlignment" Value="Stretch" />
                 <Setter Property="Margin" Value="0" />

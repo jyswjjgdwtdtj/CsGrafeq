@@ -20,7 +20,6 @@ public class EnglishChar : ObservableObject
                 if ('A' <= c && c <= 'Z') CharValueChanged?.Invoke((EnglishCharEnum)Pow(2, c - 'A'));
             }
         };
-        A = 10;
     }
 
     public static EnglishChar Instance { get; } = new();

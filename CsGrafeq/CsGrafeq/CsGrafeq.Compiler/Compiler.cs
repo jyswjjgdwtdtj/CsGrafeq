@@ -36,7 +36,6 @@ public static class Compiler
         bool useSimplification)
         where T : IComputableNumber<T>
     {
-        //expFunc = Compile<T>(expression,paraCount,out usedVars);
         try
         {
             return Result<(Delegate func, EnglishCharEnum)>.Success(
@@ -74,7 +73,7 @@ public static class Compiler
         var elements = expression.GetTokens().GetElements();
         var expStack = new Stack<Expression>();
         var cloneMethod = GetInfo(T.Clone);
-        var needClone = true;
+        var needClone = T.NeedClone;
         xVar = Expression.Parameter(typeof(T), "x");
         yVar = Expression.Parameter(typeof(T), "y");
         zVar = Expression.Parameter(typeof(T), "z");

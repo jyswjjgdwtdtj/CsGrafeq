@@ -4,7 +4,7 @@ namespace CsGrafeq.Shapes;
 
 public static class GeometryMath
 {
-    public static (Vec, Vec) GetValidVec(Vec v1, Vec v2, Vec v3, Vec v4)
+    public static Result<(Vec,Vec)> TryGetValidVec(Vec v1, Vec v2, Vec v3, Vec v4)
     {
         var vs = new Vec[4] { v1, v2, v3, v4 };
         var vs2 = new Vec[4];
@@ -16,12 +16,10 @@ public static class GeometryMath
             vs2[i] = v;
             i++;
         }
-
+        
         if (i == 2)
-            return (vs2[0], vs2[1]);
-        if (i == 0)
-            return (Vec.Invalid, Vec.Invalid);
-        return (vs2[0], vs2[2]);
+            return Result<(Vec, Vec)>.Success((vs2[0], vs2[1]));
+        return Result<(Vec, Vec)>.Error("");
     }
 
     public static Vec SolveFunction(double a, double b, double c, double d, double e, double f)

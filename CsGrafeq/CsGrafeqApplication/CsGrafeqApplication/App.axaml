@@ -7,6 +7,9 @@
     <Application.Styles>
         <themes:MaterialTheme BaseTheme="Light" PrimaryColor="Cyan" SecondaryColor="Cyan" />
         <StyleInclude Source="avares://CsGrafeqApplication.Dialogs/Views/MsgBoxButton.axaml" />
+        <Style Selector="TextBox">
+            <Setter Property="InputMethod.IsInputMethodEnabled" Value="False"></Setter>
+        </Style>
     </Application.Styles>
     <Application.Resources>
         <ResourceDictionary>

@@ -6,14 +6,9 @@ using static CsGrafeq.Interval.Extensions.IntervalSetExtension;
 using CGMath = CsGrafeq.Numeric.CsGrafeqMath;
 using static CsGrafeq.Utilities.ThrowHelper;
 using Ranges = System.Span<CsGrafeq.Interval.Range>;
-using Pool = CsGrafeq.Collections.StaticUnsafeMemoryList<CsGrafeq.Interval.Range>;
 
 namespace CsGrafeq.Interval;
 
-/// <summary>
-///     禁止多线程允许 只允许允许再单个线程！！！
-///     Pool只使用不Return释放 释放统一到最后结束运行 Pool容量足够大不会有问题 除非确保无问题
-/// </summary>
 public readonly ref struct IntervalSet : IInterval<IntervalSet>
 {
     #region 静态定义
@@ -88,13 +83,13 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
 
     public static IntervalSet Create(double num)
     {
-        return new IntervalSet(Pool.Rent(1).SetInForce(new Range(num)), IntervalSetType.Number, TT, num, num, num);
+        return new IntervalSet((new Ranges([new Range(num)])), IntervalSetType.Number, TT, num, num, num);
     }
 
     public static IntervalSet Create(double min, double max, Def def)
     {
         CGMath.SwapIfNotLess(ref min, ref max);
-        return new IntervalSet(Pool.Rent(1).SetInForce(new Range(min, max)), IntervalSetType.IntervalSet, TT, min, max,
+        return new IntervalSet((new Ranges([new Range(min,max)])), IntervalSetType.IntervalSet, TT, min, max,
             double.NaN);
     }
 
@@ -105,7 +100,7 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
             return new IntervalSet([], IntervalSetType.Empty, def, double.NaN, double.NaN, double.NaN);
         if (needSort)
             nums.Sort();
-        var intervals = Pool.Rent(len);
+        var intervals = new Ranges(new Range[len]);
         for (var idx = 0; idx < len; idx++) intervals[idx] = new Range(nums[idx]);
         return new IntervalSet(intervals, IntervalSetType.IntervalSet, def, nums[0], nums[^1], double.NaN);
     }
@@ -120,7 +115,7 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
 
     public static IntervalSet Clone(IntervalSet source)
     {
-        var ranges = Pool.Rent(source.Intervals.Length);
+        var ranges = new Ranges(new Range[source.Intervals.Length]);
         source.Intervals.CopyTo(ranges);
         return Create(ranges, source._Def);
     }
@@ -268,7 +263,7 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
         if (i1.IsNumber && i2.IsNumber) return Create(i1.Number / i2.Number);
         if (i2.IsNumber) return i1 * (1 / i2.Number);
         if (i1.IsNumber) i1 = Create(new[] { new Range(i1.Number, i1.Number) }, TT);
-        var ranges = Pool.Rent(i2.Intervals.Length + 1);
+        var ranges = new Ranges(new Range[i2.Intervals.Length + 1]);
         foreach (ref var range in i1.Intervals)
         {
             range._Inf = range._Inf == 0 ? double.Epsilon : range._Inf;
@@ -301,7 +296,7 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
         if (i2.IsNumber)
         {
             var num = i2.Number;
-            var ranges = Pool.Rent(i1.Intervals.Length * 2);
+            var ranges = new Ranges(new Range[i1.Intervals.Length * 2]);
             var loc = 0;
             foreach (var i in i1.Intervals)
             {
@@ -318,19 +313,14 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
                 }
                 else
                 {
-                    Pool.Return(i1.Intervals.Length * 2);
                     return Create(0, num, i1._Def & i2._Def);
                 }
             }
 
             if (loc == 0)
             {
-                Pool.Return(i1.Intervals.Length * 2);
                 return Empty;
             }
-            //!!! 危险示例 以下代码包含潜在危险 不应使用 !!!
-            //Pool.Return(i1.Intervals.Length * 2-loc);
-            //!!! 危险示例 以上代码包含潜在危险 不应使用 !!!
 
             var res = ranges.Slice(0, loc);
             return Create(res, FT);
@@ -411,7 +401,7 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
         if (i._IsEmpty) return Empty;
 
         if (i.IsNumber) return Create(Math.Sign(i.Number));
-        var tmp = Pool.Rent(3);
+        var tmp = new Ranges(new Range[3]);
         var loc = 0;
         if (i._Inf < 0)
             tmp[loc++] = new Range(-1);
@@ -481,7 +471,7 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
         if (c1._IsEmpty || c2._IsEmpty || c3._IsEmpty) return Empty;
 
         var loc = 0;
-        var res = Pool.Rent(c1.Intervals.Length * c2.Intervals.Length * c3.Intervals.Length);
+        var res = new Ranges(new Range[c1.Intervals.Length * c2.Intervals.Length * c3.Intervals.Length]);
         foreach (var i1 in c1.Intervals)
         foreach (var i2 in c2.Intervals)
         foreach (var i3 in c3.Intervals)
@@ -563,7 +553,7 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
                 var inum = (int)num;
                 if (inum % 2 == 0) //偶数
                 {
-                    var ranges = Pool.Rent(i1.Intervals.Length + 1);
+                    var ranges = new Ranges(new Range[i1.Intervals.Length + 1]);
                     var loc = 0;
                     foreach (var r in i1.Intervals)
                         if (r.Contains(0))
@@ -655,7 +645,7 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
             return Empty;
         var len = i1.Intervals.Length;
         var loc = 0;
-        var ranges = Pool.Rent(len * 2 + 1);
+        var ranges = new Ranges(new Range[len * 2 + 1]);
         for (var i = 0; i < len; i++)
         {
             var range = i1.Intervals[i];
@@ -697,7 +687,7 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
             return Empty;
         var len = i1.Intervals.Length;
         var loc = 0;
-        var ranges = Pool.Rent(len * 2 + 1);
+        var ranges = new Ranges(new Range[len * 2 + 1]);
         for (var i = 0; i < len; i++)
         {
             var range = i1.Intervals[i];
@@ -855,7 +845,7 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
 
         if (i1._IsEmpty)
             return Empty;
-        var ranges = Pool.Rent(i1.Intervals.Length * 2);
+        var ranges = new Ranges(new Range[i1.Intervals.Length * 2]);
         var loc = 0;
         foreach (var i in i1.Intervals)
         {
@@ -872,7 +862,6 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
             }
             else
             {
-                Pool.Return(i1.Intervals.Length * 2);
                 return Create(double.NegativeInfinity, double.PositiveInfinity, i1._Def);
             }
         }
@@ -1009,7 +998,7 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
 
         // 笛卡尔积枚举边界点：atan2 在矩形上极值只可能出现在边界，
         // 此处用四个角点做保守包络；若穿过原点或 x==0，会返回全角以保证正确性。
-        var tmp = Pool.Rent(y.Intervals.Length * x.Intervals.Length);
+        var tmp = new Ranges(new Range[y.Intervals.Length * x.Intervals.Length]);
         var loc = 0;
 
         foreach (var ry in y.Intervals)
@@ -1297,7 +1286,7 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
         if (input._IsEmpty) return Empty;
         if (input.IsNumber) return Create(f(input.Number));
 
-        var tmp = Pool.Rent(input.Intervals.Length * 2);
+        var tmp = new Ranges(new Range[input.Intervals.Length * 2]);
         var loc = 0;
 
         foreach (var r in input.Intervals)
@@ -1315,7 +1304,7 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
         var splitSet = Create(tmp.Slice(0, loc), input._Def);
 
         // (0, split] 上按递减处理，[split, +∞) 上按递增处理（这里用于 Gamma/LnGamma 的“先降后升”）
-        var resRanges = Pool.Rent(splitSet.Intervals.Length);
+        var resRanges = new Ranges(new Range[splitSet.Intervals.Length]);
         for (var i = 0; i < splitSet.Intervals.Length; i++)
         {
             var rr = splitSet.Intervals[i];
@@ -1345,7 +1334,7 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
         if (input._IsEmpty) return Empty;
         if (input.IsNumber) return Create(f(input.Number));
 
-        var res = Pool.Rent(input.Intervals.Length);
+        var res = new Ranges(new Range[input.Intervals.Length]);
         var def = input._Def;
 
         for (var i = 0; i < input.Intervals.Length; i++)
@@ -1374,7 +1363,7 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
         if (a.IsNumber && b.IsNumber)
             return Create(f(a.Number, b.Number));
 
-        var tmp = Pool.Rent(a.Intervals.Length * b.Intervals.Length);
+        var tmp = new Ranges(new Range[a.Intervals.Length * b.Intervals.Length]);
         var loc = 0;
         var def = a._Def & b._Def;
 

@@ -2,7 +2,7 @@
 
 public static class ShapeCreaterHelper
 {
-    public static int GetIndex(GeometryShape s)
+    public static int GetIndex(GeometricShape s)
     {
         switch (s)
         {
@@ -22,9 +22,9 @@ public static class ShapeCreaterHelper
         }
     }
 
-    public static IEnumerable<GeometryShape> SortShape(this IEnumerable<GeometryShape> shapes)
+    public static IEnumerable<GeometricShape> SortShape(this IEnumerable<GeometricShape> shapes)
     {
-        var list = new List<GeometryShape>(shapes);
+        var list = new List<GeometricShape>(shapes);
         list.Sort((s1, s2) =>
         {
             var i1 = GetIndex(s1);

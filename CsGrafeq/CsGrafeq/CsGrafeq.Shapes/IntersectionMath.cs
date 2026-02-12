@@ -6,11 +6,11 @@ namespace CsGrafeq.Shapes;
 public static class IntersectionMath
 {
     public static uint FromTwoShape<TShape1, TShape2>(TShape1 shape1, TShape2 shape2, out (Vec, Vec) vs)
-        where TShape1 : GeometryShape
-        where TShape2 : GeometryShape
+        where TShape1 : GeometricShape
+        where TShape2 : GeometricShape
     {
         vs = (Vec.Invalid, Vec.Invalid);
-        GeometryShape[] ss = [shape1, shape2];
+        GeometricShape[] ss = [shape1, shape2];
         ss.Sort((s1, s2) =>
         {
             var i1 = GetIndex(s1);
@@ -101,7 +101,7 @@ public static class IntersectionMath
         return new Vec(x, k1 * x - k1 * s1.X + s1.Y);
     }
 
-    private static int GetIndex(GeometryShape s)
+    private static int GetIndex(GeometricShape s)
     {
         switch (s)
         {

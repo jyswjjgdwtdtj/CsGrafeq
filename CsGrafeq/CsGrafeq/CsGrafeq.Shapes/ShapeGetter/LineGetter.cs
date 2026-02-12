@@ -23,13 +23,13 @@ public abstract class LineGetter_TwoPoint : LineGetter
         ];
     }
 
-    public override void Attach(GeometryShape subShape)
+    public override void Attach(GeometricShape subShape)
     {
         Point1.AddSubShape(subShape);
         Point2.AddSubShape(subShape);
     }
 
-    public override void UnAttach(GeometryShape subShape)
+    public override void UnAttach(GeometricShape subShape)
     {
         Point1.RemoveSubShape(subShape);
         Point2.RemoveSubShape(subShape);
@@ -111,14 +111,14 @@ public class LineGetter_AngleBisector : LineGetter
 
     public override MultiLanguageData ActionName => MultiLanguageResources.AngleBisectorText;
 
-    public override void Attach(GeometryShape subShape)
+    public override void Attach(GeometricShape subShape)
     {
         Point1.AddSubShape(subShape);
         Point2.AddSubShape(subShape);
         AnglePoint.AddSubShape(subShape);
     }
 
-    public override void UnAttach(GeometryShape subShape)
+    public override void UnAttach(GeometricShape subShape)
     {
         Point1.RemoveSubShape(subShape);
         Point2.RemoveSubShape(subShape);
@@ -157,7 +157,7 @@ public abstract class LineGetter_PointAndLine : LineGetter
     public Line Line { get; init; }
     public Point Point { get; init; }
 
-    public override void Attach(GeometryShape subShape)
+    public override void Attach(GeometricShape subShape)
     {
         Line.AddSubShape(subShape);
         Point.AddSubShape(subShape);
@@ -165,7 +165,7 @@ public abstract class LineGetter_PointAndLine : LineGetter
         ;
     }
 
-    public override void UnAttach(GeometryShape subShape)
+    public override void UnAttach(GeometricShape subShape)
     {
         Line.RemoveSubShape(subShape);
         Point.RemoveSubShape(subShape);
@@ -271,12 +271,12 @@ public class LineGetter_Fitted : LineGetter
         return new LineStruct(Point1, Point2);
     }
 
-    public override void Attach(GeometryShape subShape)
+    public override void Attach(GeometricShape subShape)
     {
         foreach (var i in Points) i.AddSubShape(subShape);
     }
 
-    public override void UnAttach(GeometryShape subShape)
+    public override void UnAttach(GeometricShape subShape)
     {
         foreach (var i in Points) i.RemoveSubShape(subShape);
     }

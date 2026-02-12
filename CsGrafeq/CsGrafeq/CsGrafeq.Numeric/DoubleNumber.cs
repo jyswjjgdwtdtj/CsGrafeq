@@ -4,14 +4,24 @@ using CGMath = CsGrafeq.Numeric.CsGrafeqMath;
 
 namespace CsGrafeq.Numeric;
 
-public struct DoubleNumber : IComputableNumber<DoubleNumber>
+public struct DoubleNumber(double value) : IComputableNumber<DoubleNumber>, IEquatable<DoubleNumber>
 {
-    public readonly double Value;
-
-    public DoubleNumber(double value)
+    public bool Equals(DoubleNumber other)
     {
-        Value = value;
+        return Value.Equals(other.Value);
     }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is DoubleNumber other && Equals(other);
+    }
+
+    public override int GetHashCode()
+    {
+        return Value.GetHashCode();
+    }
+
+    public readonly double Value = value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static DoubleNumber Sqrt(DoubleNumber num)
@@ -330,6 +340,29 @@ public struct DoubleNumber : IComputableNumber<DoubleNumber>
     {
         return source;
     }
-
+    public static bool operator ==(DoubleNumber left, DoubleNumber right)
+    {
+        return left.Value == right.Value;
+    }
+    public static bool operator !=(DoubleNumber left, DoubleNumber right)
+    {
+        return left.Value != right.Value;
+    }
+    public static bool operator <(DoubleNumber left, DoubleNumber right)
+    {
+        return left.Value < right.Value;
+    }
+    public static bool operator >(DoubleNumber left, DoubleNumber right)
+    {
+        return left.Value > right.Value;
+    }
+    public static bool operator <=(DoubleNumber left, DoubleNumber right)
+    {
+        return left.Value <= right.Value;
+    }
+    public static bool operator >=(DoubleNumber left, DoubleNumber right)
+    {
+        return left.Value >= right.Value;
+    }
     public static bool NeedClone => false;
 }

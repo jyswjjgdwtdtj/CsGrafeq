@@ -5,7 +5,7 @@
                    xmlns:controls="clr-namespace:CsGrafeqApplication.Core.Controls"
                    xmlns:csGrafeq="clr-namespace:CsGrafeq;assembly=CsGrafeq.Base"
                    xmlns:viewModel="clr-namespace:CsGrafeqApplication.Core.ViewModel"
-                   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+                   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450" 
                    x:Class="CsGrafeqApplication.Core.Controls.Keyboard" x:DataType="viewModel:KeyboardViewModel">
     <Design.PreviewWith>
         <controls:Keyboard Width="600" Height="400" />
@@ -52,7 +52,7 @@
                                             <Setter Property="RenderTransform">
                                                 <RotateTransform Angle="180" />
                                             </Setter>
-                                            <Style Selector="^ Path">
+                                            <Style Selector="^:not(:empty) Path">
                                                 <Setter Property="Fill" Value="{DynamicResource CgForegroundBrush}" />
                                             </Style>
                                         </Style>
@@ -60,28 +60,68 @@
                                     </Style>
                                 </Expander.Styles>
                                 <Panel Height="150">
+                                    <Panel.Styles>
+                                    <Style Selector="TextBlock">
+                                        <Setter Property="Foreground" Value="{DynamicResource CgForegroundBrush}"/>
+                                    </Style>
+                                    <Style Selector="AccessText">
+                                        <Setter Property="Foreground" Value="{DynamicResource CgForegroundBrush}"/>
+                                    </Style>
+                                    <Style Selector="Button">
+                                        <Setter Property="Transitions">
+                                            <Transitions>
+                                                <BrushTransition Property="Background" Duration="0.1"/>
+                                                <BrushTransition Property="Foreground" Duration="0.1"/>
+                                            </Transitions>
+                                        </Setter>
+                                        <Setter Property="Background"
+                                                Value="{DynamicResource CgBackgroundBrush}" />
+                                        <Setter Property="CornerRadius" Value="4" />
+                                        <Setter Property="Focusable" Value="False" />
+                                        <Setter Property="Foreground" Value="{DynamicResource CgForegroundBrush}"/>
+                                        <Setter Property="BorderBrush"
+                                                Value="{DynamicResource CgForegroundBrush}" />
+                                        <Setter Property="BorderThickness" Value="1" />
+                                        <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                        <Setter Property="Margin" Value="2" />
+                                        <Setter Property="Padding" Value="0" />
+                                        <Setter Property="FontFamily" Value="{StaticResource MapleMono}" />
+                                    </Style>
+                                    <Style Selector="controls|OneSymbolKeyButton">
+                                        <Setter Property="FontSize" Value="16" />
+                                    </Style>
+                                    <Style Selector="controls|TwoSymbolKeyButtonInPlace">
+                                        <Setter Property="FontSize" Value="16" />
+                                    </Style>
+                                    <Style Selector="controls|TwoSymbolKeyButton">
+                                        <Setter Property="FontSize" Value="16" />
+                                    </Style>
+                                    <Style Selector="TextBlock">
+                                        <Setter Property="HorizontalAlignment" Value="Center" />
+                                        <Setter Property="VerticalAlignment" Value="Center" />
+                                    </Style>
+                                        <Style Selector="ToggleButton">
+                                            <Setter Property="Background"
+                                                    Value="{DynamicResource CgBackgroundBrush}" />
+                                            <Style Selector="^:checked">
+                                                <Setter Property="Background"
+                                                        Value="{DynamicResource MaterialPrimaryMidBrush}" />
+                                            </Style>
+                                            <Setter Property="CornerRadius" Value="4" />
+                                            <Setter Property="Focusable" Value="False" />
+                                            <Setter Property="BorderBrush"
+                                                    Value="{DynamicResource CgForegroundBrush}" />
+                                            <Setter Property="BorderThickness" Value="1" />
+                                            <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                            <Setter Property="Margin" Value="2" />
+                                            <Setter Property="Padding" Value="0" />
+                                            <Setter Property="FontSize" Value="20" />
+                                        </Style>
+                                    </Panel.Styles>
                                     <Grid VerticalAlignment="Center" ColumnDefinitions="Auto,40,Auto,40,Auto"
                                           HorizontalAlignment="Center" Name="Container123" IsVisible="True">
                                         <Grid Grid.Column="0" ColumnDefinitions="70,70,70,70"
                                               RowDefinitions="35,35,35,35">
-                                            <Grid.Styles>
-                                                <Style Selector="controls|OneSymbolKeyButton">
-                                                    <Setter Property="FontSize" Value="16" />
-                                                </Style>
-                                                <Style Selector="Button">
-                                                    <Setter Property="Background"
-                                                            Value="{DynamicResource CgBackgroundBrush}" />
-                                                    <Setter Property="CornerRadius" Value="4" />
-                                                    <Setter Property="Focusable" Value="False" />
-                                                    <Setter Property="BorderBrush"
-                                                            Value="{DynamicResource CgForegroundBrush}" />
-                                                    <Setter Property="BorderThickness" Value="1" />
-                                                    <Setter Property="HorizontalAlignment" Value="Stretch" />
-                                                    <Setter Property="Margin" Value="2" />
-                                                    <Setter Property="Padding" Value="0" />
-                                                    <Setter Property="FontFamily" Value="{StaticResource MapleMono}" />
-                                                </Style>
-                                            </Grid.Styles>
                                             <controls:OneSymbolKeyButton Grid.Column="0" Grid.Row="0" Button="x" />
                                             <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="0" Button="y" />
                                             <controls:OneSymbolKeyButton Grid.Column="2" Grid.Row="0" Button="(" />
@@ -186,7 +226,7 @@
 
                                             </Button>
 
-                                            <Button Grid.Column="0" Grid.Row="3" Name="SwitchToABC"
+                                            <Button Grid.Column="0" Grid.Row="3" Name="SwitchToABC"  
                                                     Click="SwitchClicked">
                                                 ABC
                                             </Button>
@@ -197,11 +237,6 @@
                                         </Grid>
                                         <Grid Grid.Column="2" ColumnDefinitions="70,70,70,70"
                                               RowDefinitions="35,35,35,35">
-                                            <Grid.Styles>
-                                                <Style Selector="controls|OneSymbolKeyButton">
-                                                    <Setter Property="FontSize" Value="16" />
-                                                </Style>
-                                            </Grid.Styles>
                                             <controls:OneSymbolKeyButton Grid.Column="0" Grid.Row="0" Button="7" />
                                             <controls:OneSymbolKeyButton Grid.Column="1" Grid.Row="0" Button="8" />
                                             <controls:OneSymbolKeyButton Grid.Column="2" Grid.Row="0" Button="9" />
@@ -220,25 +255,6 @@
                                             <controls:OneSymbolKeyButton Grid.Column="3" Grid.Row="3" Button="+" />
                                         </Grid>
                                         <Grid Grid.Column="4" ColumnDefinitions="70,70" RowDefinitions="35,35,35,35">
-                                            <Grid.Styles>
-                                                <Style Selector="Button">
-                                                    <Setter Property="Background"
-                                                            Value="{DynamicResource CgBackgroundBrush}" />
-                                                    <Setter Property="CornerRadius" Value="4" />
-                                                    <Setter Property="Focusable" Value="False" />
-                                                    <Setter Property="BorderBrush"
-                                                            Value="{DynamicResource CgForegroundBrush}" />
-                                                    <Setter Property="BorderThickness" Value="1" />
-                                                    <Setter Property="HorizontalAlignment" Value="Stretch" />
-                                                    <Setter Property="Margin" Value="2" />
-                                                    <Setter Property="Padding" Value="0" />
-                                                    <Setter Property="FontSize" Value="20" />
-                                                </Style>
-                                                <Style Selector="TextBlock">
-                                                    <Setter Property="HorizontalAlignment" Value="Center" />
-                                                    <Setter Property="VerticalAlignment" Value="Center" />
-                                                </Style>
-                                            </Grid.Styles>
                                             <Button Grid.Column="0" Grid.Row="0" Click="CursorLeftClick">
                                                 <TextBlock Text="←" />
                                             </Button>
@@ -264,47 +280,11 @@
                                         <StackPanel.Styles>
                                             <Style Selector="controls|TwoSymbolKeyButtonInPlace">
                                                 <Setter Property="Width" Value="60" />
-                                                <Setter Property="FontSize" Value="16" />
                                                 <Setter Property="Height" Value="35" />
                                             </Style>
                                             <Style Selector="controls|OneSymbolKeyButton">
                                                 <Setter Property="Width" Value="60" />
-                                                <Setter Property="FontSize" Value="16" />
                                                 <Setter Property="Height" Value="35" />
-                                            </Style>
-                                            <Style Selector="TextBlock">
-                                                <Setter Property="HorizontalAlignment" Value="Center" />
-                                                <Setter Property="VerticalAlignment" Value="Center" />
-                                            </Style>
-                                            <Style Selector="Button">
-                                                <Setter Property="Background"
-                                                        Value="{DynamicResource CgBackgroundBrush}" />
-                                                <Setter Property="CornerRadius" Value="4" />
-                                                <Setter Property="Focusable" Value="False" />
-                                                <Setter Property="BorderBrush"
-                                                        Value="{DynamicResource CgForegroundBrush}" />
-                                                <Setter Property="BorderThickness" Value="1" />
-                                                <Setter Property="HorizontalAlignment" Value="Stretch" />
-                                                <Setter Property="Margin" Value="2" />
-                                                <Setter Property="Padding" Value="0" />
-                                                <Setter Property="FontSize" Value="20" />
-                                            </Style>
-                                            <Style Selector="ToggleButton">
-                                                <Setter Property="Background"
-                                                        Value="{DynamicResource CgBackgroundBrush}" />
-                                                <Style Selector="^:checked">
-                                                    <Setter Property="Background"
-                                                            Value="{DynamicResource MaterialPrimaryMidBrush}" />
-                                                </Style>
-                                                <Setter Property="CornerRadius" Value="4" />
-                                                <Setter Property="Focusable" Value="False" />
-                                                <Setter Property="BorderBrush"
-                                                        Value="{DynamicResource CgForegroundBrush}" />
-                                                <Setter Property="BorderThickness" Value="1" />
-                                                <Setter Property="HorizontalAlignment" Value="Stretch" />
-                                                <Setter Property="Margin" Value="2" />
-                                                <Setter Property="Padding" Value="0" />
-                                                <Setter Property="FontSize" Value="20" />
                                             </Style>
                                         </StackPanel.Styles>
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
@@ -364,7 +344,7 @@
 
                                         <!-- Row 2 -->
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                            <ToggleButton Width="86" Name="ShiftButton" IsChecked="True">
+                                            <ToggleButton Width="86" Name="ShiftButton" IsChecked="True" >
                                                 <TextBlock Text="⇧" />
                                             </ToggleButton>
                                             <controls:TwoSymbolKeyButtonInPlace
@@ -394,14 +374,14 @@
                                             <controls:TwoSymbolKeyButtonInPlace
                                                 IsChecked="{CompiledBinding #ShiftButton.IsChecked}" FirstButton="l"
                                                 SecondButton="L" />
-                                            <Button Width="85" Click="BackspaceClick">
+                                            <Button Width="85" Click="BackspaceClick" >
                                                 <TextBlock Text="⌫" />
                                             </Button>
                                         </StackPanel>
 
                                         <!-- Row 3 -->
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                            <Button Width="100" Click="SwitchClicked">
+                                            <Button Width="100" Click="SwitchClicked" >
                                                 <TextBlock Text="123" FontSize="16" />
                                             </Button>
                                             <controls:TwoSymbolKeyButtonInPlace
@@ -428,7 +408,7 @@
                                             <controls:TwoSymbolKeyButtonInPlace
                                                 IsChecked="{CompiledBinding #ShiftButton.IsChecked}" FirstButton=","
                                                 SecondButton="." />
-                                            <Button Width="133" Click="EnterClick">
+                                            <Button Width="133" Click="EnterClick" >
                                                 <TextBlock Text="↵" />
                                             </Button>
                                         </StackPanel>

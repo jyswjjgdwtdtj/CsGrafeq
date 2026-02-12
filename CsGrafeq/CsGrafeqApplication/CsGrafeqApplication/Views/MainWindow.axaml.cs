@@ -1,16 +1,25 @@
-﻿using Avalonia;
+﻿using System.Runtime.CompilerServices;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using CsGrafeq.Windows.IME;
+using CsGrafeqApplication.Core.Utils;
 
 namespace CsGrafeqApplication.Views;
 
 public partial class MainWindow : Window
 {
+    public static MainWindow? Instance;
     public MainWindow()
     {
         InitializeComponent();
         this.AttachDevTools();
+        Instance = this;
+    }
+
+    public void SetClientSize(Size size)
+    {
+        this.HandleResized(size,WindowResizeReason.User);
     }
 
     private void MinimizeClicked(object? sender, RoutedEventArgs e)

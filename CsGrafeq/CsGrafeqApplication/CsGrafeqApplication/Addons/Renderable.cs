@@ -1,24 +1,35 @@
 ﻿using System;
+using System.IO;
+using System.Threading;
+using Avalonia;
+using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using Avalonia.Skia;
+using CsGrafeq.Bitmap;
 using SkiaSharp;
 
 namespace CsGrafeqApplication.Addons;
 
 public class Renderable : IDisposable
 {
+    public Renderable()
+    {
+        _bitmap = new(0, 0);
+    }
     /// <summary>
     ///     缓冲区的同步锁
     /// </summary>
-    private readonly object BitmapLock = new();
+    private readonly Lock _bitmapLock = new();
 
     /// <summary>
     ///     缓冲区
     /// </summary>
-    private SKBitmap Bitmap = new(1, 1);
+    private PixelBitmap _bitmap;
 
     /// <summary>
     ///     缓冲区大小
     /// </summary>
-    private SKSizeI Size = new(1, 1);
+    private SKSizeI _size = new(0, 0);
 
     /// <summary>
     ///     指示是否处于活动
@@ -31,7 +42,7 @@ public class Renderable : IDisposable
             var flag = value && !field;
             field = value;
             Changed = true;
-            if (flag) RenderTargetSize = Size;
+            if (flag) RenderTargetSize = _size;
         }
     } = true;
 
@@ -42,14 +53,13 @@ public class Renderable : IDisposable
 
     public SKSizeI RenderTargetSize
     {
-        get => Size;
+        get => _size;
         set
         {
-            Size = value;
-            lock (BitmapLock)
+            _size = value;
+            lock (_bitmapLock)
             {
-                Bitmap.Dispose();
-                Bitmap = new SKBitmap(int.Max(value.Width, 1), int.Max(value.Height, 1));
+                PixelBitmap.Resize(ref _bitmap, _size.Width, _size.Height);
             }
         }
     }
@@ -59,7 +69,7 @@ public class Renderable : IDisposable
     /// </summary>
     public void Dispose()
     {
-        Bitmap?.Dispose();
+        _bitmap.Dispose();
         GC.SuppressFinalize(this);
     }
 
@@ -71,9 +81,19 @@ public class Renderable : IDisposable
     {
         if (!IsActive)
             return null;
-        lock (BitmapLock)
+        lock (_bitmapLock)
         {
-            return new SKCanvas(Bitmap);
+            return new SKCanvas(_bitmap.SKBitmap);
+        }
+    }
+
+    public void ClearAndFlush()
+    {
+        if (!IsActive)
+            return;
+        lock (_bitmapLock)
+        {
+            _bitmap.Clear();
         }
     }
 
@@ -85,10 +105,8 @@ public class Renderable : IDisposable
     {
         if (!IsActive)
             return;
-        lock (BitmapLock)
-        {
-            Bitmap.TryRealCopyTo(bitmap);
-        }
+        lock (_bitmapLock)
+            _bitmap.TryCopyTo(bitmap.GetPixelSpan());
     }
 
     /// <summary>
@@ -101,27 +119,47 @@ public class Renderable : IDisposable
     {
         if (!IsActive)
             return;
-        lock (BitmapLock)
+        lock (_bitmapLock)
         {
-            canvas.DrawBitmap(Bitmap, x, y);
+            canvas.DrawBitmap(_bitmap.SKBitmap, x, y, SkiaHelper.CompoundBufferPaint);
         }
     }
 
     /// <summary>
     ///     绘制事件
     /// </summary>
-    public event Action<SKCanvas?, SKRect>? OnRender;
+    public event Action<SKCanvas?, SKRect,CancellationToken>? OnRenderCanvas;
+    /// <summary>
+    ///     绘制事件
+    /// </summary>
+    public event Action<PixelBitmap, SKRect, CancellationToken>? OnRender;
 
     /// <summary>
-    ///     在指定Canvas上绘制
+    ///     当前缓冲区上绘制
     /// </summary>
-    /// <param name="dc"></param>
     /// <param name="rect"></param>
-    public void Render(SKCanvas? dc, SKRect rect)
+    /// <param name="ct"></param>
+    public void Render(SKRect rect,CancellationToken ct)
     {
         if (!IsActive)
             return;
-        OnRender?.Invoke(dc, rect);
+        lock (_bitmapLock)
+        {
+            OnRender?.Invoke(_bitmap, rect,ct);
+            OnRenderCanvas?.Invoke(GetBitmapCanvas(), rect, ct);
+        }
+    }
+    public void Render(SKRect rect){
+        Render(rect, CancellationToken.None);
+    }
+    public void DrawBitmapTo(DrawingContext dc, Rect destRect, Rect sourceRect)
+    {
+        if (!IsActive)
+            return;
+        lock (_bitmapLock)
+        {
+            dc.DrawImage(_bitmap.ToWriteableBitmap(),sourceRect, destRect);
+        }
     }
 
     ~Renderable()

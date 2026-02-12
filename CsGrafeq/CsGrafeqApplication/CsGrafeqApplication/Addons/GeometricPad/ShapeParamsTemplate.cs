@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Avalonia.Layout;
@@ -24,11 +25,12 @@ public class ShapeParamsTemplate : IDataTemplate
             stack.Orientation = Orientation.Horizontal;
             foreach (var shapeParams in item ?? [])
             {
-                var tb = new TextBlock { Classes = { "Prompt" }, VerticalAlignment = VerticalAlignment.Center };
-                tb.Bind(TextBlock.TextProperty,
-                    (shapeParams.Description ?? shapeParams.Shape.TypeName).WhenAnyValue(x => x.Data)
-                    .Select(d => d + ":"));
-                ctls.Add(tb);
+                ctls.Add(new TextBlock
+                {
+                    [!TextBlock.TextProperty] = (shapeParams.Description??shapeParams.Shape.TypeName).WhenAnyValue(d=>d.Data).Select(d=>d+":").ToBinding(),
+                    Classes = { "Prompt" },
+                    VerticalAlignment = VerticalAlignment.Center,
+                });
                 var c = ShapeTemplate!.Build(shapeParams)!;
                 c.DataContext = shapeParams.Shape;
                 ctls.Add(c);
@@ -36,14 +38,13 @@ public class ShapeParamsTemplate : IDataTemplate
             }
 
             var expns = getter.NumberParameters;
-            Console.WriteLine(expns is null);
             foreach (var expNumberData in expns ?? [])
             {
                 ctls.Add(new TextBlock
                 {
-                    Text = expNumberData.Description.Data + ":",
+                    [!TextBlock.TextProperty] = expNumberData.Description.WhenAnyValue(d=>d.Data).Select(d=>d+":").ToBinding(),
                     Classes = { "Prompt" },
-                    VerticalAlignment = VerticalAlignment.Center
+                    VerticalAlignment = VerticalAlignment.Center,
                 });
                 var c = NumberTemplate!.Build(expNumberData)!;
                 c.DataContext = expNumberData.Number;

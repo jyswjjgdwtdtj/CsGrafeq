@@ -1,8 +1,12 @@
-﻿using Avalonia;
+﻿using System;
+using System.Linq;
+using System.Threading;
+using Avalonia;
 using Avalonia.Input;
-using CsGrafeq.Debug;
+using CsGrafeqApplication.Events;
+using CsGrafeqApplication.Utilities;
 using SkiaSharp;
-using static CsGrafeq.Utilities.ThrowHelper;
+using BigPoint = CsGrafeq.PointBase<CsGrafeq.Numeric.BigNumber<long, double>>;
 
 namespace CsGrafeqApplication.Controls.Displayers;
 
@@ -11,19 +15,19 @@ public delegate void RenderHandler(SKCanvas dc, SKRect bounds);
 public class DisplayControl : CartesianDisplayer
 {
     /// <summary>
-    ///     上一时刻的零点位置
+    ///     鼠标按下时的位置 用以计算出新的Zero
     /// </summary>
-    private PointL LastZeroPos;
+    private BigPoint _pointerDownPointerPos = new() { X = 0, Y = 0 };
 
     /// <summary>
-    ///     鼠标按下时的位置
+    ///     鼠标按下时的零点位置 用以计算出新的Zero
     /// </summary>
-    private PointL MouseDownPos = new() { X = 0, Y = 0 };
+    private BigPoint _pointerDownZeroPos = new() { X = 0, Y = 0 };
 
     /// <summary>
-    ///     鼠标按下时的零点位置
+    ///     上一次重绘补全完整绘制区域时的Zero
     /// </summary>
-    private PointL MouseDownZeroPos = new() { X = 0, Y = 0 };
+    private BigPoint _previousRenderZeroPos;
 
     public DisplayControl()
     {
@@ -32,21 +36,16 @@ public class DisplayControl : CartesianDisplayer
         AddHandler(DoubleTappedEvent, (_, e) => OnPointerDoubleTapped(e));
     }
 
-    protected override void OnPointerPressed(PointerPressedEventArgs e)
+    private bool _isPointerLeftButtonDown = false;
+    protected sealed override void OnPointerPressed(PointerPressedEventArgs e)
     {
-        Debug.LogPointer("PointerPressed");
         if (!e.Pointer.IsPrimary) return;
         StopWheeling();
-        if (CallPointerPressed(e) == DoNext)
+        var ev = e.Cast(this);
+        if (CallPointerPressed(ev) == DoNext)
         {
-            if (e.Properties.IsLeftButtonPressed)
-            {
-                var p = e.GetPosition(this);
-                MouseDownPos = new PointL { X = (long)p.X, Y = (long)p.Y };
-                MouseDownZeroPos = Zero;
-            }
-
-            LastZeroPos = Zero;
+            _isPointerLeftButtonDown = true;
+            if (e.Properties.IsLeftButtonPressed) OnPointerPressedLeftButton(ev);
             base.OnPointerPressed(e);
         }
         else
@@ -55,83 +54,35 @@ public class DisplayControl : CartesianDisplayer
         }
     }
 
-    protected override void OnPointerMoved(PointerEventArgs e)
+    protected virtual void OnPointerPressedLeftButton(MouseEventArgs e, CancellationToken ct = default)
     {
-        Debug.LogPointer("PointerMoved");
+        Console.WriteLine("Press");
+        var p = e.Position;
+        _pointerDownPointerPos = p.ToBigPoint();
+        _pointerDownZeroPos = ZeroPos;
+        _previousRenderZeroPos = ZeroPos;
+    }
+
+
+    protected sealed override void OnPointerMoved(PointerEventArgs e)
+    {
         if (!e.Pointer.IsPrimary) return;
         StopWheeling();
-        if (CallPointerMoved(e) == DoNext)
+        var ev = e.Cast(this);
+        if (CallPointerMoved(ev) == DoNext)
         {
-            var current = e.GetPosition(this);
-            bool l = MouseOnYAxis, ll = MouseOnXAxis;
-            MouseOnYAxis = Abs(current.X - Zero.X) < 3;
-            MouseOnXAxis = Abs(current.Y - Zero.Y) < 3;
-            if (e.Properties.IsLeftButtonPressed)
+            var current = ev.Position.ToBigPoint();
+            MouseOnYAxis = Abs(current.X - ZeroPos.X) < 3;
+            MouseOnXAxis = Abs(current.Y - ZeroPos.Y) < 3;
+            if (ev.Properties.IsLeftButtonPressed&&_isPointerLeftButtonDown)
             {
-                //移动零点
-                var newZero = new PointL
+                ZeroPos = new BigPoint
                 {
-                    X = MouseDownZeroPos.X + (long)current.X - MouseDownPos.X,
-                    Y = MouseDownZeroPos.Y + (long)current.Y - MouseDownPos.Y
+                    X = _pointerDownZeroPos.X + current.X - _pointerDownPointerPos.X,
+                    Y = _pointerDownZeroPos.Y + current.Y - _pointerDownPointerPos.Y
                 };
-                if (newZero != Zero)
-                {
-                    Zero = newZero;
-                    lock (TotalBufferLock)
-                    {
-                        using var dc = new SKCanvas(TotalBuffer);
-                        dc.Clear(AxisBackground);
-                        RenderAxes(dc);
-                        if (!Setting.Instance.MoveOptimization || (LastZeroPos - Zero).Length > 50)
-                        {
-                            foreach (var adn in Addons)
-                            foreach (var rt in adn.Layers)
-                            {
-                                if (!rt.IsActive)
-                                    continue;
-                                var size = rt.RenderTargetSize;
-                                if (size.Width != TotalBuffer.Width || size.Height != TotalBuffer.Height)
-                                {
-                                    Throw(
-                                        $"Bitmap size mismatch TotalBufferSize:{TotalBuffer.Width},{TotalBuffer.Height} RTSize:{size.Width},{size.Height}");
-                                    return;
-                                }
-
-                                rt.CopyRenderTargetTo(TempBuffer);
-                                using (var canvas = rt.GetBitmapCanvas()!)
-                                {
-                                    canvas.Clear(SKColors.Transparent);
-                                    canvas.DrawBitmap(TempBuffer, Zero.X - LastZeroPos.X,
-                                        Zero.Y - LastZeroPos.Y);
-                                    RenderMovedPlace(canvas, rt.Render);
-                                }
-
-                                rt.DrawRenderTargetTo(dc, 0, 0);
-                            }
-
-                            LastZeroPos = Zero;
-                        }
-                        else
-                        {
-                            foreach (var adn in Addons)
-                            foreach (var layer in adn.Layers)
-                            {
-                                if (!layer.IsActive)
-                                    continue;
-                                layer.DrawRenderTargetTo(dc, (int)(Zero.X - LastZeroPos.X),
-                                    (int)(Zero.Y - LastZeroPos.Y));
-                                //RenderMovedPlace(dc, layer.Render);
-                            }
-                        }
-
-                        RenderAxesNumber(dc);
-                    }
-
-                    InvalidateVisual();
-                }
+                OnPointerMovedLeftButton(ev, default);
             }
-
-            base.OnPointerMoved(e);
         }
         else
         {
@@ -139,40 +90,127 @@ public class DisplayControl : CartesianDisplayer
         }
     }
 
-    protected override void OnPointerReleased(PointerReleasedEventArgs e)
+    protected virtual void OnPointerMovedLeftButton(MouseEventArgs e, CancellationToken ct)
     {
-        Debug.LogPointer("PointerReleased");
-        if (!e.Pointer.IsPrimary) return;
-        Focus();
+        Console.WriteLine("move");
+        if (ZeroPos != _previousRenderZeroPos)
+        {
+            lock (TotalBufferLock)
+            {
+                var dc = new SKCanvas(TotalBuffer);
+                dc.Clear(AxisBackground);
+                RenderAxes(dc);
+                if (!Setting.Instance.MoveOptimization || (_previousRenderZeroPos - ZeroPos).Length > 50)
+                {
+                    var lastZero = _previousRenderZeroPos;
+                    _previousRenderZeroPos = ZeroPos;
+                    foreach (var rt in Addons.SelectMany(adn => adn.Layers).Where(rt => rt.IsActive))
+                    {
+                        rt.CopyRenderTargetTo(TempBuffer);
+                        using var canvas = rt.GetBitmapCanvas()!;
+                        canvas.Clear(SKColors.Transparent);
+                        canvas.DrawBitmap(TempBuffer, (int)(ZeroPos.X - lastZero.X).ToDecimal(),
+                            (int)(ZeroPos.Y - lastZero.Y).ToDecimal(), SkiaHelper.CompoundBufferPaint);
+                        canvas.Flush();
+                        RenderExtension.RenderMovedPlace(rt.Render, Bounds.Size,
+                            new Point(ZeroPos.X, ZeroPos.Y),
+                            new Point(lastZero.X, lastZero.Y), CancellationHelperToken);
+                        rt.DrawRenderTargetTo(dc, 0, 0);
+                    }
+                }
+                else
+                {
+                    foreach (var layer in Addons.SelectMany(adn => adn.Layers).Where(rt => rt.IsActive))
+                        layer.DrawRenderTargetTo(dc, (int)(ZeroPos.X - _previousRenderZeroPos.X),
+                            (int)(ZeroPos.Y - _previousRenderZeroPos.Y));
+                }
+
+                RenderAxesNumber(dc);
+                dc.Dispose();
+            }
+
+            InvalidateVisual();
+        }
+    }
+
+    protected sealed override void OnPointerReleased(PointerReleasedEventArgs eventArgs)
+    {
+        var e = eventArgs.Cast(this);
         StopWheeling();
         if (CallPointerReleased(e) == DoNext)
         {
-            if (LastZeroPos != Zero) ForceToRender();
-            LastZeroPos = Zero;
-            base.OnPointerReleased(e);
+            var current = e.Position.ToBigPoint();
+            MouseOnYAxis = Abs(current.X - ZeroPos.X) < 3;
+            MouseOnXAxis = Abs(current.Y - ZeroPos.Y) < 3;
+            if (_isPointerLeftButtonDown)
+            {
+                _isPointerLeftButtonDown = false;
+                //移动零点
+                ZeroPos = new BigPoint
+                {
+                    X = _pointerDownZeroPos.X + current.X - _pointerDownPointerPos.X,
+                    Y = _pointerDownZeroPos.Y + current.Y - _pointerDownPointerPos.Y
+                };
+                OnPointerReleasedLeftButton(e);
+            }
         }
         else
         {
             AskForRender();
+        }
+    }
+
+    protected virtual void OnPointerReleasedLeftButton(MouseEventArgs e)
+    {
+        Console.WriteLine("Release");
+        if (ZeroPos != _previousRenderZeroPos)
+        {
+            if (Setting.Instance.MoveOptimization)
+            {
+                lock (TotalBufferLock)
+                {
+                    var dc = new SKCanvas(TotalBuffer);
+                    dc.Clear(AxisBackground);
+                    RenderAxes(dc);
+                    var lastZero = _previousRenderZeroPos;
+                    _previousRenderZeroPos = ZeroPos;
+                    foreach (var rt in Addons.SelectMany(adn => adn.Layers).Where(rt => rt.IsActive))
+                    {
+                        rt.CopyRenderTargetTo(TempBuffer);
+                        using var canvas = rt.GetBitmapCanvas()!;
+                        canvas.Clear(SKColors.Transparent);
+                        canvas.DrawBitmap(TempBuffer, (int)(ZeroPos.X - lastZero.X).ToDecimal(),
+                            (int)(ZeroPos.Y - lastZero.Y).ToDecimal(), SkiaHelper.CompoundBufferPaint);
+                        canvas.Flush();
+                        RenderExtension.RenderMovedPlace(rt.Render, Bounds.Size,
+                            new Point(ZeroPos.X, ZeroPos.Y),
+                            new Point(lastZero.X, lastZero.Y), CancellationHelperToken);
+                        rt.DrawRenderTargetTo(dc, 0, 0);
+                    }
+
+                    RenderAxesNumber(dc);
+                    dc.Dispose();
+                }
+
+                InvalidateVisual();
+            }
+            else
+            {
+                ForceToRender(CancellationToken.None);
+            }
         }
     }
 
     protected virtual void OnPointerTapped(TappedEventArgs e)
     {
         if (!e.Pointer.IsPrimary) return;
-        CallPointerTapped(e);
+        CallPointerTapped(e.Cast(this));
     }
 
     protected virtual void OnPointerDoubleTapped(TappedEventArgs e)
     {
         if (!e.Pointer.IsPrimary) return;
-        CallPointerDoubleTapped(e);
-    }
-
-    private void RenderMovedPlace(SKCanvas dc, RenderHandler rm)
-    {
-        RenderExtension.RenderMovedPlace(dc, rm, Bounds.Size, new Point(Zero.X, Zero.Y),
-            new Point(LastZeroPos.X, LastZeroPos.Y));
+        CallPointerDoubleTapped(e.Cast(this));
     }
 
     protected override void OnKeyDown(KeyEventArgs e)

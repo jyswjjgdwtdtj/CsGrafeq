@@ -5,7 +5,7 @@ using static CsGrafeq.Numeric.CsGrafeqMath;
 
 namespace CsGrafeq.Shapes;
 
-public abstract class Line : GeometryShape
+public abstract class Line : GeometricShape
 {
     public LineStruct Current;
     public LineGetter LineGetter;

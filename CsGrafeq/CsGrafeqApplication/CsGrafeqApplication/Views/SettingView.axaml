@@ -3,6 +3,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:csGrafeq="clr-namespace:CsGrafeq;assembly=CsGrafeq.Base"
+             xmlns:controls="clr-namespace:CsGrafeqApplication.Core.Controls;assembly=CsGrafeqApplication.Core"
+             xmlns:skiaSharp="clr-namespace:SkiaSharp;assembly=SkiaSharp"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CsGrafeqApplication.Views.SettingView" x:DataType="csGrafeq:Setting">
     <TabControl TabStripPlacement="Left" Margin="0,15" MinHeight="350">
@@ -28,7 +30,7 @@
         </TabControl.Styles>
         <TabItem Header="{CompiledBinding MultiLanguageResources.GeneralText.Data}">
             <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
-                <StackPanel Margin="15">
+                <StackPanel Margin="15,0">
                     <CheckBox IsChecked="{CompiledBinding ShowKeyboard,Mode=TwoWay}">
                         <TextBlock
                             Text="{CompiledBinding MultiLanguageResources.ShowKeyboardText.Data}" />
@@ -40,9 +42,60 @@
                 </StackPanel>
             </ScrollViewer>
         </TabItem>
+        <TabItem Header="{CompiledBinding MultiLanguageResources.RenderText.Data}">
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
+                <Grid RowDefinitions="Auto" ColumnDefinitions="Auto,Auto" Margin="15,0"
+                      DataContext="{x:Static csGrafeq:Setting.Instance}"
+                      x:DataType="csGrafeq:Setting">
+                    <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center">
+                        <Run Text="{CompiledBinding MultiLanguageResources.BlendModeText}"></Run>
+                        <Run Text=":"></Run>
+                    </TextBlock>
+                    <controls:EnumSelector x:TypeArguments="skiaSharp:SKBlendMode" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Width="140"
+                                           EnumValue="{CompiledBinding CompoundBlendMode,Mode=TwoWay}">
+                        
+                    </controls:EnumSelector>
+                </Grid>
+            </ScrollViewer>
+        </TabItem>
+        <TabItem Header="{CompiledBinding MultiLanguageResources.WindowText.Data}">
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
+                <StackPanel Margin="15,0" Orientation="Vertical">
+                    <Grid ColumnDefinitions="Auto,Auto" RowDefinitions="50,50,50">
+                        <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center">
+                            <Run Text="{CompiledBinding MultiLanguageResources.WidthText.Data}"/>
+                            <Run Text=":"></Run>
+                        </TextBlock>
+                        <NumericUpDown Increment="10" FormatString="0" Minimum="100" Maximum="3840"  Width="100" Height="35" Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" MinWidth="100" Name="WidthTextBox" Value="{CompiledBinding ClientSizeWidth,Mode=TwoWay}">
+                        </NumericUpDown>
+                        <TextBlock Grid.Column="0" Grid.Row="1" VerticalAlignment="Center">
+                            <Run Text="{CompiledBinding MultiLanguageResources.HeightText.Data}"/>
+                            <Run Text=":"></Run>
+                        </TextBlock>
+                        <NumericUpDown Increment="10" FormatString="0" Minimum="100" Maximum="2160"  Width="100" Height="35" Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" Name="HeightTextBox" Value="{CompiledBinding ClientSizeHeight,Mode=TwoWay}">
+                        </NumericUpDown>
+                        <Button Grid.Column="1" Grid.Row="2" Content="{CompiledBinding MultiLanguageResources.ApplyText}" VerticalAlignment="Center" Name="ApplyClientSizeButton" Click="ApplyClientSizeButton_OnClick">
+                            <Button.Styles>
+                                <Style Selector="Button">
+                                    <Setter Property="Background"
+                                            Value="{DynamicResource CgBackgroundBrush}" />
+                                    <Setter Property="CornerRadius" Value="4" />
+                                    <Setter Property="BorderBrush"
+                                            Value="{DynamicResource CgForegroundBrush}" />
+                                    <Setter Property="BorderThickness" Value="1" />
+                                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                    <Setter Property="Margin" Value="2" />
+                                    <Setter Property="Padding" Value="0" />
+                                </Style>
+                            </Button.Styles>
+                        </Button>
+                    </Grid>
+                </StackPanel>
+            </ScrollViewer>
+        </TabItem>
         <TabItem Header="{CompiledBinding MultiLanguageResources.GraphText.Data}">
             <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
-                <StackPanel Margin="15">
+                <StackPanel Margin="15,0">
                     <CheckBox Name="MoveOp" IsChecked="{CompiledBinding MoveOptimization,Mode=TwoWay}"
                               IsEnabled="{CompiledBinding MoveOptimizationUserEnabled,Mode=OneWay}">
                         <TextBlock
@@ -75,7 +128,7 @@
         <TabItem Header="{CompiledBinding MultiLanguageResources.ImplicitFunctionText.Data}"
                  IsVisible="{x:Static csGrafeq:Setting.CanDrawFunction}">
             <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
-                <Grid RowDefinitions="Auto" ColumnDefinitions="Auto,Auto" Margin="15"
+                <Grid RowDefinitions="Auto" ColumnDefinitions="Auto,Auto" Margin="15,0"
                       DataContext="{x:Static csGrafeq:Setting.Instance}"
                       x:DataType="csGrafeq:Setting">
                     <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">

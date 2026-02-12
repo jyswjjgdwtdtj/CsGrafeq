@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -7,9 +8,12 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Styling;
 using Avalonia.Threading;
+using CsGrafeq.Numeric;
+using CsGrafeqApplication.Events;
 using SkiaSharp;
 using static CsGrafeqApplication.Core.Utils.StaticSkiaResources;
 using static CsGrafeqApplication.Core.Utils.PointRectHelper;
+using BigPoint= CsGrafeq.PointBase<CsGrafeq.Numeric.BigNumber<long,double>>;
 
 
 namespace CsGrafeqApplication.Controls.Displayers;
@@ -21,19 +25,24 @@ public class CartesianDisplayer : Displayer
     private readonly Timer WheelingTimer;
     protected bool MouseOnYAxis, MouseOnXAxis;
     private SKBitmap PreviousBuffer = new(1, 1);
-
-    private double PreviousUnitLength;
-    private PointL PreviousZero;
+    /// <summary>
+    /// 代表上一次Zoom时单位长度，用于优化滚轮缩放和拖动时的连续绘制
+    /// </summary>
+    private double PreviousZoomUnitLength { get; set; }
+    /// <summary>
+    /// 代表上一次Zoom时原点位置，用于优化滚轮缩放和拖动时的连续绘制
+    /// </summary>
+    private BigPoint PreviousZoomZero { get; set; }
 
     public CartesianDisplayer()
     {
-        Zero = new PointL { X = 500, Y = 250 };
+        ZeroPos = new(){ X = 500, Y = 250 };
         UnitLength = 20;
         WheelingTimer = new Timer(TimerElapsed, null, 0, 500);
-        App.Current.ActualThemeVariantChanged += (s, e) =>
+        Application.Current?.ActualThemeVariantChanged += (s, e) =>
         {
             RefreshPaint();
-            ForceToRender();
+            ForceToRender(CancellationToken.None);
         };
         RefreshPaint();
     }
@@ -41,7 +50,7 @@ public class CartesianDisplayer : Displayer
     /// <summary>
     ///     数学坐标原点的像素位置
     /// </summary>
-    public PointL Zero
+    public BigPoint ZeroPos
     {
         get => field;
         set
@@ -89,19 +98,19 @@ public class CartesianDisplayer : Displayer
     /// <summary>
     ///     横向坐标轴线的位置和类型
     /// </summary>
-    public IEnumerable<(double, AxisType)> AxisX { get; private set; }
+    public (double, AxisType)[] AxisX { get; private set; }
 
     /// <summary>
     ///     纵向坐标轴线的位置和类型
     /// </summary>
-    public IEnumerable<(double, AxisType)> AxisY { get; private set; }
+    public (double, AxisType)[] AxisY { get; private set; }
 
     /// <summary>
     ///     重新刷新绘制用的画笔
     /// </summary>
     protected void RefreshPaint()
     {
-        if (App.Current.ActualThemeVariant == ThemeVariant.Light)
+        if (Application.Current?.ActualThemeVariant == ThemeVariant.Light)
         {
             AxisBackground = SKColors.White;
             AxisPaintMain = new SKPaint { Color = SKColors.Black };
@@ -119,22 +128,22 @@ public class CartesianDisplayer : Displayer
 
     public override double MathToPixelX(double d)
     {
-        return Zero.X + d * UnitLength;
+        return ZeroPos.X + d * UnitLength;
     }
 
     public override double MathToPixelY(double d)
     {
-        return Zero.Y + -d * UnitLength;
+        return ZeroPos.Y + -d * UnitLength;
     }
 
     public override double PixelToMathX(double d)
     {
-        return (d - Zero.X) / UnitLength;
+        return (d - ZeroPos.X) / UnitLength;
     }
 
     public override double PixelToMathY(double d)
     {
-        return -(d - Zero.Y) / UnitLength;
+        return -(d - ZeroPos.Y) / UnitLength;
     }
 
     /// <summary>
@@ -147,7 +156,7 @@ public class CartesianDisplayer : Displayer
         ;
         var addnumX = Pow(10D, zsX);
         var addnumDX = SpecialPow(10M, zsX);
-        for (var i = Min(Zero.X - addnumX * UnitLength,
+        for (var i = Min(ZeroPos.X - addnumX * UnitLength,
                  MathToPixelX(RoundTen(PixelToMathX(ValidRect.Right), -zsX)));
              i > ValidRect.Left;
              i -= addnumX * UnitLength)
@@ -159,7 +168,7 @@ public class CartesianDisplayer : Displayer
                 yield return (i, AxisType.Minor);
         }
 
-        for (var i = Max(Zero.X + addnumX * UnitLength,
+        for (var i = Max(ZeroPos.X + addnumX * UnitLength,
                  MathToPixelX(RoundTen(PixelToMathX(ValidRect.Left), -zsX)));
              i < ValidRect.Right;
              i += addnumX * UnitLength)
@@ -171,8 +180,8 @@ public class CartesianDisplayer : Displayer
                 yield return (i, AxisType.Minor);
         }
 
-        if (RangeIn(ValidRect.Left, ValidRect.Right, Zero.X))
-            yield return (Zero.X, AxisType.Axes);
+        if (RangeIn(ValidRect.Left, ValidRect.Right, ZeroPos.X))
+            yield return (ZeroPos.X, AxisType.Axes);
     }
 
     /// <summary>
@@ -185,7 +194,7 @@ public class CartesianDisplayer : Displayer
         ;
         var addnumY = Pow(10D, zsY);
         var addnumDY = SpecialPow(10M, zsY);
-        for (var i = Min(Zero.Y - addnumY * UnitLength,
+        for (var i = Min(ZeroPos.Y - addnumY * UnitLength,
                  MathToPixelY(RoundTen(PixelToMathY(ValidRect.Right), -zsY)));
              i > ValidRect.Left;
              i -= addnumY * UnitLength)
@@ -197,7 +206,7 @@ public class CartesianDisplayer : Displayer
                 yield return (i, AxisType.Minor);
         }
 
-        for (var i = Max(Zero.Y + addnumY * UnitLength,
+        for (var i = Max(ZeroPos.Y + addnumY * UnitLength,
                  MathToPixelY(RoundTen(PixelToMathY(ValidRect.Left), -zsY)));
              i < ValidRect.Right;
              i += addnumY * UnitLength)
@@ -209,8 +218,8 @@ public class CartesianDisplayer : Displayer
                 yield return (i, AxisType.Minor);
         }
 
-        if (RangeIn(ValidRect.Left, ValidRect.Right, Zero.Y))
-            yield return (Zero.Y, AxisType.Axes);
+        if (RangeIn(ValidRect.Left, ValidRect.Right, ZeroPos.Y))
+            yield return (ZeroPos.Y, AxisType.Axes);
     }
 
     /// <summary>
@@ -227,13 +236,13 @@ public class CartesianDisplayer : Displayer
         if (setting is { ShowAxesMajorGrid: false, ShowAxesMinorGrid: false })
             return;
         //y
-        if (RangeIn(ValidRect.Left, ValidRect.Right, Zero.X))
-            dc.DrawLine(new SKPoint(Zero.X, (float)ValidRect.Top),
-                new SKPoint(Zero.X, (float)ValidRect.Bottom), AxisPaintMain);
+        if (RangeIn(ValidRect.Left, ValidRect.Right, ZeroPos.X))
+            dc.DrawLine(new SKPoint((float)ZeroPos.X.ToDecimal(), (float)ValidRect.Top),
+                new SKPoint((float)ZeroPos.X.ToDecimal(), (float)ValidRect.Bottom), AxisPaintMain);
 
-        if (RangeIn(0, height, Zero.Y))
-            dc.DrawLine(new SKPoint((float)ValidRect.Left, Zero.Y),
-                new SKPoint((float)ValidRect.Right, Zero.Y), AxisPaintMain);
+        if (RangeIn(0, height, ZeroPos.Y))
+            dc.DrawLine(new SKPoint((float)ValidRect.Left, (float)ZeroPos.Y.ToDecimal()),
+                new SKPoint((float)ValidRect.Right, (float)ZeroPos.Y.ToDecimal()), AxisPaintMain);
         var zsX = (int)Floor(Log(350 / UnitLength, 10));
         var zsY = (int)Floor(Log(350 / UnitLength, 10));
         var addnumX = SpecialPow(10D, zsX);
@@ -241,7 +250,7 @@ public class CartesianDisplayer : Displayer
         var addnumDX = SpecialPow(10M, zsX);
         var addnumDY = SpecialPow(10M, zsY);
         SKPaint targetPen;
-        for (var i = Min(Zero.X - addnumX * UnitLength,
+        for (var i = Min(ZeroPos.X - addnumX * UnitLength,
                  MathToPixelX(RoundTen(PixelToMathX(ValidRect.Right), -zsX)));
              i > ValidRect.Left;
              i -= addnumX * UnitLength)
@@ -262,7 +271,7 @@ public class CartesianDisplayer : Displayer
                 );
         }
 
-        for (var i = Max(Zero.X + addnumX * UnitLength,
+        for (var i = Max(ZeroPos.X + addnumX * UnitLength,
                  MathToPixelX(RoundTen(PixelToMathX(ValidRect.Left), -zsX)));
              i < ValidRect.Right;
              i += addnumX * UnitLength)
@@ -283,7 +292,7 @@ public class CartesianDisplayer : Displayer
                 );
         }
 
-        for (var i = Min(Zero.Y - addnumY * UnitLength,
+        for (var i = Min(ZeroPos.Y - addnumY * UnitLength,
                  MathToPixelY(RoundTen(PixelToMathY(ValidRect.Bottom), -zsY)));
              i > ValidRect.Top;
              i -= addnumY * UnitLength)
@@ -303,7 +312,7 @@ public class CartesianDisplayer : Displayer
                 );
         }
 
-        for (var i = Max(Zero.Y + addnumY * UnitLength,
+        for (var i = Max(ZeroPos.Y + addnumY * UnitLength,
                  MathToPixelY(RoundTen(PixelToMathY(ValidRect.Top), -zsY)));
              i < ValidRect.Bottom;
              i += addnumY * UnitLength)
@@ -341,9 +350,9 @@ public class CartesianDisplayer : Displayer
         var addnumY = SpecialPow(10D, zsY);
         var addnumDX = SpecialPow(10M, zsX);
         var addnumDY = SpecialPow(10M, zsY);
-        var p = RangeTo(1, height - textFont.Size - 2, Zero.Y);
+        var p = RangeTo(1, height - textFont.Size - 2, ZeroPos.Y);
         var fff = 1f / 4f * textFont.Size;
-        for (var i = Min(Zero.X - addnumX * UnitLength,
+        for (var i = Min(ZeroPos.X - addnumX * UnitLength,
                  MathToPixelX(RoundTen(PixelToMathX(ValidRect.Right), -zsX)));
              i > ValidRect.Left;
              i -= addnumX * UnitLength)
@@ -354,7 +363,7 @@ public class CartesianDisplayer : Displayer
                 SKTextAlign.Left, textFont, AxisPaintMain);
         }
 
-        for (var i = Max(Zero.X + addnumX * UnitLength,
+        for (var i = Max(ZeroPos.X + addnumX * UnitLength,
                  MathToPixelX(RoundTen(PixelToMathX(ValidRect.Left), -zsX)));
              i < ValidRect.Right;
              i += addnumX * UnitLength)
@@ -365,43 +374,43 @@ public class CartesianDisplayer : Displayer
                 SKTextAlign.Left, textFont, AxisPaintMain);
         }
 
-        for (var i = Min(Zero.Y - addnumY * UnitLength,
+        for (var i = Min(ZeroPos.Y - addnumY * UnitLength,
                  MathToPixelY(RoundTen(PixelToMathY(ValidRect.Bottom), -zsY)));
              i > ValidRect.Top;
              i -= addnumY * UnitLength)
         {
             var num = RoundTen((decimal)PixelToMathY(i), -zsY);
-            if (ValidRect.Left + 3 > Zero.X)
+            if (ValidRect.Left + 3 > ZeroPos.X)
                 dc.DrawText(num.ToString(), new SKPoint((float)ValidRect.Left + 3, (float)(i + 4)),
                     SKTextAlign.Left, textFont, AxisPaintMain);
-            else if (Zero.X + num.ToString().Length * textFont.Size / 2 > ValidRect.Right - 3)
+            else if (ZeroPos.X + num.ToString().Length * textFont.Size / 2 > ValidRect.Right - 3)
                 dc.DrawText(num.ToString(),
                     new SKPoint((float)width - num.ToString().Length * textFont.Size / 2 - 5, (float)(i + 4)),
                     SKTextAlign.Left, textFont, AxisPaintMain);
             else
-                dc.DrawText(num.ToString(), new SKPoint(Zero.X, (float)(i + 4)), SKTextAlign.Left, textFont,
+                dc.DrawText(num.ToString(), new SKPoint((float)ZeroPos.X.ToDecimal(), (float)(i + 4)), SKTextAlign.Left, textFont,
                     AxisPaintMain);
         }
 
-        for (var i = Max(Zero.Y + addnumY * UnitLength,
+        for (var i = Max(ZeroPos.Y + addnumY * UnitLength,
                  MathToPixelY(RoundTen(PixelToMathY(ValidRect.Top), -zsY)));
              i < ValidRect.Bottom;
              i += addnumY * UnitLength)
         {
             var num = RoundTen((decimal)PixelToMathY(i), -zsY);
-            if (ValidRect.Left + 3 > Zero.X)
+            if (ValidRect.Left + 3 > ZeroPos.X)
                 dc.DrawText(num.ToString(), new SKPoint((float)ValidRect.Left + 3, (float)(i + 4)),
                     SKTextAlign.Left, textFont, AxisPaintMain);
-            else if (Zero.X + num.ToString().Length * textFont.Size / 2 > ValidRect.Right - 3)
+            else if (ZeroPos.X + num.ToString().Length * textFont.Size / 2 > ValidRect.Right - 3)
                 dc.DrawText(num.ToString(),
                     new SKPoint((float)width - num.ToString().Length * textFont.Size / 2 - 5, (float)(i + 4)),
                     SKTextAlign.Left, textFont, AxisPaintMain);
             else
-                dc.DrawText(num.ToString(), new SKPoint(Zero.X, (float)(i + 4)), SKTextAlign.Left, textFont,
+                dc.DrawText(num.ToString(), new SKPoint((float)ZeroPos.X.ToDecimal(), (float)(i + 4)), SKTextAlign.Left, textFont,
                     AxisPaintMain);
         }
 
-        dc.DrawText("0", new SKPoint(Zero.X + 3, Zero.Y + textFont.Size), SKTextAlign.Left, textFont,
+        dc.DrawText("0", new SKPoint((float)ZeroPos.X.ToDecimal() + 3, (float)ZeroPos.Y .ToDecimal()+ textFont.Size), SKTextAlign.Left, textFont,
             AxisPaintMain);
     }
 
@@ -413,8 +422,13 @@ public class CartesianDisplayer : Displayer
             {
                 dc.Clear(AxisBackground);
                 RenderAxes(dc);
-                foreach (var i in Addons)
-                foreach (var layer in i.Layers)
+                for (var i = 0; i < Addons.Count; i++)
+                {
+                    if(i!=ContainerViewModel.AddonIndex)
+                        foreach (var layer in Addons[i].Layers)
+                            layer.DrawRenderTargetTo(dc, 0, 0);
+                }
+                foreach (var layer in Addons[ContainerViewModel.AddonIndex].Layers)
                     layer.DrawRenderTargetTo(dc, 0, 0);
                 RenderAxesNumber(dc);
             }
@@ -427,7 +441,7 @@ public class CartesianDisplayer : Displayer
         {
             WheelingStopWatch.Stop();
             WheelingStopWatch.Reset();
-            Dispatcher.UIThread.InvokeAsync(ForceToRender);
+            Dispatcher.UIThread.InvokeAsync((() => ForceToRender(CancellationToken.None)));
         }
     }
 
@@ -437,7 +451,7 @@ public class CartesianDisplayer : Displayer
         {
             WheelingStopWatch.Stop();
             WheelingStopWatch.Reset();
-            ForceToRender();
+            ForceToRender(CancellationToken.None);
         }
     }
 
@@ -450,44 +464,48 @@ public class CartesianDisplayer : Displayer
     {
         if (!WheelingStopWatch.IsRunning)
         {
-            PreviousUnitLength = UnitLength;
-            PreviousUnitLength = UnitLength;
-            PreviousZero = Zero;
+            PreviousZoomUnitLength = UnitLength;
+            PreviousZoomUnitLength = UnitLength;
+            PreviousZoomZero = ZeroPos;
             WheelingStopWatch.Restart();
             if (Setting.Instance.ZoomOptimization)
                 lock (LockTargetForPreviousBuffer)
                 {
                     lock (TotalBufferLock)
                     {
-                        PreviousBuffer.Dispose();
-                        PreviousBuffer = TotalBuffer.Copy();
+                        if (PreviousBuffer.Width != TotalBuffer.Width || PreviousBuffer.Height != TotalBuffer.Height)
+                        {
+                            PreviousBuffer.Dispose();
+                            PreviousBuffer = new SKBitmap(TotalBuffer.Width, TotalBuffer.Height);
+                        }
+
+                        TotalBuffer.TryRealCopyTo(PreviousBuffer);
                     }
                 }
         }
 
-        var (x, y) = point;
-        var bzero = Zero;
-        var times_x = (Zero.X - x) / UnitLength;
-        var times_y = (Zero.Y - y) / UnitLength;
+        var (dx, dy) = point;
+        var x = new BigNumber<long, double>(0,dx);
+        var y = new BigNumber<long, double>(0,dy);
         UnitLength *= delta;
         UnitLength *= delta;
         UnitLength = RangeTo(0.01, 1000000, UnitLength);
         UnitLength = RangeTo(0.01, 1000000, UnitLength);
-        var ratioX = UnitLength / PreviousUnitLength;
-        var ratioY = UnitLength / PreviousUnitLength;
-        Zero = new PointL
+        var ratioX = UnitLength / PreviousZoomUnitLength;
+        var ratioY = UnitLength / PreviousZoomUnitLength;
+        ZeroPos = new()
         {
-            X = (long)((long)x - ((long)x - PreviousZero.X) * ratioX),
-            Y = (long)((long)y - ((long)y - PreviousZero.Y) * ratioY)
+            X = (x - (x - PreviousZoomZero.X) * ratioX),
+            Y = (y - (y - PreviousZoomZero.Y) * ratioY)
         };
         if (!Setting.Instance.ZoomOptimization || ratioX > 2 || ratioX < 0.5 || ratioY > 2 || ratioY < 0.5)
         {
             WheelingStopWatch.Stop();
             WheelingStopWatch.Reset();
-            PreviousUnitLength = UnitLength;
-            PreviousUnitLength = UnitLength;
-            PreviousZero = Zero;
-            ForceToRender();
+            PreviousZoomUnitLength = UnitLength;
+            PreviousZoomUnitLength = UnitLength;
+            PreviousZoomZero = ZeroPos;
+            ForceToRender(CancellationToken.None);
             return;
         }
 
@@ -497,10 +515,10 @@ public class CartesianDisplayer : Displayer
             {
                 dc.Clear(AxisBackground);
                 dc.DrawBitmap(PreviousBuffer, CreateSKRectWH(
-                    (float)(Zero.X - PreviousZero.X * ratioX),
-                    (float)(Zero.Y - PreviousZero.Y * ratioY),
+                    (float)(ZeroPos.X - PreviousZoomZero.X * ratioX),
+                    (float)(ZeroPos.Y - PreviousZoomZero.Y * ratioY),
                     (float)(ratioX * PreviousBuffer.Width),
-                    (float)(ratioY * PreviousBuffer.Height)), AntiAlias);
+                    (float)(ratioY * PreviousBuffer.Height)), SkiaHelper.CompoundBufferPaint);
             }
         }
 
@@ -509,7 +527,7 @@ public class CartesianDisplayer : Displayer
 
     protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
     {
-        if (CallPointerWheeled(e) == DoNext)
+        if (CallPointerWheeled(e.Cast(this)) == DoNext)
             Zoom(Pow(1.04, e.Delta.Y), e.GetPosition(this));
         else
             AskForRender();

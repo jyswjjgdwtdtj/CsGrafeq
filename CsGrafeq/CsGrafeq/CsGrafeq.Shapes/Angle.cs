@@ -4,7 +4,7 @@ using static CsGrafeq.Shapes.ShapeGetter.AngleGetter;
 
 namespace CsGrafeq.Shapes;
 
-public class Angle : GeometryShape
+public class Angle : GeometricShape
 {
     public AngleData AngleData;
     public AngleGetter AngleGetter;

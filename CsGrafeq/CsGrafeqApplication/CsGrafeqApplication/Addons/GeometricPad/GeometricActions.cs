@@ -9,7 +9,7 @@ using GeoHalf = CsGrafeq.Shapes.Half;
 
 namespace CsGrafeqApplication.Addons.GeometricPad;
 
-internal static class GeometryActions
+internal static class GeometricActions
 {
     /// <summary>
     ///     ����Point,Line,Circle,Polygon��˳��
@@ -21,7 +21,7 @@ internal static class GeometryActions
             new ActionData
             {
                 Name = new MultiLanguageData { English = "Move", Chinese = "移动" },
-                Description = new MultiLanguageData { English = "Move the selected point", Chinese = "移动选定的点" },
+                Description = new MultiLanguageData { English = "Move the selected point(s)", Chinese = "移动选定的点" },
                 GetterConstructor = null,
                 Args = [],
                 Self = ShownShapeArg.None
@@ -40,16 +40,16 @@ internal static class GeometryActions
         {
             new ActionData
             {
-                Name = new MultiLanguageData { English = "Put", Chinese = "放置" },
-                Description = new MultiLanguageData { English = "Put a point to axis", Chinese = "在坐标系中放置一个点" },
+                Name = new MultiLanguageData { English = "Place", Chinese = "放置" },
+                Description = new MultiLanguageData { English = "Place a point in the coordinate system", Chinese = "在坐标系中放置一个点" },
                 GetterConstructor = null,
                 Args = [],
                 Self = ShownShapeArg.Point
             },
             new ActionData
             {
-                Name = new MultiLanguageData { English = "Middle", Chinese = "中点" },
-                Description = new MultiLanguageData { English = "Put the middle of two points", Chinese = "放置两点的中点" },
+                Name = new MultiLanguageData { English = "Midpoint", Chinese = "中点" },
+                Description = new MultiLanguageData { English = "Place the midpoint of two points", Chinese = "放置两点的中点" },
                 GetterConstructor =
                     ConstructorInvoker.Create(typeof(PointGetter_MiddlePoint).GetConstructors()
                         .FirstOrDefault()!), // ctor(Point, Point)
@@ -58,9 +58,9 @@ internal static class GeometryActions
             },
             new ActionData
             {
-                Name = new MultiLanguageData { English = "Median Center", Chinese = "重心" },
+                Name = new MultiLanguageData { English = "Centroid", Chinese = "重心" },
                 Description = new MultiLanguageData
-                    { English = "Put the median center of three points", Chinese = "放置三点的重心（质心）" },
+                    { English = "Place the centroid of three points", Chinese = "放置三点的重心（质心）" },
                 GetterConstructor =
                     ConstructorInvoker.Create(typeof(PointGetter_Centroid).GetConstructors()
                         .FirstOrDefault()!), // ctor(Point, Point, Point)
@@ -69,9 +69,9 @@ internal static class GeometryActions
             },
             new ActionData
             {
-                Name = new MultiLanguageData { English = "Out Center", Chinese = "外心" },
+                Name = new MultiLanguageData { English = "Circumcenter", Chinese = "外心" },
                 Description = new MultiLanguageData
-                    { English = "Put the median center of three points", Chinese = "放置三点的外心（外接圆心）" },
+                    { English = "Place the circumcenter of three points", Chinese = "放置三点的外心（外接圆心）" },
                 GetterConstructor =
                     ConstructorInvoker.Create(typeof(PointGetter_Circumcenter).GetConstructors()
                         .FirstOrDefault()!), // ctor(Point, Point, Point)
@@ -80,9 +80,9 @@ internal static class GeometryActions
             },
             new ActionData
             {
-                Name = new MultiLanguageData { English = "In Center", Chinese = "内心" },
+                Name = new MultiLanguageData { English = "Incenter", Chinese = "内心" },
                 Description = new MultiLanguageData
-                    { English = "Put the in center of three points", Chinese = "放置三点的内心（内切圆心）" },
+                    { English = "Place the incenter of three points", Chinese = "放置三点的内心（内切圆心）" },
                 GetterConstructor =
                     ConstructorInvoker.Create(typeof(PointGetter_InCenter).GetConstructors()
                         .FirstOrDefault()!), // ctor(Point, Point, Point)
@@ -91,9 +91,9 @@ internal static class GeometryActions
             },
             new ActionData
             {
-                Name = new MultiLanguageData { English = "Ortho Center", Chinese = "垂心" },
+                Name = new MultiLanguageData { English = "Orthocenter", Chinese = "垂心" },
                 Description = new MultiLanguageData
-                    { English = "Put the ortho center of three points", Chinese = "放置三点的垂心" },
+                    { English = "Place the orthocenter of three points", Chinese = "放置三点的垂心" },
                 GetterConstructor =
                     ConstructorInvoker.Create(typeof(PointGetter_OrthoCenter).GetConstructors()
                         .FirstOrDefault()!), // ctor(Point, Point, Point)
@@ -104,7 +104,7 @@ internal static class GeometryActions
             {
                 Name = new MultiLanguageData { English = "Axial Symmetry", Chinese = "轴对称" },
                 Description = new MultiLanguageData
-                    { English = "Put the axial symmetry of a point from a line", Chinese = "根据直线放置点的轴对称点" },
+                    { English = "Place the reflection point across a line", Chinese = "根据直线放置点的轴对称点" },
                 GetterConstructor =
                     ConstructorInvoker.Create(typeof(PointGetter_AxialSymmetryPoint).GetConstructors()
                         .FirstOrDefault()!), // ctor(Point, Line)
@@ -113,9 +113,9 @@ internal static class GeometryActions
             },
             new ActionData
             {
-                Name = new MultiLanguageData { English = "Nearest", Chinese = "最近点" },
+                Name = new MultiLanguageData { English = "Nearest Point", Chinese = "最近点" },
                 Description = new MultiLanguageData
-                    { English = "Put the nearest point of a shape from a points", Chinese = "放置点到图形上的最近点" },
+                    { English = "Place the nearest point from a point to the shape", Chinese = "放置点到图形上的最近点" },
                 GetterConstructor =
                     ConstructorInvoker.Create(typeof(PointGetter_NearestPointOnLine).GetConstructors()
                         .FirstOrDefault()!), // ctor(Line, Point)
@@ -128,7 +128,7 @@ internal static class GeometryActions
         {
             new ActionData
             {
-                Name = new MultiLanguageData { English = "Straight", Chinese = "直线" },
+                Name = new MultiLanguageData { English = "Straight Line", Chinese = "直线" },
                 Description = new MultiLanguageData
                     { English = "Create a straight line from two points", Chinese = "由两点创建直线" },
                 GetterConstructor =
@@ -139,9 +139,9 @@ internal static class GeometryActions
             },
             new ActionData
             {
-                Name = new MultiLanguageData { English = "Half", Chinese = "射线" },
+                Name = new MultiLanguageData { English = "Half Line", Chinese = "射线" },
                 Description = new MultiLanguageData
-                    { English = "Create a half line from two points", Chinese = "由两点创建半直线" },
+                    { English = "Create a half line from two points", Chinese = "由两点创建射线" },
                 GetterConstructor =
                     ConstructorInvoker.Create(typeof(LineGetter_Half).GetConstructors()
                         .FirstOrDefault()!), // ctor(Point, Point)
@@ -152,7 +152,7 @@ internal static class GeometryActions
             {
                 Name = new MultiLanguageData { English = "Segment", Chinese = "线段" },
                 Description = new MultiLanguageData
-                    { English = "Create a line segment from two points", Chinese = "由两点创建线段" },
+                    { English = "Create a segment from two points", Chinese = "由两点创建线段" },
                 GetterConstructor =
                     ConstructorInvoker.Create(typeof(LineGetter_Segment).GetConstructors()
                         .FirstOrDefault()!), // ctor(Point, Point)
@@ -161,9 +161,9 @@ internal static class GeometryActions
             },
             new ActionData
             {
-                Name = new MultiLanguageData { English = "Vertical", Chinese = "垂线" },
+                Name = new MultiLanguageData { English = "Perpendicular Line", Chinese = "垂线" },
                 Description = new MultiLanguageData
-                    { English = "Create a vertical line of a line from a point", Chinese = "根据一条直线和一点创建垂线" },
+                    { English = "Create a perpendicular line from a line and a point", Chinese = "根据一条直线和一点创建垂线" },
                 GetterConstructor =
                     ConstructorInvoker.Create(typeof(LineGetter_Vertical).GetConstructors()
                         .FirstOrDefault()!), // ctor(Line, Point)
@@ -172,9 +172,9 @@ internal static class GeometryActions
             },
             new ActionData
             {
-                Name = new MultiLanguageData { English = "Parallel", Chinese = "平行线" },
+                Name = new MultiLanguageData { English = "Parallel Line", Chinese = "平行线" },
                 Description = new MultiLanguageData
-                    { English = "Create a parallel line of a line from a point", Chinese = "根据一条直线和一点创建平行线" },
+                    { English = "Create a parallel line from a line and a point", Chinese = "根据一条直线和一点创建平行线" },
                 GetterConstructor =
                     ConstructorInvoker.Create(typeof(LineGetter_Parallel).GetConstructors()
                         .FirstOrDefault()!), // ctor(Line, Point)
@@ -183,11 +183,11 @@ internal static class GeometryActions
             },
             new ActionData
             {
-                Name = new MultiLanguageData { English = "Fitted", Chinese = "拟合直线" },
+                Name = new MultiLanguageData { English = "Fitted Line", Chinese = "拟合直线" },
                 Description = new MultiLanguageData
                 {
                     English =
-                        "Create a fitted straight line from points \n select the first selected point to finish choosing",
+                        "Fit a straight line from multiple points\nSelect the first point to finish selecting",
                     Chinese = "由多个点拟合直线\n选中第一个点以结束选择"
                 },
                 GetterConstructor =
@@ -201,7 +201,7 @@ internal static class GeometryActions
             {
                 Name = new MultiLanguageData { English = "Perpendicular Bisector", Chinese = "垂直平分线" },
                 Description = new MultiLanguageData
-                    { English = "Create a perpendicular bisector from two points", Chinese = "由两点创建垂直平分线" },
+                    { English = "Create the perpendicular bisector from two points", Chinese = "由两点创建垂直平分线" },
                 GetterConstructor =
                     ConstructorInvoker.Create(typeof(LineGetter_PerpendicularBisector).GetConstructors()
                         .FirstOrDefault()!), // ctor(Point, Point)
@@ -217,7 +217,7 @@ internal static class GeometryActions
                 Name = new MultiLanguageData { English = "Polygon", Chinese = "多边形" },
                 Description = new MultiLanguageData
                 {
-                    English = "Create a polygon\nselect the first selected point to finish choosing",
+                    English = "Create a polygon\nSelect the first point to finish selecting",
                     Chinese = "创建多边形\n选中第一个点以结束选择"
                 },
                 GetterConstructor =
@@ -235,7 +235,7 @@ internal static class GeometryActions
             {
                 Name = new MultiLanguageData { English = "Three Points", Chinese = "三点圆" },
                 Description = new MultiLanguageData
-                    { English = "Create a circle from three points", Chinese = "由三点创建圆" },
+                    { English = "Create a circle through three points", Chinese = "由三点创建圆" },
                 GetterConstructor =
                     ConstructorInvoker.Create(typeof(CircleGetter_FromThreePoint).GetConstructors()
                         .FirstOrDefault()!), // ctor(Point, Point, Point)
@@ -246,7 +246,7 @@ internal static class GeometryActions
             {
                 Name = new MultiLanguageData { English = "Center and Point", Chinese = "圆心与一点" },
                 Description = new MultiLanguageData
-                    { English = "Create a circle from a center and a point", Chinese = "由圆心和一点创建圆" },
+                    { English = "Create a circle from its center and a point", Chinese = "由圆心和一点创建圆" },
                 GetterConstructor =
                     ConstructorInvoker.Create(
                         typeof(CircleGetter_FromCenterAndPoint).GetConstructors()
@@ -258,18 +258,18 @@ internal static class GeometryActions
             {
                 Name = new MultiLanguageData { English = "Center and Radius", Chinese = "圆心与半径" },
                 Description = new MultiLanguageData
-                    { English = "Create a circle from center and radius", Chinese = "由圆心和半径创建圆" },
+                    { English = "Create a circle from its center and radius", Chinese = "由圆心和半径创建圆" },
                 GetterConstructor =
                     ConstructorInvoker.Create(typeof(CircleGetter_FromCenterAndRadius).GetConstructors()
-                        .FirstOrDefault()!), // ctor(Point)
+                        .FirstOrDefault()!), // ctor(Point, double)
                 Args = [ShapeArg.Point],
                 Self = ShownShapeArg.Circle
             },
             new ActionData
             {
-                Name = new MultiLanguageData { English = "Apollonius", Chinese = "阿波罗尼斯圆" },
+                Name = new MultiLanguageData { English = "Apollonius Circle", Chinese = "阿波罗尼斯圆" },
                 Description = new MultiLanguageData
-                    { English = "Create a circle through Apollonius Circle", Chinese = "创建阿波罗尼斯圆" },
+                    { English = "Create an Apollonius circle", Chinese = "创建阿波罗尼斯圆" },
                 GetterConstructor =
                     ConstructorInvoker.Create(typeof(CircleGetter_Apollonius).GetConstructors()
                         .FirstOrDefault()!), // ctor(Point)
@@ -293,7 +293,7 @@ internal static class GeometryActions
         }
     };
 
-    public static GeometryShape CreateShape(ShownShapeArg target, Getter getter)
+    public static GeometricShape CreateShape(ShownShapeArg target, Getter getter)
     {
         switch (target)
         {
@@ -312,7 +312,7 @@ internal static class GeometryActions
             case ShownShapeArg.Angle:
                 return new Angle((AngleGetter)getter);
             default:
-                return Throw<GeometryShape>("Shape not supported:" + target);
+                return Throw<GeometricShape>($"The shape {target} is not supported");
         }
     }
 }

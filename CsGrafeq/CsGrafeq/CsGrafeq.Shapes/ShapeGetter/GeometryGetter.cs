@@ -20,13 +20,13 @@ public abstract class GeometryGetter : Getter
     ///     由绑定到的图形调用 代表完成Getter的桥接作用 将这个Getter对应的图形绑定到其基于的图形
     /// </summary>
     /// <param name="subShape">代表要绑定的图形</param>
-    public abstract void Attach(GeometryShape subShape);
+    public abstract void Attach(GeometricShape subShape);
 
     /// <summary>
     ///     取消桥接
     /// </summary>
     /// <param name="subShape"></param>
-    public abstract void UnAttach(GeometryShape subShape);
+    public abstract void UnAttach(GeometricShape subShape);
 
     public virtual bool Adjust()
     {

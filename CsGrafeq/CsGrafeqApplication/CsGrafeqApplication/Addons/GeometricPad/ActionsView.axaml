@@ -15,7 +15,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </geometricPad:ActionsView.Resources>
-    <ItemsControl ItemsSource="{x:Static geometricPad:GeometryActions.Actions}">
+    <ItemsControl ItemsSource="{x:Static geometricPad:GeometricActions.Actions}">
         <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
                 <VirtualizingStackPanel Orientation="Vertical" />

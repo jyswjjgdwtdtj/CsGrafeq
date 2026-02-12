@@ -11,7 +11,7 @@
              xmlns:ripple="clr-namespace:Material.Ripple;assembly=Material.Ripple"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CsGrafeqApplication.Controls.DisplayerContainer"
-             x:DataType="vm:DisplayerContainerViewModel" Foreground="{DynamicResource CgForegroundBrush}"
+             x:DataType="vm:DisplayerContainerViewModel"
              Focusable="False">
     <UserControl.Styles>
         <Styles>
@@ -50,8 +50,8 @@
                     </Style>
                 </Panel.Styles>
                 <!--Addon显示层-->
-                <DockPanel ZIndex="10">
-                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Name="PART_Grid">
+                <DockPanel ZIndex="10" LastChildFill="True" Name="PART_OperationContainer">
+                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
                         <corecontrols:ExpandBox Name="OperationContainerExpandBox" ExpandDirection="Right"
                                                 IsExpanded="{CompiledBinding #Toggle.IsChecked,Mode=OneWay}" Margin="0"
                                                 Padding="0">
@@ -146,14 +146,22 @@
                                               ItemsSource="{CompiledBinding Displayer.Addons}">
                                         <ComboBox.ItemTemplate>
                                             <DataTemplate>
-                                                <TextBlock Text="{CompiledBinding AddonName.Data}" />
+                                                <TextBlock Foreground="Black" Text="{CompiledBinding AddonName.Data}" />
                                             </DataTemplate>
                                         </ComboBox.ItemTemplate>
+                                        <ComboBox.SelectionBoxItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Foreground="{DynamicResource CgForegroundBrush}" Text="{CompiledBinding AddonName.Data}" />
+                                            </DataTemplate>
+                                        </ComboBox.SelectionBoxItemTemplate>
                                     </ComboBox>
                                 </Panel>
                             </DockPanel>
                         </Border>
                     </StackPanel>
+                    <Border Name="RenderingInfoBox" IsHitTestVisible="False" IsVisible="{CompiledBinding Displayer.IsRendering}">
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">Rendering</TextBlock>
+                    </Border>
                 </DockPanel>
                 <!--设置层-->
                 <Grid ColumnDefinitions="*,52" RowDefinitions="*,52" ZIndex="15" Name="SettingDockPanel"
@@ -403,16 +411,21 @@
                                     <views:MsgBoxButton.MsgBoxContentTemplate>
                                         <DataTemplate DataType="vm:DisplayerContainerViewModel">
                                             <TabControl VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                                                <TabControl.Styles>
+                                                    <Style Selector="TabItem">
+                                                        <Setter Property="Foreground" Value="{DynamicResource CgForegroundBrush}"/>
+                                                    </Style>
+                                                </TabControl.Styles>
                                                 <TabItem
                                                     Header="{CompiledBinding MultiLanguageResources.SettingText.Data}">
                                                     <views1:SettingView />
                                                 </TabItem>
                                                 <TabItem
-                                                    Header="{CompiledBinding MultiLanguageResources.DescriptionText.Data}">
+                                                         Header="{CompiledBinding MultiLanguageResources.DescriptionText.Data}">
                                                     <views1:DescriptionView />
                                                 </TabItem>
                                                 <TabItem
-                                                    Header="{CompiledBinding MultiLanguageResources.UsageText.Data}">
+                                                         Header="{CompiledBinding MultiLanguageResources.UsageText.Data}">
                                                     <views1:UsageView />
                                                 </TabItem>
                                             </TabControl>

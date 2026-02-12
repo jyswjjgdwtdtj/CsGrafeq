@@ -40,7 +40,7 @@ public class AngleGetter_FromThreePoint : AngleGetter
 
     public override MultiLanguageData ActionName => MultiLanguageResources.AngleText;
 
-    public override void Attach(GeometryShape subShape)
+    public override void Attach(GeometricShape subShape)
     {
         AnglePoint.AddSubShape(subShape);
         ;
@@ -50,7 +50,7 @@ public class AngleGetter_FromThreePoint : AngleGetter
         ;
     }
 
-    public override void UnAttach(GeometryShape subShape)
+    public override void UnAttach(GeometricShape subShape)
     {
         AnglePoint.RemoveSubShape(subShape);
         Point1.RemoveSubShape(subShape);

@@ -25,7 +25,7 @@ FollowSystem,跟随系统,Follow System
 Angle,角,Angle
 Unmovable,无法移动,Unmovable
 Circle,圆,Circle
-CsGrafeq,几何画板,CsGrafeq
+CsGrafeq,CsGrafeq 画板,CsGrafeq
 Delete,删除,Delete
 DeselectAll,取消全选,Deselect All
 Function,函数,Function
@@ -85,6 +85,19 @@ ShowAxesNumber,显示坐标数字,Show Axes Number
 ShowAxesMajorGrid,显示主要网格,Show Axes Major Grid
 ShowAxesMinorGrid,显示次要网格,Show Axes Minor Grid
 DefaultOpacity,默认透明度,Default Opacity
+Opacity,透明度,Opacity
+CheckPixels,像素检查,Check Pixels
+ShowFormula,显示表达式,Show Formula
+Example,示例,Example
+Enabled,可用,Enabled
+Window,窗口,Window
+ClientSize,用户区大小,ClientSize
+Width,宽,Width
+Height,高,Height
+Apply,应用,Apply
+Render,渲染,Render
+BlendMode,混合模式,Blend Mode
+,,
 ,,
 ,,
 ,,

@@ -5,7 +5,7 @@ using static CsGrafeq.Numeric.CsGrafeqMath;
 
 namespace CsGrafeq.Shapes;
 
-public class Point : GeometryShape
+public class Point : GeometricShape
 {
     public readonly DistinctList<TextGetter> TextGetters = new();
 

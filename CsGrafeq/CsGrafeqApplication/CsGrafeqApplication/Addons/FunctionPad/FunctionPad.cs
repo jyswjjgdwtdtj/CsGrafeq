@@ -1,13 +1,22 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Avalonia.Collections;
 using Avalonia.Controls;
+using Avalonia.Controls.Documents;
 using Avalonia.Controls.Templates;
 using Avalonia.Markup.Xaml.Styling;
+using CsGrafeq.Bitmap;
 using CsGrafeq.I18N;
 using CsGrafeq.Interval;
+using CsGrafeq.Numeric;
+using CsGrafeqApplication.Controls.Displayers;
 using CsGrafeqApplication.Function;
 using CsGrafeqApplication.Utilities;
+using CSharpMath.Rendering.Text;
 using SkiaSharp;
 using Range = CsGrafeq.Interval.Range;
 
@@ -44,17 +53,23 @@ public class FunctionPad : Addon
 
     public override void Delete()
     {
-        throw new NotImplementedException();
+        DeleteFunction(Functions.Where(f=>f.IsSelected==true).ToArray());
     }
 
     public override void SelectAll()
     {
-        throw new NotImplementedException();
+        foreach (var implicitFunction in Functions)
+        {
+            implicitFunction.IsSelected = true;
+        }
     }
 
     public override void DeselectAll()
     {
-        throw new NotImplementedException();
+        foreach (var implicitFunction in Functions)
+        {
+            implicitFunction.IsSelected = false;
+        }
     }
 
     private ImplicitFunction CreateAndAddFunctionCore(string exp)
@@ -64,8 +79,8 @@ public class FunctionPad : Addon
         Layers.Add(func.RenderTarget);
         func.RenderTarget.RenderTargetSize =
             new SKSizeI((int)(Owner?.Bounds.Size.Width ?? 1), (int)(Owner?.Bounds.Size.Height ?? 1));
-        func.RenderTarget.OnRender += (dc, rect) => RenderFunction(dc,
-            new SKRectI((int)rect.Left, (int)rect.Top, (int)rect.Right, (int)rect.Bottom), func);
+        func.RenderTarget.OnRender += (dc, rect,ct) => RenderFunction(dc,
+            new SKRectI((int)rect.Left, (int)rect.Top, (int)rect.Right, (int)rect.Bottom), func,ct);
         func.FuncChanged += f =>
         {
             f.RenderTarget.Changed = true;
@@ -87,6 +102,35 @@ public class FunctionPad : Addon
         return func;
     }
 
+    public void DeleteFunction(ImplicitFunction[] funcs)
+    {
+        var fs = funcs.Where(f => f.Owner == this).ToArray();
+        CommandHelper.CommandManager.Do(
+            null,
+            _ => {
+                foreach (var f in fs)
+                {
+                    f.IsDeleted = true;
+                    f.IsSelected = false;
+                }
+            },
+            o => { 
+                foreach (var f in fs)
+                {
+                    f.IsDeleted = true;
+                } },
+            o => { 
+                foreach (var f in fs)
+                {
+                    f.IsDeleted = false;
+                } },
+            o => {
+                foreach (var f in fs)
+                {
+                    f.IsDeleted = false;
+                } }
+        );
+    }
     public void DeleteFunction(ImplicitFunction func)
     {
         if (func.Owner != this)
@@ -107,42 +151,44 @@ public class FunctionPad : Addon
         func.Dispose();
     }
 
-    private void RenderFunction(SKCanvas dc, SKRectI rect, ImplicitFunction impFunc)
+    private void RenderFunction(PixelBitmap dc, SKRectI rect, ImplicitFunction impFunc,CancellationToken ct)
     {
+        Console.WriteLine(rect);
         if (!impFunc.IsCorrect)
             return;
         if (impFunc.IsDeleted)
             return;
-        lock (IntervalCompiler.SyncObjForIntervalSetCalc)
+        var rectToCalc = new ConcurrentBag<SKRectI> { rect };
+        var pointColor=new SKColor(impFunc.Color).WithAlpha(impFunc.Opacity).ToUint();
+        var func = impFunc.Function.Function;
+        dc.Color=pointColor;
+        Func<double,double,double,double,bool> msFunc =impFunc.NeedCheckPixel?impFunc.MsFunction: static (_,_,_,_ )=> true;
+        do
         {
-            var RectToCalc = new ConcurrentBag<SKRectI> { rect };
-            var Points = new ConcurrentBag<SKPoint>();
-            var Rects = new ConcurrentBag<SKRectI>();
-            var paint = new SKPaint { Color = new SKColor(impFunc.Color).WithAlpha(impFunc.Opacity) };
-            var func = impFunc.Function.Function;
-            do
+            var rs = rectToCalc.ToArray();
+            rectToCalc.Clear();
+            var len = rs.Length;
+            for(var i=0;i<len;i+=100)
             {
-                var rs = RectToCalc.ToArray();
-                RectToCalc.Clear();
-                Action<int> atn = idx => { RenderRectIntervalSet(rs[idx], RectToCalc, func, false, Points, Rects); };
-                for (var i = 0; i < rs.Length; i += 100)
+                for(var j=i;j<Min(i+100,len);j++)
                 {
-                    //此处不应使用并行
-                    //IntervalSet计算是完全线程不安全的
-                    for (var j = i; j < Min(i + 100, rs.Length); j++) atn(j);
-                    foreach (var rectToDraw in Rects) dc.DrawRect(rectToDraw, paint);
-                    Rects.Clear();
-                    dc.DrawPoints(SKPointMode.Points, Points.ToArray(), paint);
-                    Points.Clear();
+                    if (ct.IsCancellationRequested)
+                        return;
+                    RenderAction(rs[j]);
                 }
-            } while (RectToCalc.Count != 0);
-
+                if(ct.IsCancellationRequested)
+                    return;
+            }
             dc.Flush();
-        }
+            continue;
+            void RenderAction(SKRectI r)
+            {
+                RenderRectIntervalSet(r, rectToCalc, func, msFunc, dc, pointColor);
+            }   
+        } while (rectToCalc.Count != 0);
     }
 
-    private void RenderRectIntervalSet(SKRectI r, ConcurrentBag<SKRectI> RectToCalc, IntervalHandler<IntervalSet> func,
-        bool checkpixel, ConcurrentBag<SKPoint> Points, ConcurrentBag<SKRectI> Rects)
+    private void RenderRectIntervalSet(SKRectI r, ConcurrentBag<SKRectI> rectToCalc, IntervalHandler<IntervalSet> func,Func<double,double,double,double,bool> msFunc,PixelBitmap bmp,uint color)
     {
         if (r.Height == 0 || r.Width == 0)
             return;
@@ -156,31 +202,34 @@ public class FunctionPad : Addon
         var isPixel = dx == 1 && dy == 1;
         for (var i = r.Left; i < r.Right; i += dx)
         {
-            var di = i;
-            var xmin = PixelToMathX(i);
-            var xmax = PixelToMathX(i + dx);
-            var xi = IntervalSet.Create([new Range(xmin, xmax)], Def.TT);
+            var xMin = PixelToMathX(i);
+            var xMax = PixelToMathX(i + dx);
+            var xi = IntervalSet.Create([new Range(xMin, xMax)], Def.TT);
             for (var j = r.Top; j < r.Bottom; j += dy)
             {
-                var dj = j;
-                var ymin = PixelToMathY(j);
-                var ymax = PixelToMathY(j + dy);
-                var yi = IntervalSet.Create([new Range(ymin, ymax)], Def.TT);
+                var yMin = PixelToMathY(j);
+                var yMax = PixelToMathY(j + dy);
+                var yi = IntervalSet.Create([new Range(yMin, yMax)], Def.TT);
                 var result = func(xi, yi);
                 if (result == Def.TT)
                 {
                     if (isPixel)
-                        Points.Add(new SKPoint(di, dj));
+                        bmp.SetPixel_Buffered(i,j);
                     else
-                        Rects.Add(new SKRectI(di, dj, di + dx, dj + dy));
+                        bmp.SetRectangle(i, j, dx, dy, color);
                 }
                 else if (result == Def.FT)
                 {
                     if (isPixel)
-                        Points.Add(new SKPoint(di, dj));
+                    {
+                        bmp.SetPixel_Buffered(i,j);
+                    }
                     else
-                        RectToCalc.Add(new SKRectI(i, j, Min(i + dx, r.Right),
+                    {
+                        //bmp.SetRectangle(i, j, dx, dy, ((uint)Random.Shared.NextInt64(0xFFFFFF))|0xFF000000);
+                        rectToCalc.Add(new SKRectI(i, j, Min(i + dx, r.Right),
                             Min(j + dy, r.Bottom)));
+                    }
                 }
             }
         }

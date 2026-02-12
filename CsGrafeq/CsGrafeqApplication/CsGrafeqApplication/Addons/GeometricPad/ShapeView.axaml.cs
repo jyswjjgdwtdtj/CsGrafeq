@@ -48,7 +48,7 @@ public partial class ShapeView : TemplatedControl
     private void DeleteButtonClicked(object? sender, RoutedEventArgs e)
     {
         if (sender is Button btn)
-            if (btn.Tag is GeometryShape shape)
+            if (btn.Tag is GeometricShape shape)
                 CommandHelper.DoGeoShapesDelete([shape]);
             else if (btn.Tag is GeoShape s) CommandHelper.DoShapeDelete(s);
 
@@ -191,7 +191,7 @@ public partial class ShapeView : TemplatedControl
                     }
                     else
                     {
-                        (n.Owner as GeometryShape)?.RefreshValues();
+                        (n.Owner as GeometricShape)?.RefreshValues();
                         DataValidationErrors.ClearErrors(tb);
                     }
 

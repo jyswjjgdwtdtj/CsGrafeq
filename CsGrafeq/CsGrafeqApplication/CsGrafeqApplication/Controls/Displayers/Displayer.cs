@@ -1,5 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Input.GestureRecognizers;
@@ -10,39 +16,62 @@ using Avalonia.Threading;
 using CsGrafeq.I18N;
 using CsGrafeqApplication.Addons;
 using CsGrafeqApplication.Core.Controls;
+using CsGrafeqApplication.Events;
+using CsGrafeqApplication.ViewModels;
+using ReactiveUI;
 using SkiaSharp;
-using AddonPointerEventArgs = CsGrafeqApplication.Addons.Addon.AddonPointerEventArgs;
-using AddonPointerEventArgsBase = CsGrafeqApplication.Addons.Addon.AddonPointerEventArgsBase;
-using AddonPointerWheelEventArgs = CsGrafeqApplication.Addons.Addon.AddonPointerWheelEventArgs;
 using AvaPoint = Avalonia.Point;
 
 namespace CsGrafeqApplication.Controls.Displayers;
 
 public abstract class Displayer : SKCanvasView, ICustomHitTest
 {
+    public static readonly DirectProperty<Displayer, DisplayerContainerViewModel> ContainerViewModelProperty = AvaloniaProperty.RegisterDirect<Displayer, DisplayerContainerViewModel>(
+        nameof(ContainerViewModel), o => o.ContainerViewModel, (o, v) => o.ContainerViewModel = v);
+
+    public DisplayerContainerViewModel ContainerViewModel
+    {
+        get => field;
+        set => SetAndRaise(ContainerViewModelProperty, ref field, value);
+    }
+    public static readonly DirectProperty<Displayer, bool> IsRenderingProperty = AvaloniaProperty.RegisterDirect<Displayer, bool>(
+        nameof(IsRendering), o => o.IsRendering);
+
+    public bool IsRendering
+    {
+        get => field;
+        protected set => SetAndRaise(IsRenderingProperty, ref field, value);
+    }
+    
     public const bool DoNext = true;
     public const bool Intercept = false;
     private readonly Clock RenderClock = new(1);
     protected AvaPoint LastPoint;
     protected PointerPointProperties LastPointerProperties = new();
-    public List<Addon> NeedRenderingAddons = new();
-    public bool NeedRenderingAll = false;
-    public List<Renderable> NeedRenderingLayers = new();
-    protected object TotalBufferLock = new();
+    protected object TotalBufferLock { get; } = new();
 
     public Displayer()
     {
         Addons.CollectionChanged += ChildrenChanged;
-        GestureRecognizers.Add(new ScrollGestureRecognizer
-            { CanHorizontallyScroll = false, CanVerticallyScroll = false });
-        GestureRecognizers.Add(new PinchGestureRecognizer());
-        AddHandler(Gestures.ScrollGestureEvent, (s, e) => { Zoom(Pow(1.04, e.Delta.Y), Bounds.Center); });
-        AddHandler(Gestures.PinchEvent, (s, e) => { Zoom(e.Scale, e.ScaleOrigin); });
-        Languages.LanguageChanged += ForceToRender;
+        Languages.LanguageChanged += () =>
+        {
+            ForceToRender(CancellationToken.None);
+        };
         RenderClock.OnElapsed += Render;
         IsHitTestVisible = true;
+        PropertyChanged += (s, e) =>
+        {
+            if (e.Property == ContainerViewModelProperty)
+            {
+                this[!DataContextProperty] = this[!ContainerViewModelProperty];
+                ContainerViewModel?.WhenAnyValue(i => i.AddonIndex).Subscribe(d =>
+                {
+                    CompoundBuffers();
+                    InvalidateVisual();
+                });
+            }
+        };
     }
-
     protected SKBitmap TotalBuffer { get; set; } = new(1, 1);
     protected SKBitmap TempBuffer { get; set; } = new(1, 1);
 
@@ -64,7 +93,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
         var dc = e.Canvas;
         lock (TotalBufferLock)
         {
-            dc.DrawBitmap(TotalBuffer, SKPoint.Empty);
+            dc.DrawBitmap(TotalBuffer, SKPoint.Empty,SkiaHelper.CompoundBufferPaint);
         }
     }
 
@@ -92,72 +121,70 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
     {
         return new Vec(PixelToMathX(point.X), PixelToMathY(point.Y));
     }
-
-    protected bool CallPointerPressed(PointerPressedEventArgs e)
+    protected Addon? PointerCapturedAddon = null;
+    protected bool CallPointerPressed(MouseEventArgs e)
     {
-        LastPoint = e.GetPosition(this);
+        LastPoint = e.Position;
         LastPointerProperties = e.Properties;
-        var loc = LastPoint;
-        var args = new AddonPointerEventArgs(loc.X, loc.Y, e.Properties, e.KeyModifiers);
         foreach (var addon in Addons)
-            if (addon.CallPointerPressed(args) == Intercept)
+            if (addon.CallPointerPressed(e) == Intercept)
+            {
+                PointerCapturedAddon = addon;
                 return Intercept;
+            }
         return DoNext;
     }
 
-    protected bool CallPointerMoved(PointerEventArgs e)
+    protected bool CallPointerMoved(MouseEventArgs e)
     {
-        LastPoint = e.GetPosition(this);
+        LastPoint = e.Position;
         LastPointerProperties = e.Properties;
-        var loc = LastPoint;
-        var args = new AddonPointerEventArgs(loc.X, loc.Y, e.Properties, e.KeyModifiers);
-        foreach (var addon in Addons)
-            if (addon.CallPointerMoved(args) == Intercept)
-                return Intercept;
+        if (PointerCapturedAddon != null)
+        {
+            PointerCapturedAddon.CallPointerMoved(e);
+            return Intercept;
+        }
+
         return DoNext;
     }
 
-    protected bool CallPointerReleased(PointerReleasedEventArgs e)
+    protected bool CallPointerReleased(MouseEventArgs e)
     {
-        LastPoint = e.GetPosition(this);
+        LastPoint = e.Position;
         LastPointerProperties = e.Properties;
-        var loc = LastPoint;
-        var args = new AddonPointerEventArgs(loc.X, loc.Y, e.Properties, e.KeyModifiers);
-        foreach (var addon in Addons)
-            if (addon.CallPointerReleased(args) == Intercept)
-                return Intercept;
+        if (PointerCapturedAddon != null)
+        {
+            PointerCapturedAddon.CallPointerReleased(e);
+            PointerCapturedAddon = null;
+            return Intercept;
+        }
         return DoNext;
     }
 
-    protected bool CallPointerWheeled(PointerWheelEventArgs e)
+    protected bool CallPointerWheeled(MouseEventArgs e)
     {
-        LastPoint = e.GetPosition(this);
+        LastPoint = e.Position;
         LastPointerProperties = e.Properties;
-        var loc = LastPoint;
-        var args = new AddonPointerWheelEventArgs(loc.X, loc.Y, e.Properties, e.KeyModifiers,
-            new Vec(e.Delta.X, e.Delta.Y));
         foreach (var addon in Addons)
-            if (addon.CallPointerWheeled(args) == Intercept)
+            if (addon.CallPointerWheeled(e) == Intercept)
                 return Intercept;
         return DoNext;
     }
 
     public abstract void Zoom(double del, AvaPoint center);
 
-    protected bool CallPointerTapped(TappedEventArgs e)
+    protected bool CallPointerTapped(MouseEventArgs e)
     {
-        var loc = e.GetPosition(this);
-        var args = new AddonPointerEventArgsBase(loc.X, loc.Y, e.KeyModifiers);
+        var args = new MouseEventArgs(e.SourceEvent,e.SourceEventArgs,e.Position, e.KeyModifiers, LastPointerProperties);
         foreach (var addon in Addons)
             if (addon.CallPointerTapped(args) == Intercept)
                 return Intercept;
         return DoNext;
     }
 
-    protected bool CallPointerDoubleTapped(TappedEventArgs e)
+    protected bool CallPointerDoubleTapped(MouseEventArgs e)
     {
-        var loc = e.GetPosition(this);
-        var args = new AddonPointerEventArgsBase(loc.X, loc.Y, e.KeyModifiers);
+        var args = new MouseEventArgs(e.SourceEvent,e.SourceEventArgs,e.Position, e.KeyModifiers, LastPointerProperties);
         foreach (var addon in Addons)
             if (addon.CallPointerDoubleTapped(args) == Intercept)
                 return Intercept;
@@ -197,31 +224,31 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
                         layer.RenderTargetSize = new SKSizeI((int)e.NewSize.Width, (int)e.NewSize.Height);
                 }
 
-                ForceToRender();
+                ForceToRender(CancellationToken.None);
             }
     }
 
     /// <summary>
     ///     使所有层无效
     /// </summary>
-    protected void Invalidate()
+    protected void Invalidate(CancellationToken ct)
     {
-        foreach (var i in Addons) Invalidate(i);
+        if(ct.IsCancellationRequested)
+            return;
+        foreach (var i in Addons) Invalidate(i,ct);
     }
 
     /// <summary>
     ///     使Renderable层无效
     /// </summary>
     /// <param name="layer"></param>
-    protected void Invalidate(Renderable layer)
+    /// <param name="ct"></param>
+    protected void Invalidate(Renderable layer,CancellationToken ct)
     {
-        using (var dc = layer.GetBitmapCanvas())
-        {
-            dc?.Clear();
-            dc?.Flush();
-            layer.Render(dc, Bounds.ToSKRect());
-        }
-
+        if(ct.IsCancellationRequested)
+            return;
+        layer.ClearAndFlush();
+        layer.Render(Bounds.ToSKRect(),ct);
         layer.Changed = false;
     }
 
@@ -229,33 +256,41 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
     ///     使Addon中的所有层无效
     /// </summary>
     /// <param name="adn"></param>
-    protected void Invalidate(Addon adn)
+    /// <param name="ct"></param>
+    protected void Invalidate(Addon adn,CancellationToken ct)
     {
-        foreach (var layer in adn.Layers)
-            Invalidate(layer);
+        if(ct.IsCancellationRequested)
+            return;
         adn.AddonChanged = false;
+        Task.WaitAll(adn.Layers.Select(i => Task.Run(() => Invalidate(i,ct), ct)), ct);
     }
 
     /// <summary>
     ///     强制重绘
     /// </summary>
-    protected void ForceToRender()
+    protected void ForceToRender(CancellationToken ct)
     {
         RenderClock.Cancel();
-        Invalidate();
+        Invalidate(ct);
         CompoundBuffers();
         InvalidateVisual();
     }
 
     private void Render()
     {
+        Render(CancellationToken.None);
+    }
+    private void Render(CancellationToken ct)
+    {
+        if(ct.IsCancellationRequested)
+            return;
         var paintflag = false;
         foreach (var adn in Addons)
             if (adn.AddonChanged)
             {
                 paintflag = true;
                 adn.AddonChanged = false;
-                Invalidate(adn);
+                Invalidate(adn,ct);
             }
             else
             {
@@ -264,7 +299,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
                     {
                         paintflag = true;
                         layer.Changed = false;
-                        Invalidate(layer);
+                        Invalidate(layer,ct);
                     }
             }
 
