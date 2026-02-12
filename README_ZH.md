@@ -10,7 +10,7 @@ CsGrafeq是一项用C#实现的开源几何画板，使用Avalonia作为UI框架
 
 出于JIT在移动平台和浏览器中无法使用，CsGrafeq暂时只支持桌面端（目前仅支持Windows平台）
 
-[旧版本项目](./OldVersion/README.md) 是专为隐函数制作的，这项功能将会在未来合并入CsGrafeq。
+[旧版本项目](./OldVersion/README.md) 是专为隐函数制作的，其更为稳定，但不代表其效果更好。
 
 ![image](Example/1.jpg)
 ![image](Example/2.jpg)
@@ -55,14 +55,17 @@ CsGrafeq.sln
 ### 短期目标
 
 - 添加文本框支持
-- 实现原生MsgBox,InputBox
 - 实现符号计算，替换浮点计算 (e.g. 0.5->1/2, 1.414->√2)
 - 实现原生表达式编辑器
+- 实现UI线程和图像绘制线程完全分离
+- 使用GPU以加速计算
+
 
 ### 长期目标
 
 - 添加更多图形支持 如向量，距离等
 - 修复Bug
+   - 目前任然存在绘制莫名卡死的情况
 
 欢迎任何希望参与开发的朋友加入！
 
@@ -84,3 +87,12 @@ CsGrafeq.sln
 ![image](OldVersion/ExampleImage/1-6.jpg)
 ![image](OldVersion/ExampleImage/1-7.jpg)
 ![image](OldVersion/ExampleImage/1-8.jpg)
+
+## 更多
+同类软件
+ - [Graphest](https://github.com/unageek/graphest) - A faithful graphing calculator 忠实的绘制计算器
+ - [Grafeq](http://www.peda.com/grafeq/) - An intuitive, flexible, precise and robust program for producing graphs of implicit equations and inequalities. 一款直观、灵活、精确且可靠的程序，可用于绘制隐式方程和不等式的图像。
+
+论文
+ - [Tup96] Jeffrey Allen Tupper. _Graphing Equations with Generalized Interval Arithmetic._ Master's thesis, University of Toronto, 1996. http://www.dgp.toronto.edu/~mooncake/thesis.pdf
+ - [Tup01] Jeff Tupper. _Reliable Two-Dimensional Graphing Methods for Mathematical Formulae with Two Free Variables._ SIGGRAPH 2001 Conference Proceedings, 2001. http://www.dgp.toronto.edu/~mooncake/papers/SIGGRAPH2001_Tupper.pdf
