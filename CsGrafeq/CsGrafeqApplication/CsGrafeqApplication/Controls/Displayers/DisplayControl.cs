@@ -1,17 +1,12 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Input;
-using Avalonia.Threading;
-using CsGrafeq.Debug;
-using CsGrafeq.Utilities;
 using CsGrafeqApplication.Events;
 using CsGrafeqApplication.Utilities;
 using SkiaSharp;
-using static CsGrafeq.Utilities.ThrowHelper;
-using BigPoint= CsGrafeq.PointBase<CsGrafeq.Numeric.BigNumber<long,double>>;
+using BigPoint = CsGrafeq.PointBase<CsGrafeq.Numeric.BigNumber<long, double>>;
 
 namespace CsGrafeqApplication.Controls.Displayers;
 
@@ -20,19 +15,19 @@ public delegate void RenderHandler(SKCanvas dc, SKRect bounds);
 public class DisplayControl : CartesianDisplayer
 {
     /// <summary>
-    ///     上一时刻的零点位置
+    ///     鼠标按下时的位置 用以计算出新的Zero
     /// </summary>
-    private BigPoint PreviousPointerMovedZero;
+    private BigPoint _pointerDownPointerPos = new() { X = 0, Y = 0 };
 
     /// <summary>
-    ///     鼠标按下时的位置
+    ///     鼠标按下时的零点位置 用以计算出新的Zero
     /// </summary>
-    private BigPoint PointerDownPointerPos = new() { X = 0, Y = 0 };
+    private BigPoint _pointerDownZeroPos = new() { X = 0, Y = 0 };
 
     /// <summary>
-    ///     鼠标按下时的零点位置
+    ///     上一次重绘补全完整绘制区域时的Zero
     /// </summary>
-    private BigPoint PointerDownZeroPos = new() { X = 0, Y = 0 };
+    private BigPoint _previousRenderZeroPos;
 
     public DisplayControl()
     {
@@ -41,19 +36,16 @@ public class DisplayControl : CartesianDisplayer
         AddHandler(DoubleTappedEvent, (_, e) => OnPointerDoubleTapped(e));
     }
 
-    protected override void OnPointerPressed(PointerPressedEventArgs e)
+    private bool _isPointerLeftButtonDown = false;
+    protected sealed override void OnPointerPressed(PointerPressedEventArgs e)
     {
         if (!e.Pointer.IsPrimary) return;
         StopWheeling();
-        if (CallPointerPressed(e.Cast(this)) == DoNext)
+        var ev = e.Cast(this);
+        if (CallPointerPressed(ev) == DoNext)
         {
-            if (e.Properties.IsLeftButtonPressed)
-            {
-                var p = e.GetPosition(this);
-                PointerDownPointerPos = p.ToBigPoint();
-                PointerDownZeroPos = ZeroPos;
-            }
-            PreviousPointerMovedZero = ZeroPos;
+            _isPointerLeftButtonDown = true;
+            if (e.Properties.IsLeftButtonPressed) OnPointerPressedLeftButton(ev);
             base.OnPointerPressed(e);
         }
         else
@@ -62,72 +54,34 @@ public class DisplayControl : CartesianDisplayer
         }
     }
 
+    protected virtual void OnPointerPressedLeftButton(MouseEventArgs e, CancellationToken ct = default)
+    {
+        Console.WriteLine("Press");
+        var p = e.Position;
+        _pointerDownPointerPos = p.ToBigPoint();
+        _pointerDownZeroPos = ZeroPos;
+        _previousRenderZeroPos = ZeroPos;
+    }
+
+
     protected sealed override void OnPointerMoved(PointerEventArgs e)
     {
         if (!e.Pointer.IsPrimary) return;
         StopWheeling();
-        var eventargs = e.Cast(this);
-        OnPointerMovedCore(eventargs, CancellationHelperToken);
-        
-    }
-
-    protected virtual void OnPointerMovedCore(MouseEventArgs e,CancellationToken ct)
-    {
-        if(ct.IsCancellationRequested)
-            return;
-        if (CallPointerMoved(e) == DoNext)
+        var ev = e.Cast(this);
+        if (CallPointerMoved(ev) == DoNext)
         {
-            var current = e.Position.ToBigPoint();
+            var current = ev.Position.ToBigPoint();
             MouseOnYAxis = Abs(current.X - ZeroPos.X) < 3;
             MouseOnXAxis = Abs(current.Y - ZeroPos.Y) < 3;
-            if (e.Properties.IsLeftButtonPressed)
+            if (ev.Properties.IsLeftButtonPressed&&_isPointerLeftButtonDown)
             {
-                //移动零点
-                var newZero = new BigPoint
+                ZeroPos = new BigPoint
                 {
-                    X = PointerDownZeroPos.X + current.X - PointerDownPointerPos.X,
-                    Y = PointerDownZeroPos.Y + current.Y - PointerDownPointerPos.Y
+                    X = _pointerDownZeroPos.X + current.X - _pointerDownPointerPos.X,
+                    Y = _pointerDownZeroPos.Y + current.Y - _pointerDownPointerPos.Y
                 };
-                if (newZero != ZeroPos)
-                {
-                    ZeroPos = newZero;
-                    lock (TotalBufferLock)
-                    {
-                        var dc = new SKCanvas(TotalBuffer);
-                        dc.Clear(AxisBackground);
-                        RenderAxes(dc);
-                        if (!Setting.Instance.MoveOptimization || (PreviousPointerMovedZero - ZeroPos).Length > 50)
-                        {
-                            var lastZero = PreviousPointerMovedZero;
-                            PreviousPointerMovedZero = ZeroPos;
-                            foreach (var rt in Addons.SelectMany(adn => adn.Layers).Where(rt => rt.IsActive))
-                            {
-                                rt.CopyRenderTargetTo(TempBuffer);
-                                using var canvas = rt.GetBitmapCanvas()!;
-                                canvas.Clear(SKColors.Transparent);
-                                canvas.DrawBitmap(TempBuffer, (int)((ZeroPos.X - lastZero.X).ToDecimal()),
-                                    (int)((ZeroPos.Y - lastZero.Y).ToDecimal()), SkiaHelper.CompoundBufferPaint);
-                                canvas.Flush();
-                                RenderExtension.RenderMovedPlace(rt.Render, Bounds.Size,
-                                    new Point(ZeroPos.X, ZeroPos.Y),
-                                    new Point(lastZero.X, lastZero.Y), CancellationHelperToken);
-                                rt.DrawRenderTargetTo(dc, 0, 0);
-                            }
-                        }
-                        else
-                        {
-                            foreach (var layer in Addons.SelectMany(adn => adn.Layers).Where(rt=>rt.IsActive))
-                            {
-                                layer.DrawRenderTargetTo(dc, (int)(ZeroPos.X - PreviousPointerMovedZero.X),
-                                    (int)(ZeroPos.Y - PreviousPointerMovedZero.Y));
-                            }
-                        }
-                        RenderAxesNumber(dc);
-                        dc.Dispose();
-                    }
-
-                    InvalidateVisual();
-                }
+                OnPointerMovedLeftButton(ev, default);
             }
         }
         else
@@ -136,7 +90,50 @@ public class DisplayControl : CartesianDisplayer
         }
     }
 
-    protected override void OnPointerReleased(PointerReleasedEventArgs eventArgs)
+    protected virtual void OnPointerMovedLeftButton(MouseEventArgs e, CancellationToken ct)
+    {
+        Console.WriteLine("move");
+        if (ZeroPos != _previousRenderZeroPos)
+        {
+            lock (TotalBufferLock)
+            {
+                var dc = new SKCanvas(TotalBuffer);
+                dc.Clear(AxisBackground);
+                RenderAxes(dc);
+                if (!Setting.Instance.MoveOptimization || (_previousRenderZeroPos - ZeroPos).Length > 50)
+                {
+                    var lastZero = _previousRenderZeroPos;
+                    _previousRenderZeroPos = ZeroPos;
+                    foreach (var rt in Addons.SelectMany(adn => adn.Layers).Where(rt => rt.IsActive))
+                    {
+                        rt.CopyRenderTargetTo(TempBuffer);
+                        using var canvas = rt.GetBitmapCanvas()!;
+                        canvas.Clear(SKColors.Transparent);
+                        canvas.DrawBitmap(TempBuffer, (int)(ZeroPos.X - lastZero.X).ToDecimal(),
+                            (int)(ZeroPos.Y - lastZero.Y).ToDecimal(), SkiaHelper.CompoundBufferPaint);
+                        canvas.Flush();
+                        RenderExtension.RenderMovedPlace(rt.Render, Bounds.Size,
+                            new Point(ZeroPos.X, ZeroPos.Y),
+                            new Point(lastZero.X, lastZero.Y), CancellationHelperToken);
+                        rt.DrawRenderTargetTo(dc, 0, 0);
+                    }
+                }
+                else
+                {
+                    foreach (var layer in Addons.SelectMany(adn => adn.Layers).Where(rt => rt.IsActive))
+                        layer.DrawRenderTargetTo(dc, (int)(ZeroPos.X - _previousRenderZeroPos.X),
+                            (int)(ZeroPos.Y - _previousRenderZeroPos.Y));
+                }
+
+                RenderAxesNumber(dc);
+                dc.Dispose();
+            }
+
+            InvalidateVisual();
+        }
+    }
+
+    protected sealed override void OnPointerReleased(PointerReleasedEventArgs eventArgs)
     {
         var e = eventArgs.Cast(this);
         StopWheeling();
@@ -145,53 +142,62 @@ public class DisplayControl : CartesianDisplayer
             var current = e.Position.ToBigPoint();
             MouseOnYAxis = Abs(current.X - ZeroPos.X) < 3;
             MouseOnXAxis = Abs(current.Y - ZeroPos.Y) < 3;
-            if (e.Properties.IsLeftButtonPressed)
+            if (_isPointerLeftButtonDown)
             {
+                _isPointerLeftButtonDown = false;
                 //移动零点
-                var newZero = new BigPoint
+                ZeroPos = new BigPoint
                 {
-                    X = PointerDownZeroPos.X + current.X - PointerDownPointerPos.X,
-                    Y = PointerDownZeroPos.Y + current.Y - PointerDownPointerPos.Y
+                    X = _pointerDownZeroPos.X + current.X - _pointerDownPointerPos.X,
+                    Y = _pointerDownZeroPos.Y + current.Y - _pointerDownPointerPos.Y
                 };
-                if (newZero != ZeroPos)
-                {
-                    if (Setting.Instance.MoveOptimization)
-                    {
-                        lock (TotalBufferLock)
-                        {
-                            var dc = new SKCanvas(TotalBuffer);
-                            dc.Clear(AxisBackground);
-                            RenderAxes(dc);
-                            var lastZero = PreviousPointerMovedZero;
-                            PreviousPointerMovedZero = ZeroPos;
-                            foreach (var rt in Addons.SelectMany(adn => adn.Layers).Where(rt => rt.IsActive))
-                            {
-                                rt.CopyRenderTargetTo(TempBuffer);
-                                using var canvas = rt.GetBitmapCanvas()!;
-                                canvas.Clear(SKColors.Transparent);
-                                canvas.DrawBitmap(TempBuffer, (int)((ZeroPos.X - lastZero.X).ToDecimal()),
-                                    (int)((ZeroPos.Y - lastZero.Y).ToDecimal()), SkiaHelper.CompoundBufferPaint);
-                                canvas.Flush();
-                                RenderExtension.RenderMovedPlace(rt.Render, Bounds.Size,
-                                    new Point(ZeroPos.X, ZeroPos.Y),
-                                    new Point(lastZero.X, lastZero.Y), CancellationHelperToken);
-                                rt.DrawRenderTargetTo(dc, 0, 0);
-                            }
-                            RenderAxesNumber(dc);
-                            dc.Dispose();
-                        }
-                        InvalidateVisual();
-                    }
-                    else
-                    {
-                        ForceToRender(CancellationToken.None);
-                    }
-                }
+                OnPointerReleasedLeftButton(e);
             }
         }
         else
         {
             AskForRender();
+        }
+    }
+
+    protected virtual void OnPointerReleasedLeftButton(MouseEventArgs e)
+    {
+        Console.WriteLine("Release");
+        if (ZeroPos != _previousRenderZeroPos)
+        {
+            if (Setting.Instance.MoveOptimization)
+            {
+                lock (TotalBufferLock)
+                {
+                    var dc = new SKCanvas(TotalBuffer);
+                    dc.Clear(AxisBackground);
+                    RenderAxes(dc);
+                    var lastZero = _previousRenderZeroPos;
+                    _previousRenderZeroPos = ZeroPos;
+                    foreach (var rt in Addons.SelectMany(adn => adn.Layers).Where(rt => rt.IsActive))
+                    {
+                        rt.CopyRenderTargetTo(TempBuffer);
+                        using var canvas = rt.GetBitmapCanvas()!;
+                        canvas.Clear(SKColors.Transparent);
+                        canvas.DrawBitmap(TempBuffer, (int)(ZeroPos.X - lastZero.X).ToDecimal(),
+                            (int)(ZeroPos.Y - lastZero.Y).ToDecimal(), SkiaHelper.CompoundBufferPaint);
+                        canvas.Flush();
+                        RenderExtension.RenderMovedPlace(rt.Render, Bounds.Size,
+                            new Point(ZeroPos.X, ZeroPos.Y),
+                            new Point(lastZero.X, lastZero.Y), CancellationHelperToken);
+                        rt.DrawRenderTargetTo(dc, 0, 0);
+                    }
+
+                    RenderAxesNumber(dc);
+                    dc.Dispose();
+                }
+
+                InvalidateVisual();
+            }
+            else
+            {
+                ForceToRender(CancellationToken.None);
+            }
         }
     }
 

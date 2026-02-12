@@ -98,19 +98,19 @@ public class CartesianDisplayer : Displayer
     /// <summary>
     ///     横向坐标轴线的位置和类型
     /// </summary>
-    public IEnumerable<(double, AxisType)> AxisX { get; private set; }
+    public (double, AxisType)[] AxisX { get; private set; }
 
     /// <summary>
     ///     纵向坐标轴线的位置和类型
     /// </summary>
-    public IEnumerable<(double, AxisType)> AxisY { get; private set; }
+    public (double, AxisType)[] AxisY { get; private set; }
 
     /// <summary>
     ///     重新刷新绘制用的画笔
     /// </summary>
     protected void RefreshPaint()
     {
-        if (App.Current.ActualThemeVariant == ThemeVariant.Light)
+        if (Application.Current?.ActualThemeVariant == ThemeVariant.Light)
         {
             AxisBackground = SKColors.White;
             AxisPaintMain = new SKPaint { Color = SKColors.Black };

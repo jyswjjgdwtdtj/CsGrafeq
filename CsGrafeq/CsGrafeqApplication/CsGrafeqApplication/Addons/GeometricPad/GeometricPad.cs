@@ -383,7 +383,7 @@ public class GeometricPad : Addon
                     Shapes.ClearSelected<GeoPolygon>();
             }
 
-            var SAll = Shapes.GetSelectedShapes<GeometricShape>().ToList();
+            var SAll = Shapes.GetSelectedShapes<GeometricShape>().ToArray();
             var SPoints = Shapes.GetSelectedShapes<GeoPoint>().ToArray();
             var SLines = Shapes.GetSelectedShapes<GeoLine>().ToArray();
             var SCircles = Shapes.GetSelectedShapes<GeoCircle>().ToArray();
