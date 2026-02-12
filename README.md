@@ -58,11 +58,15 @@ CsGrafeq.sln
 - Implement custom msgbox/inputbox
 - Implement symbolic calculation (e.g. 0.5->1/2, 1.414->√2)
 - Implement custom formula editor
+- achieve a complete separation between the UI thread and the image rendering thread.
+- Implement GPU computing to accelerate calculations
+
 
 ### Long term plan
 
 - Add more shapes supports
 - Fix bugs
+   - There are still cases where the drawing process gets stuck for no apparent reason.
 
 Welcome to any programming enthusiasts who wish to collaborate on development. 
 
@@ -84,3 +88,12 @@ These are the screenshot from old version.\
 ![image](OldVersion/ExampleImage/1-7.jpg)
 ![image](OldVersion/ExampleImage/1-8.jpg)\
 [See More](OldVersion/Example.md) 
+
+## See Also
+Software of the same type
+ - [Graphest](https://github.com/unageek/graphest) - A faithful graphing calculator
+ - [Grafeq](http://www.peda.com/grafeq/) - An intuitive, flexible, precise and robust program for producing graphs of implicit equations and inequalities.
+
+ Papers
+ - [Tup96] Jeffrey Allen Tupper. _Graphing Equations with Generalized Interval Arithmetic._ Master's thesis, University of Toronto, 1996. http://www.dgp.toronto.edu/~mooncake/thesis.pdf
+ - [Tup01] Jeff Tupper. _Reliable Two-Dimensional Graphing Methods for Mathematical Formulae with Two Free Variables._ SIGGRAPH 2001 Conference Proceedings, 2001. http://www.dgp.toronto.edu/~mooncake/papers/SIGGRAPH2001_Tupper.pdf
