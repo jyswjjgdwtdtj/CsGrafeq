@@ -4,9 +4,9 @@ namespace CsGrafeq.Shapes;
 
 public static class GeometryMath
 {
-    public static Result<(Vec,Vec)> TryGetValidVec(Vec v1, Vec v2, Vec v3, Vec v4)
+    public static Result<(Vec, Vec)> TryGetValidVec(Vec v1, Vec v2, Vec v3, Vec v4)
     {
-        var vs = new Vec[4] { v1, v2, v3, v4 };
+        var vs = new [] { v1, v2, v3, v4 };
         var vs2 = new Vec[4];
         var i = 0;
         foreach (var v in vs)
@@ -16,10 +16,10 @@ public static class GeometryMath
             vs2[i] = v;
             i++;
         }
-        
+
         if (i == 2)
             return Result<(Vec, Vec)>.Success((vs2[0], vs2[1]));
-        return Result<(Vec, Vec)>.Error("");
+        return Result<(Vec, Vec)>.Failure("");
     }
 
     public static Vec SolveFunction(double a, double b, double c, double d, double e, double f)
@@ -59,19 +59,19 @@ public static class GeometryMath
         return new Vec(double.NaN, double.NaN);
     }
 
-    public static double DistanceToLine(Vec v1, Vec v2, Vec test, out Vec OnPoint)
+    public static double DistanceToLine(Vec v1, Vec v2, Vec test, out Vec onPoint)
     {
         var dx = v2.X - v1.X;
         var dy = v2.Y - v1.Y;
         var t = ((test.X - v1.X) * dx + (test.Y - v1.Y) * dy) / (dx * dx + dy * dy);
-        OnPoint = new Vec(v1.X + t * dx, v1.Y + t * dy);
-        return (OnPoint - test).GetLength();
+        onPoint = new Vec(v1.X + t * dx, v1.Y + t * dy);
+        return (onPoint - test).GetLength();
     }
 
-    public static double DistanceToSegment(Vec v1, Vec v2, Vec test, out Vec OnPoint)
+    public static double DistanceToSegment(Vec v1, Vec v2, Vec test, out Vec onPoint)
     {
-        var res = DistanceToLine(v1, v2, test, out OnPoint);
-        return FuzzyOnSegment(v1, v2, OnPoint) ? res : double.PositiveInfinity;
+        var res = DistanceToLine(v1, v2, test, out onPoint);
+        return FuzzyOnSegment(v1, v2, onPoint) ? res : double.PositiveInfinity;
     }
 
     public static bool FuzzyOnSegment(Vec v1, Vec v2, Vec test)

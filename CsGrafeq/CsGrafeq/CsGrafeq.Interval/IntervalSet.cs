@@ -83,13 +83,13 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
 
     public static IntervalSet Create(double num)
     {
-        return new IntervalSet((new Ranges([new Range(num)])), IntervalSetType.Number, TT, num, num, num);
+        return new IntervalSet(new Ranges([new Range(num)]), IntervalSetType.Number, TT, num, num, num);
     }
 
     public static IntervalSet Create(double min, double max, Def def)
     {
         CGMath.SwapIfNotLess(ref min, ref max);
-        return new IntervalSet((new Ranges([new Range(min,max)])), IntervalSetType.IntervalSet, TT, min, max,
+        return new IntervalSet(new Ranges([new Range(min, max)]), IntervalSetType.IntervalSet, TT, min, max,
             double.NaN);
     }
 
@@ -317,10 +317,7 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
                 }
             }
 
-            if (loc == 0)
-            {
-                return Empty;
-            }
+            if (loc == 0) return Empty;
 
             var res = ranges.Slice(0, loc);
             return Create(res, FT);

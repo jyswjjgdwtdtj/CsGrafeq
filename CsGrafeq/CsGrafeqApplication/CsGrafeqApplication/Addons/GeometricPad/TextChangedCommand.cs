@@ -1,6 +1,7 @@
 ﻿using System;
 using Avalonia.Controls;
 using CsGrafeq.Command;
+using CsGrafeq.Compiler;
 
 namespace CsGrafeqApplication.Addons.GeometricPad;
 

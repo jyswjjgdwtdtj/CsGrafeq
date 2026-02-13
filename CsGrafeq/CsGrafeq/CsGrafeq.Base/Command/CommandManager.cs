@@ -17,8 +17,6 @@ public class CommandManager
         {
             _currentDoNode = _currentDoNode.Next!;
             _currentDoNode.Value.Do.Invoke(_currentDoNode.Value.Tag);
-
-            Console.WriteLine("Redo:" + _currentDoNode.Value.Description);
         }
     }
 
@@ -27,7 +25,6 @@ public class CommandManager
         if (_currentDoNode != _doList.First)
         {
             _currentDoNode.Value.UnDo.Invoke(_currentDoNode.Value.Tag);
-            Console.WriteLine("Undo:" + _currentDoNode.Value.Description);
             _currentDoNode = _currentDoNode.Previous!;
         }
     }

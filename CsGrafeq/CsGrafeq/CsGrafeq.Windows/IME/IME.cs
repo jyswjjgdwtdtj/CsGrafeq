@@ -22,25 +22,22 @@ public static class IME
                 Disable(handle);
                 break;
         }
-        
     }
+
     public static void Disable(IntPtr handle)
     {
-
         // Close the IME if necessary
-        if (IsOpen(handle))
-        {
-            SetOpenStatus(false, handle);
-        }
+        if (IsOpen(handle)) SetOpenStatus(false, handle);
         ImePInvoke.ImmAssociateContext(handle, IntPtr.Zero);
     }
+
     public static void SetOpenStatus(bool open, IntPtr handle)
     {
         var inputContext = ImePInvoke.ImmGetContext(handle);
 
         if (inputContext != IntPtr.Zero)
         {
-            bool succeeded = ImePInvoke.ImmSetOpenStatus(inputContext, open?1:0);
+            var succeeded = ImePInvoke.ImmSetOpenStatus(inputContext, open ? 1 : 0);
             Debug.Assert(succeeded, "Could not set the IME open status.");
 
             if (succeeded)
@@ -50,11 +47,12 @@ public static class IME
             }
         }
     }
+
     public static bool IsOpen(IntPtr handle)
     {
-        IntPtr inputContext = ImePInvoke.ImmGetContext(handle);
+        var inputContext = ImePInvoke.ImmGetContext(handle);
 
-        bool retval = false;
+        var retval = false;
 
         if (inputContext != IntPtr.Zero)
         {

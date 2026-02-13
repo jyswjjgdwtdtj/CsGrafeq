@@ -37,8 +37,7 @@ public partial class SettingView : UserControl
 
     private void ApplyClientSizeButton_OnClick(object? sender, RoutedEventArgs e)
     {
-        Console.WriteLine(Setting.Instance.ClientSizeWidth+" "+Setting.Instance.ClientSizeHeight);
         MainWindow.Instance?.SetClientSize(new Size(Setting.Instance.ClientSizeWidth+2, Setting.Instance.ClientSizeHeight+32));
-        
     }
+    
 }

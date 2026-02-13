@@ -7,6 +7,7 @@
                         xmlns:controls="clr-namespace:CsGrafeqApplication.Core.Controls;assembly=CsGrafeqApplication.Core"
                         xmlns:getter="clr-namespace:CsGrafeq.Shapes.ShapeGetter;assembly=CsGrafeq.Shapes"
                         xmlns:csGrafeq="clr-namespace:CsGrafeq;assembly=CsGrafeq.Compiler"
+                        xmlns:compiler="clr-namespace:CsGrafeq.Compiler;assembly=CsGrafeq.Compiler"
                         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
                         x:Class="CsGrafeqApplication.Addons.GeometricPad.ShapeView">
     <geometricpad:ShapeView.Styles>
@@ -373,7 +374,7 @@
                                                                         </geometricpad:ShapeParamsTemplate.ShapeTemplate>
                                                                         <geometricpad:ShapeParamsTemplate.NumberTemplate>
                                                                             <DataTemplate
-                                                                                DataType="csGrafeq:ExpNumber">
+                                                                                DataType="compiler:ExpNumber">
                                                                                 <TextBox
                                                                                     Text="{CompiledBinding ValueStr,Mode=TwoWay}"
                                                                                     Classes="CommonTextBox Big"

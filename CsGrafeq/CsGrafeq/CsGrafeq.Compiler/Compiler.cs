@@ -1,11 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
-using System.Numerics;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using CsGrafeq.Numeric;
-using MathNet.Numerics;
+using CsGrafeq.Variables;
 using MathNet.Symbolics;
 using Expression = System.Linq.Expressions.Expression;
 using sysMath = System.Math;
@@ -15,15 +14,15 @@ namespace CsGrafeq.Compiler;
 
 public static class Compiler
 {
-    private static readonly Regex letter = new("[a-zA-Z]");
-    private static readonly Regex number = new("[0-9]");
-    private static readonly Regex oper = new("([/<>+=^*%(),|&]|-)");
-    private static readonly Regex letterOrnumberOr_ = new("[a-zA-Z0-9_]");
-    private static readonly Regex numberOrpoint = new("[0-9.]");
-    private static readonly Regex spaceOrtab = new(@"([ ]|\t)");
+    private static readonly Regex LetterRegex = new("[a-zA-Z]");
+    private static readonly Regex NumberRegex = new("[0-9]");
+    private static readonly Regex OperatorRegex = new("([/<>+=^*%(),|&]|-)");
+    private static readonly Regex LetterOrNumberOrUnderlineRegex = new("[a-zA-Z0-9_]");
+    private static readonly Regex NumberOrPointRegex = new("[0-9.]");
+    private static readonly Regex SpaceOrTabRegex = new(@"([ ]|\t)");
 
     public static Delegate Compile<T>(string expression, uint paraCount, bool useSimplification,
-        out EnglishCharEnum usedVars)
+        out VariablesEnum usedVars)
         where T : IComputableNumber<T>, INeedClone<T>
     {
         ParameterExpression x, y, z;
@@ -32,13 +31,13 @@ public static class Compiler
         return expResult.Compile();
     }
 
-    public static Result<(Delegate func, EnglishCharEnum usedVars)> TryCompile<T>(string expression, uint paraCount,
+    public static Result<(Delegate func, VariablesEnum usedVars)> TryCompile<T>(string expression, uint paraCount,
         bool useSimplification)
         where T : IComputableNumber<T>
     {
         try
         {
-            return Result<(Delegate func, EnglishCharEnum)>.Success(
+            return Result<(Delegate func, VariablesEnum)>.Success(
                 (Compile<T>(expression, paraCount, useSimplification, out var usedVars), usedVars), expression);
         }
         catch (Exception e)
@@ -48,13 +47,13 @@ public static class Compiler
                 ex = new Exception("Incomplete expression");
             else
                 ex = e;
-            return Result<(Delegate func, EnglishCharEnum)>.Error(ex);
+            return Result<(Delegate func, VariablesEnum)>.Failure(ex);
         }
     }
 
     public static Expression ConstructExpTree<T>(this string expression, [Range(0, 3)] uint argsLength,
         out ParameterExpression x, out ParameterExpression y, out ParameterExpression z,
-        out EnglishCharEnum usedVars, bool enableSimplification) where T : IComputableNumber<T>, allows ref struct
+        out VariablesEnum usedVars, bool enableSimplification) where T : IComputableNumber<T>, allows ref struct
     {
         return enableSimplification
             ? ContructSimplifiedExpTree<T>(expression, argsLength, out x, out y, out z, out usedVars)
@@ -63,13 +62,13 @@ public static class Compiler
 
     public static Expression ConstructExpTree<T>(this string expression, [Range(0, 3)] uint argsLength,
         out ParameterExpression xVar, out ParameterExpression yVar, out ParameterExpression zVar,
-        out EnglishCharEnum usedVars) where T : IComputableNumber<T>, allows ref struct
+        out VariablesEnum usedVars) where T : IComputableNumber<T>, allows ref struct
     {
         if (string.IsNullOrWhiteSpace(expression))
             throw new Exception("Expression cannot be empty");
         if (expression.StartsWith('-'))
             expression = '0' + expression;
-        usedVars = EnglishCharEnum.None;
+        usedVars = VariablesEnum.None;
         var elements = expression.GetTokens().GetElements();
         var expStack = new Stack<Expression>();
         var cloneMethod = GetInfo(T.Clone);
@@ -77,7 +76,6 @@ public static class Compiler
         xVar = Expression.Parameter(typeof(T), "x");
         yVar = Expression.Parameter(typeof(T), "y");
         zVar = Expression.Parameter(typeof(T), "z");
-        var variables = Expression.Constant(EnglishChar.Instance);
         foreach (var element in elements)
             switch (element.Type)
             {
@@ -211,9 +209,9 @@ public static class Compiler
                     else if (name.Length == 1 && 'a' <= name[0] && name[0] <= 'z')
                     {
                         expStack.Push(Expression.Call(GetInfo(T.CreateFromDouble),
-                            Expression.Call(GetInfo(EnglishChar.StaticGetValue),
+                            Expression.Call(GetInfo(Variables.VarRecorder.StaticGetValue),
                                 Expression.Constant(name[0]))));
-                        usedVars |= (EnglishCharEnum)sysMath.Pow(2, name[0] - 'a');
+                        usedVars |= (VariablesEnum)sysMath.Pow(2, name[0] - 'a');
                     }
                     else
                     {
@@ -261,7 +259,7 @@ public static class Compiler
 
     public static Expression ContructSimplifiedExpTree<T>(string expression, [Range(0, 3)] uint argsLength,
         out ParameterExpression xVar, out ParameterExpression yVar, out ParameterExpression zVar,
-        out EnglishCharEnum usedVars) where T : IComputableNumber<T>, allows ref struct
+        out VariablesEnum usedVars) where T : IComputableNumber<T>, allows ref struct
     {
         var strspan = expression.AsSpan();
         var sb = new StringBuilder();
@@ -304,69 +302,40 @@ public static class Compiler
         }
     }
 
-    public static BigRational ToBigRational(this string numberStr)
-    {
-        if (string.IsNullOrWhiteSpace(numberStr))
-            throw new ArgumentException("Number string cannot be empty", nameof(numberStr));
-
-        if (!double.TryParse(numberStr, out var d))
-            throw new FormatException($"Cannot parse number: {numberStr}");
-
-        // 如果是整数，直接返回
-        if (numberStr.IndexOf('.') == -1) return BigRational.FromBigInt(BigInteger.Parse(numberStr));
-
-        // 处理小数：转换为分数
-        var parts = numberStr.Split('.');
-        var integerPart = parts[0];
-        var decimalPart = parts[1];
-
-        // 计算分母 (10^小数位数)
-        var denominator = BigInteger.Pow(10, decimalPart.Length);
-
-        // 计算分子
-        var numerator = BigInteger.Parse(integerPart + decimalPart);
-
-        // 如果原数为负数，确保分子为负
-        if (numberStr.StartsWith("-")) return BigRational.FromBigIntFraction(numerator, denominator);
-
-        return BigRational.FromBigIntFraction(numerator, denominator);
-    }
-
-    public static Element[] GetElements(this Token[] Tokens)
+    public static Element[] GetElements(this Token[] tokens)
     {
         var op = new Stack<OperatorType>();
         var exp = new Stack<Element>();
         var loc = 0;
-        var len = Tokens.Length - 1;
+        var len = tokens.Length - 1;
         op.Push(OperatorType.Start);
-        var Previous = ElementType.None;
+        var previous = ElementType.None;
         while (loc <= len)
-            switch (GetTokenLevel(Tokens[loc]))
+            switch (GetTokenLevel(tokens[loc]))
             {
                 case -3: //var|func
-                    if (Previous == ElementType.Number || Previous == ElementType.Variable ||
-                        Previous == ElementType.Function)
-                        throw new Exception("Missing operator between " + Tokens[loc - 1] + " and " + Tokens[loc]);
-                    var Tokenname = Tokens[loc].NameOrValue;
-                    if (Tokens[sysMath.Min(loc + 1, len)].Type == TokenType.LeftBracket)
+                    if (previous == ElementType.Number || previous == ElementType.Variable)// rider说这永远不会发生 => previous == ElementType.Function
+                        throw new Exception("Missing operator between " + tokens[loc - 1] + " and " + tokens[loc]);
+                    var tokenName = tokens[loc].NameOrValue;
+                    if (tokens[sysMath.Min(loc + 1, len)].Type == TokenType.LeftBracket)
                     {
-                        Previous = ElementType.Variable;
+                        previous = ElementType.Variable;
                         loc += 2;
-                        if (Tokens[loc].Type == TokenType.RightBracket)
+                        if (tokens[loc].Type == TokenType.RightBracket)
                         {
-                            exp.Push(new Element(ElementType.Function, Tokenname, 0));
+                            exp.Push(new Element(ElementType.Function, tokenName, 0));
                             loc++;
                         }
                         else
                         {
                             var bc = 0;
-                            var dimcount = 0;
+                            var dimCounter = 0;
                             var ts = new List<Token>();
                             while (true)
                             {
-                                if (bc == 0 && Tokens[loc].Type == TokenType.Comma)
+                                if (bc == 0 && tokens[loc].Type == TokenType.Comma)
                                 {
-                                    dimcount++;
+                                    dimCounter++;
                                     foreach (var i in ts.ToArray().GetElements())
                                         exp.Push(i);
                                     ts.Clear();
@@ -374,77 +343,76 @@ public static class Compiler
                                     continue;
                                 }
 
-                                if (bc == 0 && Tokens[loc].Type == TokenType.RightBracket)
+                                if (bc == 0 && tokens[loc].Type == TokenType.RightBracket)
                                 {
-                                    dimcount++;
+                                    dimCounter++;
                                     foreach (var i in ts.ToArray().GetElements())
                                         exp.Push(i);
                                     loc++;
                                     break;
                                 }
 
-                                if (Tokens[loc].Type == TokenType.LeftBracket)
+                                if (tokens[loc].Type == TokenType.LeftBracket)
                                     bc++;
-                                if (Tokens[loc].Type == TokenType.RightBracket)
+                                if (tokens[loc].Type == TokenType.RightBracket)
                                     bc--;
-                                ts.Add(Tokens[loc]);
+                                ts.Add(tokens[loc]);
                                 loc++;
                             }
 
-                            exp.Push(new Element(ElementType.Function, Tokenname, dimcount));
+                            exp.Push(new Element(ElementType.Function, tokenName, dimCounter));
                         }
                     }
-                    else if ((Tokenname.Length == 1 && 'a' <= Tokenname.ToLower()[0] &&
-                              'z' >= Tokenname.ToLower()[0]) || Tokenname.ToLower() == "pi") //var
+                    else if ((tokenName.Length == 1 && 'a' <= tokenName.ToLower()[0] &&
+                              'z' >= tokenName.ToLower()[0]) || tokenName.ToLower() == "pi") //var
                     {
-                        Previous = ElementType.Variable;
-                        exp.Push(new Element(ElementType.Variable, Tokenname, 0));
+                        previous = ElementType.Variable;
+                        exp.Push(new Element(ElementType.Variable, tokenName, 0));
                         loc++;
                     }
                     else
                     {
-                        throw new Exception("Unknown variable:" + Tokens[loc].NameOrValue);
+                        throw new Exception("Unknown variable:" + tokens[loc].NameOrValue);
                     }
 
                     break;
                 case -4: //num
-                    if (Previous == ElementType.Number || Previous == ElementType.Variable ||
-                        Previous == ElementType.Function)
-                        throw new Exception("Missing operator between " + Tokens[loc - 1] + " and " + Tokens[loc]);
-                    Previous = ElementType.Number;
-                    exp.Push(new Element(ElementType.Number, Tokens[loc].NameOrValue, 0));
+                    if (previous == ElementType.Number || previous == ElementType.Variable)
+                        throw new Exception("Missing operator between " + tokens[loc - 1] + " and " + tokens[loc]);
+                    previous = ElementType.Number;
+                    exp.Push(new Element(ElementType.Number, tokens[loc].NameOrValue, 0));
                     loc++;
                     break;
                 case -1: //'('|')'
-                    if (Tokens[loc].Type == TokenType.LeftBracket)
+                    if (tokens[loc].Type == TokenType.LeftBracket)
                     {
-                        if (Previous == ElementType.Number || Previous == ElementType.Variable)
-                            throw new Exception("Missing operator between " + Tokens[loc - 1] + " and " + Tokens[loc]);
+                        if (previous == ElementType.Number || previous == ElementType.Variable)
+                            throw new Exception("Missing operator between " + tokens[loc - 1] + " and " + tokens[loc]);
                         op.Push(OperatorType.LeftBracket);
-                        Previous = ElementType.Operator;
+                        previous = ElementType.Operator;
                     }
-                    else if (Tokens[loc].Type == TokenType.RightBracket)
+                    else if (tokens[loc].Type == TokenType.RightBracket)
                     {
-                        if (Previous == ElementType.Function || Previous == ElementType.Operator)
-                            throw new Exception("Missing operator between " + Tokens[loc - 1] + " and " + Tokens[loc]);
-                        Previous = ElementType.Variable;
+                        if (previous == ElementType.Operator)
+                            throw new Exception("Missing operator between " + tokens[loc - 1] + " and " + tokens[loc]);
+                        previous = ElementType.Variable;
                         MoveOperatorTo(op, exp, OperatorType.LeftBracket);
                     }
 
                     loc++;
                     break;
                 default:
-                    if (Previous == ElementType.Operator && Tokens[loc].Type == TokenType.Subtract)
+                    if (previous == ElementType.Operator && tokens[loc].Type == TokenType.Subtract)
                     {
-                        Tokens[loc].Type = TokenType.Neg;
+                        tokens[loc].Type = TokenType.Neg;
                         goto jt;
                     }
 
-                    if (Previous == ElementType.Function || Previous == ElementType.Operator)
-                        throw new Exception("Missing operator between " + Tokens[loc - 1] + " and " + Tokens[loc]);
+                    if (previous == ElementType.Operator)
+                        throw new Exception("Missing operator between " + tokens[loc - 1] + " and " + tokens[loc]);
                     jt:
-                    Previous = ElementType.Operator;
-                    JudgeOperator(op, exp, Tokens[loc].ToOper());
+                    previous = ElementType.Operator;
+                    JudgeOperator(op, exp, tokens[loc].ToOper());
                     loc++;
                     break;
             }
@@ -452,23 +420,25 @@ public static class Compiler
         while (op.Count != 0 && op.Peek() != OperatorType.Start) exp.Push(op.Pop().ToElement());
         return exp.Reverse().ToArray();
     }
-
-    public static Token[] GetTokens(this string script) //词法分析器
+    /// <summary>
+    /// 词法分析器 陈年老代码 本用于某个脚本解释器
+    /// </summary>
+    public static Token[] GetTokens(this string script)
     {
         script += '#';
         var loc = 0;
-        var Tokens = new List<Token>();
+        var tokens = new List<Token>();
         while (loc < script.Length)
         {
             Token t;
             t.NameOrValue = "";
             t.Type = TokenType.Err_UnDefined;
             if (script[loc] == '#') break;
-            if (letter.IsMatch(script[loc] + ""))
+            if (LetterRegex.IsMatch(script[loc] + ""))
             {
                 t.NameOrValue += script[loc];
                 loc++;
-                while (letterOrnumberOr_.IsMatch(script[loc] + ""))
+                while (LetterOrNumberOrUnderlineRegex.IsMatch(script[loc] + ""))
                 {
                     t.NameOrValue += script[loc];
                     loc++;
@@ -476,11 +446,11 @@ public static class Compiler
 
                 t.Type = TokenType.VariableOrFunction;
             }
-            else if (number.IsMatch(script[loc] + ""))
+            else if (NumberRegex.IsMatch(script[loc] + ""))
             {
                 t.NameOrValue += script[loc];
                 loc++;
-                while (numberOrpoint.IsMatch(script[loc] + ""))
+                while (NumberOrPointRegex.IsMatch(script[loc] + ""))
                 {
                     t.NameOrValue += script[loc];
                     loc++;
@@ -488,7 +458,7 @@ public static class Compiler
 
                 t.Type = TokenType.Number;
             }
-            else if (oper.IsMatch(script[loc] + ""))
+            else if (OperatorRegex.IsMatch(script[loc] + ""))
             {
                 switch (script[loc])
                 {
@@ -551,7 +521,7 @@ public static class Compiler
 
                 loc++;
             }
-            else if (spaceOrtab.IsMatch(script[loc] + ""))
+            else if (SpaceOrTabRegex.IsMatch(script[loc] + ""))
             {
                 loc++;
                 continue;
@@ -561,10 +531,10 @@ public static class Compiler
                 throw new Exception("Unknown character:" + script[loc]);
             }
 
-            Tokens.Add(t);
+            tokens.Add(t);
         }
 
-        return Tokens.ToArray();
+        return tokens.ToArray();
     }
 
     private static int GetTokenLevel(Token c)

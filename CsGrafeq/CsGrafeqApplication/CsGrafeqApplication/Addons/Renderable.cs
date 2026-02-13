@@ -1,10 +1,7 @@
 ﻿using System;
-using System.IO;
 using System.Threading;
 using Avalonia;
 using Avalonia.Media;
-using Avalonia.Media.Imaging;
-using Avalonia.Skia;
 using CsGrafeq.Bitmap;
 using SkiaSharp;
 
@@ -12,10 +9,6 @@ namespace CsGrafeqApplication.Addons;
 
 public class Renderable : IDisposable
 {
-    public Renderable()
-    {
-        _bitmap = new(0, 0);
-    }
     /// <summary>
     ///     缓冲区的同步锁
     /// </summary>
@@ -24,7 +17,7 @@ public class Renderable : IDisposable
     /// <summary>
     ///     缓冲区
     /// </summary>
-    private PixelBitmap _bitmap;
+    private PixelBitmap _bitmap = new(0, 0);
 
     /// <summary>
     ///     缓冲区大小
@@ -36,7 +29,7 @@ public class Renderable : IDisposable
     /// </summary>
     public bool IsActive
     {
-        get => field;
+        get;
         set
         {
             var flag = value && !field;

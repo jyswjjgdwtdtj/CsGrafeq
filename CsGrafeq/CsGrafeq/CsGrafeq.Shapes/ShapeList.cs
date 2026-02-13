@@ -7,8 +7,7 @@ namespace CsGrafeq.Shapes;
 
 public class ShapeList : ObservableCollection<Shape>
 {
-    private static readonly StringBuilder sb = new();
-    private readonly DistinctList<GeometricShape> SelectedShapes = new();
+    private readonly DistinctList<GeometricShape> _selectedShapes = new();
 
     public ShapeList()
     {
@@ -56,7 +55,7 @@ public class ShapeList : ObservableCollection<Shape>
             return Result<Shape>.Success(shape);
         }
 
-        return Result<Shape>.Error("Shape already added to another ShapeList");
+        return Result<Shape>.Failure("Shape already added to another ShapeList");
     }
 
     public void Delete(Shape shape)
@@ -85,12 +84,12 @@ public class ShapeList : ObservableCollection<Shape>
     {
         base.Add(shape);
         shape.Name = GetFirstNameNotDistributed().ToUpper();
-        shape.SelectedChanged += (s, e) =>
+        shape.SelectedChanged += (_, e) =>
         {
             if (e)
-                SelectedShapes.Add(shape);
+                _selectedShapes.Add(shape);
             else
-                SelectedShapes.Remove(shape);
+                _selectedShapes.Remove(shape);
         };
     }
 
@@ -129,6 +128,7 @@ public class ShapeList : ObservableCollection<Shape>
     /// <returns></returns>
     public static string GetNameFromIndex(int index)
     {
+        StringBuilder sb = new();
         if (index < 0)
             return "";
         sb.Clear();
@@ -183,7 +183,7 @@ public class ShapeList : ObservableCollection<Shape>
     /// <returns></returns>
     public IEnumerable<T> GetSelectedShapes<T>() where T : GeometricShape
     {
-        foreach (var i in SelectedShapes.OfType<T>())
+        foreach (var i in _selectedShapes.OfType<T>())
             yield return i;
     }
 
@@ -206,7 +206,7 @@ public class ShapeList : ObservableCollection<Shape>
     public Shape? GetShapeByName(string name)
     {
         name = name.ToLower();
-        return this.FirstOrDefault(shape => !shape.IsDeleted && shape.Name.ToLower() == name, null);
+        return this.FirstOrDefault(shape => !shape!.IsDeleted && shape.Name.ToLower() == name,null);
     }
 
     public string GetFirstNameNotDistributed()

@@ -7,6 +7,7 @@ using Avalonia.Controls.Templates;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
+using CsGrafeq.Compiler;
 using CsGrafeq.Shapes;
 using CsGrafeqApplication.Dialogs.InfoDialog;
 using CsGrafeqApplication.Utilities;
@@ -181,8 +182,7 @@ public partial class ShapeView : TemplatedControl
         if (sender is TextBox tb)
             if (e.Property == TextBox.TextProperty)
             {
-                var n = tb.Tag as ExpNumber;
-                if (n is not null && tb.IsFocused)
+                if (tb.Tag is ExpNumber n && tb.IsFocused)
                 {
                     if (n.IsError)
                     {

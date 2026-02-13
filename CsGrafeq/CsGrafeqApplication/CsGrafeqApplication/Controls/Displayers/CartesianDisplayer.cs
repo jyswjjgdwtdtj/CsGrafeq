@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -11,8 +10,8 @@ using Avalonia.Threading;
 using CsGrafeq.Numeric;
 using CsGrafeqApplication.Events;
 using SkiaSharp;
-using static CsGrafeqApplication.Core.Utils.StaticSkiaResources;
 using static CsGrafeqApplication.Core.Utils.PointRectHelper;
+using static CsGrafeqApplication.Core.Utils.StaticSkiaResources;
 using BigPoint= CsGrafeq.PointBase<CsGrafeq.Numeric.BigNumber<long,double>>;
 
 
@@ -20,11 +19,19 @@ namespace CsGrafeqApplication.Controls.Displayers;
 
 public class CartesianDisplayer : Displayer
 {
-    private readonly object LockTargetForPreviousBuffer = new();
-    private readonly Stopwatch WheelingStopWatch = new();
-    private readonly Timer WheelingTimer;
-    protected bool MouseOnYAxis, MouseOnXAxis;
-    private SKBitmap PreviousBuffer = new(1, 1);
+    private Lock LockTargetForPreviousBuffer { get; } = new();
+    /// <summary>
+    /// 记录距离上次Zoom的时间
+    /// </summary>
+    private Stopwatch WheelingStopWatch { get; } = new();
+    /// <summary>
+    /// 循环检测距离上次Zoom是否超过一定时间 如果超过则重绘
+    /// </summary>
+    private Timer WheelingTimer { get; init; }
+    /// <summary>
+    /// 记录上一次重绘的Buffer
+    /// </summary>
+    private SKBitmap PreviousBuffer { get; set; } = new(1, 1);
     /// <summary>
     /// 代表上一次Zoom时单位长度，用于优化滚轮缩放和拖动时的连续绘制
     /// </summary>
@@ -36,10 +43,12 @@ public class CartesianDisplayer : Displayer
 
     public CartesianDisplayer()
     {
+        AxisY=AxisX = [];
+        AxisPaint1 = AxisPaint2 =AxisPaintMain = new SKPaint();
         ZeroPos = new(){ X = 500, Y = 250 };
         UnitLength = 20;
         WheelingTimer = new Timer(TimerElapsed, null, 0, 500);
-        Application.Current?.ActualThemeVariantChanged += (s, e) =>
+        Application.Current?.ActualThemeVariantChanged += (_,_) =>
         {
             RefreshPaint();
             ForceToRender(CancellationToken.None);
@@ -93,6 +102,7 @@ public class CartesianDisplayer : Displayer
             AxisX = GetAxisXs().ToArray();
             AxisY = GetAxisYs().ToArray();
         }
+        // ReSharper disable once MemberInitializerValueIgnored
     } = 20.0001d;
 
     /// <summary>
@@ -153,16 +163,15 @@ public class CartesianDisplayer : Displayer
     public IEnumerable<(double, AxisType)> GetAxisXs()
     {
         var zsX = (int)Floor(Log(350 / UnitLength, 10));
-        ;
         var addnumX = Pow(10D, zsX);
-        var addnumDX = SpecialPow(10M, zsX);
+        var addnumDx = SpecialPow(10M, zsX);
         for (var i = Min(ZeroPos.X - addnumX * UnitLength,
                  MathToPixelX(RoundTen(PixelToMathX(ValidRect.Right), -zsX)));
              i > ValidRect.Left;
              i -= addnumX * UnitLength)
         {
             var num = RoundTen((decimal)PixelToMathX(i), -zsX);
-            if (num % (10 * addnumDX) == 0)
+            if (num % (10 * addnumDx) == 0)
                 yield return (i, AxisType.Major);
             else
                 yield return (i, AxisType.Minor);
@@ -174,7 +183,7 @@ public class CartesianDisplayer : Displayer
              i += addnumX * UnitLength)
         {
             var num = RoundTen((decimal)PixelToMathX(i), -zsX);
-            if (num % (10 * addnumDX) == 0)
+            if (num % (10 * addnumDx) == 0)
                 yield return (i, AxisType.Major);
             else
                 yield return (i, AxisType.Minor);
@@ -191,16 +200,15 @@ public class CartesianDisplayer : Displayer
     public IEnumerable<(double, AxisType)> GetAxisYs()
     {
         var zsY = (int)Floor(Log(350 / UnitLength, 10));
-        ;
         var addnumY = Pow(10D, zsY);
-        var addnumDY = SpecialPow(10M, zsY);
+        var addnumDy = SpecialPow(10M, zsY);
         for (var i = Min(ZeroPos.Y - addnumY * UnitLength,
                  MathToPixelY(RoundTen(PixelToMathY(ValidRect.Right), -zsY)));
              i > ValidRect.Left;
              i -= addnumY * UnitLength)
         {
             var num = RoundTen((decimal)PixelToMathY(i), -zsY);
-            if (num % (10 * addnumDY) == 0)
+            if (num % (10 * addnumDy) == 0)
                 yield return (i, AxisType.Major);
             else
                 yield return (i, AxisType.Minor);
@@ -212,7 +220,7 @@ public class CartesianDisplayer : Displayer
              i += addnumY * UnitLength)
         {
             var num = RoundTen((decimal)PixelToMathY(i), -zsY);
-            if (num % (10 * addnumDY) == 0)
+            if (num % (10 * addnumDy) == 0)
                 yield return (i, AxisType.Major);
             else
                 yield return (i, AxisType.Minor);
@@ -247,9 +255,8 @@ public class CartesianDisplayer : Displayer
         var zsY = (int)Floor(Log(350 / UnitLength, 10));
         var addnumX = SpecialPow(10D, zsX);
         var addnumY = SpecialPow(10D, zsY);
-        var addnumDX = SpecialPow(10M, zsX);
-        var addnumDY = SpecialPow(10M, zsY);
-        SKPaint targetPen;
+        var addnumDx = SpecialPow(10M, zsX);
+        var addnumDy = SpecialPow(10M, zsY);
         for (var i = Min(ZeroPos.X - addnumX * UnitLength,
                  MathToPixelX(RoundTen(PixelToMathX(ValidRect.Right), -zsX)));
              i > ValidRect.Left;
@@ -263,7 +270,7 @@ public class CartesianDisplayer : Displayer
                     AxisPaint1
                 );
 
-            if (setting.ShowAxesMinorGrid && num % (10 * addnumDX) == 0)
+            if (setting.ShowAxesMinorGrid && num % (10 * addnumDx) == 0)
                 dc.DrawLine(
                     (float)i, 0,
                     (float)i, (float)height,
@@ -284,7 +291,7 @@ public class CartesianDisplayer : Displayer
                     AxisPaint1
                 );
 
-            if (setting.ShowAxesMinorGrid && num % (10 * addnumDX) == 0)
+            if (setting.ShowAxesMinorGrid && num % (10 * addnumDx) == 0)
                 dc.DrawLine(
                     (float)i, 0,
                     (float)i, (float)height,
@@ -304,7 +311,7 @@ public class CartesianDisplayer : Displayer
                     (float)width, (float)i,
                     AxisPaint1
                 );
-            if (setting.ShowAxesMinorGrid && num % (10 * addnumDY) == 0)
+            if (setting.ShowAxesMinorGrid && num % (10 * addnumDy) == 0)
                 dc.DrawLine(
                     0, (float)i,
                     (float)width, (float)i,
@@ -324,7 +331,7 @@ public class CartesianDisplayer : Displayer
                     (float)width, (float)i,
                     AxisPaint1
                 );
-            if (setting.ShowAxesMinorGrid && num % (10 * addnumDY) == 0)
+            if (setting.ShowAxesMinorGrid && num % (10 * addnumDy) == 0)
                 dc.DrawLine(
                     0, (float)i,
                     (float)width, (float)i,
@@ -348,8 +355,6 @@ public class CartesianDisplayer : Displayer
         var zsY = (int)Floor(Log(350 / UnitLength, 10));
         var addnumX = SpecialPow(10D, zsX);
         var addnumY = SpecialPow(10D, zsY);
-        var addnumDX = SpecialPow(10M, zsX);
-        var addnumDY = SpecialPow(10M, zsY);
         var p = RangeTo(1, height - textFont.Size - 2, ZeroPos.Y);
         var fff = 1f / 4f * textFont.Size;
         for (var i = Min(ZeroPos.X - addnumX * UnitLength,
@@ -416,25 +421,27 @@ public class CartesianDisplayer : Displayer
 
     public override void CompoundBuffers()
     {
-        lock (TotalBufferLock)
-        {
-            using (var dc = new SKCanvas(TotalBuffer))
+        if(ContainerViewModel is {} vm)
+            lock (TotalBufferLock)
             {
+                using var dc = new SKCanvas(TotalBuffer);
                 dc.Clear(AxisBackground);
                 RenderAxes(dc);
                 for (var i = 0; i < Addons.Count; i++)
                 {
-                    if(i!=ContainerViewModel.AddonIndex)
+                    if(i!=vm.AddonIndex)
                         foreach (var layer in Addons[i].Layers)
                             layer.DrawRenderTargetTo(dc, 0, 0);
                 }
-                foreach (var layer in Addons[ContainerViewModel.AddonIndex].Layers)
+                foreach (var layer in Addons[vm.AddonIndex].Layers)
                     layer.DrawRenderTargetTo(dc, 0, 0);
                 RenderAxesNumber(dc);
             }
-        }
     }
-
+    /// <summary>
+    /// 如距离上次Zoom过去一定时间 则重绘
+    /// </summary>
+    /// <param name="arg"></param>
     private void TimerElapsed(object? arg)
     {
         if (WheelingStopWatch.IsRunning && WheelingStopWatch.ElapsedMilliseconds > 150)
@@ -444,7 +451,9 @@ public class CartesianDisplayer : Displayer
             Dispatcher.UIThread.InvokeAsync((() => ForceToRender(CancellationToken.None)));
         }
     }
-
+    /// <summary>
+    /// 用于在Zoom过后 当鼠标移动则重绘
+    /// </summary>
     protected void StopWheeling()
     {
         if (WheelingStopWatch.IsRunning)
@@ -454,7 +463,6 @@ public class CartesianDisplayer : Displayer
             ForceToRender(CancellationToken.None);
         }
     }
-
     /// <summary>
     ///     newvalue=unitlength*delta
     /// </summary>
@@ -511,15 +519,13 @@ public class CartesianDisplayer : Displayer
 
         lock (TotalBufferLock)
         {
-            using (var dc = new SKCanvas(TotalBuffer))
-            {
-                dc.Clear(AxisBackground);
-                dc.DrawBitmap(PreviousBuffer, CreateSKRectWH(
-                    (float)(ZeroPos.X - PreviousZoomZero.X * ratioX),
-                    (float)(ZeroPos.Y - PreviousZoomZero.Y * ratioY),
-                    (float)(ratioX * PreviousBuffer.Width),
-                    (float)(ratioY * PreviousBuffer.Height)), SkiaHelper.CompoundBufferPaint);
-            }
+            using var dc = new SKCanvas(TotalBuffer);
+            dc.Clear(AxisBackground);
+            dc.DrawBitmap(PreviousBuffer, CreateSKRectWH(
+                (float)(ZeroPos.X - PreviousZoomZero.X * ratioX),
+                (float)(ZeroPos.Y - PreviousZoomZero.Y * ratioY),
+                (float)(ratioX * PreviousBuffer.Width),
+                (float)(ratioY * PreviousBuffer.Height)), SkiaHelper.CompoundBufferPaint);
         }
 
         InvalidateVisual();

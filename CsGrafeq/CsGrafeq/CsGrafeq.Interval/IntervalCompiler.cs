@@ -1,7 +1,6 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
-using CsGrafeq.Collections;
 using CsGrafeq.Interval.Extensions;
 using CsGrafeq.Interval.Interface;
 using CsGrafeq.Numeric;
@@ -33,14 +32,13 @@ public static class IntervalCompiler
             [typeof(IntervalSet), typeof(IntervalSet)], typeof(IntervalSet).Module, true);
         var ilg = dynamicMethod.GetILGenerator();
         var ilr = new ILRecorder(ilg);
-        ilr.Emit(OpCodes.Call, GetInfo(StaticUnsafeMemoryList<Range>.Clear));
-        CompileToILGenerator<IntervalSet>(ilr, expression.Body);
+        CompileToIlGenerator<IntervalSet>(ilr, expression.Body);
         ilr.Emit(OpCodes.Ret);
         var func = dynamicMethod.CreateDelegate<IntervalHandler<IntervalSet>>();
         try
         {
             var testInterval = IntervalSet.CreateFromDouble(-1.0);
-            var result = func(testInterval, testInterval);
+            func(testInterval, testInterval);
         }
         catch (Exception ex)
         {
@@ -50,7 +48,7 @@ public static class IntervalCompiler
         return func;
     }
 
-    public static void CompileToILGenerator<T>(ILRecorder ilGenerator, Expression expression)
+    public static void CompileToIlGenerator<T>(ILRecorder ilGenerator, Expression expression)
         where T : IInterval<T>, allows ref struct
     {
         switch (expression.NodeType)
@@ -69,8 +67,8 @@ public static class IntervalCompiler
             case ExpressionType.GreaterThanOrEqual:
             {
                 var exp = (BinaryExpression)expression;
-                CompileToILGenerator<T>(ilGenerator, exp.Left);
-                CompileToILGenerator<T>(ilGenerator, exp.Right);
+                CompileToIlGenerator<T>(ilGenerator, exp.Left);
+                CompileToIlGenerator<T>(ilGenerator, exp.Right);
                 EmitExpressionMethod<T>(ilGenerator, exp.Method);
             }
                 break;
@@ -78,7 +76,7 @@ public static class IntervalCompiler
             case ExpressionType.Negate:
             {
                 var exp = (UnaryExpression)expression;
-                CompileToILGenerator<T>(ilGenerator, exp.Operand);
+                CompileToIlGenerator<T>(ilGenerator, exp.Operand);
                 EmitExpressionMethod<T>(ilGenerator, exp.Method);
             }
                 break;
@@ -86,7 +84,7 @@ public static class IntervalCompiler
             {
                 var exp = (MethodCallExpression)expression;
                 var method = exp.Method;
-                foreach (var arg in exp.Arguments) CompileToILGenerator<T>(ilGenerator, arg);
+                foreach (var arg in exp.Arguments) CompileToIlGenerator<T>(ilGenerator, arg);
                 EmitExpressionMethod<T>(ilGenerator, method);
             }
                 break;
@@ -167,20 +165,23 @@ public static class IntervalCompiler
         }
         catch (Exception e)
         {
-            return Result<HasReferenceIntervalSetFunc<IntervalSet>>.Error(e);
+            return Result<HasReferenceIntervalSetFunc<IntervalSet>>.Failure(e);
         }
     }
 
-    public static Func<double,double,double,double,bool> GetMSDelegate(string expression)
+    public static Func<double, double, double, double, bool> GetMarchingSquaresFunc(string expression)
     {
-        var xParams = (new int[4]).Select(i => Expression.Parameter(typeof(DoubleNumber), "x" + i)).ToArray();
-        var yParams = (new int[4]).Select(i => Expression.Parameter(typeof(DoubleNumber), "y" + i)).ToArray();
-        var exp=Compiler.Compiler.ConstructExpTree<DoubleNumber>(expression, 2, out var xVar, out var yVar, out _, out var chars,
+        var xParams = Enumerable.Range(0, 4).Select(i => Expression.Parameter(typeof(DoubleNumber), "x" + i)).ToArray();
+        var yParams = Enumerable.Range(0, 4).Select(i => Expression.Parameter(typeof(DoubleNumber), "y" + i)).ToArray();
+        var exp = Compiler.Compiler.ConstructExpTree<DoubleNumber>(expression, 2, out var xVar, out var yVar, out _,
+            out _,
             Setting.Instance.EnableExpressionSimplification);
-        var regulatedExp=RegulateExpression(exp, xVar, yVar, xParams, yParams);
+        var regulatedExp = RegulateExpression(exp, xVar, yVar, xParams, yParams);
         Console.WriteLine(regulatedExp.ToCSharpString());
-        var lambda=Expression.Lambda<Func<DoubleNumber,DoubleNumber,DoubleNumber,DoubleNumber,DoubleNumber,DoubleNumber,DoubleNumber,DoubleNumber,bool>>(regulatedExp,xParams.Concat(yParams)).Compile();
-        return ((left, top, right, bottom) =>
+        var lambda = Expression
+            .Lambda<Func<DoubleNumber, DoubleNumber, DoubleNumber, DoubleNumber, DoubleNumber, DoubleNumber,
+                DoubleNumber, DoubleNumber, bool>>(regulatedExp, xParams.Concat(yParams)).Compile();
+        return (left, top, right, bottom) =>
         {
             var xStep = (right - left) / 3;
             var yStep = (bottom - top) / 3;
@@ -188,54 +189,64 @@ public static class IntervalCompiler
             var midY1 = new DoubleNumber(top + yStep);
             var midX2 = new DoubleNumber(right - xStep);
             var midY2 = new DoubleNumber(bottom - yStep);
-            return lambda.Invoke(new DoubleNumber(left), midX1, midX2,new DoubleNumber(right), new DoubleNumber(top), midY1, midY2, new DoubleNumber(bottom));
-        });
+            return lambda.Invoke(new DoubleNumber(left), midX1, midX2, new DoubleNumber(right), new DoubleNumber(top),
+                midY1, midY2, new DoubleNumber(bottom));
+        };
     }
 
-    private static Expression RegulateExpression(Expression expression,ParameterExpression originalX,ParameterExpression originalY,ParameterExpression[] xParams,ParameterExpression[] yParams)
+    private static Expression RegulateExpression(Expression expression, ParameterExpression originalX,
+        ParameterExpression originalY, ParameterExpression[] xParams, ParameterExpression[] yParams)
     {
         if (expression is BinaryExpression binaryExpression)
         {
             if (binaryExpression.NodeType == ExpressionType.Or)
-            {
                 return Expression.Or(RegulateExpression(binaryExpression.Left, originalX, originalY, xParams, yParams),
-                    RegulateExpression(binaryExpression.Right, originalX, originalY, xParams, yParams));//均为bool
-            }if (binaryExpression.NodeType == ExpressionType.And)
-            {
+                    RegulateExpression(binaryExpression.Right, originalX, originalY, xParams, yParams)); //均为bool
+            if (binaryExpression.NodeType == ExpressionType.And)
                 return Expression.And(RegulateExpression(binaryExpression.Left, originalX, originalY, xParams, yParams),
-                    RegulateExpression(binaryExpression.Right, originalX, originalY, xParams, yParams));//均为bool
-            } if (binaryExpression.NodeType == ExpressionType.Equal)
+                    RegulateExpression(binaryExpression.Right, originalX, originalY, xParams, yParams)); //均为bool
+            if (binaryExpression.NodeType == ExpressionType.Equal)
             {
-                var res=RegulateExpression(Expression.Subtract(binaryExpression.Left,binaryExpression.Right), originalX, originalY, xParams, yParams);
-                return Expression.Call(((Func<DoubleNumber[],bool>)NumberHelper.IsSomeGreaterAndSomeLessThanZero).Method,res);
-            } if (binaryExpression.NodeType == ExpressionType.LessThan||binaryExpression.NodeType == ExpressionType.LessThanOrEqual)
+                var res = RegulateExpression(Expression.Subtract(binaryExpression.Left, binaryExpression.Right),
+                    originalX, originalY, xParams, yParams);
+                return Expression.Call(
+                    ((Func<DoubleNumber[], bool>)NumberHelper.IsSomeGreaterAndSomeLessThanZero).Method, res);
+            }
+
+            if (binaryExpression.NodeType == ExpressionType.LessThan ||
+                binaryExpression.NodeType == ExpressionType.LessThanOrEqual)
             {
-                var res=RegulateExpression(Expression.Subtract(binaryExpression.Left,binaryExpression.Right), originalX, originalY, xParams, yParams);
-                return Expression.Call(((Func<DoubleNumber[],bool>)NumberHelper.IsAllLessThanZero).Method,res);
-            } if (binaryExpression.NodeType == ExpressionType.GreaterThan||binaryExpression.NodeType == ExpressionType.GreaterThanOrEqual)
+                var res = RegulateExpression(Expression.Subtract(binaryExpression.Left, binaryExpression.Right),
+                    originalX, originalY, xParams, yParams);
+                return Expression.Call(((Func<DoubleNumber[], bool>)NumberHelper.IsAllLessThanZero).Method, res);
+            }
+
+            if (binaryExpression.NodeType == ExpressionType.GreaterThan ||
+                binaryExpression.NodeType == ExpressionType.GreaterThanOrEqual)
             {
-                var res=RegulateExpression(Expression.Subtract(binaryExpression.Left,binaryExpression.Right), originalX, originalY, xParams, yParams);
-                return Expression.Call(((Func<DoubleNumber[],bool>)NumberHelper.IsAllGreaterThanZero).Method,res);
+                var res = RegulateExpression(Expression.Subtract(binaryExpression.Left, binaryExpression.Right),
+                    originalX, originalY, xParams, yParams);
+                return Expression.Call(((Func<DoubleNumber[], bool>)NumberHelper.IsAllGreaterThanZero).Method, res);
             }
         }
         // Todo:使用Vector SIMD优化计算 
         // 这里太TM适合用SIMD了
         // 计算16个点的值，然后返回一个bool结果
         // 但怎么实现呢？
-        
-        var func=Expression.Lambda<Func<DoubleNumber,DoubleNumber,DoubleNumber>>(expression,originalX,originalY);
-        int idx = 0;
+
+        var func = Expression.Lambda<Func<DoubleNumber, DoubleNumber, DoubleNumber>>(expression, originalX, originalY);
+        var idx = 0;
         var exps = new Expression[16];
         foreach (var xParam in xParams)
+        foreach (var yParam in yParams)
         {
-            foreach (var yParam in yParams)
-            {
-                var callExp=Expression.Invoke(func, xParam, yParam);
-                exps[idx++] = callExp;
-            }
+            var callExp = Expression.Invoke(func, xParam, yParam);
+            exps[idx++] = callExp;
         }
+
         return Expression.NewArrayInit(typeof(DoubleNumber), exps);
     }
+
     private static MethodInfo GetInfo(Delegate action)
     {
         return action.Method;

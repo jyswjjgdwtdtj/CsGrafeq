@@ -1,10 +1,12 @@
-﻿namespace CsGrafeqApplication;
+﻿using CsGrafeq.Variables;
+
+namespace CsGrafeqApplication;
 
 public class VariableChanger
 {
-    public readonly EnglishChar Chars;
+    public readonly VarRecorder Chars;
 
-    public VariableChanger(EnglishChar Chars)
+    public VariableChanger(VarRecorder Chars)
     {
         this.Chars = Chars;
     }

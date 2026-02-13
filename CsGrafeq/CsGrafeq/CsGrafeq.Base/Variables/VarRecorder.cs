@@ -6,25 +6,29 @@ using ReactiveUI;
 using static CsGrafeq.Utilities.ThrowHelper;
 using static System.Math;
 
-namespace CsGrafeq;
+namespace CsGrafeq.Variables;
 
-public class EnglishChar : ObservableObject
+public class VarRecorder : ObservableObject
 {
-    protected EnglishChar()
+    
+    protected VarRecorder()
     {
         PropertyChanged += (s, e) =>
         {
             if (e.PropertyName?.Length == 1)
             {
                 var c = e.PropertyName[0];
-                if ('A' <= c && c <= 'Z') CharValueChanged?.Invoke((EnglishCharEnum)Pow(2, c - 'A'));
+                if ('A' <= c && c <= 'Z') CharValueChanged?.Invoke((VariablesEnum)Pow(2, c - 'A'));
             }
         };
     }
-
-    public static EnglishChar Instance { get; } = new();
+    
+    
+    public static VarRecorder Instance { get; } = new();
     public NativeBuffer<double> CharsValue { get; } = new('Z' - 'A' + 1, true);
     public ObservableCollection<uint> CharsReferenceCounter { get; } = new(new uint['Z' - 'A' + 1]);
+
+    private List<IHasReference> Children { get; } = new();
 
     public double this[char c]
     {
@@ -180,7 +184,7 @@ public class EnglishChar : ObservableObject
         set => this.RaiseAndSetIfChanged(ref CharsValue[22], value);
     }
 
-    public event Action<EnglishCharEnum>? CharValueChanged;
+    public event Action<VariablesEnum>? CharValueChanged;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public double GetValue(char c)
@@ -194,32 +198,44 @@ public class EnglishChar : ObservableObject
         return Instance[c];
     }
 
-    public void AddReference(EnglishCharEnum c)
+    public void RefreshReferences()
     {
-        var uc = (uint)c;
-        for (var i = 0; i < 26; i++)
-            if (((uc >> i) & 0x1) == 0x1)
-                CharsReferenceCounter[i]++;
-        this.RaisePropertyChanged(nameof(CharsReferenceCounter));
+        var re =new Span<uint>(new uint['z' - 'a' + 1]);
+        foreach (var ve in Children.Where(c=>c.IsActive).Select(c=>(ulong)c.References))
+        {
+            for (var i = 0; i < 26; i++)
+                if (((ve >> i) & 0x1) == 0x1)
+                    re[i]++;
+        }
+
+        var flag = false;
+        for (var i = 0; i < 'z' - 'a' + 1; i++)
+        {
+            // ReSharper disable once RedundantCheckBeforeAssignment
+            if (CharsReferenceCounter[i] != re[i])
+            {
+                Console.WriteLine(re[i]+" "+i);
+                CharsReferenceCounter[i] = re[i];
+                flag = true;
+            }
+        }
+        if(flag)
+            this.RaisePropertyChanged(nameof(CharsReferenceCounter));
     }
 
-    public void RemoveReference(EnglishCharEnum c)
+    public void Attach(IHasReference hr)
     {
-        var uc = (uint)c;
-        for (var i = 0; i < 26; i++)
-            if (((uc >> i) & 0x1) == 0x1)
-            {
-                if (CharsReferenceCounter[i] == 0)
-                    Throw(new Exception("The reference counter is already zero."));
-                CharsReferenceCounter[i]--;
-            }
+        Children.Add(hr);
+    }
 
-        this.RaisePropertyChanged(nameof(CharsReferenceCounter));
+    public void Detach(IHasReference hr)
+    {
+        Children.Remove(hr);
     }
 }
 
 [Flags]
-public enum EnglishCharEnum : long
+public enum VariablesEnum : ulong
 {
     None = 0,
     A = 1L << 0,

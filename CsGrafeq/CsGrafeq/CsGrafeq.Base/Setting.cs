@@ -2,7 +2,6 @@
 
 global using CsGrafeq;
 global using CsGrafeq.I18N;
-using System.ComponentModel.DataAnnotations;
 using CsGrafeq.MVVM;
 using ReactiveUI;
 using SkiaSharp;
@@ -91,11 +90,13 @@ public class Setting : ObservableObject
         get;
         set => this.RaiseAndSetIfChanged(ref field, value);
     } = true;
+
     public int ClientSizeWidth
     {
         get;
         set => this.RaiseAndSetIfChanged(ref field, value);
     } = 800;
+
     public int ClientSizeHeight
     {
         get;

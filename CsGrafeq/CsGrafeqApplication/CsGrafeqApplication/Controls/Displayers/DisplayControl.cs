@@ -10,9 +10,7 @@ using BigPoint = CsGrafeq.PointBase<CsGrafeq.Numeric.BigNumber<long, double>>;
 
 namespace CsGrafeqApplication.Controls.Displayers;
 
-public delegate void RenderHandler(SKCanvas dc, SKRect bounds);
-
-public class DisplayControl : CartesianDisplayer
+public sealed class DisplayControl : CartesianDisplayer
 {
     /// <summary>
     ///     鼠标按下时的位置 用以计算出新的Zero
@@ -36,8 +34,8 @@ public class DisplayControl : CartesianDisplayer
         AddHandler(DoubleTappedEvent, (_, e) => OnPointerDoubleTapped(e));
     }
 
-    private bool _isPointerLeftButtonDown = false;
-    protected sealed override void OnPointerPressed(PointerPressedEventArgs e)
+    private bool _isPointerLeftButtonDown;
+    protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         if (!e.Pointer.IsPrimary) return;
         StopWheeling();
@@ -54,17 +52,20 @@ public class DisplayControl : CartesianDisplayer
         }
     }
 
-    protected virtual void OnPointerPressedLeftButton(MouseEventArgs e, CancellationToken ct = default)
+    private void OnPointerPressedLeftButton(MouseEventArgs e, CancellationToken ct = default)
     {
         Console.WriteLine("Press");
         var p = e.Position;
         _pointerDownPointerPos = p.ToBigPoint();
         _pointerDownZeroPos = ZeroPos;
-        _previousRenderZeroPos = ZeroPos;
+        lock (TotalBufferLock)
+        {
+            _previousRenderZeroPos = ZeroPos;
+        }
     }
 
 
-    protected sealed override void OnPointerMoved(PointerEventArgs e)
+    protected override void OnPointerMoved(PointerEventArgs e)
     {
         if (!e.Pointer.IsPrimary) return;
         StopWheeling();
@@ -72,8 +73,6 @@ public class DisplayControl : CartesianDisplayer
         if (CallPointerMoved(ev) == DoNext)
         {
             var current = ev.Position.ToBigPoint();
-            MouseOnYAxis = Abs(current.X - ZeroPos.X) < 3;
-            MouseOnXAxis = Abs(current.Y - ZeroPos.Y) < 3;
             if (ev.Properties.IsLeftButtonPressed&&_isPointerLeftButtonDown)
             {
                 ZeroPos = new BigPoint
@@ -81,7 +80,7 @@ public class DisplayControl : CartesianDisplayer
                     X = _pointerDownZeroPos.X + current.X - _pointerDownPointerPos.X,
                     Y = _pointerDownZeroPos.Y + current.Y - _pointerDownPointerPos.Y
                 };
-                OnPointerMovedLeftButton(ev, default);
+                OnPointerMovedLeftButton(ev, CancellationToken.None);
             }
         }
         else
@@ -90,7 +89,7 @@ public class DisplayControl : CartesianDisplayer
         }
     }
 
-    protected virtual void OnPointerMovedLeftButton(MouseEventArgs e, CancellationToken ct)
+    private void OnPointerMovedLeftButton(MouseEventArgs e, CancellationToken ct)
     {
         Console.WriteLine("move");
         if (ZeroPos != _previousRenderZeroPos)
@@ -133,15 +132,13 @@ public class DisplayControl : CartesianDisplayer
         }
     }
 
-    protected sealed override void OnPointerReleased(PointerReleasedEventArgs eventArgs)
+    protected override void OnPointerReleased(PointerReleasedEventArgs eventArgs)
     {
         var e = eventArgs.Cast(this);
         StopWheeling();
         if (CallPointerReleased(e) == DoNext)
         {
             var current = e.Position.ToBigPoint();
-            MouseOnYAxis = Abs(current.X - ZeroPos.X) < 3;
-            MouseOnXAxis = Abs(current.Y - ZeroPos.Y) < 3;
             if (_isPointerLeftButtonDown)
             {
                 _isPointerLeftButtonDown = false;
@@ -160,7 +157,7 @@ public class DisplayControl : CartesianDisplayer
         }
     }
 
-    protected virtual void OnPointerReleasedLeftButton(MouseEventArgs e)
+    private void OnPointerReleasedLeftButton(MouseEventArgs e)
     {
         Console.WriteLine("Release");
         if (ZeroPos != _previousRenderZeroPos)
@@ -201,13 +198,13 @@ public class DisplayControl : CartesianDisplayer
         }
     }
 
-    protected virtual void OnPointerTapped(TappedEventArgs e)
+    private void OnPointerTapped(TappedEventArgs e)
     {
         if (!e.Pointer.IsPrimary) return;
         CallPointerTapped(e.Cast(this));
     }
 
-    protected virtual void OnPointerDoubleTapped(TappedEventArgs e)
+    private void OnPointerDoubleTapped(TappedEventArgs e)
     {
         if (!e.Pointer.IsPrimary) return;
         CallPointerDoubleTapped(e.Cast(this));

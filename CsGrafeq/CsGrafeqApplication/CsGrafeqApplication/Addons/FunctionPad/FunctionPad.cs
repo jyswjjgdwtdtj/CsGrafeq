@@ -1,22 +1,17 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Collections;
 using Avalonia.Controls;
-using Avalonia.Controls.Documents;
 using Avalonia.Controls.Templates;
 using Avalonia.Markup.Xaml.Styling;
 using CsGrafeq.Bitmap;
 using CsGrafeq.I18N;
 using CsGrafeq.Interval;
-using CsGrafeq.Numeric;
-using CsGrafeqApplication.Controls.Displayers;
 using CsGrafeqApplication.Function;
 using CsGrafeqApplication.Utilities;
-using CSharpMath.Rendering.Text;
 using SkiaSharp;
 using Range = CsGrafeq.Interval.Range;
 
@@ -28,17 +23,16 @@ public class FunctionPad : Addon
     {
         AddonName = MultiLanguageResources.Instance.FunctionPadText;
         var host = new Control();
-        object? obj;
         host.Resources.MergedDictionaries.Add(
             new ResourceInclude(new Uri("avares://CsGrafeqApplication/"))
             {
                 Source = new Uri("avares://CsGrafeqApplication/Addons/FunctionPad/FunctionPadResources.axaml")
             });
-        host.TryFindResource("FunctionPadViewTemplate", out obj);
-        MainTemplate = (IDataTemplate)obj;
+        host.TryFindResource("FunctionPadViewTemplate", out var obj);
+        MainTemplate = (IDataTemplate)obj!;
         host.TryFindResource("FunctionPadInfoTemplate", out obj);
-        InfoTemplate = (IDataTemplate)obj;
-        Functions.CollectionChanged += (s, e) =>
+        InfoTemplate = (IDataTemplate)obj!;
+        Functions.CollectionChanged += (_,_) =>
         {
             Setting.Instance.MoveOptimizationUserEnabled =
                 Setting.Instance.ZoomOptimizationUserEnabled = Functions.Count == 0;
@@ -53,7 +47,7 @@ public class FunctionPad : Addon
 
     public override void Delete()
     {
-        DeleteFunction(Functions.Where(f=>f.IsSelected==true).ToArray());
+        DeleteFunction(Functions.Where(f=>f.IsSelected).ToArray());
     }
 
     public override void SelectAll()
@@ -95,16 +89,16 @@ public class FunctionPad : Addon
         CommandHelper.CommandManager.Do(
             null,
             _ => { },
-            o => { func.IsDeleted = false; },
-            o => { func.IsDeleted = true; },
-            o => { DeleteFunctionCore(func); }, true
+            _ => { func.IsDeleted = false; },
+            _ => { func.IsDeleted = true; },
+            _ => { DeleteFunctionCore(func); }, true
         );
         return func;
     }
 
-    public void DeleteFunction(ImplicitFunction[] funcs)
+    private void DeleteFunction(ImplicitFunction[] functions)
     {
-        var fs = funcs.Where(f => f.Owner == this).ToArray();
+        var fs = functions.Where(f => f.Owner == this).ToArray();
         CommandHelper.CommandManager.Do(
             null,
             _ => {
@@ -114,17 +108,17 @@ public class FunctionPad : Addon
                     f.IsSelected = false;
                 }
             },
-            o => { 
+            _ => { 
                 foreach (var f in fs)
                 {
                     f.IsDeleted = true;
                 } },
-            o => { 
+            _ => { 
                 foreach (var f in fs)
                 {
                     f.IsDeleted = false;
                 } },
-            o => {
+            _ => {
                 foreach (var f in fs)
                 {
                     f.IsDeleted = false;
@@ -138,9 +132,9 @@ public class FunctionPad : Addon
         CommandHelper.CommandManager.Do(
             null,
             _ => { func.IsDeleted = true; },
-            o => { func.IsDeleted = true; },
-            o => { func.IsDeleted = false; },
-            o => { func.IsDeleted = false; }
+            _ => { func.IsDeleted = true; },
+            _ => { func.IsDeleted = false; }, 
+            _ => { func.IsDeleted = false; }
         );
     }
 
@@ -153,7 +147,6 @@ public class FunctionPad : Addon
 
     private void RenderFunction(PixelBitmap dc, SKRectI rect, ImplicitFunction impFunc,CancellationToken ct)
     {
-        Console.WriteLine(rect);
         if (!impFunc.IsCorrect)
             return;
         if (impFunc.IsDeleted)
@@ -170,12 +163,15 @@ public class FunctionPad : Addon
             var len = rs.Length;
             for(var i=0;i<len;i+=100)
             {
-                for(var j=i;j<Min(i+100,len);j++)
+                /*for(var j=i;j<Min(i+100,len);j++)
                 {
-                    if (ct.IsCancellationRequested)
-                        return;
                     RenderAction(rs[j]);
                 }
+                */
+                Parallel.For(i, Min(i + 100, len), (j) =>
+                {
+                    RenderAction(rs[j]);
+                });
                 if(ct.IsCancellationRequested)
                     return;
             }
@@ -192,13 +188,13 @@ public class FunctionPad : Addon
     {
         if (r.Height == 0 || r.Width == 0)
             return;
-        int xtimes = 2, ytimes = 2;
+        int xTimes = 2, yTimes = 2;
         if (r.Width > r.Height)
-            ytimes = 1;
+            yTimes = 1;
         else if (r.Width < r.Height)
-            xtimes = 1;
-        var dx = (int)Ceiling((double)r.Width / xtimes);
-        var dy = (int)Ceiling((double)r.Height / ytimes);
+            xTimes = 1;
+        var dx = (int)Ceiling((double)r.Width / xTimes);
+        var dy = (int)Ceiling((double)r.Height / yTimes);
         var isPixel = dx == 1 && dy == 1;
         for (var i = r.Left; i < r.Right; i += dx)
         {
@@ -222,7 +218,8 @@ public class FunctionPad : Addon
                 {
                     if (isPixel)
                     {
-                        bmp.SetPixel_Buffered(i,j);
+                        if(msFunc(xMin,yMin,xMax,yMax))
+                            bmp.SetPixel_Buffered(i,j);
                     }
                     else
                     {
