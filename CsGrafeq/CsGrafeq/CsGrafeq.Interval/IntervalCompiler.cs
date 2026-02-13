@@ -175,7 +175,7 @@ public static class IntervalCompiler
         var yParams = Enumerable.Range(0, 4).Select(i => Expression.Parameter(typeof(DoubleNumber), "y" + i)).ToArray();
         var exp = Compiler.Compiler.ConstructExpTree<DoubleNumber>(expression, 2, out var xVar, out var yVar, out _,
             out _,
-            Setting.Instance.EnableExpressionSimplification);
+            Setting.Setting.Instance.EnableExpressionSimplification);
         var regulatedExp = RegulateExpression(exp, xVar, yVar, xParams, yParams);
         Console.WriteLine(regulatedExp.ToCSharpString());
         var lambda = Expression

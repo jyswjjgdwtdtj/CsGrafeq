@@ -10,6 +10,7 @@ using Avalonia.Markup.Xaml.Styling;
 using CsGrafeq.Bitmap;
 using CsGrafeq.I18N;
 using CsGrafeq.Interval;
+using CsGrafeq.Setting;
 using CsGrafeqApplication.Function;
 using CsGrafeqApplication.Utilities;
 using SkiaSharp;

@@ -7,6 +7,7 @@ using Avalonia.Controls.Templates;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml.Styling;
 using CsGrafeq.I18N;
+using CsGrafeq.Setting;
 using CsGrafeq.Shapes;
 using CsGrafeq.Shapes.ShapeGetter;
 using CsGrafeqApplication.Controls.Displayers;

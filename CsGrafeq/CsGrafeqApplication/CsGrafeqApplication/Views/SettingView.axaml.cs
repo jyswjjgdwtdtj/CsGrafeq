@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using CsGrafeq.Setting;
 
 namespace CsGrafeqApplication.Views;
 

@@ -2,6 +2,7 @@
 using CsGrafeq.MVVM;
 using CsGrafeq.Numeric;
 using CsGrafeq.Variables;
+using CsGrafeq.Setting;
 using ReactiveUI;
 using static CsGrafeq.Utilities.DoubleCompareHelper;
 
@@ -123,7 +124,7 @@ public class ExpNumber : ObservableObject
 
         Func.Dispose();
         IsExpression = true;
-        Compiler.TryCompile<DoubleNumber>(expression, 0, Setting.Instance.EnableExpressionSimplification)
+        Compiler.TryCompile<DoubleNumber>(expression, 0, Setting.Setting.Instance.EnableExpressionSimplification)
             .Match(funcTuple =>
             {
                 Func = new HasReferenceFunction<Func<DoubleNumber>>((Func<DoubleNumber>)funcTuple.func,

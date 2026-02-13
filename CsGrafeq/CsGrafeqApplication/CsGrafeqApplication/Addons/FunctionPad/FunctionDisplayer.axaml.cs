@@ -7,6 +7,7 @@ using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using CsGrafeq.Interval;
+using CsGrafeq.Setting;
 using CsGrafeqApplication.Dialogs.InfoDialog;
 using CsGrafeqApplication.Dialogs.Params;
 using CsGrafeqApplication.Function;

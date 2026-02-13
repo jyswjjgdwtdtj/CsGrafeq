@@ -8,6 +8,7 @@ using Avalonia.Input;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using CsGrafeq.Numeric;
+using CsGrafeq.Setting;
 using CsGrafeqApplication.Events;
 using SkiaSharp;
 using static CsGrafeqApplication.Core.Utils.PointRectHelper;

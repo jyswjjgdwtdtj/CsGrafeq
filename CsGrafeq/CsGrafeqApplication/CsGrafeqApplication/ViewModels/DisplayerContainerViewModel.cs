@@ -1,3 +1,4 @@
+using CsGrafeq.Setting;
 using CsGrafeqApplication.Controls.Displayers;
 using CsGrafeqApplication.Core.ViewModel;
 using ReactiveUI;

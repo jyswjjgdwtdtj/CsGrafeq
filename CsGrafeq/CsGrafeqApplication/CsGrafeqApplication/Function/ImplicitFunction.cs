@@ -1,6 +1,7 @@
 using System;
 using CsGrafeq.Interval;
 using CsGrafeq.Numeric;
+using CsGrafeq.Setting;
 using CsGrafeq.Shapes;
 using CsGrafeq.Variables;
 using CsGrafeqApplication.Addons;
@@ -69,7 +70,7 @@ public class ImplicitFunction : InteractiveObject
     {
         get;
         set => this.RaiseAndSetIfChanged(ref field, value);
-    } = false;
+    } = true;
 
     public HasReferenceIntervalSetFunc<IntervalSet> Function
     {

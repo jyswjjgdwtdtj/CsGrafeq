@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using Avalonia;
 using Avalonia.Input;
+using CsGrafeq.Setting;
 using CsGrafeqApplication.Events;
 using CsGrafeqApplication.Utilities;
 using SkiaSharp;
