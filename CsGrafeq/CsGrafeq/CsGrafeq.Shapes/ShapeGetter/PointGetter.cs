@@ -1,4 +1,5 @@
-﻿using CsGrafeq.I18N;
+﻿using CsGrafeq.Compiler;
+using CsGrafeq.I18N;
 using CsGrafeq.Numeric;
 using ReactiveUI;
 using static CsGrafeq.Shapes.GeometryMath;
@@ -26,7 +27,6 @@ public abstract class PointGetter : GeometryGetter
 
 public abstract class PointGetter_Movable : PointGetter
 {
-    public bool Fixed = false;
 
     public PointGetter_Movable()
     {
@@ -35,6 +35,7 @@ public abstract class PointGetter_Movable : PointGetter
         PointX.UserSetValueStr += XChanged;
         PointY.UserSetValueStr += YChanged;
         ShapeParameters = [];
+        NumberParameters = [new(PointX,MultiLanguageData.Empty),new(PointY,MultiLanguageData.Empty)];
     }
 
     public abstract GeometricShape? On { get; }

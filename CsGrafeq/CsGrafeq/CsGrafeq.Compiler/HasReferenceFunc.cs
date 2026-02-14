@@ -1,55 +1,45 @@
+using CsGrafeq.Variables;
+
 namespace CsGrafeq.Compiler;
 
-public class HasReferenceFunction<T> : IDisposable where T : Delegate
+public class HasReferenceFunction<T> :IHasReference, IDisposable where T : Delegate
 {
-    private readonly bool Disposed = false;
+    private readonly bool _disposed = false;
     public readonly T Function;
-    public readonly EnglishCharEnum Reference;
 
-    public HasReferenceFunction(T function, EnglishCharEnum reference)
+    public bool IsActive
+    {
+        get;
+        set
+        {
+            if (field != value)
+            {
+                Console.WriteLine(value);
+                field = value;
+                VarRecorder.Instance.RefreshReferences();
+            }   
+        }
+    } = true;
+
+    public VariablesEnum References { get; }
+
+    public HasReferenceFunction(T function, VariablesEnum references)
     {
         Function = function;
         if (function == null)
             throw new ArgumentNullException(nameof(function));
-        Reference = reference;
-        EnglishChar.Instance.AddReference(reference);
+        References = references;
+        VarRecorder.Instance.Attach(this);
+        VarRecorder.Instance.RefreshReferences();
     }
 
     public void Dispose()
     {
-        if (!Disposed)
+        if (!_disposed)
         {
-            EnglishChar.Instance.RemoveReference(Reference);
-            GC.SuppressFinalize(this);
-        }
-    }
-
-    ~HasReferenceFunction()
-    {
-        Dispose();
-    }
-}
-
-public class HasReferenceFunction : IDisposable
-{
-    private readonly bool Disposed = false;
-    public readonly nint Function;
-    public readonly EnglishCharEnum Reference;
-
-    public HasReferenceFunction(nint function, EnglishCharEnum reference)
-    {
-        Function = function;
-        if (function == nint.Zero)
-            throw new ArgumentNullException(nameof(function));
-        Reference = reference;
-        EnglishChar.Instance.AddReference(reference);
-    }
-
-    public void Dispose()
-    {
-        if (!Disposed)
-        {
-            EnglishChar.Instance.RemoveReference(Reference);
+            IsActive = false;
+            VarRecorder.Instance.Detach(this);
+            VarRecorder.Instance.RefreshReferences();
             GC.SuppressFinalize(this);
         }
     }

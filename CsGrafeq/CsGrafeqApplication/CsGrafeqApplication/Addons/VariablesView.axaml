@@ -5,13 +5,14 @@
              xmlns:ctls="clr-namespace:CsGrafeqApplication.Controls"
              xmlns:csgrafeqbase="clr-namespace:CsGrafeq;assembly=CsGrafeq.Base"
              xmlns:addons="clr-namespace:CsGrafeqApplication.Addons"
+             xmlns:variables="clr-namespace:CsGrafeq.Variables;assembly=CsGrafeq.Base"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CsGrafeqApplication.Addons.VariablesView">
     <Design.PreviewWith>
         <addons:VariablesView />
     </Design.PreviewWith>
-    <ContentControl DataContext="{x:Static csgrafeqbase:EnglishChar.Instance}">
-        <StackPanel Orientation="Vertical" x:DataType="csgrafeqbase:EnglishChar">
+    <ContentControl DataContext="{x:Static variables:VarRecorder.Instance}">
+        <StackPanel Orientation="Vertical" x:DataType="variables:VarRecorder">
             <ctls:VariableBox VariableName="a" Value="{CompiledBinding A,Mode=TwoWay}"
                               IsVisible="{CompiledBinding CharsReferenceCounter[0],Converter={StaticResource IntToBool},Mode=OneWay}" />
             <ctls:VariableBox VariableName="b" Value="{CompiledBinding B,Mode=TwoWay}"

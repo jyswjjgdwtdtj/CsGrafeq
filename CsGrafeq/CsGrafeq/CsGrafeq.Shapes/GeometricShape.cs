@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using CsGrafeq.Shapes.ShapeGetter;
 using ReactiveUI;
 
@@ -8,6 +9,22 @@ namespace CsGrafeq.Shapes;
 /// </summary>
 public abstract class GeometricShape : RefreshableShape
 {
+    protected GeometricShape()
+    {
+        PropertyChanged += OnPropertyChanged;
+    }
+
+    private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(IsDeleted))
+        {
+            foreach (var num in Getter?.NumberParameters ?? [])
+            {
+                num.Number.IsActive = !IsDeleted;
+            }
+        }
+    }
+
     public List<GeometricShape> SubShapes = new();
 
     /// <summary>

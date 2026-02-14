@@ -5,6 +5,7 @@
                    xmlns:controls="clr-namespace:CsGrafeqApplication.Core.Controls"
                    xmlns:csGrafeq="clr-namespace:CsGrafeq;assembly=CsGrafeq.Base"
                    xmlns:viewModel="clr-namespace:CsGrafeqApplication.Core.ViewModel"
+                   xmlns:setting="clr-namespace:CsGrafeq.Setting;assembly=CsGrafeq.Setting"
                    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450" 
                    x:Class="CsGrafeqApplication.Core.Controls.Keyboard" x:DataType="viewModel:KeyboardViewModel">
     <Design.PreviewWith>
@@ -39,8 +40,8 @@
                     <DockPanel LastChildFill="True">
                         <controls:ExpandBox BorderBrush="{DynamicResource MaterialPrimaryMidBrush}"
                                             BorderThickness="0,1,0,0" DockPanel.Dock="Bottom"
-                                            DataContext="{x:Static csGrafeq:Setting.Instance}"
-                                            IsExpanded="{CompiledBinding ShowKeyboard}" x:DataType="csGrafeq:Setting"
+                                            DataContext="{x:Static setting:Setting.Instance}"
+                                            IsExpanded="{CompiledBinding ShowKeyboard}" x:DataType="setting:Setting"
                                             ExpandDirection="Up">
                             <Expander Name="PART_Expander"
                                       Background="{DynamicResource CgTranslucentBackgroundBrush}"

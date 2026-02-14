@@ -15,13 +15,11 @@ namespace CsGrafeqApplication.Addons;
 
 public abstract class Addon : ReactiveObject
 {
-    public const bool DoNext = true;
-    public const bool Intercept = false;
+    protected const bool DoNext = true;
+    protected const bool Intercept = false;
     internal readonly List<Renderable> Layers = new();
 
-    public EventHandler? OwnerChanged;
-
-    public Addon()
+    protected Addon()
     {
         AddonName = new MultiLanguageData { Chinese = "", English = "" };
         InfoTemplate = MainTemplate = new FuncDataTemplate<object?>(o => true, o => new Control());
@@ -30,10 +28,7 @@ public abstract class Addon : ReactiveObject
     public IDataTemplate? InfoTemplate { get; init; }
     public IDataTemplate? MainTemplate { get; init; }
 
-    public bool AddonChanged { get; set; } = false;
-
-    //Addon内部勿动
-    public bool IsAddonEnabled { get; set; } = true;
+    public bool AddonChanged { get; set; }
 
     /// <summary>
     ///     所有者
@@ -45,75 +40,72 @@ public abstract class Addon : ReactiveObject
         {
             if (!(value is CartesianDisplayer))
                 throw new Exception();
-            if (value == null)
-                throw new ArgumentNullException(nameof(value));
-            field = value;
+            field = value ?? throw new ArgumentNullException(nameof(value));
             PixelToMathX = value.PixelToMathX;
             PixelToMathY = value.PixelToMathY;
             PixelToMath = value.PixelToMath;
-            PixelToMathSK = value.PixelToMath;
+            PixelToMathSk = value.PixelToMath;
             MathToPixelX = value.MathToPixelX;
             MathToPixelY = value.MathToPixelY;
             MathToPixel = value.MathToPixel;
-            MathToPixelSK = value.MathToPixelSK;
-            OwnerChanged?.Invoke(this, new EventArgs());
+            MathToPixelSk = value.MathToPixelSk;
         }
     }
 
-    public MultiLanguageData AddonName { get; init; }
+    public MultiLanguageData AddonName { get; protected init; }
 
     internal bool CallKeyDown(KeyEventArgs e)
     {
-        if (!IsAddonEnabled || Owner == null)
+        if ( Owner == null)
             return DoNext;
         return OnKeyDown(e);
     }
 
     internal bool CallKeyUp(KeyEventArgs e)
     {
-        if (!IsAddonEnabled || Owner == null)
+        if ( Owner == null)
             return DoNext;
         return OnKeyUp(e);
     }
 
     internal bool CallPointerPressed(MouseEventArgs e)
     {
-        if (!IsAddonEnabled || Owner == null)
+        if ( Owner == null)
             return DoNext;
         return OnPointerPressed(e);
     }
 
     internal void CallPointerMoved(MouseEventArgs e)
     {
-        if (!IsAddonEnabled || Owner == null)
+        if ( Owner == null)
             return;
         OnPointerMoved(e);
     }
 
     internal void CallPointerReleased(MouseEventArgs e)
     {
-        if (!IsAddonEnabled || Owner == null)
+        if ( Owner == null)
             return;
         OnPointerReleased(e);
     }
 
     internal bool CallPointerWheeled(MouseEventArgs e)
     {
-        if (!IsAddonEnabled || Owner == null)
+        if ( Owner == null)
             return DoNext;
         return OnPointerWheeled(e);
     }
 
     internal bool CallPointerTapped(MouseEventArgs e)
     {
-        if (!IsAddonEnabled || Owner == null)
+        if ( Owner == null)
             return DoNext;
         return OnPointerTapped(e);
     }
 
     internal bool CallPointerDoubleTapped(MouseEventArgs e)
     {
-        if (!IsAddonEnabled || Owner == null)
+        if ( Owner == null)
             return DoNext;
         return OnPointerDoubleTapped(e);
     }
@@ -138,12 +130,10 @@ public abstract class Addon : ReactiveObject
 
     protected virtual void OnPointerMoved(MouseEventArgs e)
     {
-        return;
     }
     
     protected virtual void OnPointerReleased(MouseEventArgs e)
     {
-        return;
     }
 
     protected virtual bool OnPointerTapped(MouseEventArgs e)
@@ -165,16 +155,6 @@ public abstract class Addon : ReactiveObject
     public abstract void SelectAll();
     public abstract void DeselectAll();
 
-    private class OnceLock
-    {
-        public bool Value { get; private set; }
-
-        public void SetValueTrue()
-        {
-            Value = true;
-        }
-    }
-
     #region CoordinateTransformFuncs
 
     /// <summary>
@@ -185,7 +165,7 @@ public abstract class Addon : ReactiveObject
     /// <summary>
     ///     将数学坐标转换为像素坐标（SKPoint） 来自Owner
     /// </summary>
-    protected Func<Vec, SKPoint> MathToPixelSK = VoidFunc<Vec, SKPoint>;
+    protected Func<Vec, SKPoint> MathToPixelSk = VoidFunc<Vec, SKPoint>;
 
     /// <summary>
     ///     将像素坐标转换为数学坐标（Avalonia.Point） 来自Owner
@@ -195,7 +175,7 @@ public abstract class Addon : ReactiveObject
     /// <summary>
     ///     将像素坐标转换为数学坐标（SKPoint） 来自Owner
     /// </summary>
-    protected Func<SKPoint, Vec> PixelToMathSK = VoidFunc<SKPoint, Vec>;
+    protected Func<SKPoint, Vec> PixelToMathSk = VoidFunc<SKPoint, Vec>;
 
     protected Func<double, double> PixelToMathX = VoidFunc<double, double>,
         PixelToMathY = VoidFunc<double, double>,

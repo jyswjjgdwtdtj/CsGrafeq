@@ -1,4 +1,4 @@
-﻿namespace CsGrafeq;
+﻿namespace CsGrafeq.Setting;
 
 public static class OS
 {

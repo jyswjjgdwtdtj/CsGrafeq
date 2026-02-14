@@ -340,29 +340,36 @@ public struct DoubleNumber(double value) : IComputableNumber<DoubleNumber>, IEqu
     {
         return source;
     }
+
     public static bool operator ==(DoubleNumber left, DoubleNumber right)
     {
         return left.Value == right.Value;
     }
+
     public static bool operator !=(DoubleNumber left, DoubleNumber right)
     {
         return left.Value != right.Value;
     }
+
     public static bool operator <(DoubleNumber left, DoubleNumber right)
     {
         return left.Value < right.Value;
     }
+
     public static bool operator >(DoubleNumber left, DoubleNumber right)
     {
         return left.Value > right.Value;
     }
+
     public static bool operator <=(DoubleNumber left, DoubleNumber right)
     {
         return left.Value <= right.Value;
     }
+
     public static bool operator >=(DoubleNumber left, DoubleNumber right)
     {
         return left.Value >= right.Value;
     }
+
     public static bool NeedClone => false;
 }

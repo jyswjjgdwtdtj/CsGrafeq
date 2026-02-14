@@ -1,4 +1,5 @@
-﻿using CsGrafeq.I18N;
+﻿using CsGrafeq.Compiler;
+using CsGrafeq.I18N;
 
 namespace CsGrafeq.Shapes.ShapeGetter;
 

@@ -11,6 +11,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using CsGrafeq.I18N;
+using CsGrafeq.Setting;
 using CsGrafeqApplication.Addons.FunctionPad;
 using CsGrafeqApplication.Addons.GeometricPad;
 using CsGrafeqApplication.Controls.Displayers;
@@ -47,7 +48,7 @@ public partial class DisplayerContainer : UserControl, IInfoDialog
     {
         KeyDown += GlobalKeyDown;
         DataContext = VM;
-        VM.Displayer = new DisplayControl { Addons = { new GeometricPad(), new FunctionPad() },ContainerViewModel = VM};
+        VM.Displayer = new DisplayControl { Addons = { new GeometricPad(), new FunctionPad() }, ContainerViewModel = VM };
         InitializeComponent();
         _infoDialogAnimation.Delay = TimeSpan.FromSeconds(3);
         _infoDialogAnimation.Duration = TimeSpan.FromSeconds(0.2);
@@ -85,93 +86,93 @@ public partial class DisplayerContainer : UserControl, IInfoDialog
         switch (e.Key)
         {
             case Key.Delete:
-            {
-                if (e.KeyModifiers == KeyModifiers.None)
                 {
-                    Delete_Clicked(sender, e);
-                    e.Handled = true;
+                    if (e.KeyModifiers == KeyModifiers.None)
+                    {
+                        Delete_Clicked(sender, e);
+                        e.Handled = true;
+                    }
                 }
-            }
                 break;
             case Key.A:
-            {
-                if (e.KeyModifiers == KeyModifiers.Control)
                 {
-                    SelectAll_Clicked(sender, e);
-                    e.Handled = true;
+                    if (e.KeyModifiers == KeyModifiers.Control)
+                    {
+                        SelectAll_Clicked(sender, e);
+                        e.Handled = true;
+                    }
                 }
-            }
                 break;
             case Key.S:
-            {
-                if (e.KeyModifiers == KeyModifiers.Control)
                 {
-                    SaveClicked(sender, e);
-                    e.Handled = true;
+                    if (e.KeyModifiers == KeyModifiers.Control)
+                    {
+                        SaveClicked(sender, e);
+                        e.Handled = true;
+                    }
                 }
-            }
                 break;
             case Key.Z: // Ctrl+Z ����
-            {
-                if (e.KeyModifiers == KeyModifiers.Control)
                 {
-                    StepBack_Clicked(sender, e);
-                    e.Handled = true;
-                }
+                    if (e.KeyModifiers == KeyModifiers.Control)
+                    {
+                        StepBack_Clicked(sender, e);
+                        e.Handled = true;
+                    }
 
-                if (e.KeyModifiers == (KeyModifiers.Control | KeyModifiers.Shift))
-                {
-                    StepOver_Clicked(sender, e);
-                    e.Handled = true;
+                    if (e.KeyModifiers == (KeyModifiers.Control | KeyModifiers.Shift))
+                    {
+                        StepOver_Clicked(sender, e);
+                        e.Handled = true;
+                    }
                 }
-            }
                 break;
             case Key.Y: // Ctrl+Y ����
-            {
-                if (e.KeyModifiers == KeyModifiers.Control)
                 {
-                    StepOver_Clicked(sender, e);
-                    e.Handled = true;
+                    if (e.KeyModifiers == KeyModifiers.Control)
+                    {
+                        StepOver_Clicked(sender, e);
+                        e.Handled = true;
+                    }
                 }
-            }
                 break;
             case Key.OemPlus: // Ctrl + +
             case Key.Add:
-            {
-                if (e.KeyModifiers == KeyModifiers.Control)
                 {
-                    ZoomIn_Clicked(sender, e);
-                    e.Handled = true;
+                    if (e.KeyModifiers == KeyModifiers.Control)
+                    {
+                        ZoomIn_Clicked(sender, e);
+                        e.Handled = true;
+                    }
                 }
-            }
                 break;
             case Key.OemMinus: // Ctrl + -
             case Key.Subtract:
-            {
-                if (e.KeyModifiers == KeyModifiers.Control)
                 {
-                    ZoomOut_Clicked(sender, e);
-                    e.Handled = true;
+                    if (e.KeyModifiers == KeyModifiers.Control)
+                    {
+                        ZoomOut_Clicked(sender, e);
+                        e.Handled = true;
+                    }
                 }
-            }
                 break;
             case Key.Escape:
-            {
-                if (e.KeyModifiers == KeyModifiers.None)
                 {
-                    DeSelectAll_Clicked(sender, e);
-                    e.Handled = true;
+                    if (e.KeyModifiers == KeyModifiers.None)
+                    {
+                        DeSelectAll_Clicked(sender, e);
+                        e.Handled = true;
+                    }
                 }
-            }
                 break;
             case Key.B:
-            {
-                if (e.KeyModifiers == KeyModifiers.Control)
                 {
-                    DeSelectAll_Clicked(sender, e);
-                    e.Handled = true;
+                    if (e.KeyModifiers == KeyModifiers.Control)
+                    {
+                        DeSelectAll_Clicked(sender, e);
+                        e.Handled = true;
+                    }
                 }
-            }
                 break;
         }
     }
@@ -198,7 +199,7 @@ public partial class DisplayerContainer : UserControl, IInfoDialog
 
     private void Delete_Clicked(object? sender, RoutedEventArgs e)
     {
-        foreach (var displayerAddon in VM.Displayer?.Addons??[])
+        foreach (var displayerAddon in VM.Displayer?.Addons ?? [])
         {
             displayerAddon.Delete();
         }
@@ -206,7 +207,7 @@ public partial class DisplayerContainer : UserControl, IInfoDialog
 
     private void SelectAll_Clicked(object? sender, RoutedEventArgs e)
     {
-        foreach (var displayerAddon in VM.Displayer?.Addons??[])
+        foreach (var displayerAddon in VM.Displayer?.Addons ?? [])
         {
             displayerAddon.SelectAll();
         }
@@ -214,7 +215,7 @@ public partial class DisplayerContainer : UserControl, IInfoDialog
 
     private void DeSelectAll_Clicked(object? sender, RoutedEventArgs e)
     {
-        foreach (var displayerAddon in VM.Displayer?.Addons??[])
+        foreach (var displayerAddon in VM.Displayer?.Addons ?? [])
         {
             displayerAddon.DeselectAll();
         }
@@ -222,7 +223,7 @@ public partial class DisplayerContainer : UserControl, IInfoDialog
 
     private void LanguageSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        Languages.SetLanguage(Languages.AllowedLanguages[(sender as ComboBox)?.SelectedIndex ?? 0]);
+        Languages.SetLanguage((LanguagesEnum)((sender as ComboBox)?.SelectedIndex ?? 0));
     }
 
     private void Github_Clicked(object? sender, RoutedEventArgs e)
@@ -264,18 +265,18 @@ public partial class DisplayerContainer : UserControl, IInfoDialog
                 DefaultExtension = ".png",
                 ShowOverwritePrompt = true
             });
-            if (file != null&&VM.Displayer is {} displayer)
+            if (file != null && VM.Displayer is { } displayer)
             {
                 var size = new PixelSize((int)displayer.Bounds.Width, (int)displayer.Bounds.Height);
                 var rr = new RenderTargetBitmap(size);
                 using (var dc = rr.CreateDrawingContext())
                 {
                     dc.DrawRectangle(Brushes.Transparent, null, Bounds);
-                    foreach (var adn in VM.Displayer?.Addons??[])
+                    foreach (var adn in VM.Displayer?.Addons ?? [])
                     {
                         foreach (var renderable in adn.Layers)
                         {
-                            renderable.DrawBitmapTo(dc, Bounds,Bounds);
+                            renderable.DrawBitmapTo(dc, Bounds, Bounds);
                         }
                     }
                     var rt = new RenderTargetBitmap(new PixelSize((int)InfoContainer.Bounds.Width,
@@ -292,6 +293,7 @@ public partial class DisplayerContainer : UserControl, IInfoDialog
     private void ColorSettingColorChanged(object? sender, ColorChangedEventArgs e)
     {
         var theme = Material.Styles.Themes.Theme.Create(Themes.Theme.CurrentTheme);
+        Setting.Instance.PrimaryColor = e.NewColor.ToUInt32();
         theme.SetPrimaryColor(e.NewColor);
         Themes.Theme.CurrentTheme = theme;
     }
@@ -359,5 +361,12 @@ public partial class DisplayerContainer : UserControl, IInfoDialog
         var pseudoClasses = OuterBorder.UnsafeGetPseudoClasses();
         pseudoClasses.Add(":dragging");
         pseudoClasses.Set(":dragging", false);
+    }
+
+    private void ColorPicker_Loaded(object? sender, RoutedEventArgs e)
+    {
+        if (!(sender is ColorPicker cp))
+            return;
+        cp.Color = Color.FromUInt32(Setting.Instance.PrimaryColor);
     }
 }

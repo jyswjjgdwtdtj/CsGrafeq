@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+
+  <ItemGroup>
+    <PackageReference Include="SkiaSharp" Version="3.119.1" />
+  </ItemGroup>
+
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\CsGrafeq.MVVM\CsGrafeq.MVVM.csproj" />
+		<ProjectReference Include="..\CsGrafeq.Setting.Generator\CsGrafeq.Setting.Generator.csproj"  OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="all"/>
+	</ItemGroup>
+
+</Project>

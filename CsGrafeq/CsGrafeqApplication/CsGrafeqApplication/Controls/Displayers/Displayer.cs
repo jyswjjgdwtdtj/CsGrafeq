@@ -1,19 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.Input.GestureRecognizers;
 using Avalonia.Metadata;
 using Avalonia.Rendering;
 using Avalonia.Skia;
 using Avalonia.Threading;
 using CsGrafeq.I18N;
+using CsGrafeq.Setting;
 using CsGrafeqApplication.Addons;
 using CsGrafeqApplication.Core.Controls;
 using CsGrafeqApplication.Events;
@@ -26,10 +24,10 @@ namespace CsGrafeqApplication.Controls.Displayers;
 
 public abstract class Displayer : SKCanvasView, ICustomHitTest
 {
-    public static readonly DirectProperty<Displayer, DisplayerContainerViewModel> ContainerViewModelProperty = AvaloniaProperty.RegisterDirect<Displayer, DisplayerContainerViewModel>(
+    public static readonly DirectProperty<Displayer, DisplayerContainerViewModel?> ContainerViewModelProperty = AvaloniaProperty.RegisterDirect<Displayer, DisplayerContainerViewModel?>(
         nameof(ContainerViewModel), o => o.ContainerViewModel, (o, v) => o.ContainerViewModel = v);
 
-    public DisplayerContainerViewModel ContainerViewModel
+    public DisplayerContainerViewModel? ContainerViewModel
     {
         get => field;
         set => SetAndRaise(ContainerViewModelProperty, ref field, value);
@@ -42,11 +40,10 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
         get => field;
         protected set => SetAndRaise(IsRenderingProperty, ref field, value);
     }
-    
-    public const bool DoNext = true;
-    public const bool Intercept = false;
-    private readonly Clock RenderClock = new(1);
-    protected AvaPoint LastPoint;
+
+    protected const bool DoNext = true;
+    private const bool Intercept = false;
+    private readonly Clock _renderClock = new(1);
     protected PointerPointProperties LastPointerProperties = new();
     protected object TotalBufferLock { get; } = new();
 
@@ -57,14 +54,14 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
         {
             ForceToRender(CancellationToken.None);
         };
-        RenderClock.OnElapsed += Render;
+        _renderClock.OnElapsed += Render;
         IsHitTestVisible = true;
-        PropertyChanged += (s, e) =>
+        PropertyChanged += (_, e) =>
         {
             if (e.Property == ContainerViewModelProperty)
             {
                 this[!DataContextProperty] = this[!ContainerViewModelProperty];
-                ContainerViewModel?.WhenAnyValue(i => i.AddonIndex).Subscribe(d =>
+                Setting.Instance.WhenAnyValue(i => i.AddonIndex).Subscribe(_ =>
                 {
                     CompoundBuffers();
                     InvalidateVisual();
@@ -107,7 +104,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
         return new AvaPoint(MathToPixelX(vec.X), MathToPixelY(vec.Y));
     }
 
-    public SKPoint MathToPixelSK(Vec vec)
+    public SKPoint MathToPixelSk(Vec vec)
     {
         return new SKPoint((float)MathToPixelX(vec.X), (float)MathToPixelY(vec.Y));
     }
@@ -121,15 +118,15 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
     {
         return new Vec(PixelToMathX(point.X), PixelToMathY(point.Y));
     }
-    protected Addon? PointerCapturedAddon = null;
+
+    private Addon? _pointerCapturedAddon;
     protected bool CallPointerPressed(MouseEventArgs e)
     {
-        LastPoint = e.Position;
         LastPointerProperties = e.Properties;
         foreach (var addon in Addons)
             if (addon.CallPointerPressed(e) == Intercept)
             {
-                PointerCapturedAddon = addon;
+                _pointerCapturedAddon = addon;
                 return Intercept;
             }
         return DoNext;
@@ -137,11 +134,10 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
 
     protected bool CallPointerMoved(MouseEventArgs e)
     {
-        LastPoint = e.Position;
         LastPointerProperties = e.Properties;
-        if (PointerCapturedAddon != null)
+        if (_pointerCapturedAddon != null)
         {
-            PointerCapturedAddon.CallPointerMoved(e);
+            _pointerCapturedAddon.CallPointerMoved(e);
             return Intercept;
         }
 
@@ -150,12 +146,11 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
 
     protected bool CallPointerReleased(MouseEventArgs e)
     {
-        LastPoint = e.Position;
         LastPointerProperties = e.Properties;
-        if (PointerCapturedAddon != null)
+        if (_pointerCapturedAddon != null)
         {
-            PointerCapturedAddon.CallPointerReleased(e);
-            PointerCapturedAddon = null;
+            _pointerCapturedAddon.CallPointerReleased(e);
+            _pointerCapturedAddon = null;
             return Intercept;
         }
         return DoNext;
@@ -163,7 +158,6 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
 
     protected bool CallPointerWheeled(MouseEventArgs e)
     {
-        LastPoint = e.Position;
         LastPointerProperties = e.Properties;
         foreach (var addon in Addons)
             if (addon.CallPointerWheeled(e) == Intercept)
@@ -262,7 +256,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
         if(ct.IsCancellationRequested)
             return;
         adn.AddonChanged = false;
-        Task.WaitAll(adn.Layers.Select(i => Task.Run(() => Invalidate(i,ct), ct)), ct);
+        Task.WaitAll(adn.Layers.Select(i => Task.Run(() => Invalidate(i,CancellationToken.None))));
     }
 
     /// <summary>
@@ -270,7 +264,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
     /// </summary>
     protected void ForceToRender(CancellationToken ct)
     {
-        RenderClock.Cancel();
+        _renderClock.Cancel();
         Invalidate(ct);
         CompoundBuffers();
         InvalidateVisual();
@@ -315,7 +309,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
     /// </summary>
     internal void AskForRender()
     {
-        RenderClock.Touch();
+        _renderClock.Touch();
     }
 
     private void ChildrenChanged(object? sender, NotifyCollectionChangedEventArgs e)

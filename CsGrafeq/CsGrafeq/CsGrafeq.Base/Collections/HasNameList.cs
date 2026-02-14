@@ -2,19 +2,9 @@
 
 namespace CsGrafeq.Collections;
 
-public class HasNameList<T> : ObservableCollection<T>
+public class HasNameList<T>(string name) : ObservableCollection<T>
 {
-    public HasNameList(string Name)
-    {
-        this.Name = Name;
-    }
-
-    public string Name { get; init; }
+    public string Name { get; init; } = name;
 }
 
-public class HasNameStrList : HasNameList<string>
-{
-    public HasNameStrList(string Name) : base(Name)
-    {
-    }
-}
+public class HasNameStrList(string name) : HasNameList<string>(name);

@@ -1,7 +1,9 @@
 using System;
 using CsGrafeq.Interval;
 using CsGrafeq.Numeric;
+using CsGrafeq.Setting;
 using CsGrafeq.Shapes;
+using CsGrafeq.Variables;
 using CsGrafeqApplication.Addons;
 using CsGrafeqApplication.Addons.FunctionPad;
 using ReactiveUI;
@@ -23,7 +25,7 @@ public class ImplicitFunction : InteractiveObject
             if (e.PropertyName == nameof(IsCorrect) || e.PropertyName == nameof(IsDeleted))
                 RefreshIsActive();
         };
-        EnglishChar.Instance.CharValueChanged += CharValueChanged;
+        VarRecorder.Instance.CharValueChanged += CharValueChanged;
         Opacity = Setting.Instance.DefaultOpacity;
         Expression = expression;
     }
@@ -68,13 +70,13 @@ public class ImplicitFunction : InteractiveObject
     {
         get;
         set => this.RaiseAndSetIfChanged(ref field, value);
-    } = false;
+    } = true;
 
     public HasReferenceIntervalSetFunc<IntervalSet> Function
     {
         get => field;
         private set => this.RaiseAndSetIfChanged(ref field, value);
-    } = new((x, y) => Def.FF, EnglishCharEnum.None);
+    } = new((x, y) => Def.FF, VariablesEnum.None);
 
     public Func<double,double,double,double, bool> MsFunction=static (_,_,_,_)=>false;
 
@@ -90,7 +92,7 @@ public class ImplicitFunction : InteractiveObject
                 success =>
                 {
                     Function = success;
-                    MsFunction = IntervalCompiler.GetMSDelegate(field);
+                    MsFunction = IntervalCompiler.GetMarchingSquaresFunc(field);
                     LastError = "No Error";
                     IsCorrect = true;
                     last.Dispose();
@@ -123,15 +125,15 @@ public class ImplicitFunction : InteractiveObject
 
     public override void Dispose()
     {
-        EnglishChar.Instance.CharValueChanged -= CharValueChanged;
+        VarRecorder.Instance.CharValueChanged -= CharValueChanged;
         RenderTarget.Dispose();
         GC.SuppressFinalize(this);
     }
 
-    private void CharValueChanged(EnglishCharEnum englishCharEnum)
+    private void CharValueChanged(VariablesEnum variablesEnum)
     {
         if (IsCorrect && !IsDeleted)
-            if (Function.Reference.HasFlag(englishCharEnum))
+            if (Function.References.HasFlag(variablesEnum))
                 InvokeChanged();
     }
 

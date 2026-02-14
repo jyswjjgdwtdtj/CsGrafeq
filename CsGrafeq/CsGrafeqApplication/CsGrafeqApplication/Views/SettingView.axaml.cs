@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using CsGrafeq.Setting;
 
 namespace CsGrafeqApplication.Views;
 
@@ -37,8 +38,7 @@ public partial class SettingView : UserControl
 
     private void ApplyClientSizeButton_OnClick(object? sender, RoutedEventArgs e)
     {
-        Console.WriteLine(Setting.Instance.ClientSizeWidth+" "+Setting.Instance.ClientSizeHeight);
         MainWindow.Instance?.SetClientSize(new Size(Setting.Instance.ClientSizeWidth+2, Setting.Instance.ClientSizeHeight+32));
-        
     }
+    
 }

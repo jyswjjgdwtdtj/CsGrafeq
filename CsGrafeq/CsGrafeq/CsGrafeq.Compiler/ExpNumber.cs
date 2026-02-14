@@ -1,32 +1,43 @@
 ﻿using CsGrafeq.Compiler;
 using CsGrafeq.MVVM;
 using CsGrafeq.Numeric;
+using CsGrafeq.Variables;
+using CsGrafeq.Setting;
 using ReactiveUI;
 using static CsGrafeq.Utilities.DoubleCompareHelper;
 
-namespace CsGrafeq;
+namespace CsGrafeq.Compiler;
 
 /// <summary>
 ///     充满了别扭 没办法……
 ///     面向用户编程就是这样子 要拗出很奇怪恶心的东西
+///     不敢动 不敢动。。。
 /// </summary>
 public class ExpNumber : ObservableObject
 {
-    private readonly HasReferenceFunction<Func<DoubleNumber>> Direct;
-
-    private readonly HasReferenceFunction<Func<DoubleNumber>> None = new(NoneFunc, EnglishCharEnum.None);
+    public bool IsActive
+    {
+        get;
+        set
+        {
+            Func.IsActive = value;
+            field = value;
+        }
+    } = true;
+    private HasReferenceFunction<Func<DoubleNumber>> Direct { get;}
+    private HasReferenceFunction<Func<DoubleNumber>> None { get; } = new(NoneFunc, VariablesEnum.None);
     public readonly object? Owner;
-    private HasReferenceFunction<Func<DoubleNumber>> Func;
-    private DoubleNumber Number;
-    private int NumberChangedSuspended;
-    private string ShownText = "0";
+    private HasReferenceFunction<Func<DoubleNumber>> Func { get; set; }
+    private DoubleNumber Number { get; set; }
+    private int NumberChangedSuspended { get; set; }
+    private string _shownText = "0";
 
     public ExpNumber(double initialNumber = 0, object? owner = null)
     {
         Owner = owner;
-        Direct = new HasReferenceFunction<Func<DoubleNumber>>(DirectFunc, EnglishCharEnum.None);
+        Direct = new HasReferenceFunction<Func<DoubleNumber>>(DirectFunc, VariablesEnum.None);
         Func = Direct;
-        EnglishChar.Instance.CharValueChanged += CharValueChanged;
+        VarRecorder.Instance.CharValueChanged += CharValueChanged;
         PropertyChanged += (s, e) => { };
     }
 
@@ -38,11 +49,11 @@ public class ExpNumber : ObservableObject
     /// </summary>
     public string ValueStr
     {
-        get => ShownText;
+        get => _shownText;
         set
         {
             SetExpression(value);
-            this.RaiseAndSetIfChanged(ref ShownText, value);
+            this.RaiseAndSetIfChanged(ref _shownText, value);
         }
     }
 
@@ -80,7 +91,7 @@ public class ExpNumber : ObservableObject
 
     ~ExpNumber()
     {
-        EnglishChar.Instance.CharValueChanged -= CharValueChanged;
+        VarRecorder.Instance.CharValueChanged -= CharValueChanged;
     }
 
     public void SetNumber(double number)
@@ -113,11 +124,12 @@ public class ExpNumber : ObservableObject
 
         Func.Dispose();
         IsExpression = true;
-        Compiler.Compiler.TryCompile<DoubleNumber>(expression, 0, Setting.Instance.EnableExpressionSimplification)
+        Compiler.TryCompile<DoubleNumber>(expression, 0, Setting.Setting.Instance.EnableExpressionSimplification)
             .Match(funcTuple =>
             {
                 Func = new HasReferenceFunction<Func<DoubleNumber>>((Func<DoubleNumber>)funcTuple.func,
                     funcTuple.usedVars);
+                Func.IsActive=IsActive;
                 IsError = false;
                 SetValue(Func.Function().Value);
                 UserSetValueStr?.Invoke();
@@ -142,14 +154,14 @@ public class ExpNumber : ObservableObject
 
         if (!IsExpression)
         {
-            ShownText = double.IsNaN(value) ? "" : value.CustomToString(8, 1e-8);
+            _shownText = double.IsNaN(value) ? "" : value.CustomToString(8, 1e-8);
             this.RaisePropertyChanged(nameof(ValueStr));
         }
     }
 
-    private void CharValueChanged(EnglishCharEnum c)
+    private void CharValueChanged(VariablesEnum c)
     {
-        if (Func.Reference.HasFlag(c)) SetValue(Func.Function().Value);
+        if (Func.References.HasFlag(c)) SetValue(Func.Function().Value);
     }
 
     private DoubleNumber DirectFunc()

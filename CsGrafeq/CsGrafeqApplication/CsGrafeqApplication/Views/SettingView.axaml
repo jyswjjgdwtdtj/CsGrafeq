@@ -5,8 +5,9 @@
              xmlns:csGrafeq="clr-namespace:CsGrafeq;assembly=CsGrafeq.Base"
              xmlns:controls="clr-namespace:CsGrafeqApplication.Core.Controls;assembly=CsGrafeqApplication.Core"
              xmlns:skiaSharp="clr-namespace:SkiaSharp;assembly=SkiaSharp"
+             xmlns:setting="clr-namespace:CsGrafeq.Setting;assembly=CsGrafeq.Setting"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="CsGrafeqApplication.Views.SettingView" x:DataType="csGrafeq:Setting">
+             x:Class="CsGrafeqApplication.Views.SettingView" x:DataType="setting:Setting">
     <TabControl TabStripPlacement="Left" Margin="0,15" MinHeight="350">
         <TabControl.Styles>
             <Style Selector="TabItem">
@@ -45,8 +46,8 @@
         <TabItem Header="{CompiledBinding MultiLanguageResources.RenderText.Data}">
             <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
                 <Grid RowDefinitions="Auto" ColumnDefinitions="Auto,Auto" Margin="15,0"
-                      DataContext="{x:Static csGrafeq:Setting.Instance}"
-                      x:DataType="csGrafeq:Setting">
+                      DataContext="{x:Static setting:Setting.Instance}"
+                      x:DataType="setting:Setting">
                     <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center">
                         <Run Text="{CompiledBinding MultiLanguageResources.BlendModeText}"></Run>
                         <Run Text=":"></Run>
@@ -126,18 +127,18 @@
             </ScrollViewer>
         </TabItem>
         <TabItem Header="{CompiledBinding MultiLanguageResources.ImplicitFunctionText.Data}"
-                 IsVisible="{x:Static csGrafeq:Setting.CanDrawFunction}">
+                 IsVisible="{x:Static setting:Setting.CanDrawFunction}">
             <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
                 <Grid RowDefinitions="Auto" ColumnDefinitions="Auto,Auto" Margin="15,0"
-                      DataContext="{x:Static csGrafeq:Setting.Instance}"
-                      x:DataType="csGrafeq:Setting">
+                      DataContext="{x:Static setting:Setting.Instance}"
+                      x:DataType="setting:Setting">
                     <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">
                         <Run Text="{CompiledBinding MultiLanguageResources.DefaultOpacityText.Data}" />
                         <Run Text=":" />
                     </TextBlock>
                     <TextBox Grid.Row="0" Grid.Column="1" TemplateApplied="TemplateAppliedHandler"
                              VerticalAlignment="Center"
-                             Text="{CompiledBinding DefaultOpacity}" x:DataType="csGrafeq:Setting">
+                             Text="{CompiledBinding DefaultOpacity}" x:DataType="setting:Setting">
                         <TextBox.Styles>
                             <FluentTheme />
                         </TextBox.Styles>

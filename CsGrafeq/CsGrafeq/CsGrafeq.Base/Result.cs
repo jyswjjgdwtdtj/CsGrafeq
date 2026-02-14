@@ -29,7 +29,7 @@ public class Result<TSuccess, TException> where TException : Exception
         return new Result<TSuccess, TException>(okValue, message);
     }
 
-    public static Result<TSuccess, TException> Error(TException exception)
+    public static Result<TSuccess, TException> Failure(TException exception)
     {
         return new Result<TSuccess, TException>(exception);
     }
@@ -75,19 +75,19 @@ public class Result<TSuccess, TException> where TException : Exception
             errorAction(_exception!);
     }
 
-    public void IfSuccess(Action<TSuccess> successAction)
+    public void IfSuccessful(Action<TSuccess> successAction)
     {
         if (IsSuccessful)
             successAction(_value!);
     }
 
-    public void IfError(Action<TException> errorAction)
+    public void IfFailed(Action<TException> errorAction)
     {
         if (!IsSuccessful)
             errorAction(_exception!);
     }
 
-    public void IfErrorThrow()
+    public void IfErrorThenThrow()
     {
         if (!IsSuccessful)
             throw _exception!;
@@ -109,12 +109,12 @@ public class Result<TSuccess> : Result<TSuccess, Exception>
         return new Result<TSuccess>(okValue, message);
     }
 
-    public static Result<TSuccess> Error(string error)
+    public static Result<TSuccess> Failure(string error)
     {
         return new Result<TSuccess>(new Exception(error));
     }
 
-    public new static Result<TSuccess> Error(Exception exception)
+    public new static Result<TSuccess> Failure(Exception exception)
     {
         return new Result<TSuccess>(exception);
     }

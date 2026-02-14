@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Avalonia.Skia;
+using CsGrafeq.Setting;
 using Material.Styles.Themes;
 using ReactiveUI;
 using SkiaSharp;

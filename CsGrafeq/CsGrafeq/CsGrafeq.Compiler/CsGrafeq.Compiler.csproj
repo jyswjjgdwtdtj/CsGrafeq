@@ -11,6 +11,7 @@
         <ProjectReference Include="..\CsGrafeq.Base\CsGrafeq.Base.csproj"/>
         <ProjectReference Include="..\CsGrafeq.MVVM\CsGrafeq.MVVM.csproj"/>
         <ProjectReference Include="..\CsGrafeq.Numeric\CsGrafeq.Numeric.csproj"/>
+        <ProjectReference Include="..\CsGrafeq.Setting\CsGrafeq.Setting.csproj" />
     </ItemGroup>
 
     <ItemGroup>

@@ -1,5 +1,4 @@
-﻿using CsGrafeq.Collections;
-using sysMath = System.Math;
+﻿using sysMath = System.Math;
 
 namespace CsGrafeq.Interval.Extensions;
 
@@ -105,7 +104,7 @@ internal static class IntervalSetExtension
     public static unsafe IntervalSet IntervalSetMethod(IntervalSet i1, IntervalSet i2,
         delegate*<Range, Range, Range> handler)
     {
-        var ranges = StaticUnsafeMemoryList<Range>.Rent(i1.Intervals.Length * i2.Intervals.Length);
+        var ranges = new Range[i1.Intervals.Length * i2.Intervals.Length];
         var loc = 0;
         foreach (var i in i1.Intervals)
         foreach (var j in i2.Intervals)
