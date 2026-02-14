@@ -66,9 +66,7 @@
                             <Image Width="16" Height="16" Source="avares://CsGrafeqApplication/Assets/favicon.ico"
                                    VerticalAlignment="Center" Margin="8,5,5,5" />
                             <TextBlock VerticalAlignment="Center" FontFamily="{StaticResource MapleMono}"
-                                       Foreground="{DynamicResource CgForegroundBrush}">
-                                CsGrafeq
-                            </TextBlock>
+                                       Foreground="{DynamicResource CgForegroundBrush}" Text="{CompiledBinding MultiLanguageResources.CsGrafeqText}"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
                             <Button Padding="0" Width="45" CornerRadius="0"

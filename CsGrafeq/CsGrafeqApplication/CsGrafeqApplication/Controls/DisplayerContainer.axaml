@@ -25,7 +25,7 @@
         </Border>
         <!--Info显示层-->
         <Border Name="InfoContainer">
-            <TabControl Name="AddonInfoTabControl" SelectedIndex="{CompiledBinding AddonIndex,Mode=OneWay}"
+            <TabControl Name="AddonInfoTabControl" SelectedIndex="{CompiledBinding Setting.AddonIndex,Mode=OneWay}"
                         ItemsSource="{CompiledBinding Displayer.Addons}" HorizontalAlignment="Right">
                 <TabControl.ContentTemplate>
                     <DataTemplate DataType="addons:Addon">
@@ -59,7 +59,7 @@
                                     Name="OperationContainer"
                                     Background="{DynamicResource CgTranslucentBackgroundBrush}">
                                 <TabControl Name="AddonsTabControl"
-                                            SelectedIndex="{CompiledBinding AddonIndex,Mode=OneWay}"
+                                            SelectedIndex="{CompiledBinding Setting.AddonIndex,Mode=OneWay}"
                                             ItemsSource="{CompiledBinding Displayer.Addons}"
                                             HorizontalAlignment="Stretch">
                                     <TabControl.ContentTemplate>
@@ -141,7 +141,7 @@
                                 </ToggleButton>
                                 <Panel DockPanel.Dock="Right" VerticalAlignment="Stretch"
                                        HorizontalAlignment="Stretch">
-                                    <ComboBox SelectedIndex="{CompiledBinding AddonIndex,Mode=TwoWay}"
+                                    <ComboBox SelectedIndex="{CompiledBinding Setting.AddonIndex,Mode=TwoWay}"
                                               Name="ChooseAddonComboBox" VerticalAlignment="Top"
                                               ItemsSource="{CompiledBinding Displayer.Addons}">
                                         <ComboBox.ItemTemplate>
@@ -391,7 +391,7 @@
                                     <Button.Flyout>
                                         <Flyout Placement="Left">
                                             <ColorPicker Foreground="Black" IsAlphaVisible="False"
-                                                         IsAlphaEnabled="False"
+                                                         IsAlphaEnabled="False" Loaded="ColorPicker_Loaded"
                                                          ColorChanged="ColorSettingColorChanged" />
                                         </Flyout>
                                     </Button.Flyout>
@@ -406,7 +406,7 @@
                                     <ToolTip.Tip>
                                         <TextBlock Text="{CompiledBinding MultiLanguageResources.SettingText.Data}" />
                                     </ToolTip.Tip>
-                                    <Path Name="Setting" Classes="Icon Fill"
+                                    <Path Name="SettingPath" Classes="Icon Fill"
                                           Data="M2.5 2A1.5 1.5 0 0 0 1 3.5v1a1.5 1.5 0 0 0 1 1.415V11.5A2.5 2.5 0 0 0 4.5 14h2.1a5.5 5.5 0 0 1-.393-1H4.5A1.5 1.5 0 0 1 3 11.5V6h10.5A1.5 1.5 0 0 0 15 4.5v-1A1.5 1.5 0 0 0 13.5 2zM2 3.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5zm7.067 4.943a2 2 0 0 1-1.431 2.478l-.461.118a4.7 4.7 0 0 0 .01 1.016l.35.083a2 2 0 0 1 1.456 2.519l-.127.422q.387.307.835.518l.325-.344a2 2 0 0 1 2.91.002l.337.358q.44-.204.822-.498l-.156-.556a2 2 0 0 1 1.43-2.478l.46-.118a4.7 4.7 0 0 0-.01-1.017l-.348-.082a2 2 0 0 1-1.456-2.52l.126-.422a4.3 4.3 0 0 0-.835-.518l-.325.344a2 2 0 0 1-2.91-.001l-.337-.358a4.3 4.3 0 0 0-.821.497zM11.5 12.5a1 1 0 1 1 0-2a1 1 0 0 1 0 2" />
                                     <views:MsgBoxButton.MsgBoxContentTemplate>
                                         <DataTemplate DataType="vm:DisplayerContainerViewModel">
@@ -439,14 +439,9 @@
                                     <Button.Flyout>
                                         <Flyout Placement="Left">
                                             <ComboBox Foreground="Black"
-                                                      SelectedIndex="{x:Static i18N:Languages.CurrentLanguageIndex}"
+                                                      SelectedIndex="{x:Static i18N:Languages.InitialLanguageIndex}"
+                                                      ItemsSource="{x:Static i18N:MultiLanguageData.LanguageTexts}"
                                                       SelectionChanged="LanguageSelectionChanged">
-                                                <ComboBoxItem>
-                                                    <TextBlock Text="en-us (English)" />
-                                                </ComboBoxItem>
-                                                <ComboBoxItem>
-                                                    <TextBlock Text="zh-hans (Chinese)" />
-                                                </ComboBoxItem>
                                             </ComboBox>
                                         </Flyout>
                                     </Button.Flyout>

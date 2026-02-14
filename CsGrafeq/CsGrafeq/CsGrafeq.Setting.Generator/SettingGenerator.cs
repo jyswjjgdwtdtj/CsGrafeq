@@ -14,6 +14,7 @@ public class SettingGenerator : IIncrementalGenerator
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         string resx = Resources.SettingData??"";
+        //var resx = "#";
         var parts=resx.Split('#');
         if (parts.Length!=2)
             throw new InvalidOperationException("Setting.txt 的内容格式不正确，必须包含两个 '#' 作为段落分隔符。");

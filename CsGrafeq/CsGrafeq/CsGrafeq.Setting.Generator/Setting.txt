@@ -3,6 +3,7 @@ CsGrafeq.MVVM
 System
 SkiaSharp
 #
+uint,PrimaryColor,0xFF77CCBB
 byte,DefaultOpacity,255
 bool,EnableExpressionSimplification,false
 bool,MoveOptimization,false
@@ -17,3 +18,4 @@ bool,ShowAxesMinorGrid,true
 int,ClientSizeWidth,800
 int,ClientSizeHeight,600
 SKBlendMode,CompoundBlendMode,SKBlendMode.SrcOver
+int,AddonIndex,0

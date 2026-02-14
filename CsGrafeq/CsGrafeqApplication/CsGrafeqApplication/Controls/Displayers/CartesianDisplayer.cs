@@ -430,11 +430,11 @@ public class CartesianDisplayer : Displayer
                 RenderAxes(dc);
                 for (var i = 0; i < Addons.Count; i++)
                 {
-                    if(i!=vm.AddonIndex)
+                    if(i!=Setting.Instance.AddonIndex)
                         foreach (var layer in Addons[i].Layers)
                             layer.DrawRenderTargetTo(dc, 0, 0);
                 }
-                foreach (var layer in Addons[vm.AddonIndex].Layers)
+                foreach (var layer in Addons[Setting.Instance.AddonIndex].Layers)
                     layer.DrawRenderTargetTo(dc, 0, 0);
                 RenderAxesNumber(dc);
             }

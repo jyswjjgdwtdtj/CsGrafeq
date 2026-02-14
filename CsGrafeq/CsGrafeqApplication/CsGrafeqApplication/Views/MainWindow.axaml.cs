@@ -1,7 +1,9 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using CsGrafeq.Setting;
 using CsGrafeq.Windows.IME;
 using CsGrafeqApplication.Core.Utils;
 
@@ -15,6 +17,12 @@ public partial class MainWindow : Window
         InitializeComponent();
         this.AttachDevTools();
         Instance = this;
+        this.Closed += OnClosed;
+    }
+
+    private void OnClosed(object? sender, EventArgs e)
+    {
+        Setting.Save();
     }
 
     public void SetClientSize(Size size)

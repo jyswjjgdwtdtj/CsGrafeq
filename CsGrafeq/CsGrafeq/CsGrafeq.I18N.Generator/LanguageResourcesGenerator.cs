@@ -20,8 +20,10 @@ public class MultiLanguageResourcesGenerator : IIncrementalGenerator
         builder.AppendLine("public class MultiLanguageResources{");
         builder.AppendLine("\tpublic static MultiLanguageResources Instance { get; private set; } = new();");
         builder.AppendLine("\tpublic IReadOnlyDictionary<string, MultiLanguageData> All { get; init; }");
-        var split = resx.Take(1).Single().Single();
-        var title = resx.Skip(1).Take(1).Single().Split(split);
+        var split = ',';
+        var title = resx.Take(1).Single().Split(split).Skip(1).ToArray();
+        var languages = title.Select(t => t.Split(';')[0]).ToArray();
+        var languagesText = title.Select(t => t.Split(';')[1]).ToArray();
         foreach (var line in resx.Skip(1))
         {
             if (string.IsNullOrWhiteSpace(line)) continue;
@@ -33,7 +35,7 @@ public class MultiLanguageResourcesGenerator : IIncrementalGenerator
             if (s1.Length * key.Length * s2.Length != 0)
             {
                 builder.AppendLine(
-                    $"\tpublic MultiLanguageData {key} {{ get; }} = new() {{ {title[1]} = \"{s1}\", {title[2]} = \"{s2}\" }};");
+                    $"\tpublic MultiLanguageData {key} {{ get; }} = new() {{ {languages[0]} = \"{s1}\", {languages[1]} = \"{s2}\" }};");
                 dicBuilder.AppendLine($"\t\t\t[\"{key}\"] = {key},");
             }
             else
@@ -54,10 +56,62 @@ public class MultiLanguageResourcesGenerator : IIncrementalGenerator
         builder.AppendLine("\t\t};");
         builder.AppendLine("\t}");
         builder.AppendLine("}");
+        var multiLanguageResources = builder.ToString().Replace("\t", "    ");
 
+        builder.Clear();
+        builder.AppendLine("using System;");
+        builder.AppendLine("namespace CsGrafeq.I18N;");
+        builder.AppendLine("public enum LanguagesEnum");
+        builder.AppendLine("{");
+        for (int i = 0; i < languages.Length; i++)
+        {
+            builder.AppendLine($"\t{languages[i]},");
+        }
+        builder.AppendLine("}");
+        var languagesEnum = builder.ToString().Replace("\t", "    ");
+        
+        builder.Clear();
+        dicBuilder.Clear();
+        var dicBuilder2 = new StringBuilder();
+        var dicBuilder3 = new StringBuilder();
+        builder.AppendLine("using System;");
+        builder.AppendLine("using ReactiveUI;");
+        builder.AppendLine("namespace CsGrafeq.I18N;");
+        builder.AppendLine("public partial class MultiLanguageData");
+        builder.AppendLine("{");
+        dicBuilder.AppendLine("\tpublic static readonly IReadOnlyList<string> LanguageNames = new[] {");
+        dicBuilder2.AppendLine("\tpublic static readonly IReadOnlyList<string> LanguageTexts = new[] {");
+        dicBuilder3.AppendLine("\tpublic string GetData(LanguagesEnum key){");
+        dicBuilder3.AppendLine("\t\treturn key switch {");
+        for (int i = 0; i < languages.Length; i++)
+        {
+            builder.AppendLine($"\tpublic string {languages[i]}");
+            builder.AppendLine("\t{");
+            builder.AppendLine($"\t\tget;");
+            builder.AppendLine($"\t\tinit => this.RaiseAndSetIfChanged(ref field, value);");
+            builder.AppendLine("\t}");
+            dicBuilder.AppendLine($"\t\t\"{languages[i]}\",");
+            dicBuilder2.AppendLine($"\t\t\"{languagesText[i]}\",");
+            dicBuilder3.AppendLine($"\t\t\tLanguagesEnum.{languages[i]} => {languages[i]},");
+        }
+        dicBuilder.AppendLine("\t};");
+        dicBuilder2.AppendLine("\t};");
+        dicBuilder3.AppendLine("\t\t\t_ => throw new ArgumentOutOfRangeException(nameof(key), key, null),");
+        dicBuilder3.AppendLine("\t\t};");
+        dicBuilder3.AppendLine("\t}");
+        builder.AppendLine(dicBuilder.ToString());
+        builder.AppendLine(dicBuilder2.ToString());
+        builder.AppendLine(dicBuilder3.ToString());
+        builder.AppendLine("}");
+        var multiLanguageData = builder.ToString().Replace("\t", "    ");
+        
+        
         //在编译时生成源代码
         context.RegisterPostInitializationOutput(ctx =>
-            ctx.AddSource("MultiLanguageResources.g.cs",
-                SourceText.From(builder.ToString().Replace("\t", "    "), Encoding.UTF8)));
+        {
+            ctx.AddSource("LanguagesEnum.g.cs", SourceText.From(languagesEnum, Encoding.UTF8));
+            ctx.AddSource("MultilanguageData.g.cs", SourceText.From(multiLanguageData, Encoding.UTF8));
+            ctx.AddSource("MultiLanguageResources.g.cs", SourceText.From(multiLanguageResources, Encoding.UTF8));
+        });
     }
 }

@@ -15,7 +15,7 @@ public partial class Setting : ObservableObject
     /// </summary>
     public static readonly double PointerTouchRange = OS.GetOSType() == OSType.Android ? 15 : 5;
 
-    public static Setting Instance { get; } = new();
+    public static Setting Instance { get; }
     /// <summary>
     ///     是否允许函数绘图
     /// </summary>

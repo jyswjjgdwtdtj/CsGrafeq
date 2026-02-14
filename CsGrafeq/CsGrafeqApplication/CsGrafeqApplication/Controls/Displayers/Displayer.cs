@@ -11,6 +11,7 @@ using Avalonia.Rendering;
 using Avalonia.Skia;
 using Avalonia.Threading;
 using CsGrafeq.I18N;
+using CsGrafeq.Setting;
 using CsGrafeqApplication.Addons;
 using CsGrafeqApplication.Core.Controls;
 using CsGrafeqApplication.Events;
@@ -60,7 +61,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
             if (e.Property == ContainerViewModelProperty)
             {
                 this[!DataContextProperty] = this[!ContainerViewModelProperty];
-                ContainerViewModel?.WhenAnyValue(i => i.AddonIndex).Subscribe(_ =>
+                Setting.Instance.WhenAnyValue(i => i.AddonIndex).Subscribe(_ =>
                 {
                     CompoundBuffers();
                     InvalidateVisual();
