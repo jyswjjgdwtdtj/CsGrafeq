@@ -1,13 +1,15 @@
-﻿using static CsGrafeq.Numeric.CsGrafeqMath;
+﻿using CsGrafeq.Interfaces;
+using CsGrafeq.Numeric.Exact;
+using static CsGrafeq.Numeric.CsGrafeqMath;
 
 namespace CsGrafeq.Shapes;
 
 public static class GeometryMath
 {
-    public static Result<(Vec, Vec)> TryGetValidVec(Vec v1, Vec v2, Vec v3, Vec v4)
+    public static Result<(T, T)> TryGetValidVec<T,TValue>(T v1, T v2, T v3, T v4) where T:IPoint<TValue>
     {
         var vs = new [] { v1, v2, v3, v4 };
-        var vs2 = new Vec[4];
+        var vs2 = new T[4];
         var i = 0;
         foreach (var v in vs)
         {
@@ -18,45 +20,34 @@ public static class GeometryMath
         }
 
         if (i == 2)
-            return Result<(Vec, Vec)>.Success((vs2[0], vs2[1]));
-        return Result<(Vec, Vec)>.Failure("");
+            return Result<(T, T)>.Success((vs2[0], vs2[1]));
+        return Result<(T, T)>.Failure("");
     }
 
-    public static Vec SolveFunction(double a, double b, double c, double d, double e, double f)
+    public static VectorExact SolveFunction(ExactNumber a, ExactNumber b, ExactNumber c, ExactNumber d, ExactNumber e, ExactNumber f)
     {
         var det = a * e - b * d;
         if (det == 0)
-            return Vec.Invalid;
-        var mat = new double[2, 2];
+            return VectorExact.NaN;
+        var mat = new ExactNumber[2, 2];
         mat[0, 0] = e / det;
         mat[0, 1] = -b / det;
         mat[1, 0] = -d / det;
         mat[1, 1] = a / det;
         var x = mat[0, 0] * c + mat[0, 1] * f;
         var y = mat[1, 0] * c + mat[1, 1] * f;
-        return new Vec(x, y);
+        return new VectorExact(x, y);
     }
 
 
     /// <summary>
     ///     ss,se为线段 s,e为直线
     /// </summary>
-    public static Vec GetIntersectionOfSegmentAndLine(Vec segmentStart, Vec segmentEnd, Vec lineStart, Vec lineEnd)
+    public static VectorExact GetIntersectionOfSegmentAndLine(VectorExact segmentStart, VectorExact segmentEnd, VectorExact lineStart, VectorExact lineEnd)
     {
         var j = IntersectionMath.FromTwoLine(segmentStart, segmentEnd, lineStart, lineEnd);
         if (RangeIn(segmentStart.X, segmentEnd.X, j.X) && RangeIn(segmentStart.Y, segmentEnd.Y, j.Y)) return j;
-        return new Vec(double.NaN, double.NaN);
-    }
-
-    public static Vec GetIntersectionOfTwoSegments(Vec s1, Vec e1, Vec s2, Vec e2)
-    {
-        var j = IntersectionMath.FromTwoLine(s1, e1, s2, e2);
-        if (RangeIn(s1.X, e1.X, j.X) &&
-            RangeIn(s1.Y, e1.Y, j.Y) &&
-            RangeIn(s2.X, e2.X, j.X) &&
-            RangeIn(s2.Y, e2.Y, j.Y))
-            return j;
-        return new Vec(double.NaN, double.NaN);
+        return VectorExact.NaN;
     }
 
     public static double DistanceToLine(Vec v1, Vec v2, Vec test, out Vec onPoint)
@@ -66,12 +57,6 @@ public static class GeometryMath
         var t = ((test.X - v1.X) * dx + (test.Y - v1.Y) * dy) / (dx * dx + dy * dy);
         onPoint = new Vec(v1.X + t * dx, v1.Y + t * dy);
         return (onPoint - test).GetLength();
-    }
-
-    public static double DistanceToSegment(Vec v1, Vec v2, Vec test, out Vec onPoint)
-    {
-        var res = DistanceToLine(v1, v2, test, out onPoint);
-        return FuzzyOnSegment(v1, v2, onPoint) ? res : double.PositiveInfinity;
     }
 
     public static bool FuzzyOnSegment(Vec v1, Vec v2, Vec test)

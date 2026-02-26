@@ -1,15 +1,11 @@
-﻿namespace CsGrafeq;
+﻿using CsGrafeq.Interfaces;
 
-public struct VecI : IEquatable<VecI>
+namespace CsGrafeq;
+
+public struct VecI(int x, int y) : IEquatable<VecI>, IPoint<int>
 {
-    public int X;
-    public int Y;
-
-    public VecI(int x, int y)
-    {
-        X = x;
-        Y = y;
-    }
+    public int X { get; set; } = x;
+    public int Y { get; set; } = y;
 
     public static bool operator ==(VecI left, VecI right)
     {

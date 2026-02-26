@@ -85,8 +85,7 @@
                                             Value="{DynamicResource CgForegroundBrush}" />
                                     <Setter Property="BorderThickness" Value="1" />
                                     <Setter Property="HorizontalAlignment" Value="Stretch" />
-                                    <Setter Property="Margin" Value="2" />
-                                    <Setter Property="Padding" Value="0" />
+                                    <Setter Property="Padding" Value="3" />
                                 </Style>
                             </Button.Styles>
                         </Button>
@@ -145,6 +144,21 @@
                     </TextBox>
                 </Grid>
             </ScrollViewer>
+        </TabItem>
+        <TabItem Header="{CompiledBinding MultiLanguageResources.ResetOptionsText.Data}">
+            <Button Content="{CompiledBinding MultiLanguageResources.RestoreToDefaultText.Data}" Margin="15,0" VerticalAlignment="Top" HorizontalAlignment="Left" Click="RestoreToDefaultClicked">
+                <Button.Styles>
+                    <Style Selector="Button">
+                        <Setter Property="Background"
+                                Value="{DynamicResource CgBackgroundBrush}" />
+                        <Setter Property="CornerRadius" Value="4" />
+                        <Setter Property="BorderBrush"
+                                Value="{DynamicResource CgForegroundBrush}" />
+                        <Setter Property="BorderThickness" Value="1" />
+                        <Setter Property="HorizontalAlignment" Value="Stretch" />
+                    </Style>
+                </Button.Styles>
+            </Button>
         </TabItem>
     </TabControl>
 </UserControl>

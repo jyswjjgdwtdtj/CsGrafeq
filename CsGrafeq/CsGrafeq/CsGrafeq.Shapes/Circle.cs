@@ -1,4 +1,5 @@
-﻿using CsGrafeq.Shapes.ShapeGetter;
+﻿using CsGrafeq.Numeric.Exact;
+using CsGrafeq.Shapes.ShapeGetter;
 using static System.Math;
 
 namespace CsGrafeq.Shapes;
@@ -16,9 +17,9 @@ public class Circle : FilledShape
         RefreshValues();
     }
 
-    public double Radius => Current.Radius;
-    public double LocY => Current.Center.Y;
-    public double LocX => Current.Center.X;
+    public ExactNumber Radius => Current.Radius;
+    public ExactNumber LocY => Current.Center.Y;
+    public ExactNumber LocX => Current.Center.X;
     public override CircleGetter Getter => CircleGetter;
 
     public override void RefreshValues()
@@ -29,15 +30,15 @@ public class Circle : FilledShape
         InvokeChanged();
     }
 
-    public override Vec DistanceTo(Vec vec)
+    public override Vec NearestFrom(Vec vec)
     {
-        return Current.Center + (vec - Current.Center).Unit() * Current.Radius;
+        return Current.Center.ToVec() + (vec - Current.Center.ToVec()).Unit() * Current.Radius.ToFloat();
     }
 
     public override bool IsIntersectedWithRect(CgRectangle rect)
     {
         var o = rect.Location + rect.Size / 2;
-        var cc = Current.Center - o;
+        var cc = Current.Center.ToVec() - o;
         o = rect.Size / 2;
         cc.X = Abs(cc.X);
         cc.Y = Abs(cc.Y);
@@ -50,6 +51,6 @@ public class Circle : FilledShape
 
 public struct CircleStruct
 {
-    public Vec Center;
-    public double Radius;
+    public VectorExact Center;
+    public ExactNumber Radius;
 }

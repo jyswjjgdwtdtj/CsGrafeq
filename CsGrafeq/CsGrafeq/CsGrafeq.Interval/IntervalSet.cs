@@ -1398,4 +1398,9 @@ public readonly ref struct IntervalSet : IInterval<IntervalSet>
     }
 
     #endregion
+
+    public int CompareTo(IntervalSet other)
+    {
+        throw new NotImplementedException();
+    }
 }

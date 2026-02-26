@@ -1,20 +1,15 @@
-﻿using static System.Math;
+﻿using CsGrafeq.Interfaces;
+using static System.Math;
 
 namespace CsGrafeq;
 
 /// <summary>
 ///     总是代表数学空间的向量或点 区别于Avalonia.Point，其总为像素坐标
 /// </summary>
-public struct Vec : IEquatable<Vec>
+public struct Vec(double x, double y) : IEquatable<Vec>, IPoint<double>
 {
-    public double X;
-    public double Y;
-
-    public Vec(double x, double y)
-    {
-        X = x;
-        Y = y;
-    }
+    public double X { get; set; } = x;
+    public double Y { get; set; } = y;
 
     public static bool operator ==(Vec left, Vec right)
     {

@@ -5,6 +5,7 @@ using CsGrafeq.Interval.Extensions;
 using CsGrafeq.Interval.Interface;
 using CsGrafeq.Numeric;
 using FastExpressionCompiler;
+using NumberHelper = CsGrafeq.Interval.Extensions.NumberHelper;
 
 namespace CsGrafeq.Interval;
 
@@ -177,7 +178,6 @@ public static class IntervalCompiler
             out _,
             Setting.Setting.Instance.EnableExpressionSimplification);
         var regulatedExp = RegulateExpression(exp, xVar, yVar, xParams, yParams);
-        Console.WriteLine(regulatedExp.ToCSharpString());
         var lambda = Expression
             .Lambda<Func<DoubleNumber, DoubleNumber, DoubleNumber, DoubleNumber, DoubleNumber, DoubleNumber,
                 DoubleNumber, DoubleNumber, bool>>(regulatedExp, xParams.Concat(yParams)).Compile();

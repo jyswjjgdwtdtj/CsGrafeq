@@ -1,4 +1,6 @@
 ﻿using System.Text;
+using CsGrafeq.Numeric;
+using CsGrafeq.Numeric.Exact;
 using CsGrafeq.Shapes.ShapeGetter;
 using static CsGrafeq.Shapes.GeometryMath;
 using static CsGrafeq.Numeric.CsGrafeqMath;
@@ -28,17 +30,17 @@ public abstract class Line : GeometricShape
 
     public abstract bool CheckIsValid(Vec vec);
 
-    public override Vec DistanceTo(Vec vec)
+    public override Vec NearestFrom(Vec vec)
     {
-        var res = DistanceToLine(Current.Point1, Current.Point2, vec, out var point);
+        var res = DistanceToLine(Current.Point1.ToVec(), Current.Point2.ToVec(), vec, out var point);
         return CheckIsValid(point) ? point : Vec.Infinity;
     }
 
     public override bool IsIntersectedWithRect(CgRectangle rect)
     {
         return RangeIn(rect.Location.X, rect.Location.X + rect.Size.X,
-            ((Current.Point1 + Current.Point2) / 2).X) && RangeIn(rect.Location.Y,
-            rect.Location.Y + rect.Size.Y, ((Current.Point1 + Current.Point2) / 2).Y);
+            ((Current.Point1.ToVec() + Current.Point2.ToVec()) / 2).X) && RangeIn(rect.Location.Y,
+            rect.Location.Y + rect.Size.Y, ((Current.Point1.ToVec() + Current.Point2.ToVec()) / 2).Y);
     }
 }
 
@@ -58,7 +60,7 @@ public class Segment : Line
 
     public override bool CheckIsValid(Vec vec)
     {
-        return FuzzyOnSegment(Current.Point1, Current.Point2, vec);
+        return FuzzyOnSegment(Current.Point1.ToVec(), Current.Point2.ToVec(), vec);
     }
 }
 
@@ -71,7 +73,7 @@ public class Half : Line
 
     public override bool CheckIsValid(Vec vec)
     {
-        return FuzzyOnHalf(Current.Point1, Current.Point2, vec);
+        return FuzzyOnHalf(Current.Point1.ToVec(), Current.Point2.ToVec(), vec);
     }
 }
 
@@ -84,22 +86,22 @@ public class Straight : Line
 
     public override bool CheckIsValid(Vec vec)
     {
-        return FuzzyOnStraight(Current.Point1, Current.Point2, vec);
+        return FuzzyOnStraight(Current.Point1.ToVec(), Current.Point2.ToVec(), vec);
     }
 }
 
 public readonly struct LineStruct
 {
-    public readonly Vec Point1, Point2;
+    public readonly VectorExact Point1, Point2;
 
-    public LineStruct(Vec point1, Vec point2)
+    public LineStruct(VectorExact point1, VectorExact point2)
     {
         Point1 = point1;
         Point2 = point2;
     }
 
     //ax+by+c=0
-    public (double a, double b, double c) GetNormal()
+    public (ExactNumber a, ExactNumber b, ExactNumber c) GetNormal()
     {
         if (Point1.X == Point2.X)
             return (1, 0, -Point2.X);
@@ -181,13 +183,13 @@ public readonly struct LineStruct
         if (b == 0) return $"x={-c / a}";
         var slope = -a / b;
         var intercept = -c / b;
-        var slopeStr = slope switch
+        var slopeStr = slope.ToFloat() switch
         {
             1 => "",
             -1 => "-",
             _ => slope.ToString()
         };
-        var interceptStr = intercept switch
+        var interceptStr = intercept.ToFloat() switch
         {
             > 0 => "+" + intercept,
             0 => "",
@@ -198,5 +200,5 @@ public readonly struct LineStruct
 
     public string ExpStr => GetSlopeInterceptStr();
 
-    public double Distance => (Point1 - Point2).GetLength();
+    public double Distance => (Point1 - Point2).ToVec().GetLength();
 }

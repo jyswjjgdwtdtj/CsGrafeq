@@ -20,25 +20,32 @@ public partial class SettingView : UserControl
     {
         var tb = s as TextBox;
         var borderelement = e.NameScope.Find<Border>("PART_BorderElement");
-        borderelement.CornerRadius = new CornerRadius(0);
-        borderelement.BorderThickness = new Thickness(0, 0, 0, 2);
-        borderelement.Background = Brushes.Transparent;
-        borderelement.IsVisible = true;
-        tb.LostFocus += (s, e) =>
+        if (tb != null && borderelement != null)
         {
-            borderelement.IsVisible = true;
+            borderelement.CornerRadius = new CornerRadius(0);
+            borderelement.BorderThickness = new Thickness(0, 0, 0, 2);
             borderelement.Background = Brushes.Transparent;
-        };
-        tb.GotFocus += (s, e) =>
-        {
             borderelement.IsVisible = true;
-            borderelement.Background = Brushes.Transparent;
-        };
+            tb.LostFocus += (_,_) =>
+            {
+                borderelement.IsVisible = true;
+                borderelement.Background = Brushes.Transparent;
+            };
+            tb.GotFocus += (_,_) =>
+            {
+                borderelement.IsVisible = true;
+                borderelement.Background = Brushes.Transparent;
+            };
+        }
     }
 
     private void ApplyClientSizeButton_OnClick(object? sender, RoutedEventArgs e)
     {
         MainWindow.Instance?.SetClientSize(new Size(Setting.Instance.ClientSizeWidth+2, Setting.Instance.ClientSizeHeight+32));
     }
-    
+
+    private void RestoreToDefaultClicked(object? sender, RoutedEventArgs e)
+    {
+        Setting.Instance.RestoreToDefault();
+    }
 }

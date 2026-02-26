@@ -84,11 +84,11 @@ public abstract class GeometricShape : RefreshableShape
     }
 
     /// <summary>
-    ///     到一点最近的距离
+    ///     到一点最近的点
     /// </summary>
     /// <param name="vec"></param>
     /// <returns></returns>
-    public abstract Vec DistanceTo(Vec vec);
+    public abstract Vec NearestFrom(Vec vec);
 
     /// <summary>
     ///     Selected被改变

@@ -29,26 +29,9 @@ public class Vector2<T> : ObservableObject, IPoint<T>
         X = x;
         Y = y;
     }
-}
 
-public class Vector2Double : Vector2<double>
-{
-    public Vector2Double(double x, double y) : base(x, y)
+    public bool IsInvalid()
     {
-    }
-
-    public static implicit operator Vec(Vector2Double vec)
-    {
-        return new Vec(vec.X, vec.Y);
-    }
-
-    public static implicit operator Vector2Double(Vec vec)
-    {
-        return new Vector2Double(vec.X, vec.Y);
-    }
-
-    public void SetValue(Vec vec)
-    {
-        SetValue(vec.X, vec.Y);
+        return false;
     }
 }

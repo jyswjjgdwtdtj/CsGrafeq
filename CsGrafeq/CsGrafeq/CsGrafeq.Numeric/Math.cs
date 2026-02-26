@@ -34,24 +34,24 @@ public static class CsGrafeqMath
     /// </summary>
     /// <param name="num1"></param>
     /// <param name="num2"></param>
-    /// <param name="numtest"></param>
+    /// <param name="numTest"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    public static bool RangeIn<T>(T num1, T num2, T numtest) where T : INumber<T>
+    public static bool RangeIn<T>(T num1, T num2, T numTest) where T : IComparable<T>
     {
         SwapIfNotLess(ref num1, ref num2);
-        return num1 <= numtest && numtest <= num2;
+        return num1.CompareTo(numTest) <= 0 && numTest.CompareTo(num2) <= 0;
     }
 
     /// <summary>
-    ///     使num1&lt;=num2
+    ///     使num1小于num2
     /// </summary>
     /// <param name="num1"></param>
     /// <param name="num2"></param>
     /// <typeparam name="T"></typeparam>
-    public static void SwapIfNotLess<T>(ref T num1, ref T num2) where T : INumber<T>
+    public static void SwapIfNotLess<T>(ref T num1, ref T num2) where T : IComparable<T>
     {
-        if (num1 > num2) (num1, num2) = (num2, num1);
+        if (num1.CompareTo(num2)==1) (num1, num2) = (num2, num1);
     }
 
     /// <summary>
