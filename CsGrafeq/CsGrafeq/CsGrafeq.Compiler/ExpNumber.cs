@@ -154,7 +154,11 @@ public class ExpNumber : ObservableObject
 
         if (!IsExpression)
         {
+<<<<<<< Updated upstream
             _shownText = double.IsNaN(value) ? "" : value.CustomToString(8, 1e-8);
+=======
+            _shownText = double.IsNaN(value.ToFloat()) ? "" : value.ToString(8);
+>>>>>>> Stashed changes
             this.RaisePropertyChanged(nameof(ValueStr));
         }
     }
