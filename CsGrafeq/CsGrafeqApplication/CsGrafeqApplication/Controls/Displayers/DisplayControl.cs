@@ -55,7 +55,6 @@ public sealed class DisplayControl : CartesianDisplayer
 
     private void OnPointerPressedLeftButton(MouseEventArgs e, CancellationToken ct = default)
     {
-        Console.WriteLine("Press");
         var p = e.Position;
         _pointerDownPointerPos = p.ToBigPoint();
         _pointerDownZeroPos = ZeroPos;
@@ -92,7 +91,6 @@ public sealed class DisplayControl : CartesianDisplayer
 
     private void OnPointerMovedLeftButton(MouseEventArgs e, CancellationToken ct)
     {
-        Console.WriteLine("move");
         if (ZeroPos != _previousRenderZeroPos)
         {
             lock (TotalBufferLock)
@@ -160,7 +158,6 @@ public sealed class DisplayControl : CartesianDisplayer
 
     private void OnPointerReleasedLeftButton(MouseEventArgs e)
     {
-        Console.WriteLine("Release");
         if (ZeroPos != _previousRenderZeroPos)
         {
             if (Setting.Instance.MoveOptimization)

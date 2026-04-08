@@ -1,4 +1,6 @@
 ﻿using CsGrafeq.I18N;
+using CsGrafeq.Numeric;
+using CsGrafeq.Numeric.Exact;
 using static System.Math;
 
 namespace CsGrafeq.Shapes.ShapeGetter;
@@ -82,17 +84,17 @@ public class LineGetter_PerpendicularBisector : LineGetter_TwoPoint
 
     public override LineStruct GetLine()
     {
-        var RealPoint1 = (Vec)Point1.Location;
-        var RealPoint2 = (Vec)Point2.Location;
-        var MiddlePoint = (RealPoint1 + RealPoint2) / 2;
-        var p1 = MiddlePoint;
-        Vec p2;
-        var k = (RealPoint1.Y - RealPoint2.Y) / (RealPoint1.X - RealPoint2.X);
-        var theta = Atan2(-1 / k, 1);
-        if (RealPoint1.Y - RealPoint2.Y > 0)
-            p2 = new Vec(p1.X + Cos(theta), p1.Y - Cos(theta) / k);
+        var realPoint1 = Point1.Location;
+        var realPoint2 = Point2.Location;
+        var middlePoint = (realPoint1 + realPoint2) / 2;
+        var p1 = middlePoint;
+        VectorExact p2;
+        var k = (realPoint1.Y - realPoint2.Y) / (realPoint1.X - realPoint2.X);
+        var theta = ExactNumber.ArcTan2(-1 / k, 1);
+        if (realPoint1.Y - realPoint2.Y > 0)
+            p2 = new(p1.X + ExactNumber.Cos(theta), p1.Y - ExactNumber.Cos(theta) / k);
         else
-            p2 = new Vec(p1.X - Cos(theta), p1.Y + Cos(theta) / k);
+            p2 = new(p1.X - ExactNumber.Cos(theta), p1.Y + ExactNumber.Cos(theta) / k);
         return new LineStruct(p1, p2);
     }
 }
@@ -127,9 +129,9 @@ public class LineGetter_AngleBisector : LineGetter
 
     public override LineStruct GetLine()
     {
-        var p1 = (Vec)Point1.Location;
-        var p2 = (Vec)Point2.Location;
-        var ap = (Vec)AnglePoint.Location;
+        var p1 = Point1.Location.ToVec();
+        var p2 = Point2.Location.ToVec();
+        var ap = AnglePoint.Location.ToVec();
         Vec v1, v2;
         v1 = ap;
         p1 -= ap;
@@ -141,7 +143,7 @@ public class LineGetter_AngleBisector : LineGetter
             v2 = new Vec(ap.X, ap.Y - 1);
         else
             v2 = new Vec(ap.X - Cos(theta), ap.Y - Sin(theta));
-        return new LineStruct(v1, v2);
+        return new LineStruct(v1.ToExact(), v2.ToExact());
     }
 }
 
@@ -180,17 +182,21 @@ public class LineGetter_Vertical : LineGetter_PointAndLine
 
     public override MultiLanguageData ActionName => MultiLanguageResources.VerticalLineText;
 
+    /// <summary>
+    /// 这里得改
+    /// </summary>
+    /// <returns></returns>
     public override LineStruct GetLine()
     {
         var v1 = Point.Location;
-        Vec v2;
+        VectorExact v2;
         var ps = Line.Current;
         var k = (ps.Point1.Y - ps.Point2.Y) / (ps.Point1.X - ps.Point2.X);
-        var theta = Atan2(-1 / k, 1);
+        var theta = ExactNumber.ArcTan2(-1 / k, 1);
         if (ps.Point1.Y - ps.Point2.Y > 0)
-            v2 = new Vec(v1.X + Cos(theta), v1.Y - Cos(theta) / k);
+            v2 = new(v1.X + ExactNumber.Cos(theta), v1.Y - ExactNumber.Cos(theta) / k);
         else
-            v2 = new Vec(v1.X - Cos(theta), v1.Y + Cos(theta) / k);
+            v2 = new(v1.X - ExactNumber.Cos(theta), v1.Y + ExactNumber.Cos(theta) / k);
         return new LineStruct(v1, v2);
     }
 }
@@ -206,17 +212,17 @@ public class LineGetter_Parallel : LineGetter_PointAndLine
     public override LineStruct GetLine()
     {
         var v1 = Point.Location;
-        Vec v2;
+        VectorExact v2;
         var ps = Line.Current;
         var k = (ps.Point1.Y - ps.Point2.Y) / (ps.Point1.X - ps.Point2.X);
-        double theta;
+        ExactNumber theta;
         if (ps.Point1.X == ps.Point2.X)
             theta = PI / 2;
-        else theta = Atan2(-1 / k, 1);
+        else theta = ExactNumber.ArcTan2(-1 / k, 1);
         if (ps.Point1.Y - ps.Point2.Y > 0)
-            v2 = new Vec(v1.X + Cos(theta), v1.Y + Cos(theta) * k);
+            v2 = new(v1.X + ExactNumber.Cos(theta), v1.Y + ExactNumber.Cos(theta) * k);
         else
-            v2 = new Vec(v1.X - Cos(theta), v1.Y - Cos(theta) * k);
+            v2 = new(v1.X - ExactNumber.Cos(theta), v1.Y - ExactNumber.Cos(theta) * k);
         return new LineStruct(v1, v2);
     }
 }
@@ -234,38 +240,38 @@ public class LineGetter_Fitted : LineGetter
 
     public override LineStruct GetLine()
     {
-        double meanX = 0, meanY = 0;
-        var Vecs = new Vec[Points.Length];
+        ExactNumber meanX = 0, meanY = 0;
+        var vecs = new VectorExact[Points.Length];
         for (var i = 0; i < Points.Length; i++)
         {
-            Vecs[i] = Points[i].Location;
-            meanX += Vecs[i].X;
-            meanY += Vecs[i].Y;
+            vecs[i] = Points[i].Location;
+            meanX += vecs[i].X;
+            meanY += vecs[i].Y;
         }
 
-        meanX /= Vecs.Length;
-        meanY /= Vecs.Length;
-        double a = 0, c = 0;
+        meanX /= vecs.Length;
+        meanY /= vecs.Length;
+        ExactNumber a = 0, c = 0;
         for (var i = 0; i < Points.Length; i++)
         {
-            var x = Vecs[i].X;
-            var y = Vecs[i].Y;
+            var x = vecs[i].X;
+            var y = vecs[i].Y;
             a += (x - meanX) * (y - meanY);
             c += (x - meanX) * (x - meanX);
         }
 
         var m = a / c;
         var b = meanY - m * meanX;
-        Vec Point1, Point2;
+        VectorExact Point1, Point2;
         if (c == 0) //x的常值函数
         {
-            Point1 = new Vec(meanX, 1);
-            Point2 = new Vec(meanX, 2);
+            Point1 = new(meanX, 1);
+            Point2 = new(meanX, 2);
         }
         else
         {
-            Point1 = new Vec(1, m + b);
-            Point2 = new Vec(2, 2 * m + b);
+            Point1 = new(1, m + b);
+            Point2 = new(2, 2 * m + b);
         }
 
         return new LineStruct(Point1, Point2);

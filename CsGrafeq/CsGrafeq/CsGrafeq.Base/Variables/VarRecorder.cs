@@ -214,7 +214,6 @@ public class VarRecorder : ObservableObject
             // ReSharper disable once RedundantCheckBeforeAssignment
             if (CharsReferenceCounter[i] != re[i])
             {
-                Console.WriteLine(re[i]+" "+i);
                 CharsReferenceCounter[i] = re[i];
                 flag = true;
             }

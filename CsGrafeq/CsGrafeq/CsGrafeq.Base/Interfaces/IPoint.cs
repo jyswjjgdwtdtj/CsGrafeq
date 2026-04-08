@@ -2,6 +2,7 @@ namespace CsGrafeq.Interfaces;
 
 public interface IPoint<T>
 {
-    T X { get; set; }
-    T Y { get; set; }
+    T X { get; }
+    T Y { get; }
+    bool IsInvalid();
 }

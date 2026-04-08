@@ -1,10 +1,11 @@
+using System.Numerics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace CsGrafeq.Numeric;
 
-public interface IComputableNumber<T> : IHasOperatorNumber<T>, INeedClone<T>
-    where T : IComputableNumber<T>, INeedClone<T>, allows ref struct
+public interface IComputableNumber<T> : IHasOperatorNumber<T>, INeedClone<T>,IComparable<T>
+    where T : IComputableNumber<T>, INeedClone<T>,IComparable<T>, allows ref struct
 {
     static IComputableNumber()
     {

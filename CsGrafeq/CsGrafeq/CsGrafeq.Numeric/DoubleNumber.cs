@@ -372,4 +372,9 @@ public struct DoubleNumber(double value) : IComputableNumber<DoubleNumber>, IEqu
     }
 
     public static bool NeedClone => false;
+
+    public int CompareTo(DoubleNumber other)
+    {
+        return Value.CompareTo(other.Value);
+    }
 }

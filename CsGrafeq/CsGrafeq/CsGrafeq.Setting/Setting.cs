@@ -62,18 +62,7 @@ namespace CsGrafeq.Setting
         public static void Save()
         {
             var settingFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Setting.json");
-            Console.WriteLine(settingFilePath);
-            string json;
-            try
-            {
-                json = JsonSerializer.Serialize(Instance.MemberwiseClone() as Setting, SourceGenerationContext.Default.Setting);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-            Console.WriteLine(settingFilePath+"\r\n"+json);
+            var json = JsonSerializer.Serialize(Instance.MemberwiseClone() as Setting, SourceGenerationContext.Default.Setting);
             File.WriteAllText(settingFilePath, json);
         }
     }

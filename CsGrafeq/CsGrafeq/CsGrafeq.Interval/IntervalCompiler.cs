@@ -4,7 +4,9 @@ using System.Reflection.Emit;
 using CsGrafeq.Interval.Extensions;
 using CsGrafeq.Interval.Interface;
 using CsGrafeq.Numeric;
+using CsGrafeq.Result;
 using FastExpressionCompiler;
+using NumberHelper = CsGrafeq.Interval.Extensions.NumberHelper;
 
 namespace CsGrafeq.Interval;
 
@@ -156,16 +158,16 @@ public static class IntervalCompiler
             ilGenerator.Emit(OpCodes.Call, mi);
     }
 
-    public static Result<HasReferenceIntervalSetFunc<IntervalSet>> TryCompile(string expression,
+    public static ResultWithException<HasReferenceIntervalSetFunc<IntervalSet>> TryCompile(string expression,
         bool enableSimplification)
     {
         try
         {
-            return Result<HasReferenceIntervalSetFunc<IntervalSet>>.Success(Compile(expression, enableSimplification));
+            return ResultWithException<HasReferenceIntervalSetFunc<IntervalSet>>.Success(Compile(expression, enableSimplification));
         }
         catch (Exception e)
         {
-            return Result<HasReferenceIntervalSetFunc<IntervalSet>>.Failure(e);
+            return ResultWithException<HasReferenceIntervalSetFunc<IntervalSet>>.Failure(e);
         }
     }
 
@@ -177,7 +179,6 @@ public static class IntervalCompiler
             out _,
             Setting.Setting.Instance.EnableExpressionSimplification);
         var regulatedExp = RegulateExpression(exp, xVar, yVar, xParams, yParams);
-        Console.WriteLine(regulatedExp.ToCSharpString());
         var lambda = Expression
             .Lambda<Func<DoubleNumber, DoubleNumber, DoubleNumber, DoubleNumber, DoubleNumber, DoubleNumber,
                 DoubleNumber, DoubleNumber, bool>>(regulatedExp, xParams.Concat(yParams)).Compile();

@@ -14,7 +14,6 @@ public class HasReferenceFunction<T> :IHasReference, IDisposable where T : Deleg
         {
             if (field != value)
             {
-                Console.WriteLine(value);
                 field = value;
                 VarRecorder.Instance.RefreshReferences();
             }   

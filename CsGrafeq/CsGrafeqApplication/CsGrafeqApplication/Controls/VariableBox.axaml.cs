@@ -1,10 +1,12 @@
-﻿using Avalonia;
+﻿using System;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Data;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
+using MathNet.Numerics;
 
 namespace CsGrafeqApplication.Controls;
 
@@ -34,6 +36,11 @@ public partial class VariableBox : UserControl
         AvaloniaXamlLoader.Load(this);
     }
 
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+    }
+
     public bool ShowOnAxis
     {
         get => field;
@@ -55,7 +62,7 @@ public partial class VariableBox : UserControl
     public double Value
     {
         get => field;
-        set => SetAndRaise(ValueProperty, ref field, value);
+        set => SetAndRaise(ValueProperty, ref field, Double.Round(value,(int)Ceiling(-Log10(Max - Min))+4));
     }
 
     public string VariableName

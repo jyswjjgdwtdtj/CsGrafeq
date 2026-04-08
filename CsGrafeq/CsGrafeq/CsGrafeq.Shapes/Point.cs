@@ -1,4 +1,5 @@
 ﻿using CsGrafeq.Collections;
+using CsGrafeq.Numeric.Exact;
 using CsGrafeq.Shapes.ShapeGetter;
 using ReactiveUI;
 using static CsGrafeq.Numeric.CsGrafeqMath;
@@ -23,25 +24,24 @@ public class Point : GeometricShape
         set => this.RaiseAndSetIfChanged(ref field, value);
     }
 
-    public Vector2Double Location { get; } = new(0, 0);
+    public VectorExact Location { get; private set; } = VectorExact.Zero;
 
     public override PointGetter Getter => PointGetter;
 
     public override void RefreshValues()
     {
-        var loc = PointGetter.GetPoint();
-        Location.SetValue(loc.X, loc.Y);
+        Location=PointGetter.GetPoint();
         InvokeChanged();
     }
 
-    public override Vec DistanceTo(Vec vec)
+    public override Vec NearestFrom(Vec vec)
     {
-        return Location;
+        return Location.ToVec();
     }
 
     public override bool IsIntersectedWithRect(CgRectangle rect)
     {
-        var v = Location - rect.Location;
+        var v = Location.ToVec() - rect.Location;
         return RangeIn(0, rect.Size.X, v.X) && RangeIn(0, rect.Size.Y, v.Y);
     }
 }

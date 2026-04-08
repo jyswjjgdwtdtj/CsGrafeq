@@ -1,17 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<LangVersion>preview</LangVersion>
 		<Nullable>enable</Nullable>
 		<EnForceExtendedAnalyzerRules>true</EnForceExtendedAnalyzerRules>
-	</PropertyGroup>
-	<PropertyGroup>
-		<PublishTrimmed>false</PublishTrimmed>
-		<PublishReadyToRun>false</PublishReadyToRun>
-		<PublishSingleFile>false</PublishSingleFile>
-		<IsTrimmable>false</IsTrimmable>
-		<RunILLink>false</RunILLink>
 	</PropertyGroup>
 
 
