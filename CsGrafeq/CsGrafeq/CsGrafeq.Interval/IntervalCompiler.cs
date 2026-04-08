@@ -4,6 +4,7 @@ using System.Reflection.Emit;
 using CsGrafeq.Interval.Extensions;
 using CsGrafeq.Interval.Interface;
 using CsGrafeq.Numeric;
+using CsGrafeq.Result;
 using FastExpressionCompiler;
 using NumberHelper = CsGrafeq.Interval.Extensions.NumberHelper;
 
@@ -157,16 +158,16 @@ public static class IntervalCompiler
             ilGenerator.Emit(OpCodes.Call, mi);
     }
 
-    public static Result<HasReferenceIntervalSetFunc<IntervalSet>> TryCompile(string expression,
+    public static ResultWithException<HasReferenceIntervalSetFunc<IntervalSet>> TryCompile(string expression,
         bool enableSimplification)
     {
         try
         {
-            return Result<HasReferenceIntervalSetFunc<IntervalSet>>.Success(Compile(expression, enableSimplification));
+            return ResultWithException<HasReferenceIntervalSetFunc<IntervalSet>>.Success(Compile(expression, enableSimplification));
         }
         catch (Exception e)
         {
-            return Result<HasReferenceIntervalSetFunc<IntervalSet>>.Failure(e);
+            return ResultWithException<HasReferenceIntervalSetFunc<IntervalSet>>.Failure(e);
         }
     }
 

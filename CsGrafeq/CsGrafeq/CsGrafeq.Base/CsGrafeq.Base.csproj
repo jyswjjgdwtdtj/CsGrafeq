@@ -24,6 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\CsGrafeq.Collections\CsGrafeq.Collections.csproj" />
         <ProjectReference Include="..\CsGrafeq.Setting\CsGrafeq.Setting.csproj" />
         <ProjectReference Include="..\CsGrafeq.MVVM\CsGrafeq.MVVM.csproj" />
         <ProjectReference Include="..\CsGrafeq.Setting\CsGrafeq.Setting.csproj" />

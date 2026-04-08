@@ -1,21 +1,20 @@
 ﻿using CsGrafeq.Utilities;
 using MathNet.Numerics;
 using MathNet.Symbolics;
+using CsGrafeq.Result;
 
 namespace CsGrafeq.Numeric.Exact;
 
-public readonly struct ExactNumber : IComputableNumber<ExactNumber>
+public readonly struct ExactNumber : IComputableNumber<ExactNumber>, IEquatable<ExactNumber>
 {
+    public const double Epsilon = 1e-10;
     public static readonly ExactNumber NaN = CreateFloat(double.NaN);
     public ExactNumberType NumberType { get; init; }
 
     public ExactNumber()
     {
     }
-
     private Rational RationalPart { get; init; }
-    private Surd SurdPart1 { get; init; }
-    private Surd SurdPart2 { get; init; }
     private double FloatPart { get; init; }
 
     public static ExactNumber CreateRational(Rational rational)
@@ -26,70 +25,43 @@ public readonly struct ExactNumber : IComputableNumber<ExactNumber>
             RationalPart = rational
         };
     }
+    
 
-    public static ExactNumber CreateUniSurd(Surd surd)
+    public static ExactNumber CreateFloat(double value,bool tryOptimize=false)
     {
-        return new ExactNumber
+        var d = value;
+        if (tryOptimize)
         {
-            NumberType = ExactNumberType.UniSurd,
-            SurdPart1 = surd
-        };
-    }
-
-    public static ExactNumber CreateRationalAndSurd(Rational rational, Surd surd)
-    {
-        return new ExactNumber
-        {
-            NumberType = ExactNumberType.RationalAndSurd,
-            RationalPart = rational,
-            SurdPart1 = surd
-        };
-    }
-
-    public static ExactNumber CreateFloat(double value)
-    {
+            if (value == (int)value)
+            {
+                // value 是一个整数，可以直接创建一个 Rational 来存储。
+                return CreateRational(new Rational(Math.Sign(value), (uint)Math.Abs((long)value),1));
+            }
+            var sgn= Math.Sign(value);
+            value = Math.Abs(value);
+            uint integerPart = (uint)Math.Floor(value);
+            var decimalPart= value - integerPart;
+            if (DecimalPart.TryFindNear(decimalPart, out var index))
+            {
+                var res = (DecimalPart.Backward[index] + new Rational(1, integerPart, 1));
+                if(res.IsSuccessful)
+                    return CreateRational(res.Success().WithSign(sgn));
+            } 
+        }
         return new ExactNumber
         {
             NumberType = ExactNumberType.Float,
-            FloatPart = value
+            FloatPart = d
         };
     }
-
-    public static ExactNumber CreateContainsPi(Rational rational)
-    {
-        return new ExactNumber
-        {
-            NumberType = ExactNumberType.ContainsPi,
-            RationalPart = rational
-        };
-    }
-
-    public static ExactNumber CreateBiSurd(Surd surd1, Surd surd2)
-    {
-        return new ExactNumber
-        {
-            NumberType = ExactNumberType.BiSurd,
-            SurdPart1 = surd1,
-            SurdPart2 = surd2
-        };
-    }
-
     public double ToFloat()
     {
         switch (NumberType)
         {
-            case ExactNumberType.UniSurd:
-                return SurdPart1.ToFloat();
             case ExactNumberType.Rational:
                 return RationalPart.ToFloat();
             case ExactNumberType.Float:
                 return FloatPart;
-            case ExactNumberType.ContainsPi:
-                return RationalPart.ToFloat() * Math.PI;
-            case ExactNumberType.BiSurd:
-                return SurdPart1.ToFloat() + SurdPart2.ToFloat();
-            case ExactNumberType.RationalAndSurd:
-                return RationalPart.ToFloat() + SurdPart1.ToFloat();
             default: throw new NotImplementedException();
         }
     }
@@ -104,23 +76,49 @@ public readonly struct ExactNumber : IComputableNumber<ExactNumber>
         => CreateFloat(num);
     public static implicit operator ExactNumber(int num)
         => CreateFloat(num);
+
     public static ExactNumber operator +(ExactNumber left, ExactNumber right)
-        => CreateFloat(left.ToFloat() + right.ToFloat());
+    {
+        if (left.NumberType == ExactNumberType.Rational && right.NumberType == ExactNumberType.Rational)
+            return ToExactNumber(left.RationalPart + right.RationalPart);
+        return  CreateFloat(left.ToFloat() + right.ToFloat());
+    }
 
     public static ExactNumber operator -(ExactNumber left, ExactNumber right)
-        => CreateFloat(left.ToFloat() - right.ToFloat());
+    {
+        if (left.NumberType == ExactNumberType.Rational && right.NumberType == ExactNumberType.Rational)
+            return ToExactNumber(left.RationalPart - right.RationalPart);
+        return  CreateFloat(left.ToFloat() - right.ToFloat());
+    }
 
     public static ExactNumber operator *(ExactNumber left, ExactNumber right)
-        => CreateFloat(left.ToFloat() * right.ToFloat());
+    {
+        if (left.NumberType == ExactNumberType.Rational && right.NumberType == ExactNumberType.Rational)
+            return ToExactNumber(left.RationalPart * right.RationalPart);
+        return  CreateFloat(left.ToFloat() * right.ToFloat());
+    }
 
     public static ExactNumber operator /(ExactNumber left, ExactNumber right)
-        => CreateFloat(left.ToFloat() / right.ToFloat());
+    {
+        if (left.NumberType == ExactNumberType.Rational && right.NumberType == ExactNumberType.Rational)
+            return ToExactNumber(left.RationalPart / right.RationalPart);
+        return  CreateFloat(left.ToFloat() / right.ToFloat());
+    }
 
     public static ExactNumber operator %(ExactNumber left, ExactNumber right)
         => CreateFloat(left.ToFloat() % right.ToFloat());
 
     public static ExactNumber operator -(ExactNumber num)
-        => CreateFloat(-num.ToFloat());
+    {
+        switch (num.NumberType)
+        {
+            case ExactNumberType.Float:
+                return -num.FloatPart;
+            case ExactNumberType.Rational:
+                return CreateRational(num.RationalPart.WithSign(-num.RationalPart.Sign));
+            default: throw new NotImplementedException();
+        }
+    }
 
     // IComputableNumber<T>
     public static ExactNumber Sqrt(ExactNumber num)
@@ -273,18 +271,10 @@ public readonly struct ExactNumber : IComputableNumber<ExactNumber>
     {
         switch (NumberType)
         {
-            case ExactNumberType.UniSurd:
-                return SurdPart1.ToString();
             case ExactNumberType.Rational:
                 return RationalPart.ToString();
             case ExactNumberType.Float:
                 return fix==int.MaxValue?FloatPart.ToString():((decimal)FloatPart).Round(fix).ToString();
-            case ExactNumberType.ContainsPi:
-                return RationalPart.ToString()+"*π";
-            case ExactNumberType.BiSurd:
-                return CombineExpr(SurdPart1.ToString(),SurdPart2.ToString());
-            case ExactNumberType.RationalAndSurd:
-                return CombineExpr(RationalPart.ToString(),SurdPart1.ToString());
             default: throw new NotImplementedException();
         }
     }
@@ -294,16 +284,20 @@ public readonly struct ExactNumber : IComputableNumber<ExactNumber>
         return ToString(int.MaxValue);
     }
 
-    private static string CombineExpr(string expr1, string expr2)
-    {
-        return expr1 + (expr2.StartsWith('-')?(expr2):("+"+expr2));
-    }
+    private static string CombineExpr(string expr1, string expr2) => expr1 + (expr2.StartsWith('-')?(expr2):("+"+expr2));
+
     public override bool Equals(object? obj)
     {
         if (obj is not ExactNumber other)
             return false;
         return ToFloat().Equals(other.ToFloat());
     }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine((int)NumberType, RationalPart, FloatPart);
+    }
+
     public bool Equals(ExactNumber other)
     {
         var thisValue = ToFloat();
@@ -348,5 +342,14 @@ public readonly struct ExactNumber : IComputableNumber<ExactNumber>
         if(other==this)
             return 0;
         return 1;
+    }
+
+    public static ExactNumber ToExactNumber(Result<Rational, double> input)
+    {
+        input.Success(out var okValue, out _);
+        if (input.IsSuccessful)            
+            return CreateRational(okValue);
+        input.Error(out var errorValue);
+        return CreateFloat(errorValue);
     }
 }

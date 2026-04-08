@@ -1,12 +1,13 @@
 ﻿using CsGrafeq.Interfaces;
 using CsGrafeq.Numeric.Exact;
+using CsGrafeq.Result;
 using static CsGrafeq.Numeric.CsGrafeqMath;
 
 namespace CsGrafeq.Shapes;
 
 public static class GeometryMath
 {
-    public static Result<(T, T)> TryGetValidVec<T,TValue>(T v1, T v2, T v3, T v4) where T:IPoint<TValue>
+    public static ResultWithException<(T, T)> TryGetValidVec<T,TValue>(T v1, T v2, T v3, T v4) where T:IPoint<TValue>
     {
         var vs = new [] { v1, v2, v3, v4 };
         var vs2 = new T[4];
@@ -20,8 +21,8 @@ public static class GeometryMath
         }
 
         if (i == 2)
-            return Result<(T, T)>.Success((vs2[0], vs2[1]));
-        return Result<(T, T)>.Failure("");
+            return ResultWithException<(T, T)>.Success((vs2[0], vs2[1]));
+        return ResultWithException<(T, T)>.Failure("");
     }
 
     public static VectorExact SolveFunction(ExactNumber a, ExactNumber b, ExactNumber c, ExactNumber d, ExactNumber e, ExactNumber f)

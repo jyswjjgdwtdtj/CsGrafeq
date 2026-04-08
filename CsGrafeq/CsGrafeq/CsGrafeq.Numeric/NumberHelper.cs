@@ -8,14 +8,14 @@ public static class NumberHelper
     {
         public ExactNumber ToExact()
         {
-            return ExactNumber.CreateFloat(self);
+            return ExactNumber.CreateFloat(self,true);
         }
     }
     extension(int self)
     {
         public ExactNumber ToExact()
         {
-            return ExactNumber.CreateFloat(self);
+            return ExactNumber.CreateFloat(self,true);
         }
     }
 

@@ -111,7 +111,7 @@ public class ExpNumber : ObservableObject
         {
             IsExpression = false;
             Func.Dispose();
-            Number = ExactNumber.CreateFloat(result);
+            Number = ExactNumber.CreateFloat(result,true);
             Func = Direct;
             //改这里就会出bug 不敢动了
             SuspendNumberChanged();

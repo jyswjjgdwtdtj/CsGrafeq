@@ -49,6 +49,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsGrafeq.Setting", "CsGrafe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsGrafeq.Setting.Generator", "CsGrafeq\CsGrafeq.Setting.Generator\CsGrafeq.Setting.Generator.csproj", "{C98BF45A-99AE-D42A-0E72-7A203453AE4E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsGrafeq.Collections", "CsGrafeq\CsGrafeq.Collections\CsGrafeq.Collections.csproj", "{41E403E8-DC6F-442C-ADF1-483D2BA33E95}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -143,6 +145,10 @@ Global
 		{C98BF45A-99AE-D42A-0E72-7A203453AE4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C98BF45A-99AE-D42A-0E72-7A203453AE4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C98BF45A-99AE-D42A-0E72-7A203453AE4E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41E403E8-DC6F-442C-ADF1-483D2BA33E95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41E403E8-DC6F-442C-ADF1-483D2BA33E95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41E403E8-DC6F-442C-ADF1-483D2BA33E95}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41E403E8-DC6F-442C-ADF1-483D2BA33E95}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -169,6 +175,7 @@ Global
 		{9AED9F20-E656-4A13-9118-C13855A7A634} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{CB11A22C-6F59-3D45-059B-3F3FB70494E2} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{C98BF45A-99AE-D42A-0E72-7A203453AE4E} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{41E403E8-DC6F-442C-ADF1-483D2BA33E95} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5A59E9EE-CB1C-46E4-84FF-9F8B019627AD}

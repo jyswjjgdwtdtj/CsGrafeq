@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using CsGrafeq.Numeric;
+using CsGrafeq.Result;
 using CsGrafeq.Variables;
 using MathNet.Symbolics;
 using Expression = System.Linq.Expressions.Expression;
@@ -31,13 +32,13 @@ public static class Compiler
         return expResult.Compile();
     }
 
-    public static Result<(Delegate func, VariablesEnum usedVars)> TryCompile<T>(string expression, uint paraCount,
+    public static ResultWithException<(Delegate func, VariablesEnum usedVars)> TryCompile<T>(string expression, uint paraCount,
         bool useSimplification)
         where T : IComputableNumber<T>
     {
         try
         {
-            return Result<(Delegate func, VariablesEnum)>.Success(
+            return ResultWithException<(Delegate func, VariablesEnum)>.Success(
                 (Compile<T>(expression, paraCount, useSimplification, out var usedVars), usedVars), expression);
         }
         catch (Exception e)
@@ -47,7 +48,7 @@ public static class Compiler
                 ex = new Exception("Incomplete expression");
             else
                 ex = e;
-            return Result<(Delegate func, VariablesEnum)>.Failure(ex);
+            return ResultWithException<(Delegate func, VariablesEnum)>.Failure(ex);
         }
     }
 

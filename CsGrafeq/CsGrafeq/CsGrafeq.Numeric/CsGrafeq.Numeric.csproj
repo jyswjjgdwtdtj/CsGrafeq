@@ -8,6 +8,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\CsGrafeq.Base\CsGrafeq.Base.csproj"/>
+        <ProjectReference Include="..\CsGrafeq.Collections\CsGrafeq.Collections.csproj" />
     </ItemGroup>
 
     <ItemGroup>

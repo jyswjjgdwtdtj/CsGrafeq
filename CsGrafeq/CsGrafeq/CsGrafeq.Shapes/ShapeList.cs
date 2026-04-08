@@ -2,6 +2,7 @@
 using System.Text;
 using CsGrafeq.Collections;
 using CsGrafeq.I18N;
+using CsGrafeq.Result;
 
 namespace CsGrafeq.Shapes;
 
@@ -42,7 +43,7 @@ public class ShapeList : ObservableCollection<Shape>
         throw new NotImplementedException("Not yet implemented");
     }
 
-    public Result<Shape> TryAdd(Shape shape)
+    public ResultWithException<Shape> TryAdd(Shape shape)
     {
         if (shape.Owner == null)
         {
@@ -52,10 +53,10 @@ public class ShapeList : ObservableCollection<Shape>
             else
                 AddNotGeometry(shape);
             shape.Owner = this;
-            return Result<Shape>.Success(shape);
+            return ResultWithException<Shape>.Success(shape);
         }
 
-        return Result<Shape>.Failure("Shape already added to another ShapeList");
+        return ResultWithException<Shape>.Failure("Shape already added to another ShapeList");
     }
 
     public void Delete(Shape shape)
