@@ -4,6 +4,7 @@ namespace CsGrafeq.Numeric.Exact;
 
 public static class DecimalPart
 {
+    private const double Eps= 1e-8;
     public static BiDictionary<double, Rational> Decimal { get; } = new()
     {
         { 0.03225806451612903, new Rational(1, 1, 31) },
@@ -320,55 +321,66 @@ public static class DecimalPart
         ListCount= Decimal.Count;
         Forward = Decimal.Forward.Keys.ToList();
         Backward = Decimal.Backward.Keys.ToList();
+        foreach (var rational in Backward)
+        {
+            Console.WriteLine(rational);
+        }
     }
     internal static readonly int ListCount;
     internal static List<double> Forward;
     internal static List<Rational> Backward;
-    
-    public static bool TryFindNear(double x, out int index)
+
+    public static bool TryFindNear(double target, out int index)
+    {
+        var res= TryFindNearestIndex(target, out index);
+        if(Math.Abs(target-Forward[index]) > Eps)
+            return false;
+        return res;
+    }
+    public static bool TryFindNearestIndex(double target, out int index)
     {
         index = -1;
-        int n = ListCount;
-        if (n == 0) return false;
-
-        // 1) lower_bound: 找到第一个 >= x 的位置 lo
-        int lo = 0, hi = n; // [lo, hi)
-        while (lo < hi)
+        int low = 0;
+        int high = ListCount - 1;
+        while (low <= high)
         {
-            int mid = lo + ((hi - lo) >> 1);
-            if (Forward[mid] < x) lo = mid + 1;
-            else hi = mid;
-        }
-        int pos = lo; // pos in [0..n]
-
-        // 2) 只需检查 pos 及其邻居
-        int bestIdx = -1;
-        double bestDiff = double.PositiveInfinity;
-
-        void Consider(int i)
-        {
-            if (i < 0 || i >= n) return;
-            double diff = Math.Abs(Forward[i] - x);
-            if (diff < ExactNumber.Epsilon)
+            int mid = low + (high - low) / 2;
+            if (Forward[mid] < target)
             {
-                if (diff < bestDiff || (diff == bestDiff && i < bestIdx))
-                {
-                    bestDiff = diff;
-                    bestIdx = i;
-                }
+                low = mid + 1;
+            }
+            else if (Forward[mid] > target)
+            {
+                high = mid - 1;
+            }
+            else
+            {
+                index = mid;
+                return true;
             }
         }
-
-        Consider(pos);
-        Consider(pos - 1);
-        Consider(pos + 1); // 可选：为了更稳妥（极端情况下）
-
-        if (bestIdx >= 0)
+        if (high < 0)
         {
-            index = bestIdx;
+            index = 0; 
             return true;
         }
+        if (low >= ListCount)
+        {
+            index = ListCount - 1;
+            return true;
+        }
+        double diffHigh = Math.Abs(Forward[high] - target);
+        double diffLow = Math.Abs(Forward[low] - target);
 
-        return false;
+        if (diffHigh <= diffLow)
+        {
+            index = high;
+        }
+        else
+        {
+            index = low;
+        }
+
+        return true;
     }
 }

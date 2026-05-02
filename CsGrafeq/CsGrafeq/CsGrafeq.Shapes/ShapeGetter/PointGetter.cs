@@ -11,7 +11,7 @@ namespace CsGrafeq.Shapes.ShapeGetter;
 
 public abstract class PointGetter : GeometryGetter
 {
-    public abstract VectorExact GetPoint();
+    public abstract Vec GetPoint();
 
     public static implicit operator PointGetter(Vec f)
     {
@@ -55,7 +55,7 @@ public abstract class PointGetter_Movable : PointGetter
     /// 用于拖动点时设置点的位置
     /// </summary>
     /// <param name="controlPoint"></param>
-    public abstract void SetPoint(VectorExact controlPoint);
+    public abstract void SetPoint(Vec controlPoint);
     /// <summary>
     /// 用于回复点的位置时设置点的位置，参数为字符串以支持表达式
     /// </summary>
@@ -77,7 +77,7 @@ public abstract class PointGetter_Movable : PointGetter
 
 public class PointGetter_FromLocation : PointGetter_Movable
 {
-    public PointGetter_FromLocation((ExactNumber, ExactNumber) initial) : this(initial.Item1, initial.Item2)
+    public PointGetter_FromLocation((double, double) initial) : this(initial.Item1, initial.Item2)
     {
     }
 
@@ -85,7 +85,7 @@ public class PointGetter_FromLocation : PointGetter_Movable
     {
     }
 
-    public PointGetter_FromLocation(ExactNumber x, ExactNumber y)
+    public PointGetter_FromLocation(double x, double y)
     {
         PointX.SetNumber(x);
         PointY.SetNumber(y);
@@ -94,9 +94,9 @@ public class PointGetter_FromLocation : PointGetter_Movable
     public override MultiLanguageData ActionName => MultiLanguageResources.PointText;
     public override GeometricShape? On => null;
 
-    public override VectorExact GetPoint()
+    public override Vec GetPoint()
     {
-        return new VectorExact(PointX.Value, PointY.Value);
+        return new Vec(PointX.Value, PointY.Value);
     }
 
     public override void XChanged()
@@ -107,7 +107,7 @@ public class PointGetter_FromLocation : PointGetter_Movable
     {
     }
 
-    public override void SetPoint(VectorExact controlPoint)
+    public override void SetPoint(Vec controlPoint)
     {
         PointX.SetNumber(controlPoint.X);
         PointY.SetNumber(controlPoint.Y);
@@ -129,7 +129,7 @@ public abstract class PointGetter_OnShape<T> : PointGetter_Movable where T : Geo
     protected bool IsPointXPrior = true;
     protected bool UseExpression;
 
-    public PointGetter_OnShape(T shape, VectorExact InitialPoint)
+    public PointGetter_OnShape(T shape, Vec InitialPoint)
     {
         OnShape = shape;
         SetPoint(InitialPoint);
@@ -139,10 +139,10 @@ public abstract class PointGetter_OnShape<T> : PointGetter_Movable where T : Geo
     public override GeometricShape On => OnShape;
     public override MultiLanguageData ActionName => MultiLanguageResources.PointText;
 
-    public sealed override VectorExact GetPoint()
+    public sealed override Vec GetPoint()
     {
         Refresh();
-        return new VectorExact(PointX.Value, PointY.Value);
+        return new Vec(PointX.Value, PointY.Value);
     }
 
     public void Refresh()
@@ -163,9 +163,9 @@ public abstract class PointGetter_OnShape<T> : PointGetter_Movable where T : Geo
         }
     }
 
-    protected abstract ExactNumber XFromY(ExactNumber y);
-    protected abstract ExactNumber YFromX(ExactNumber x);
-    protected abstract VectorExact GetPointWithoutExpression();
+    protected abstract double XFromY(double y);
+    protected abstract double YFromX(double x);
+    protected abstract Vec GetPointWithoutExpression();
 
     public override void Attach(GeometricShape subShape)
     {
@@ -219,7 +219,7 @@ public abstract class PointGetter_OnShape<T> : PointGetter_Movable where T : Geo
             {
                 //x,y均为数字
                 UseExpression = false;
-                SetPoint(new VectorExact(px, py));
+                SetPoint(new Vec(px, py));
             }
             else
             {
@@ -234,7 +234,7 @@ public abstract class PointGetter_OnShape<T> : PointGetter_Movable where T : Geo
     }
 }
 
-public sealed class PointGetter_OnLine(Line line, VectorExact InitialPoint) : PointGetter_OnShape<Line>(line, InitialPoint)
+public sealed class PointGetter_OnLine(Line line, Vec InitialPoint) : PointGetter_OnShape<Line>(line, InitialPoint)
 {
     private readonly Line Line = line;
     private double ratio;
@@ -243,9 +243,9 @@ public sealed class PointGetter_OnLine(Line line, VectorExact InitialPoint) : Po
     {
         double ratio;
         if (Line.Current.Point1.X != Line.Current.Point2.X)
-            ratio = ((p.X - Line.Current.Point1.X) / (Line.Current.Point2.X - Line.Current.Point1.X)).ToFloat();
+            ratio = ((p.X - Line.Current.Point1.X) / (Line.Current.Point2.X - Line.Current.Point1.X));
         else if (Line.Current.Point1.Y != Line.Current.Point2.Y)
-            ratio = ((p.Y - Line.Current.Point1.Y) / (Line.Current.Point2.Y - Line.Current.Point1.Y)).ToFloat();
+            ratio = ((p.Y - Line.Current.Point1.Y) / (Line.Current.Point2.Y - Line.Current.Point1.Y));
         else
             ratio = 0.5;
         if (Line is Half)
@@ -255,16 +255,16 @@ public sealed class PointGetter_OnLine(Line line, VectorExact InitialPoint) : Po
         return ratio;
     }
 
-    protected override VectorExact GetPointWithoutExpression()
+    protected override Vec GetPointWithoutExpression()
     {
-        return new VectorExact(
+        return new Vec(
             Line.Current.Point1.X + ratio * (Line.Current.Point2.X - Line.Current.Point1.X),
             Line.Current.Point1.Y + ratio * (Line.Current.Point2.Y - Line.Current.Point1.Y));
     }
 
-    protected override ExactNumber YFromX(ExactNumber pointX)
+    protected override double YFromX(double pointX)
     {
-        if (double.IsNaN(pointX.ToFloat()))
+        if (double.IsNaN(pointX))
             return pointX;
         var (a, b, c) = Line.Current.GetNormal();
         if (a == 0) return c / b;
@@ -274,9 +274,9 @@ public sealed class PointGetter_OnLine(Line line, VectorExact InitialPoint) : Po
         return (-c - a * pointX) / b;
     }
 
-    protected override ExactNumber XFromY(ExactNumber pointY)
+    protected override double XFromY(double pointY)
     {
-        if (double.IsNaN(pointY.ToFloat()))
+        if (double.IsNaN(pointY))
             return pointY;
         var (a, b, c) = Line.Current.GetNormal();
         if (b == 0) return c / a;
@@ -286,9 +286,9 @@ public sealed class PointGetter_OnLine(Line line, VectorExact InitialPoint) : Po
         return (-c - b * pointY) / a;
     }
 
-    public override void SetPoint(VectorExact controlPoint)
+    public override void SetPoint(Vec controlPoint)
     {
-        var p = InternalGetPoint(controlPoint.ToVec());
+        var p = InternalGetPoint(controlPoint);
         ratio = GetRatio(p);
         PointX.SetNumber(p.X);
         PointY.SetNumber(p.Y);
@@ -300,8 +300,8 @@ public sealed class PointGetter_OnLine(Line line, VectorExact InitialPoint) : Po
     /// <returns></returns>
     private Vec InternalGetPoint(Vec controlPoint)
     {
-        var v1 = Line.Current.Point1.ToVec();
-        var v2 = Line.Current.Point2.ToVec();
+        var v1 = Line.Current.Point1;
+        var v2 = Line.Current.Point2;
         var dx = v2.X - v1.X;
         var dy = v2.Y - v1.Y;
         var t = ((controlPoint.X - v1.X) * dx + (controlPoint.Y - v1.Y) * dy) / (dx * dx + dy * dy);
@@ -314,7 +314,7 @@ public sealed class PointGetter_OnLine(Line line, VectorExact InitialPoint) : Po
         PointY.SuspendNumberChanged();
         PointY.SetNumber(YFromX(PointX.Value));
         PointY.ResumeNumberChanged();
-        ratio = GetRatio(new Vec(PointX.Value.ToFloat(), PointY.Value.ToFloat()));
+        ratio = GetRatio(new Vec(PointX.Value, PointY.Value));
     }
 
     public override void YChanged()
@@ -323,28 +323,28 @@ public sealed class PointGetter_OnLine(Line line, VectorExact InitialPoint) : Po
         PointX.SuspendNumberChanged();
         PointX.SetNumber(XFromY(PointY.Value));
         PointX.ResumeNumberChanged();
-        ratio = GetRatio(new Vec(PointX.Value.ToFloat(), PointY.Value.ToFloat()));
+        ratio = GetRatio(new Vec(PointX.Value, PointY.Value));
     }
 }
 
-public class PointGetter_OnCircle(Circle circle, VectorExact InitialPoint) : PointGetter_OnShape<Circle>(circle, InitialPoint)
+public class PointGetter_OnCircle(Circle circle, Vec InitialPoint) : PointGetter_OnShape<Circle>(circle, InitialPoint)
 {
     private readonly Circle Circle = circle;
     private double theta;
 
-    protected override VectorExact GetPointWithoutExpression()
+    protected override Vec GetPointWithoutExpression()
     {
-        return new VectorExact(Circle.Current.Center.X + Cos(theta) * Circle.Current.Radius,
+        return new Vec(Circle.Current.Center.X + Cos(theta) * Circle.Current.Radius,
             Circle.Current.Center.Y + Sin(theta) * Circle.Current.Radius);
     }
 
-    public override void SetPoint(VectorExact controlPoint)
+    public override void SetPoint(Vec controlPoint)
     {
         UseExpression = false;
         if ((controlPoint - Circle.Current.Center).GetLength() == 0)
             theta = 0;
         else
-            theta = (controlPoint - Circle.Current.Center).ToVec().Arg2();
+            theta = (controlPoint - Circle.Current.Center).Arg2();
         var vec = GetPointWithoutExpression();
         PointX.SetNumber(vec.X);
         PointY.SetNumber(vec.Y);
@@ -353,37 +353,37 @@ public class PointGetter_OnCircle(Circle circle, VectorExact InitialPoint) : Poi
     private double GetTheta(Vec controlPoint)
     {
         double theta;
-        if ((controlPoint - Circle.Current.Center.ToVec()).GetLength() == 0)
+        if ((controlPoint - Circle.Current.Center).GetLength() == 0)
             theta = 0;
         else
-            theta = (controlPoint - Circle.Current.Center.ToVec()).Arg2();
+            theta = (controlPoint - Circle.Current.Center).Arg2();
         return theta;
     }
 
-    protected override ExactNumber YFromX(ExactNumber x)
+    protected override double YFromX(double x)
     {
         var r = Circle.Current.Radius;
         var cx = Circle.Current.Center.X;
         var cy = Circle.Current.Center.Y;
         var val = r * r - (x - cx) * (x - cx);
         if (val < 0) return double.NaN;
-        val = ExactNumber.Sqrt(val);
+        val = double.Sqrt(val);
         var y1 = cy + val;
         var y2 = cy - val;
-        return ExactNumber.Abs(y1 - PointY.Value) < ExactNumber.Abs(y2 - PointY.Value) ? y1 : y2;
+        return double.Abs(y1 - PointY.Value) < double.Abs(y2 - PointY.Value) ? y1 : y2;
     }
 
-    protected override ExactNumber XFromY(ExactNumber y)
+    protected override double XFromY(double y)
     {
         var r = Circle.Current.Radius;
         var cx = Circle.Current.Center.X;
         var cy = Circle.Current.Center.Y;
         var val = r * r - (y - cy) * (y - cy);
         if (val < 0) return double.NaN;
-        val = ExactNumber.Sqrt(val);
+        val = double.Sqrt(val);
         var x1 = cx + val;
         var x2 = cx - val;
-        return ExactNumber.Abs(x1 - PointX.Value) < ExactNumber.Abs(x2 - PointX.Value) ? x1 : x2;
+        return double.Abs(x1 - PointX.Value) < double.Abs(x2 - PointX.Value) ? x1 : x2;
     }
 
     public override void XChanged()
@@ -392,7 +392,7 @@ public class PointGetter_OnCircle(Circle circle, VectorExact InitialPoint) : Poi
         PointY.SuspendNumberChanged();
         PointY.SetNumber(YFromX(PointX.Value));
         PointY.ResumeNumberChanged();
-        theta = GetTheta(new Vec(PointX.Value.ToFloat(), PointY.Value.ToFloat()));
+        theta = GetTheta(new Vec(PointX.Value, PointY.Value));
     }
 
     public override void YChanged()
@@ -401,7 +401,7 @@ public class PointGetter_OnCircle(Circle circle, VectorExact InitialPoint) : Poi
         PointX.SuspendNumberChanged();
         PointX.SetNumber(XFromY(PointY.Value));
         PointX.ResumeNumberChanged();
-        theta = GetTheta(new Vec(PointX.Value.ToFloat(), PointY.Value.ToFloat()));
+        theta = GetTheta(new Vec(PointX.Value, PointY.Value));
     }
 }
 
@@ -423,7 +423,7 @@ public class PointGetter_NearestPointOnLine : PointGetter
 
     public override MultiLanguageData ActionName => MultiLanguageResources.NearestPointText;
 
-    public override VectorExact GetPoint()
+    public override Vec GetPoint()
     {
         var v1 = Line.Current.Point1;
         var v2 = Line.Current.Point2;
@@ -435,7 +435,7 @@ public class PointGetter_NearestPointOnLine : PointGetter
             t = CsGrafeqMath.RangeTo(0, double.PositiveInfinity, t);
         else if (Line is Segment)
             t = CsGrafeqMath.RangeTo(0, 1, t);
-        return new VectorExact(v1.X + t * dx, v1.Y + t * dy);
+        return new Vec(v1.X + t * dx, v1.Y + t * dy);
     }
 
     public override void Attach(GeometricShape subShape)
@@ -468,7 +468,7 @@ public class PointGetter_AxialSymmetryPoint : PointGetter
 
     public override MultiLanguageData ActionName => MultiLanguageResources.AxialSymmetryText;
 
-    public override VectorExact GetPoint()
+    public override Vec GetPoint()
     {
         var v1 = Line.Current.Point1;
         var v2 = Line.Current.Point2;
@@ -476,7 +476,7 @@ public class PointGetter_AxialSymmetryPoint : PointGetter
         var dx = v2.X - v1.X;
         var dy = v2.Y - v1.Y;
         var t = ((ControlPoint.X - v1.X) * dx + (ControlPoint.Y - v1.Y) * dy) / (dx * dx + dy * dy);
-        return new VectorExact(v1.X + t * dx, v1.Y + t * dy) * 2 - ControlPoint;
+        return new Vec(v1.X + t * dx, v1.Y + t * dy) * 2 - ControlPoint;
     }
 
     public override void Attach(GeometricShape subShape)
@@ -540,7 +540,7 @@ public class PointGetter_EndOfLine : PointGetter
 
     public override MultiLanguageData ActionName { get; }
 
-    public override VectorExact GetPoint()
+    public override Vec GetPoint()
     {
         if (First)
             return line.Current.Point1;
@@ -566,7 +566,7 @@ public class PointGetter_MiddlePoint : PointGetter_FromTwoPoint
 
     public override MultiLanguageData ActionName { get; } = MultiLanguageResources.Instance.MiddlePointText;
 
-    public override VectorExact GetPoint()
+    public override Vec GetPoint()
     {
         return (Point1.Location + Point2.Location) / 2;
     }
@@ -586,7 +586,7 @@ public class PointGetter_MiddlePoint : PointGetter_FromTwoPoint
          base.Attach(handler,subShape);
          AngleGetter.Attach(handler, subShape);
      }
-     public override VectorExact GetPoint()
+     public override Vec GetPoint()
      {
          double theta = (Point2.Location - Point1.Location).Arg2();
          theta += AngleGetter.GetAngle();
@@ -609,7 +609,7 @@ public abstract class PointGetter_FromThreePoint : PointGetter
         ShapeParameters = [point1, point2, point3];
     }
 
-    public abstract override VectorExact GetPoint();
+    public abstract override Vec GetPoint();
 
     public override void Attach(GeometricShape subShape)
     {
@@ -634,9 +634,9 @@ public class PointGetter_Centroid : PointGetter_FromThreePoint
 
     public override MultiLanguageData ActionName { get; } = MultiLanguageResources.Instance.CentroidText;
 
-    public override VectorExact GetPoint()
+    public override Vec GetPoint()
     {
-        return new VectorExact(
+        return new Vec(
             (Point1.Location.X + Point2.Location.X + Point3.Location.X) / 3,
             (Point1.Location.Y + Point2.Location.Y + Point3.Location.Y) / 3
         );
@@ -651,7 +651,7 @@ public class PointGetter_OrthoCenter : PointGetter_FromThreePoint
 
     public override MultiLanguageData ActionName { get; } = MultiLanguageResources.Instance.OrthocenterText;
 
-    public override VectorExact GetPoint()
+    public override Vec GetPoint()
     {
         var a = Point1.Location.X;
         var b = Point1.Location.Y;
@@ -671,12 +671,12 @@ public class PointGetter_InCenter : PointGetter_FromThreePoint
 
     public override MultiLanguageData ActionName { get; } = MultiLanguageResources.Instance.IncenterText;
 
-    public override VectorExact GetPoint()
+    public override Vec GetPoint()
     {
         var a = (Point2.Location - Point3.Location).GetLength();
         var b = (Point1.Location - Point3.Location).GetLength();
         var c = (Point2.Location - Point1.Location).GetLength();
-        return new VectorExact(
+        return new Vec(
             (a * Point1.Location.X + b * Point2.Location.X + c * Point3.Location.X) / (a + b + c),
             (a * Point1.Location.Y + b * Point2.Location.Y + c * Point3.Location.Y) / (a + b + c)
         );
@@ -691,7 +691,7 @@ public class PointGetter_Circumcenter : PointGetter_FromThreePoint
 
     public override MultiLanguageData ActionName { get; } = MultiLanguageResources.Instance.CircumcenterText;
 
-    public override VectorExact GetPoint()
+    public override Vec GetPoint()
     {
         var x1 = Point1.Location.X;
         var y1 = Point1.Location.Y;
@@ -752,18 +752,18 @@ public abstract class PointGetter_Intersection<TShape1, TShape2>
 public class PointGetter_FromLineAndCircle(Line line, Circle circle, bool isFirst)
     : PointGetter_Intersection<Line, Circle>(line, circle, isFirst)
 {
-    public override VectorExact GetPoint()
+    public override Vec GetPoint()
     {
         var vs = IntersectionMath.FromLineAndCircle(line.Current, circle.Current);
         var v = IsFirst ? vs.v1 : vs.v2;
-        return line.CheckIsValid(v.ToVec()) ? v : VectorExact.NaN;
+        return line.CheckIsValid(v) ? v : Vec.Invalid;
     }
 }
 
 public class PointGetter_FromTwoCircle(Circle shape1, Circle shape2, bool isFirst)
     : PointGetter_Intersection<Circle, Circle>(shape1, shape2, isFirst)
 {
-    public sealed override VectorExact GetPoint()
+    public sealed override Vec GetPoint()
     {
         var vs = IntersectionMath.FromTwoCircle(shape1.Current, shape2.Current);
         return IsFirst ? vs.v1 : vs.v2;
@@ -772,12 +772,12 @@ public class PointGetter_FromTwoCircle(Circle shape1, Circle shape2, bool isFirs
 
 public class PointGetter_FromTwoLine(Line line1, Line line2) : PointGetter_Intersection<Line, Line>(line1, line2, false)
 {
-    public override VectorExact GetPoint()
+    public override Vec GetPoint()
     {
         var v = IntersectionMath.FromTwoLine(line1.Current, line2.Current);
-        if (line1.CheckIsValid(v.ToVec()) && line2.CheckIsValid(v.ToVec()))
+        if (line1.CheckIsValid(v) && line2.CheckIsValid(v))
             return v;
-        return VectorExact.NaN;
+        return Vec.Invalid;
     }
 }
 

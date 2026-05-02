@@ -86,6 +86,15 @@ public class Result<TSuccess, TError>
         if (!IsSuccessful)
             errorAction(_exception!);
     }
+
+    public override string ToString()
+    {
+        if(IsSuccessful)
+            return $"Success: {_value} Message: {_successMessage}";
+        else
+            return $"Failure: {_exception}";
+    }
+
     public static implicit operator Result<TSuccess, TError>(TSuccess value) => Success(value);
     public static implicit operator Result<TSuccess, TError>(TError error) => Failure(error);
 }

@@ -31,7 +31,7 @@ public class PolygonGetter : GeometryGetter
     public virtual Vec[] GetPolygon()
     {
         var vs = new Vec[Points.Length];
-        for (var i = 0; i < Points.Length; i++) vs[i] = Points[i].Location.ToVec();
+        for (var i = 0; i < Points.Length; i++) vs[i] = Points[i].Location;
         return vs;
     }
 }

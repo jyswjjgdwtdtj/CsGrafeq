@@ -32,7 +32,7 @@ public class Angle : GeometricShape
 
     public override bool IsIntersectedWithRect(CgRectangle rect)
     {
-        var v = AngleData.AnglePoint.ToVec() - rect.Location;
+        var v = AngleData.AnglePoint - rect.Location;
         return RangeIn(0, rect.Size.X, v.X) && RangeIn(0, rect.Size.Y, v.Y);
     }
 }

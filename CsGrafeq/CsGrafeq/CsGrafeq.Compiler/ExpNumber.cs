@@ -25,25 +25,25 @@ public class ExpNumber : ObservableObject
             field = value;
         }
     } = true;
-    private HasReferenceFunction<Func<ExactNumber>> Direct { get;}
-    private HasReferenceFunction<Func<ExactNumber>> None { get; } = new(NoneFunc, VariablesEnum.None);
+    private HasReferenceFunction<Func<DoubleNumber>> Direct { get;}
+    private HasReferenceFunction<Func<DoubleNumber>> None { get; } = new(NoneFunc, VariablesEnum.None);
     public readonly object? Owner;
-    private HasReferenceFunction<Func<ExactNumber>> Func { get; set; }
-    private ExactNumber Number { get; set; }
+    private HasReferenceFunction<Func<DoubleNumber>> Func { get; set; }
+    private double Number { get; set; }
     private int NumberChangedSuspended { get; set; }
     private string _shownText = "0";
 
     public ExpNumber(double initialNumber = 0, object? owner = null)
     {
         Owner = owner;
-        Direct = new HasReferenceFunction<Func<ExactNumber>>(DirectFunc, VariablesEnum.None);
+        Direct = new HasReferenceFunction<Func<DoubleNumber>>(DirectFunc, VariablesEnum.None);
         Func = Direct;
         VarRecorder.Instance.CharValueChanged += CharValueChanged;
         PropertyChanged += (s, e) => { };
     }
 
     public bool IsExpression { get; private set; }
-    public ExactNumber Value { get; private set; }
+    public double Value { get; private set; }
 
     /// <summary>
     ///     只能由用户触发
@@ -95,7 +95,7 @@ public class ExpNumber : ObservableObject
         VarRecorder.Instance.CharValueChanged -= CharValueChanged;
     }
 
-    public void SetNumber(ExactNumber number)
+    public void SetNumber(double number)
     {
         IsExpression = false;
         Func.Dispose();
@@ -111,11 +111,11 @@ public class ExpNumber : ObservableObject
         {
             IsExpression = false;
             Func.Dispose();
-            Number = ExactNumber.CreateFloat(result,true);
+            Number = result;
             Func = Direct;
             //改这里就会出bug 不敢动了
             SuspendNumberChanged();
-            SetValue(Func.Function());
+            SetValue(Func.Function().Value);
             ResumeNumberChanged();
             UserSetValueStr?.Invoke();
             CallNumberChanged();
@@ -125,26 +125,26 @@ public class ExpNumber : ObservableObject
 
         Func.Dispose();
         IsExpression = true;
-        Compiler.TryCompile<ExactNumber>(expression, 0, Setting.Setting.Instance.EnableExpressionSimplification)
+        Compiler.TryCompile<DoubleNumber>(expression, 0, Setting.Setting.Instance.EnableExpressionSimplification)
             .Match(funcTuple =>
             {
-                Func = new HasReferenceFunction<Func<ExactNumber>>((Func<ExactNumber>)funcTuple.func,
+                Func = new HasReferenceFunction<Func<DoubleNumber>>((Func<DoubleNumber>)funcTuple.func,
                     funcTuple.usedVars);
                 Func.IsActive=IsActive;
                 IsError = false;
-                SetValue(Func.Function());
+                SetValue(Func.Function().Value);
                 UserSetValueStr?.Invoke();
             }, ex =>
             {
                 Func = None;
-                SetValue(ExactNumber.NaN);
+                SetValue(Double.NaN);
                 IsError = true;
                 Error = ex;
                 UserSetValueStr?.Invoke();
             });
     }
 
-    private void SetValue(ExactNumber value)
+    private void SetValue(double value)
     {
         if (!value.Equals(Value) || IsExpression)
         {
@@ -155,23 +155,25 @@ public class ExpNumber : ObservableObject
 
         if (!IsExpression)
         {
-            _shownText = double.IsNaN(value.ToFloat()) ? "" : value.ToFloat().CustomToString(8, 1e-8);
+            // Todo
+            //有bug
+            _shownText = double.IsNaN(value) ? "" : value.ExactToString();
             this.RaisePropertyChanged(nameof(ValueStr));
         }
     }
 
     private void CharValueChanged(VariablesEnum c)
     {
-        if (Func.References.HasFlag(c)) SetValue(Func.Function());
+        if (Func.References.HasFlag(c)) SetValue(Func.Function().Value);
     }
 
-    private ExactNumber DirectFunc()
+    private DoubleNumber DirectFunc()
     {
-        return Number;
+        return DoubleNumber.CreateFromDouble(Number);
     }
 
-    private static ExactNumber NoneFunc()
+    private static DoubleNumber NoneFunc()
     {
-        return ExactNumber.NaN;
+        return DoubleNumber.NaN;
     }
 }

@@ -182,11 +182,10 @@ public static class CsGrafeqMath
     /// </summary>
     /// <param name="d"></param>
     /// <param name="dots"></param>
-    /// <param name="precision"></param>
     /// <returns></returns>
-    public static string CustomToString(this double d, int dots, double precision)
+    public static string CustomToString(this double d, int dots)
     {
         var tar = double.Round(d, dots);
-        return double.Abs(tar - d) < precision ? tar.ToString() : d.ToString();
+        return tar.ToString();
     }
 }

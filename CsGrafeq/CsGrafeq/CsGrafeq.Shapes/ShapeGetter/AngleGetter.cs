@@ -11,11 +11,11 @@ public abstract class AngleGetter : GeometryGetter
     public readonly struct AngleData
     {
         public readonly double Angle;
-        public readonly VectorExact AnglePoint;
-        public readonly VectorExact Point1;
-        public readonly VectorExact Point2;
+        public readonly Vec AnglePoint;
+        public readonly Vec Point1;
+        public readonly Vec Point2;
 
-        public AngleData(double angle, VectorExact ap, VectorExact p1, VectorExact p2)
+        public AngleData(double angle, Vec ap, Vec p1, Vec p2)
         {
             Angle = angle;
             AnglePoint = ap;
@@ -60,8 +60,8 @@ public class AngleGetter_FromThreePoint : AngleGetter
 
     public override AngleData GetAngle()
     {
-        var aa = ((Point2.Location - AnglePoint.Location).ToVec().Arg2() -
-                  (Point1.Location - AnglePoint.Location).ToVec().Arg2()) /
+        var aa = ((Point2.Location - AnglePoint.Location).Arg2() -
+                  (Point1.Location - AnglePoint.Location).Arg2()) /
             PI * 180;
         aa = aa % 360;
         if (aa > 180)

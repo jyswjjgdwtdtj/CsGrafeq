@@ -12,6 +12,9 @@
         <UseAppHost>true</UseAppHost>
         <PublishSingleFile>false</PublishSingleFile>
     </PropertyGroup>
+    <PropertyGroup Label="Avalonia">
+      <AvaloniaUseCompiledBindingsByDefault>True</AvaloniaUseCompiledBindingsByDefault>
+    </PropertyGroup>
 
     <ItemGroup>
         <AndroidResource Include="Icon.png">
@@ -20,14 +23,14 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia"/>
-        <PackageReference Include="Avalonia.Android"/>
-        <PackageReference Include="Avalonia.Diagnostics"/>
-        <PackageReference Include="SkiaSharp.NativeAssets.Android"/>
-        <PackageReference Include="Xamarin.AndroidX.Core.SplashScreen"/>
+        <PackageReference Include="Avalonia" />
+        <PackageReference Include="Avalonia.Android" />
+        <PackageReference Include="Avalonia.Diagnostics" />
+        <PackageReference Include="SkiaSharp.NativeAssets.Android" />
+        <PackageReference Include="Xamarin.AndroidX.Core.SplashScreen" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\CsGrafeqApplication\CsGrafeqApplication.csproj"/>
+        <ProjectReference Include="..\CsGrafeqApplication\CsGrafeqApplication.csproj" />
     </ItemGroup>
 </Project>

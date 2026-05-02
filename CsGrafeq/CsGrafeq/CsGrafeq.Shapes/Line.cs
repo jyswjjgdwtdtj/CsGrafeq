@@ -32,15 +32,15 @@ public abstract class Line : GeometricShape
 
     public override Vec NearestFrom(Vec vec)
     {
-        var res = DistanceToLine(Current.Point1.ToVec(), Current.Point2.ToVec(), vec, out var point);
+        var res = DistanceToLine(Current.Point1, Current.Point2, vec, out var point);
         return CheckIsValid(point) ? point : Vec.Infinity;
     }
 
     public override bool IsIntersectedWithRect(CgRectangle rect)
     {
         return RangeIn(rect.Location.X, rect.Location.X + rect.Size.X,
-            ((Current.Point1.ToVec() + Current.Point2.ToVec()) / 2).X) && RangeIn(rect.Location.Y,
-            rect.Location.Y + rect.Size.Y, ((Current.Point1.ToVec() + Current.Point2.ToVec()) / 2).Y);
+            ((Current.Point1 + Current.Point2) / 2).X) && RangeIn(rect.Location.Y,
+            rect.Location.Y + rect.Size.Y, ((Current.Point1 + Current.Point2) / 2).Y);
     }
 }
 
@@ -60,7 +60,7 @@ public class Segment : Line
 
     public override bool CheckIsValid(Vec vec)
     {
-        return FuzzyOnSegment(Current.Point1.ToVec(), Current.Point2.ToVec(), vec);
+        return FuzzyOnSegment(Current.Point1, Current.Point2, vec);
     }
 }
 
@@ -73,7 +73,7 @@ public class Half : Line
 
     public override bool CheckIsValid(Vec vec)
     {
-        return FuzzyOnHalf(Current.Point1.ToVec(), Current.Point2.ToVec(), vec);
+        return FuzzyOnHalf(Current.Point1, Current.Point2, vec);
     }
 }
 
@@ -86,22 +86,22 @@ public class Straight : Line
 
     public override bool CheckIsValid(Vec vec)
     {
-        return FuzzyOnStraight(Current.Point1.ToVec(), Current.Point2.ToVec(), vec);
+        return FuzzyOnStraight(Current.Point1, Current.Point2, vec);
     }
 }
 
 public readonly struct LineStruct
 {
-    public readonly VectorExact Point1, Point2;
+    public readonly Vec Point1, Point2;
 
-    public LineStruct(VectorExact point1, VectorExact point2)
+    public LineStruct(Vec point1, Vec point2)
     {
         Point1 = point1;
         Point2 = point2;
     }
 
     //ax+by+c=0
-    public (ExactNumber a, ExactNumber b, ExactNumber c) GetNormal()
+    public (double a, double b, double c) GetNormal()
     {
         if (Point1.X == Point2.X)
             return (1, 0, -Point2.X);
@@ -113,6 +113,7 @@ public readonly struct LineStruct
     public string GetNormalStr()
     {
         var (a, b, c) = GetNormal();
+        var (astr, bstr, cstr) = (a.ExactToString(), b.ExactToString(), c.ExactToString());
         var sb = new StringBuilder();
         if (a == 0)
         {
@@ -128,7 +129,7 @@ public readonly struct LineStruct
         }
         else
         {
-            sb.Append(a + "x");
+            sb.Append(astr + "x");
         }
 
         if (b == 0)
@@ -145,11 +146,11 @@ public readonly struct LineStruct
         }
         else if (b > 0)
         {
-            sb.Append("+" + b + "y");
+            sb.Append("+" + bstr + "y");
         }
         else
         {
-            sb.Append(b + "y");
+            sb.Append(bstr + "y");
         }
 
         if (c == 0)
@@ -166,11 +167,11 @@ public readonly struct LineStruct
         }
         else if (c > 0)
         {
-            sb.Append("+" + c);
+            sb.Append("+" + cstr);
         }
         else
         {
-            sb.Append(c);
+            sb.Append(cstr);
         }
 
         sb.Append("=0");
@@ -180,25 +181,26 @@ public readonly struct LineStruct
     public string GetSlopeInterceptStr()
     {
         var (a, b, c) = GetNormal();
-        if (b == 0) return $"x={-c / a}";
+        var (astr, bstr, cstr) = (a.ExactToString(), b.ExactToString(), c.ExactToString());
+        if (b == 0) return $"x={(-c / a).ExactToString()}";
         var slope = -a / b;
         var intercept = -c / b;
-        var slopeStr = slope.ToFloat() switch
+        var slopeStr = slope switch
         {
             1 => "",
             -1 => "-",
-            _ => slope.ToString()
+            _ => slope.ExactToString()
         };
-        var interceptStr = intercept.ToFloat() switch
+        var interceptStr = intercept switch
         {
             > 0 => "+" + intercept,
             0 => "",
-            _ => intercept.ToString()
+            _ => intercept.ExactToString()
         };
         return $"y={slopeStr}x{interceptStr}";
     }
 
     public string ExpStr => GetSlopeInterceptStr();
 
-    public double Distance => (Point1 - Point2).ToVec().GetLength();
+    public double Distance => (Point1 - Point2).GetLength();
 }

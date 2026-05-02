@@ -88,13 +88,13 @@ public class LineGetter_PerpendicularBisector : LineGetter_TwoPoint
         var realPoint2 = Point2.Location;
         var middlePoint = (realPoint1 + realPoint2) / 2;
         var p1 = middlePoint;
-        VectorExact p2;
+        Vec p2;
         var k = (realPoint1.Y - realPoint2.Y) / (realPoint1.X - realPoint2.X);
-        var theta = ExactNumber.ArcTan2(-1 / k, 1);
+        var theta = double.Atan2(-1 / k, 1);
         if (realPoint1.Y - realPoint2.Y > 0)
-            p2 = new(p1.X + ExactNumber.Cos(theta), p1.Y - ExactNumber.Cos(theta) / k);
+            p2 = new(p1.X + double.Cos(theta), p1.Y - double.Cos(theta) / k);
         else
-            p2 = new(p1.X - ExactNumber.Cos(theta), p1.Y + ExactNumber.Cos(theta) / k);
+            p2 = new(p1.X - double.Cos(theta), p1.Y + double.Cos(theta) / k);
         return new LineStruct(p1, p2);
     }
 }
@@ -129,9 +129,9 @@ public class LineGetter_AngleBisector : LineGetter
 
     public override LineStruct GetLine()
     {
-        var p1 = Point1.Location.ToVec();
-        var p2 = Point2.Location.ToVec();
-        var ap = AnglePoint.Location.ToVec();
+        var p1 = Point1.Location;
+        var p2 = Point2.Location;
+        var ap = AnglePoint.Location;
         Vec v1, v2;
         v1 = ap;
         p1 -= ap;
@@ -143,7 +143,7 @@ public class LineGetter_AngleBisector : LineGetter
             v2 = new Vec(ap.X, ap.Y - 1);
         else
             v2 = new Vec(ap.X - Cos(theta), ap.Y - Sin(theta));
-        return new LineStruct(v1.ToExact(), v2.ToExact());
+        return new LineStruct(v1, v2);
     }
 }
 
@@ -189,14 +189,14 @@ public class LineGetter_Vertical : LineGetter_PointAndLine
     public override LineStruct GetLine()
     {
         var v1 = Point.Location;
-        VectorExact v2;
+        Vec v2;
         var ps = Line.Current;
         var k = (ps.Point1.Y - ps.Point2.Y) / (ps.Point1.X - ps.Point2.X);
-        var theta = ExactNumber.ArcTan2(-1 / k, 1);
+        var theta = double.Atan2(-1 / k, 1);
         if (ps.Point1.Y - ps.Point2.Y > 0)
-            v2 = new(v1.X + ExactNumber.Cos(theta), v1.Y - ExactNumber.Cos(theta) / k);
+            v2 = new(v1.X + double.Cos(theta), v1.Y - double.Cos(theta) / k);
         else
-            v2 = new(v1.X - ExactNumber.Cos(theta), v1.Y + ExactNumber.Cos(theta) / k);
+            v2 = new(v1.X - double.Cos(theta), v1.Y + double.Cos(theta) / k);
         return new LineStruct(v1, v2);
     }
 }
@@ -212,17 +212,17 @@ public class LineGetter_Parallel : LineGetter_PointAndLine
     public override LineStruct GetLine()
     {
         var v1 = Point.Location;
-        VectorExact v2;
+        Vec v2;
         var ps = Line.Current;
         var k = (ps.Point1.Y - ps.Point2.Y) / (ps.Point1.X - ps.Point2.X);
-        ExactNumber theta;
+        double theta;
         if (ps.Point1.X == ps.Point2.X)
             theta = PI / 2;
-        else theta = ExactNumber.ArcTan2(-1 / k, 1);
+        else theta = double.Atan2(-1 / k, 1);
         if (ps.Point1.Y - ps.Point2.Y > 0)
-            v2 = new(v1.X + ExactNumber.Cos(theta), v1.Y + ExactNumber.Cos(theta) * k);
+            v2 = new(v1.X + double.Cos(theta), v1.Y + double.Cos(theta) * k);
         else
-            v2 = new(v1.X - ExactNumber.Cos(theta), v1.Y - ExactNumber.Cos(theta) * k);
+            v2 = new(v1.X - double.Cos(theta), v1.Y - double.Cos(theta) * k);
         return new LineStruct(v1, v2);
     }
 }
@@ -240,8 +240,8 @@ public class LineGetter_Fitted : LineGetter
 
     public override LineStruct GetLine()
     {
-        ExactNumber meanX = 0, meanY = 0;
-        var vecs = new VectorExact[Points.Length];
+        double meanX = 0, meanY = 0;
+        var vecs = new Vec[Points.Length];
         for (var i = 0; i < Points.Length; i++)
         {
             vecs[i] = Points[i].Location;
@@ -251,7 +251,7 @@ public class LineGetter_Fitted : LineGetter
 
         meanX /= vecs.Length;
         meanY /= vecs.Length;
-        ExactNumber a = 0, c = 0;
+        double a = 0, c = 0;
         for (var i = 0; i < Points.Length; i++)
         {
             var x = vecs[i].X;
@@ -262,7 +262,7 @@ public class LineGetter_Fitted : LineGetter
 
         var m = a / c;
         var b = meanY - m * meanX;
-        VectorExact Point1, Point2;
+        Vec Point1, Point2;
         if (c == 0) //x的常值函数
         {
             Point1 = new(meanX, 1);

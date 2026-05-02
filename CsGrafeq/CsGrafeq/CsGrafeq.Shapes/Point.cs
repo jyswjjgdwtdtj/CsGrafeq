@@ -24,7 +24,7 @@ public class Point : GeometricShape
         set => this.RaiseAndSetIfChanged(ref field, value);
     }
 
-    public VectorExact Location { get; private set; } = VectorExact.Zero;
+    public Vec Location { get; private set; } = Vec.Empty;
 
     public override PointGetter Getter => PointGetter;
 
@@ -36,12 +36,12 @@ public class Point : GeometricShape
 
     public override Vec NearestFrom(Vec vec)
     {
-        return Location.ToVec();
+        return Location;
     }
 
     public override bool IsIntersectedWithRect(CgRectangle rect)
     {
-        var v = Location.ToVec() - rect.Location;
+        var v = Location - rect.Location;
         return RangeIn(0, rect.Size.X, v.X) && RangeIn(0, rect.Size.Y, v.Y);
     }
 }

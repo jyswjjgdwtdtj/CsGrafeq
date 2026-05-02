@@ -7,6 +7,8 @@
         <PublishTrimmed>true</PublishTrimmed>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
         <LangVersion>Preview</LangVersion>
+        <Company>CsGrafeq-JYSW</Company>
+        <Product>CsGrafeq</Product>
     </PropertyGroup>
 
     <PropertyGroup>

@@ -61,11 +61,14 @@ public class GeometricPad : Addon
         };
 #if DEBUG
         var p1 = AddShape(new GeoPoint(new PointGetter_FromLocation(new Vec(0.5, 0.5))));
+       
         var p2 = AddShape(new GeoPoint(new PointGetter_FromLocation(new Vec(1.5, 1.5))));
         var s1 = AddShape(new Straight(new LineGetter_Connected(p1!, p2!)));
         var p3 = AddShape(new GeoPoint(new PointGetter_OnLine(s1!, new(0, 0))));
         var p4 = AddShape(new GeoPoint(new PointGetter_MiddlePoint(p1!, p2!)));
         var c1 = AddShape(new Circle(new CircleGetter_FromCenterAndRadius(p1!)));
+        
+        
 #endif
     }
 
@@ -270,21 +273,21 @@ public class GeometricPad : Addon
             }*/
             if (MovingPoint.PointGetter is PointGetter_Movable pg && MovingPoint.IsUserEnabled)
             {
-                pg.SetPoint(Owner.PixelToMath(PointerMovedPosition).ToExact());
+                pg.SetPoint(Owner.PixelToMath(PointerMovedPosition));
                 if (MovingPoint.PointGetter is PointGetter_FromLocation)
                 {
                     pg.SetPoint(
-                        Owner.PixelToMath(FindNearestPointOnTwoAxisLine(PointerMovedPosition)).ToExact());
+                        Owner.PixelToMath(FindNearestPointOnTwoAxisLine(PointerMovedPosition)));
                 }
                 else if (MovingPoint.PointGetter is PointGetter_OnLine)
                 {
-                    var newp = FindNearestPointOnTwoAxisLine(MathToPixel(pg.GetPoint().ToVec()));
+                    var newp = FindNearestPointOnTwoAxisLine(MathToPixel(pg.GetPoint()));
                     if (newp.X != PointerMovedPosition.X)
                         pg.PointX.SetNumber(PixelToMathX(newp.X));
                     else if (newp.Y != PointerMovedPosition.Y)
                         pg.PointY.SetNumber(PixelToMathY(newp.Y));
                     else
-                        pg.SetPoint(Owner.PixelToMath(newp).ToExact());
+                        pg.SetPoint(Owner.PixelToMath(newp));
                 }
 
                 MovingPoint.RefreshValues();
@@ -461,10 +464,10 @@ public class GeometricPad : Addon
     private void RenderShapes(SKCanvas dc, SKRect rect, IEnumerable<GeometricShape> shapes)
     {
         var unitLength = (Owner as CartesianDisplayer)!.UnitLength;
-        var lt = new Vec(PixelToMathX(rect.Left), PixelToMathY(rect.Bottom)).ToExact();
-        var rt = new Vec(PixelToMathX(rect.Right), PixelToMathY(rect.Bottom)).ToExact();
-        var rb = new Vec(PixelToMathX(rect.Right), PixelToMathY(rect.Top)).ToExact();
-        var lb = new Vec(PixelToMathX(rect.Left), PixelToMathY(rect.Top)).ToExact();
+        var lt = new Vec(PixelToMathX(rect.Left), PixelToMathY(rect.Bottom));
+        var rt = new Vec(PixelToMathX(rect.Right), PixelToMathY(rect.Bottom));
+        var rb = new Vec(PixelToMathX(rect.Right), PixelToMathY(rect.Top));
+        var lb = new Vec(PixelToMathX(rect.Left), PixelToMathY(rect.Top));
         var cd = (CartesianDisplayer)Owner;
         using SKPaint tpFilledPaint = new(),
             filledPaint = new(),
@@ -513,7 +516,7 @@ public class GeometricPad : Addon
                 {
                     var v1 = s.Current.Point1;
                     var v2 = s.Current.Point2;
-                    var rs = TryGetValidVec<VectorExact,ExactNumber>(
+                    var rs = TryGetValidVec<Vec,double>(
                         GetIntersectionOfSegmentAndLine(lt, rt, v1, v2),
                         GetIntersectionOfSegmentAndLine(rt, rb, v1, v2),
                         GetIntersectionOfSegmentAndLine(rb, lb, v1, v2),
@@ -522,8 +525,8 @@ public class GeometricPad : Addon
                     if (rs.IsError)
                         continue;
                     rs.Success(out var vs,out _);
-                    var p1 = MathToPixelSk(vs.Item1.ToVec());
-                    var p2 = MathToPixelSk(vs.Item2.ToVec());
+                    var p1 = MathToPixelSk(vs.Item1);
+                    var p2 = MathToPixelSk(vs.Item2);
                     if (s.Selected)
                         dc.DrawLine(p1,p2, strokePaint);
                     else
@@ -531,20 +534,20 @@ public class GeometricPad : Addon
 
                     dc.DrawBubble(
                         $"{MultiLanguageResources.Instance.StraightText}:{s.Name}",
-                        MathToPixelSk((s.Current.Point1 + s.Current.Point2).ToVec() / 2), bubbleBack, paintMain);
+                        MathToPixelSk((s.Current.Point1 + s.Current.Point2) / 2), bubbleBack, paintMain);
                 }
                     break;
                 case GeoSegment s:
                 {
-                    var v1 = s.Current.Point1.ToVec();
-                    var v2 = s.Current.Point2.ToVec();
+                    var v1 = s.Current.Point1;
+                    var v2 = s.Current.Point2;
                     if (s.Selected)
                         dc.DrawLine(MathToPixelSk(v1), MathToPixelSk(v2), strokePaint);
                     else
                         dc.DrawLine(MathToPixelSk(v1), MathToPixelSk(v2), strokePaintMain);
 
                     dc.DrawBubble($"{MultiLanguageResources.Instance.SegmentText}:{s.Name}",
-                        MathToPixelSk((s.Current.Point1 + s.Current.Point2).ToVec() / 2),
+                        MathToPixelSk((s.Current.Point1 + s.Current.Point2) / 2),
                         bubbleBack, paintMain);
                 }
                     break;
@@ -552,7 +555,7 @@ public class GeometricPad : Addon
                 {
                     var v1 = h.Current.Point1;
                     var v2 = h.Current.Point2;
-                    var rs = TryGetValidVec<VectorExact,ExactNumber>(
+                    var rs = TryGetValidVec<Vec,double>(
                         GetIntersectionOfSegmentAndLine(lt, rt, v1, v2),
                         GetIntersectionOfSegmentAndLine(rt, rb, v1, v2),
                         GetIntersectionOfSegmentAndLine(rb, lb, v1, v2),
@@ -561,29 +564,29 @@ public class GeometricPad : Addon
                     if(rs.IsError)
                         continue;
                     rs.Success(out var vs,out _);
-                    VectorExact p;
+                    Vec p;
                     if (v1.X == v2.X)
                     {
-                        if ((vs.Item1.Y - v1.Y) / ExactNumber.Sgn(v2.Y - v1.Y) > (vs.Item2.Y - v1.Y) / ExactNumber.Sgn(v2.Y - v1.Y))
+                        if ((vs.Item1.Y - v1.Y) / Sign(v2.Y - v1.Y) > (vs.Item2.Y - v1.Y) / Sign(v2.Y - v1.Y))
                             p = vs.Item1;
                         else
                             p = vs.Item2;
                     }
                     else
                     {
-                        if ((vs.Item1.X - v1.X) / ExactNumber.Sgn(v2.X - v1.X) > (vs.Item2.X - v1.X) / ExactNumber.Sgn(v2.X - v1.X))
+                        if ((vs.Item1.X - v1.X) / Sign(v2.X - v1.X) > (vs.Item2.X - v1.X) / Sign(v2.X - v1.X))
                             p = vs.Item1;
                         else
                             p = vs.Item2;
                     }
 
                     if (h.Selected)
-                        dc.DrawLine(MathToPixelSk(v1.ToVec()), MathToPixelSk(p.ToVec()), strokePaint);
+                        dc.DrawLine(MathToPixelSk(v1), MathToPixelSk(p), strokePaint);
                     else
-                        dc.DrawLine(MathToPixelSk(v1.ToVec()), MathToPixelSk(p.ToVec()), strokePaintMain);
+                        dc.DrawLine(MathToPixelSk(v1), MathToPixelSk(p), strokePaintMain);
 
                     dc.DrawBubble($"{MultiLanguageResources.Instance.HalfLineText}:{h.Name}",
-                        MathToPixelSk((h.Current.Point1 + h.Current.Point2).ToVec() / 2),
+                        MathToPixelSk((h.Current.Point1 + h.Current.Point2) / 2),
                         bubbleBack, paintMain);
                 }
                     break;
@@ -624,8 +627,8 @@ public class GeometricPad : Addon
                 case GeoCircle circle:
                 {
                     var cs = circle.Current;
-                    var pf = MathToPixelSk(cs.Center.ToVec());
-                    var s = new SKSize((float)(cs.Radius * unitLength).ToFloat(), (float)(cs.Radius * unitLength).ToFloat());
+                    var pf = MathToPixelSk(cs.Center);
+                    var s = new SKSize((float)(cs.Radius * unitLength), (float)(cs.Radius * unitLength));
                     if (circle.Selected)
                         dc.DrawOval(pf, s, strokePaint);
                     else
@@ -633,18 +636,18 @@ public class GeometricPad : Addon
 
                     var r2 = cs.Radius * Sqrt(2) / 2;
                     dc.DrawBubble($"{MultiLanguageResources.Instance.CircleText}:{circle.Name}",
-                        MathToPixelSk(circle.Current.Center.ToVec() + new Vec(-r2.ToFloat(), r2.ToFloat())), bubbleBack, paintMain);
+                        MathToPixelSk(circle.Current.Center + new Vec(-r2, r2)), bubbleBack, paintMain);
                 }
                     break;
                 case Angle ang:
                 {
                     var angle = ang.AngleData;
-                    var pf = MathToPixelSk(angle.AnglePoint.ToVec());
+                    var pf = MathToPixelSk(angle.AnglePoint);
                     var arg1 =
-                        CustomMod(MathToPixel(angle.Point1.ToVec()).Sub(MathToPixel(angle.AnglePoint.ToVec())).Arg() / PI * 180,
+                        CustomMod(MathToPixel(angle.Point1).Sub(MathToPixel(angle.AnglePoint)).Arg() / PI * 180,
                             360);
                     var arg2 =
-                        CustomMod(MathToPixel(angle.Point2.ToVec()).Sub(MathToPixel(angle.AnglePoint.ToVec())).Arg() / PI * 180,
+                        CustomMod(MathToPixel(angle.Point2).Sub(MathToPixel(angle.AnglePoint)).Arg() / PI * 180,
                             360);
                     var aa = angle.Angle;
                     var a = arg2 - arg1;
@@ -674,7 +677,7 @@ public class GeometricPad : Addon
             tpFilledPaint.Color = new SKColor(p.Color).WithAlpha(90);
             strokePaint1.Color = new SKColor(p.Color).WithAlpha(255);
             var index = 0;
-            var loc = MathToPixelSk(p.Location.ToVec());
+            var loc = MathToPixelSk(p.Location);
             dc.DrawBubble($"{MultiLanguageResources.Instance.PointText}:" + p.Name,
                 loc.OffSetBy(2, 2 + 20 * index++), bubbleBack, paintMain);
             if (p == MovingPoint)
@@ -682,7 +685,7 @@ public class GeometricPad : Addon
                 dc.DrawOval(loc, new SKSize(4, 4), FilledMid);
                 dc.DrawOval(loc, new SKSize(7, 7), StrokeMid);
                 dc.DrawBubble(
-                    $"({MovingPoint.Location.X.ToString(8)},{MovingPoint.Location.Y.ToString(8)}) {(MovingPoint.PointGetter is PointGetter_Movable && MovingPoint.IsUserEnabled ? "" : MultiLanguageResources.Instance.CantBeMovedText)}",
+                    $"({MovingPoint.Location.X.ExactToString()},{MovingPoint.Location.Y.ExactToString()}) {(MovingPoint.PointGetter is PointGetter_Movable && MovingPoint.IsUserEnabled ? "" : MultiLanguageResources.Instance.CantBeMovedText)}",
                     loc.OffSetBy(2, 2 + 20 * index++), bubbleBack, paintMain);
             }
             else if (p.Selected)
@@ -748,9 +751,9 @@ public class GeometricPad : Addon
         {
             var shape = ss[0].Item2;
             if (shape is GeoCircle)
-                return new PointGetter_OnCircle((Circle)shape, PixelToMath(location).ToExact());
+                return new PointGetter_OnCircle((Circle)shape, PixelToMath(location));
             if (shape is GeoLine)
-                return new PointGetter_OnLine((GeoLine)shape, PixelToMath(location).ToExact());
+                return new PointGetter_OnLine((GeoLine)shape, PixelToMath(location));
             return new PointGetter_FromLocation(PixelToMath(location));
         }
 
@@ -765,19 +768,19 @@ public class GeometricPad : Addon
         {
             if (s1 is Circle c2 && s2 is GeoLine l2)
             {
-                VectorExact v1, v2;
+                Vec v1, v2;
                 (v1, v2) = IntersectionMath.FromLineAndCircle(l2.Current, c2.Current);
                 return new PointGetter_FromLineAndCircle(l2, c2,
-                    (MathToPixel(v1.ToVec()) - location).GetLength() < (MathToPixel(v2.ToVec()) - location).GetLength());
+                    (MathToPixel(v1) - location).GetLength() < (MathToPixel(v2) - location).GetLength());
             }
         }
 
         if (s1 is Circle c3 && s2 is Circle c4)
         {
-            VectorExact v1, v2;
+            Vec v1, v2;
             (v1, v2) = IntersectionMath.FromTwoCircle(c3.Current, c4.Current);
             return new PointGetter_FromTwoCircle(c3,c4,
-                (MathToPixel(v1.ToVec()) - location).GetLength() < (MathToPixel(v2.ToVec()) - location).GetLength());
+                (MathToPixel(v1) - location).GetLength() < (MathToPixel(v2) - location).GetLength());
         }
 
         return null;
@@ -812,8 +815,8 @@ public class GeometricPad : Addon
             }
         }
 
-        VectorExact ret=new VectorExact(double.IsNaN(nearestX) ? location.X : nearestX, double.IsNaN(nearestY) ? location.Y : nearestY);
-        return ret.ToVec().ToAvaPoint();
+        Vec ret=new Vec(double.IsNaN(nearestX) ? location.X : nearestX, double.IsNaN(nearestY) ? location.Y : nearestY);
+        return ret.ToAvaPoint();
     }
 
     /// <summary>

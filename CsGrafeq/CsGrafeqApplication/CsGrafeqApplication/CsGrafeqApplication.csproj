@@ -98,11 +98,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="DataTemplates\"/>
-        <Folder Include="Resources\"/>
-    </ItemGroup>
-
-    <ItemGroup>
       <AvaloniaResource Include="Assets\favicon.ico" />
     </ItemGroup>
 </Project>

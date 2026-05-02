@@ -25,30 +25,30 @@ public static class GeometryMath
         return ResultWithException<(T, T)>.Failure("");
     }
 
-    public static VectorExact SolveFunction(ExactNumber a, ExactNumber b, ExactNumber c, ExactNumber d, ExactNumber e, ExactNumber f)
+    public static Vec SolveFunction(double a, double b, double c, double d, double e, double f)
     {
         var det = a * e - b * d;
         if (det == 0)
-            return VectorExact.NaN;
-        var mat = new ExactNumber[2, 2];
+            return Vec.Invalid;
+        var mat = new double[2, 2];
         mat[0, 0] = e / det;
         mat[0, 1] = -b / det;
         mat[1, 0] = -d / det;
         mat[1, 1] = a / det;
         var x = mat[0, 0] * c + mat[0, 1] * f;
         var y = mat[1, 0] * c + mat[1, 1] * f;
-        return new VectorExact(x, y);
+        return new Vec(x, y);
     }
 
 
     /// <summary>
     ///     ss,se为线段 s,e为直线
     /// </summary>
-    public static VectorExact GetIntersectionOfSegmentAndLine(VectorExact segmentStart, VectorExact segmentEnd, VectorExact lineStart, VectorExact lineEnd)
+    public static Vec GetIntersectionOfSegmentAndLine(Vec segmentStart, Vec segmentEnd, Vec lineStart, Vec lineEnd)
     {
         var j = IntersectionMath.FromTwoLine(segmentStart, segmentEnd, lineStart, lineEnd);
         if (RangeIn(segmentStart.X, segmentEnd.X, j.X) && RangeIn(segmentStart.Y, segmentEnd.Y, j.Y)) return j;
-        return VectorExact.NaN;
+        return Vec.Invalid;
     }
 
     public static double DistanceToLine(Vec v1, Vec v2, Vec test, out Vec onPoint)

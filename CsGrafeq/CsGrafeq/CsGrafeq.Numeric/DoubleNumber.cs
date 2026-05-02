@@ -6,6 +6,7 @@ namespace CsGrafeq.Numeric;
 
 public struct DoubleNumber(double value) : IComputableNumber<DoubleNumber>, IEquatable<DoubleNumber>
 {
+    public static readonly DoubleNumber NaN= DoubleNumber.CreateFromDouble(double.NaN);
     public bool Equals(DoubleNumber other)
     {
         return Value.Equals(other.Value);

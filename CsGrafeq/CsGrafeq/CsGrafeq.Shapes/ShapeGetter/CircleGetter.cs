@@ -77,7 +77,7 @@ public class CircleGetter_FromCenterAndRadius : CircleGetter
 
     public override CircleStruct GetCircle()
     {
-        return new CircleStruct { Center = Center.Location, Radius = Radius.Value.Value };
+        return new CircleStruct { Center = Center.Location, Radius = Radius.Value };
     }
 
     public override void Attach(GeometricShape subShape)
@@ -152,26 +152,26 @@ public class CircleGetter_Apollonius : CircleGetter
         var y1 = PointA.Location.Y;
         var x2 = PointB.Location.X;
         var y2 = PointB.Location.Y;
-        var k = Ratio.Value.Value;
+        var k = Ratio.Value;
 
         if (double.IsNaN(k) || k <= 0)
-            return new CircleStruct { Center = VectorExact.NaN, Radius = double.PositiveInfinity };
+            return new CircleStruct { Center = Vec.Invalid, Radius = double.PositiveInfinity };
 
         var k2 = k * k;
         var denom = 1 - k2;
         // 当 denom 接近 0 时 (k==1) 退化为直线（非圆）
         if (Math.Abs(denom) < 1e-12)
-            return new CircleStruct { Center =  VectorExact.NaN, Radius = double.PositiveInfinity };
+            return new CircleStruct { Center =  Vec.Invalid, Radius = double.PositiveInfinity };
 
         var cx = (x1 - k2 * x2) / denom;
         var cy = (y1 - k2 * y2) / denom;
 
         var numerator = x1 * x1 + y1 * y1 - k2 * (x2 * x2 + y2 * y2);
         var rSq = cx * cx + cy * cy - numerator / denom;
-        if (double.IsNaN(rSq.ToFloat()) || rSq < 0)
+        if (double.IsNaN(rSq) || rSq < 0)
             rSq = 0;
 
-        var radius = ExactNumber.Sqrt(ExactNumber.Max(0, rSq));
+        var radius = double.Sqrt(double.Max(0, rSq));
         return new CircleStruct { Center = new (cx, cy), Radius = radius };
     }
 

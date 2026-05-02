@@ -74,15 +74,15 @@ public readonly struct Rational([Range(-1,1)]int sign,uint numerator, uint denom
                 absDen /= g;
     
                 if (absNum > uint.MaxValue || absDen > uint.MaxValue)
-                    return r1.ToFloat() + r2.ToFloat();
+                    return r1 + r2;
                 if(absNum<=MaxValue && absDen<=MaxValue)
                     return new Rational(sign, (uint)absNum, (uint)absDen);
-                return r1.ToFloat() + r2.ToFloat();
+                return r1 + r2;
             }
         }
         catch (OverflowException)
         {
-            return r1.ToFloat() + r2.ToFloat();
+            return r1 + r2;
         }
     }
     
@@ -114,14 +114,14 @@ public readonly struct Rational([Range(-1,1)]int sign,uint numerator, uint denom
                 den /= g;
     
                 if (num > MaxValue || den >MaxValue)
-                    return r1.ToFloat() * r2.ToFloat();
+                    return r1 * r2;
     
                 return new Rational(sign, (uint)num, (uint)den);
             }
         }
         catch (OverflowException)
         {
-            return r1.ToFloat() * r2.ToFloat();
+            return r1 * r2;
         }
     }
 
