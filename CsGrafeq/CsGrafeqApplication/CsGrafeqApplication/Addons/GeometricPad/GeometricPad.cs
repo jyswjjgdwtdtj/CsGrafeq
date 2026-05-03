@@ -48,7 +48,7 @@ public class GeometricPad : Addon
         MainTemplate = (IDataTemplate)obj!;
         CurrentAction = GeometricActions.Actions.FirstOrDefault()?.FirstOrDefault()!;
         Layers.Add(_mainRenderTarget);
-        _mainRenderTarget.OnRenderCanvas += Renderable_OnRender;
+        _mainRenderTarget.OnRender += Renderable_OnRender;
         Shapes.CollectionChanged += (_,_) =>
         {
             _mainRenderTarget.Changed = true;

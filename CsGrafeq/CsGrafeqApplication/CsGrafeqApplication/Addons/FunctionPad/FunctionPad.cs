@@ -146,16 +146,22 @@ public class FunctionPad : Addon
         func.Dispose();
     }
 
-    private void RenderFunction(PixelBitmap dc, SKRectI rect, ImplicitFunction impFunc,CancellationToken ct)
+    private void RenderFunction(SKCanvas dc, SKRectI rect, ImplicitFunction impFunc,CancellationToken ct)
     {
         if (!impFunc.IsCorrect)
             return;
         if (impFunc.IsDeleted)
             return;
+        using var paint = new SKPaint();
+        paint.IsAntialias = false;
+        paint.Style = SKPaintStyle.Fill;
+        paint.Color = new SKColor(impFunc.Color).WithAlpha(impFunc.Opacity);
+        paint.BlendMode = SKBlendMode.Src;
         var rectToCalc = new ConcurrentBag<SKRectI> { rect };
+        var rectToRender = new ConcurrentBag<SKRectI>();
+        var pixelToRender = new ConcurrentBag<SKPoint>();
         var pointColor=new SKColor(impFunc.Color).WithAlpha(impFunc.Opacity).ToUint();
         var func = impFunc.Function.Function;
-        dc.Color=pointColor;
         Func<double,double,double,double,bool> msFunc =impFunc.NeedCheckPixel?impFunc.MsFunction: static (_,_,_,_ )=> true;
         do
         {
@@ -173,19 +179,24 @@ public class FunctionPad : Addon
                 {
                     RenderAction(rs[j]);
                 });
-                if(ct.IsCancellationRequested)
-                    return;
+                dc.DrawPoints(SKPointMode.Points, pixelToRender.ToArray(),paint);
+                foreach (var r in rectToRender)
+                {
+                    dc.DrawRect(r, paint);
+                }
+                pixelToRender.Clear();
+                rectToRender.Clear();
             }
             dc.Flush();
             continue;
             void RenderAction(SKRectI r)
             {
-                RenderRectIntervalSet(r, rectToCalc, func, msFunc, dc, pointColor);
+                RenderRectIntervalSet(r, rectToCalc,pixelToRender,rectToRender, func, msFunc);
             }   
         } while (rectToCalc.Count != 0);
     }
 
-    private void RenderRectIntervalSet(SKRectI r, ConcurrentBag<SKRectI> rectToCalc, IntervalHandler<IntervalSet> func,Func<double,double,double,double,bool> msFunc,PixelBitmap bmp,uint color)
+    private void RenderRectIntervalSet(SKRectI r, ConcurrentBag<SKRectI> rectToCalc,ConcurrentBag<SKPoint> pixelsToRender,ConcurrentBag<SKRectI> rectToRender, IntervalHandler<IntervalSet> func,Func<double,double,double,double,bool> msFunc)
     {
         if (r.Height == 0 || r.Width == 0)
             return;
@@ -211,20 +222,19 @@ public class FunctionPad : Addon
                 if (result == Def.TT)
                 {
                     if (isPixel)
-                        bmp.SetPixel_Buffered(i,j);
+                        pixelsToRender.Add(new(i,j));
                     else
-                        bmp.SetRectangle(i, j, dx, dy, color);
+                        rectToRender.Add(new(i, j, i+dx, j+dy));
                 }
                 else if (result == Def.FT)
                 {
                     if (isPixel)
                     {
                         if(msFunc(xMin,yMin,xMax,yMax))
-                            bmp.SetPixel_Buffered(i,j);
+                            pixelsToRender.Add(new(i,j));
                     }
                     else
                     {
-                        //bmp.SetRectangle(i, j, dx, dy, ((uint)Random.Shared.NextInt64(0xFFFFFF))|0xFF000000);
                         rectToCalc.Add(new SKRectI(i, j, Min(i + dx, r.Right),
                             Min(j + dy, r.Bottom)));
                     }

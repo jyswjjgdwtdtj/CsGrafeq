@@ -117,15 +117,10 @@ public class Renderable : IDisposable
             canvas.DrawBitmap(_bitmap.SKBitmap, x, y, SkiaHelper.CompoundBufferPaint);
         }
     }
-
     /// <summary>
     ///     绘制事件
     /// </summary>
-    public event Action<SKCanvas?, SKRect,CancellationToken>? OnRenderCanvas;
-    /// <summary>
-    ///     绘制事件
-    /// </summary>
-    public event Action<PixelBitmap, SKRect, CancellationToken>? OnRender;
+    public event Action<SKCanvas, SKRect, CancellationToken>? OnRender;
 
     /// <summary>
     ///     当前缓冲区上绘制
@@ -138,8 +133,10 @@ public class Renderable : IDisposable
             return;
         lock (_bitmapLock)
         {
-            OnRender?.Invoke(_bitmap, rect,ct);
-            OnRenderCanvas?.Invoke(GetBitmapCanvas(), rect, ct);
+            var c = GetBitmapCanvas();
+            if(c == null)
+                return;
+            OnRender?.Invoke(c, rect, ct);
         }
     }
     public void Render(SKRect rect){

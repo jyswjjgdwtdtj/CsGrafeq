@@ -26,7 +26,7 @@
         <!--Info显示层-->
         <Border Name="InfoContainer">
             <TabControl Name="AddonInfoTabControl" SelectedIndex="{CompiledBinding Setting.AddonIndex,Mode=OneWay}"
-                        ItemsSource="{CompiledBinding Displayer.Addons}" HorizontalAlignment="Right">
+                        ItemsSource="{CompiledBinding Displayer.Addons}" HorizontalAlignment="Right" VerticalAlignment="Top">
                 <TabControl.ContentTemplate>
                     <DataTemplate DataType="addons:Addon">
                         <ContentControl Content="{CompiledBinding .}" ContentTemplate="{CompiledBinding InfoTemplate}" />
@@ -37,6 +37,9 @@
                         <Style Selector="^ /template/ Panel#PART_TabsPanel">
                             <Setter Property="IsVisible" Value="False" />
                         </Style>
+                    </Style>
+                    <Style Selector="TabControl /template/ Border#PART_RootBorder">
+                        <Setter Property="Background" Value="{x:Null}"></Setter>
                     </Style>
                 </TabControl.Styles>
             </TabControl>

@@ -70,7 +70,7 @@ public class ImplicitFunction : InteractiveObject
     {
         get;
         set => this.RaiseAndSetIfChanged(ref field, value);
-    } = true;
+    } = false;
 
     public HasReferenceIntervalSetFunc<IntervalSet> Function
     {

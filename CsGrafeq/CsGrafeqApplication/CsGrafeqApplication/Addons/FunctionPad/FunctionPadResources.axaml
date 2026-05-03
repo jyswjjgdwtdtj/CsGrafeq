@@ -42,7 +42,7 @@
         </ContentControl>
     </DataTemplate>
     <DataTemplate x:Key="FunctionPadInfoTemplate" DataType="functionPad:FunctionPad">
-        <Border CornerRadius="5">
+        <Border CornerRadius="5" Background="{x:Null}">
             <ItemsControl ItemsSource="{CompiledBinding Functions}">
                 <ItemsControl.ItemTemplate>
                     <functionPad:ImpFuncShowDataTemplate>

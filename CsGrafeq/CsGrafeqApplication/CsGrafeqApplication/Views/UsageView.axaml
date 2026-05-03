@@ -6,4 +6,5 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CsGrafeqApplication.Views.UsageView"
              x:DataType="viewModels:MainViewModel">
+    <Image Source="avares://CsGrafeqApplication/Assets/instruction.png" Stretch="Uniform"></Image>
 </UserControl>

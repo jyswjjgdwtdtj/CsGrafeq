@@ -11,6 +11,11 @@ using System.Globalization;
 using CsGrafeq;
 using CsGrafeq.Setting;
 using Avalonia.Media;
+using System;
+using Avalonia.Platform;
+using CsGrafeqApplication.Dialogs;
+using CsGrafeqApplication.Dialogs.Models;
+using CsGrafeqApplication.Dialogs.Params;
 
 
 namespace CsGrafeqApplication;
@@ -36,6 +41,22 @@ public class App : Application
         {
             desktop.MainWindow = new MainWindow();
             desktop.MainWindow.DataContext = new MainWindowViewModel(desktop.MainWindow);
+            desktop.MainWindow.Loaded += async (s, e) =>
+            {
+                var msg=MessageBoxManager.GetMessageBoxStandard(new MsgBoxParams()
+                {
+                    Title = "提示",
+                    ButtonDefinitions =
+                        new ButtonDefinitions() { BtnDefs = { new ButtonDefinition() { Name = "OK",IsDefault = true,IsCancel = false} } },
+                    Content = new Image
+                    {
+                        Source = new Avalonia.Media.Imaging.Bitmap(
+                            AssetLoader.Open(new Uri("avares://CsGrafeqApplication/Assets/instruction.png"))),
+                        Stretch = Stretch.Uniform
+                    }
+                });
+                await msg.ShowWindowDialogAsync(desktop.MainWindow);
+            };
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
         {

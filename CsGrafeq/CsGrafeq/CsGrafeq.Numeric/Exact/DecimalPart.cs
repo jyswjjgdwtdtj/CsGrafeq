@@ -321,12 +321,9 @@ public static class DecimalPart
         ListCount= Decimal.Count;
         Forward = Decimal.Forward.Keys.ToList();
         Backward = Decimal.Backward.Keys.ToList();
-        foreach (var rational in Backward)
-        {
-            Console.WriteLine(rational);
-        }
     }
-    internal static readonly int ListCount;
+
+    private static readonly int ListCount;
     internal static List<double> Forward;
     internal static List<Rational> Backward;
 

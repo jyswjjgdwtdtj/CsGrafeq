@@ -7,10 +7,13 @@ using System.Text.Json.Serialization;
 using System.Timers;
 using Timer=System.Timers.Timer;
 
+
 namespace CsGrafeq.Setting
 {
     public partial class Setting
     {
+        public static bool JsonExists { get; private set; } = true;
+        private static bool _isFirstTime=true;
         private static Timer _savingTimer = new();
         static Setting()
         {
@@ -55,6 +58,10 @@ namespace CsGrafeq.Setting
                 {
                     // ignored
                 }
+            }
+            else if (_isFirstTime)
+            {
+                JsonExists = false;
             }
             return false;
         }
