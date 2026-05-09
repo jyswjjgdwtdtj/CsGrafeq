@@ -4,5 +4,5 @@ public interface IClose
 {
     void Close();
 
-    void CloseWindow(object sender, EventArgs eventArgs);
+    void CloseWindow(object? sender, EventArgs eventArgs);
 }

@@ -13,7 +13,7 @@ public class Dialog<V, VM, T> : IDialog<T> where V : UserControl, IClosable, IDi
     private readonly V _view;
     private readonly VM _viewModel;
 
-    private readonly string ClickAwayParam = "MsBoxIdentifier_Cancel";
+    private readonly string _clickAwayParam = "MsBoxIdentifier_Cancel";
 
     public Dialog(V view, VM viewModel)
     {
@@ -98,33 +98,33 @@ public class Dialog<V, VM, T> : IDialog<T> where V : UserControl, IClosable, IDi
     /// </summary>
     /// <param name="owner"></param>
     /// <returns></returns>
-    public Task<T> ShowAsPopupAsync(ContentControl owner)
+    public Task<T> ShowAsPopupAsync(ContentControl? owner)
     {
-        DialogHostStyles style = null;
-        if (!owner.Styles.OfType<DialogHostStyles>().Any())
+        DialogHostStyles? style = null;
+        if (owner != null && !owner.Styles.OfType<DialogHostStyles>().Any())
         {
             style = [];
             owner.Styles.Add(style);
         }
 
 
-        var parentContent = owner.Content;
+        var parentContent = owner?.Content;
         var dh = new DialogHost
         {
             Identifier = "MsBoxIdentifier" + Guid.NewGuid()
         };
         _viewModel.MakeDialogResult(_view);
-        owner.Content = null;
+        owner?.Content = null;
         dh.Content = parentContent;
 
         dh.CloseOnClickAway = true;
-        dh.CloseOnClickAwayParameter = ClickAwayParam;
+        dh.CloseOnClickAwayParameter = _clickAwayParam;
         dh.DialogClosing += (ss, ee) =>
         {
-            if (ee.Parameter?.ToString() == ClickAwayParam) _view.Close();
+            if (ee.Parameter?.ToString() == _clickAwayParam) _view.Close();
         };
 
-        owner.Content = dh;
+        owner?.Content = dh;
         var tcs = new TaskCompletionSource<T>();
         _view.Closing += (_, _) =>
         {
@@ -132,10 +132,10 @@ public class Dialog<V, VM, T> : IDialog<T> where V : UserControl, IClosable, IDi
 
             if (dh.CurrentSession != null && !dh.CurrentSession.IsEnded) DialogHost.Close(dh.Identifier);
 
-            owner.Content = null;
+            owner?.Content = null;
             dh.Content = null;
-            owner.Content = parentContent;
-            if (style != null) owner.Styles.Remove(style);
+            owner?.Content = parentContent;
+            if (style != null) owner?.Styles.Remove(style);
             tcs.TrySetResult(r);
         };
         DialogHost.Show(_view, dh.Identifier);

@@ -8,7 +8,6 @@ using CsGrafeqApplication.ViewModels;
 using CsGrafeqApplication.Views;
 using Material.Styles.Themes;
 using System.Globalization;
-using CsGrafeq;
 using CsGrafeq.Setting;
 using Avalonia.Media;
 using System;
@@ -43,19 +42,22 @@ public class App : Application
             desktop.MainWindow.DataContext = new MainWindowViewModel(desktop.MainWindow);
             desktop.MainWindow.Loaded += async (s, e) =>
             {
-                var msg=MessageBoxManager.GetMessageBoxStandard(new MsgBoxParams()
+                if (!Setting.JsonExists)
                 {
-                    Title = "提示",
-                    ButtonDefinitions =
-                        new ButtonDefinitions() { BtnDefs = { new ButtonDefinition() { Name = "OK",IsDefault = true,IsCancel = false} } },
-                    Content = new Image
+                    var msg = MessageBoxManager.GetMessageBoxStandard(new MsgBoxParams()
                     {
-                        Source = new Avalonia.Media.Imaging.Bitmap(
-                            AssetLoader.Open(new Uri("avares://CsGrafeqApplication/Assets/instruction.png"))),
-                        Stretch = Stretch.Uniform
-                    }
-                });
-                await msg.ShowWindowDialogAsync(desktop.MainWindow);
+                        Title = "提示",
+                        ButtonDefinitions =
+                            new ButtonDefinitions() { BtnDefs = { new ButtonDefinition() { Name = "OK", IsDefault = true, IsCancel = false } } },
+                        Content = new Image
+                        {
+                            Source = new Avalonia.Media.Imaging.Bitmap(
+                                AssetLoader.Open(new Uri("avares://CsGrafeqApplication/Assets/instruction.png"))),
+                            Stretch = Stretch.Uniform
+                        }
+                    });
+                    await msg.ShowWindowDialogAsync(desktop.MainWindow);
+                }
             };
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)

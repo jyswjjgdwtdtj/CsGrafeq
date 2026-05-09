@@ -10,12 +10,14 @@ CsGrafeq is a geometry sketchpad. It's made by Avalonia and use Material.Avaloni
 
 For the sake that JIT is unavailable in mobile platforms and browser, CsGrafeq now only support Desktop (now only Windows). 
 
+CsGrafeq supports both Chinese and English.
+
 [Project](./OldVersion/README.md) in old version folder is for stably implicit function plotting. Implicit function plotting is being made now.
 
-![image](Example/1.jpg)
-![image](Example/2.jpg)
-![image](Example/3.jpg)
-![image](Example/4.jpg)
+![image](Example/1.png)
+![image](Example/2.png)
+![image](Example/3.png)
+![image](Example/4.png)
 
 ## Features
 
@@ -55,10 +57,6 @@ CsGrafeq.sln
 ### Short term plan
 
 - Add text block supports
-- Implement custom msgbox/inputbox
-- Implement symbolic calculation (e.g. 0.5->1/2, 1.414->√2)
-- Implement custom formula editor
-- achieve a complete separation between the UI thread and the image rendering thread.
 - Implement GPU computing to accelerate calculations
 
 

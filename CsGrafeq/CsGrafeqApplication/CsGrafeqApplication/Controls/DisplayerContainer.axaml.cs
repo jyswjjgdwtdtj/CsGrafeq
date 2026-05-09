@@ -30,6 +30,7 @@ public partial class DisplayerContainer : UserControl, IInfoDialog
     private const double MinOperationWidth = 50;
     private const double ReserveRightMin = 300; // 右侧至少保留空间，避免盖住Displayer等
     private const string GithubRepUrl = "https://github.com/jyswjjgdwtdtj/CsGrafeq";
+    private const string IssueUrl = "https://github.com/jyswjjgdwtdtj/CsGrafeq/issues/new";
 
     public static readonly DirectProperty<DisplayerContainer, bool> IsOperationVisibleProperty =
         AvaloniaProperty.RegisterDirect<DisplayerContainer, bool>(nameof(VM.IsOperationVisible),
@@ -368,5 +369,14 @@ public partial class DisplayerContainer : UserControl, IInfoDialog
         if (!(sender is ColorPicker cp))
             return;
         cp.Color = Color.FromUInt32(Setting.Instance.PrimaryColor);
+    }
+
+    private void Issue_Clicked(object? sender, RoutedEventArgs e)
+    {
+        Process.Start(new ProcessStartInfo
+        {
+            FileName = new Uri(IssueUrl).AbsoluteUri,
+            UseShellExecute = true
+        });
     }
 }

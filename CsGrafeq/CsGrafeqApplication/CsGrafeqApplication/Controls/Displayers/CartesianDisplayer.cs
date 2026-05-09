@@ -163,7 +163,7 @@ public class CartesianDisplayer : Displayer
     /// <returns></returns>
     public IEnumerable<(double, AxisType)> GetAxisXs()
     {
-        var zsX = (int)Floor(Log(350 / UnitLength, 10));
+        var zsX = (int)Floor(Log(AxisWidthNumber / UnitLength, 10));
         var addnumX = Pow(10D, zsX);
         var addnumDx = SpecialPow(10M, zsX);
         for (var i = Min(ZeroPos.X - addnumX * UnitLength,
@@ -200,7 +200,7 @@ public class CartesianDisplayer : Displayer
     /// <returns></returns>
     public IEnumerable<(double, AxisType)> GetAxisYs()
     {
-        var zsY = (int)Floor(Log(350 / UnitLength, 10));
+        var zsY = (int)Floor(Log(AxisWidthNumber / UnitLength, 10));
         var addnumY = Pow(10D, zsY);
         var addnumDy = SpecialPow(10M, zsY);
         for (var i = Min(ZeroPos.Y - addnumY * UnitLength,
@@ -230,7 +230,7 @@ public class CartesianDisplayer : Displayer
         if (RangeIn(ValidRect.Left, ValidRect.Right, ZeroPos.Y))
             yield return (ZeroPos.Y, AxisType.Axes);
     }
-
+    private const int AxisWidthNumber = 250;
     /// <summary>
     ///     绘制坐标轴线
     /// </summary>
@@ -252,8 +252,8 @@ public class CartesianDisplayer : Displayer
         if (RangeIn(0, height, ZeroPos.Y))
             dc.DrawLine(new SKPoint((float)ValidRect.Left, (float)ZeroPos.Y.ToDecimal()),
                 new SKPoint((float)ValidRect.Right, (float)ZeroPos.Y.ToDecimal()), AxisPaintMain);
-        var zsX = (int)Floor(Log(350 / UnitLength, 10));
-        var zsY = (int)Floor(Log(350 / UnitLength, 10));
+        var zsX = (int)Floor(Log(AxisWidthNumber / UnitLength, 10));
+        var zsY = (int)Floor(Log(AxisWidthNumber / UnitLength, 10));
         var addnumX = SpecialPow(10D, zsX);
         var addnumY = SpecialPow(10D, zsY);
         var addnumDx = SpecialPow(10M, zsX);
@@ -352,8 +352,8 @@ public class CartesianDisplayer : Displayer
         var textFont = MapleMono;
         var width = Bounds.Width;
         var height = Bounds.Height;
-        var zsX = (int)Floor(Log(350 / UnitLength, 10));
-        var zsY = (int)Floor(Log(350 / UnitLength, 10));
+        var zsX = (int)Floor(Log(AxisWidthNumber / UnitLength, 10));
+        var zsY = (int)Floor(Log(AxisWidthNumber / UnitLength, 10));
         var addnumX = SpecialPow(10D, zsX);
         var addnumY = SpecialPow(10D, zsY);
         var p = RangeTo(1, height - textFont.Size - 2, ZeroPos.Y);

@@ -12,7 +12,7 @@ namespace CsGrafeq.Setting
 {
     public partial class Setting
     {
-        public static bool JsonExists { get; private set; } = true;
+        public static bool JsonExists { get; private set; } = false;
         private static bool _isFirstTime=true;
         private static Timer _savingTimer = new();
         static Setting()
@@ -44,6 +44,7 @@ namespace CsGrafeq.Setting
             instance = new();
             if (File.Exists(settingFilePath))
             {
+                JsonExists = true;
                 var json = File.ReadAllText(settingFilePath);
                 try
                 {

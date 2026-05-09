@@ -67,13 +67,11 @@ public sealed class DisplayControl : CartesianDisplayer
 
     protected override void OnPointerMoved(PointerEventArgs e)
     {
-        Console.WriteLine("PointerMovedOUt"+DateTime.Now);
         if (!e.Pointer.IsPrimary) return;
         StopWheeling();
         var ev = e.Cast(this);
         if (CallPointerMoved(ev) == DoNext)
         {
-            Console.WriteLine("PointerMovedIn"+DateTime.Now);
             var current = ev.Position.ToBigPoint();
             if (ev.Properties.IsLeftButtonPressed&&_isPointerLeftButtonDown)
             {
