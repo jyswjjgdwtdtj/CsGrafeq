@@ -83,6 +83,11 @@ public struct Vec(double x, double y) : IEquatable<Vec>, IPoint<double>
         return double.IsNaN(X) || double.IsNaN(Y);
     }
 
+    public Vec RespectivelyMultiply(Vec other)
+    {
+        return new Vec(X * other.X, Y * other.Y);
+    }
+
     /// <summary>
     ///     无效向量（XY均为NaN）
     /// </summary>

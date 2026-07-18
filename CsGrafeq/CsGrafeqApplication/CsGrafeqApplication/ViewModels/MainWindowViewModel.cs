@@ -6,12 +6,12 @@ namespace CsGrafeqApplication.ViewModels;
 
 public class MainWindowViewModel : MainViewModel
 {
-    private readonly Window Window;
-    private bool isMaximized;
+    private readonly Window _window;
+    private bool _isMaximized;
 
     public MainWindowViewModel(Window window)
     {
-        Window = window;
+        _window = window;
         window.PropertyChanged += WindowOnPropertyChanged;
     }
 
@@ -23,21 +23,21 @@ public class MainWindowViewModel : MainViewModel
 
     public bool IsMaximized
     {
-        get => isMaximized;
+        get => _isMaximized;
         set
         {
-            if (isMaximized != value)
+            if (_isMaximized != value)
             {
                 if (value)
                 {
-                    isMaximized = true;
-                    Window.WindowState = WindowState.Maximized;
+                    _isMaximized = true;
+                    _window.WindowState = WindowState.Maximized;
                     this.RaiseAndSetIfChanged(ref field, value);
                 }
                 else
                 {
-                    isMaximized = false;
-                    Window.WindowState = WindowState.Normal;
+                    _isMaximized = false;
+                    _window.WindowState = WindowState.Normal;
                     this.RaiseAndSetIfChanged(ref field, value);
                 }
             }
@@ -61,9 +61,9 @@ public class MainWindowViewModel : MainViewModel
         if (e.Property == Window.WindowStateProperty)
         {
             WindowState = (WindowState)e.NewValue;
-            this.RaiseAndSetIfChanged(ref isMaximized, Window.WindowState == WindowState.Maximized,
+            this.RaiseAndSetIfChanged(ref _isMaximized, _window.WindowState == WindowState.Maximized,
                 nameof(IsMaximized));
-            if (isMaximized)
+            if (_isMaximized)
             {
                 OffSet = 7;
                 LengthContract = -7;

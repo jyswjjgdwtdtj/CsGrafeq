@@ -66,7 +66,7 @@ public class ImplicitFunction : InteractiveObject
         private set => this.RaiseAndSetIfChanged(ref field, value);
     } = "";
 
-    public bool NeedCheckPixel
+    public bool NeedPixelCheck
     {
         get;
         set => this.RaiseAndSetIfChanged(ref field, value);

@@ -8,7 +8,7 @@
         x:Class="CsGrafeqApplication.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/favicon.ico"
-        Title="{CompiledBinding MultiLanguageResources.CsGrafeqText.Data}"
+        Title="{CompiledBinding MultiLanguageResources.CsGrafeqText.Data,Mode=OneWay}"
         ExtendClientAreaToDecorationsHint="True"
         ExtendClientAreaChromeHints="NoChrome"
         SystemDecorations="Full"
@@ -66,7 +66,7 @@
                             <Image Width="16" Height="16" Source="avares://CsGrafeqApplication/Assets/favicon.ico"
                                    VerticalAlignment="Center" Margin="8,5,5,5" />
                             <TextBlock VerticalAlignment="Center" FontFamily="{StaticResource MapleMono}"
-                                       Foreground="{DynamicResource CgForegroundBrush}" Text="{CompiledBinding MultiLanguageResources.CsGrafeqText}"/>
+                                       Foreground="{DynamicResource CgForegroundBrush}" Text="{CompiledBinding MultiLanguageResources.CsGrafeqText.Data}"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
                             <Button Padding="0" Width="45" CornerRadius="0"

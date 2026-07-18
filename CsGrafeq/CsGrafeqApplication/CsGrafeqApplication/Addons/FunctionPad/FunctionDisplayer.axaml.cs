@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
@@ -103,7 +104,8 @@ public partial class FunctionDisplayer : TemplatedControl
             !string.IsNullOrWhiteSpace(newFuncTextBox.Text) && IntervalCompiler
                 .TryCompile(newFuncTextBox.Text, Setting.Instance.EnableExpressionSimplification).Success(out _, out _))
         {
-            Target.CreateAndAddFunction(newFuncTextBox.Text);
+            var index = ImplicitFunctionExamples.ExampleExpressions.IndexOf(newFuncTextBox.Text);
+            Target.CreateAndAddFunction(newFuncTextBox.Text,index != -1 && ImplicitFunctionExamples.Examples[index].NeedPixelCheck);
             newFuncTextBox.Text = "";
         }
     }

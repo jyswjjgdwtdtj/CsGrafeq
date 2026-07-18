@@ -5,6 +5,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Metadata;
 using CsGrafeqApplication.Core.Utils;
+using static CsGrafeqApplication.Core.Utils.TextBoxInputHelper;
 
 namespace CsGrafeqApplication.Core.Controls;
 
@@ -53,22 +54,22 @@ public partial class Keyboard : TemplatedControl
 
     private void CursorLeftClick(object? sender, RoutedEventArgs e)
     {
-        if (TopLevel.GetTopLevel(this).TryFindTextBox(out var textBox)) textBox.CursorLeft();
+        if (TryFindTextBox(out var textBox)) textBox.CursorLeft();
     }
 
     private void CursorRightClick(object? sender, RoutedEventArgs e)
     {
-        if (TopLevel.GetTopLevel(this).TryFindTextBox(out var textBox)) textBox.CursorRight();
+        if (TryFindTextBox(out var textBox)) textBox.CursorRight();
     }
 
     private void BackspaceClick(object? sender, RoutedEventArgs e)
     {
-        if (TopLevel.GetTopLevel(this).TryFindTextBox(out var textBox)) textBox.Backspace();
+        if (TryFindTextBox(out var textBox)) textBox.Backspace();
     }
 
     private void EnterClick(object? sender, RoutedEventArgs e)
     {
-        if (TopLevel.GetTopLevel(this).TryFindTextBox(out var textBox))
+        if (TryFindTextBox(out var textBox))
         {
             textBox.RaiseEvent(new KeyEventArgs
             {
@@ -85,6 +86,6 @@ public partial class Keyboard : TemplatedControl
 
     private void DeleteClick(object? sender, RoutedEventArgs e)
     {
-        if (TopLevel.GetTopLevel(this).TryFindTextBox(out var textBox)) textBox.Delete();
+        if (TryFindTextBox(out var textBox)) textBox.Delete();
     }
 }

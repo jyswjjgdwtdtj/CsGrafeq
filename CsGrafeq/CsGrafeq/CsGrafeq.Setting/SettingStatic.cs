@@ -24,4 +24,10 @@ public partial class Setting : ObservableObject
 #else
     public static bool CanDrawFunction { get; } = false;
 #endif
+
+    public bool IsFocusOnTextBox
+    {
+        get;
+        set=>this.RaiseAndSetIfChanged(ref field, value);
+    }
 }

@@ -38,6 +38,7 @@ public sealed class DisplayControl : CartesianDisplayer
     private bool _isPointerLeftButtonDown;
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
+        base.OnPointerPressed(e);
         if (!e.Pointer.IsPrimary) return;
         StopWheeling();
         var ev = e.Cast(this);
@@ -67,6 +68,7 @@ public sealed class DisplayControl : CartesianDisplayer
 
     protected override void OnPointerMoved(PointerEventArgs e)
     {
+        base.OnPointerMoved(e);
         if (!e.Pointer.IsPrimary) return;
         StopWheeling();
         var ev = e.Cast(this);
@@ -133,6 +135,7 @@ public sealed class DisplayControl : CartesianDisplayer
 
     protected override void OnPointerReleased(PointerReleasedEventArgs eventArgs)
     {
+        base.OnPointerReleased(eventArgs);
         var e = eventArgs.Cast(this);
         StopWheeling();
         if (CallPointerReleased(e) == DoNext)

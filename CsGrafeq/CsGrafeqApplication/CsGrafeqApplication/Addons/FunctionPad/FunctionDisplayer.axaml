@@ -29,7 +29,7 @@
                                     <DataTemplate DataType="x:Object">
                                         <ScrollViewer Tag="{CompiledBinding .}">
                                             <ListBox
-                                                ItemsSource="{x:Static functionPad:ImplicitFunctionExamples.Examples}">
+                                                ItemsSource="{x:Static functionPad:ImplicitFunctionExamples.ExampleExpressions}">
                                                 <ListBox.ItemContainerTheme>
                                                     <ControlTheme TargetType="ListBoxItem"
                                                                   BasedOn="{StaticResource MaterialListBoxItem}">
@@ -71,6 +71,17 @@
                 <ScrollViewer ZIndex="1" DataContext="{TemplateBinding Target}">
                     <ItemsControl ItemsSource="{CompiledBinding Functions}" Padding="0,0,0,5" Name="ShapeItemsControl"
                                   x:DataType="functionPad:FunctionPad">
+                        <ItemsControl.Styles>
+                            <Style Selector="ItemsControl:empty">
+                                <Setter Property="Template">
+                                    <ControlTemplate>
+                                        <Border Height="50" DataContext="{x:Static i18N:MultiLanguageResources.Instance}" VerticalAlignment="Top">
+                                            <TextBlock FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{CompiledBinding CreateNewFunctionsText.Data,Mode=OneWay}" x:DataType="i18N:MultiLanguageResources" Foreground="{DynamicResource MaterialPrimaryMidBrush}"></TextBlock>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter>
+                            </Style>
+                        </ItemsControl.Styles>
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <VirtualizingStackPanel Orientation="Vertical" />
@@ -133,7 +144,7 @@
                                                     <Run Text=":"></Run>
                                                 </TextBlock>
                                                 <CheckBox Grid.Row="3" Grid.Column="1" Foreground="Black"
-                                                          IsChecked="{CompiledBinding NeedCheckPixel}"
+                                                          IsChecked="{CompiledBinding NeedPixelCheck}"
                                                           VerticalAlignment="Center"
                                                           HorizontalAlignment="Center" />
                                             </Grid>

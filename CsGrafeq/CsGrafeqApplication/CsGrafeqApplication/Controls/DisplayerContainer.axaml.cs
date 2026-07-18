@@ -379,4 +379,15 @@ public partial class DisplayerContainer : UserControl, IInfoDialog
             UseShellExecute = true
         });
     }
+
+    private void ResetAxesButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if(VM.Displayer is CartesianDisplayer displayer)
+        {
+            displayer.UnitLengthX = CartesianDisplayer.DefaultUnitLength;
+            displayer.UnitLengthY = CartesianDisplayer.DefaultUnitLength;
+            displayer.ZeroPos = CartesianDisplayer.DefualtZeroPos;
+            displayer.ForceToRender(CancellationToken.None);
+        }
+    }
 }

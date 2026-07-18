@@ -11,6 +11,7 @@
         <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
         <UseAppHost>true</UseAppHost>
         <PublishSingleFile>false</PublishSingleFile>
+		<PublishTrimmed>true</PublishTrimmed>
     </PropertyGroup>
     <PropertyGroup Label="Avalonia">
       <AvaloniaUseCompiledBindingsByDefault>True</AvaloniaUseCompiledBindingsByDefault>

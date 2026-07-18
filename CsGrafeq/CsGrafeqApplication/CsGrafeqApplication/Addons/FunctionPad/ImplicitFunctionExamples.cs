@@ -5,7 +5,8 @@ namespace CsGrafeqApplication.Addons.FunctionPad;
 
 public static class ImplicitFunctionExamples
 {
-    public static readonly IReadOnlyList<string> Examples;
+    public static readonly IReadOnlyList<ExpressionExample> Examples;
+    public static readonly string[] ExampleExpressions;
 
     static ImplicitFunctionExamples()
     {
@@ -40,6 +41,20 @@ abs(sin(x^2+2*x*y))=sin(x-2*y);no
 tan(sin(x)+cos(y))=sin(tan(x+y));no
 arctan(sin(x)+cos(y))=sin(arctan(x+y));no
 0.25*(2*sin(x*sin(y)+y*sin(x)))>0;no".Replace("\r\n", "@").Replace("\n", "@").Split("@")
-            .Select(s => s.Split(';').First()).ToArray();
+            .Select((s) =>
+            {
+                var ss=s.Split(';');
+                return new ExpressionExample(ss[0], ss[1] == "yes");
+            }).ToArray();
+        ExampleExpressions=Examples.Select(e=>e.Expression).ToArray();
+    }
+    public struct ExpressionExample
+    {
+        public string Expression;
+        public bool NeedPixelCheck;
+        public ExpressionExample(string expression, bool needPixelCheck)
+        {
+            Expression = expression;
+        }
     }
 }

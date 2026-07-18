@@ -60,7 +60,8 @@
                                         <Setter Property="Focusable" Value="False" />
                                     </Style>
                                 </Expander.Styles>
-                                <Panel Height="150">
+                                <Panel Height="150"
+                                       IsEnabled="{CompiledBinding $parent[controls:Keyboard].((viewModel:KeyboardViewModel)DataContext).IsKeyboardEnabled}">
                                     <Panel.Styles>
                                     <Style Selector="TextBlock">
                                         <Setter Property="Foreground" Value="{DynamicResource CgForegroundBrush}"/>

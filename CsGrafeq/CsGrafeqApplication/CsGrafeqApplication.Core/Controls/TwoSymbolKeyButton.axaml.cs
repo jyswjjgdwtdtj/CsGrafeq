@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using CsGrafeq.Keyboard;
 using CsGrafeqApplication.Core.Utils;
+using static CsGrafeqApplication.Core.Utils.TextBoxInputHelper;
 
 namespace CsGrafeqApplication.Core.Controls;
 
@@ -42,7 +43,7 @@ public partial class TwoSymbolKeyButton : ToggleButton
         CurrentButton = FirstButton;
         PART_Button.Click += (s, e) =>
         {
-            TopLevel.GetTopLevel(this)?.Input(IsChecked ?? false ? FirstButton : SecondButton);
+            Input(IsChecked ?? false ? FirstButton : SecondButton);
         };
     }
 

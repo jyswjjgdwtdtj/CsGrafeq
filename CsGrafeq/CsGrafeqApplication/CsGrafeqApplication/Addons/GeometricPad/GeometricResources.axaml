@@ -2,7 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:geometricpad="clr-namespace:CsGrafeqApplication.Addons.GeometricPad"
                     xmlns:system="clr-namespace:System;assembly=System.Runtime"
-                    xmlns:addons="clr-namespace:CsGrafeqApplication.Addons">
+                    xmlns:addons="clr-namespace:CsGrafeqApplication.Addons"
+                    xmlns:i18N="clr-namespace:CsGrafeq.I18N;assembly=CsGrafeq.I18N">
     <DataTemplate x:Key="GeometricPadViewTemplate" x:DataType="geometricpad:GeometricPad">
         <ContentControl>
             <ContentControl.Styles>
@@ -27,6 +28,17 @@
                         <ScrollViewer ZIndex="1">
                             <ItemsControl ItemsSource="{CompiledBinding Shapes}" Padding="0,0,0,5"
                                           Name="ShapeItemsControl">
+                                <ItemsControl.Styles>
+                                    <Style Selector="ItemsControl:empty">
+                                        <Setter Property="Template">
+                                            <ControlTemplate>
+                                                <Border Height="50" DataContext="{x:Static i18N:MultiLanguageResources.Instance}" VerticalAlignment="Top">
+                                                    <TextBlock FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{CompiledBinding CreateNewShapesText.Data,Mode=OneWay}" x:DataType="i18N:MultiLanguageResources" Foreground="{DynamicResource MaterialPrimaryMidBrush}"></TextBlock>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter>
+                                    </Style>
+                                </ItemsControl.Styles>
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <VirtualizingStackPanel Orientation="Vertical" />

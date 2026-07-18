@@ -60,6 +60,7 @@ public class GeometricPad : Addon
             Owner?.AskForRender();
         };
 #if DEBUG
+        /*
         var p1 = AddShape(new GeoPoint(new PointGetter_FromLocation(new Vec(0.5, 0.5))));
        
         var p2 = AddShape(new GeoPoint(new PointGetter_FromLocation(new Vec(1.5, 1.5))));
@@ -68,7 +69,7 @@ public class GeometricPad : Addon
         var p4 = AddShape(new GeoPoint(new PointGetter_MiddlePoint(p1!, p2!)));
         var c1 = AddShape(new Circle(new CircleGetter_FromCenterAndRadius(p1!)));
         
-        
+      */  
 #endif
     }
 
@@ -309,7 +310,7 @@ public class GeometricPad : Addon
                 new AvaSize(PointerReleasedPosition.X - PointerPressedPosition.X,
                     PointerReleasedPosition.Y - PointerPressedPosition.Y)).RegulateRectangle();
             var mathrect = new CgRectangle(Owner.PixelToMath(new AvaPoint(rect.Left, rect.Top + rect.Height)),
-                new Vec(rect.Width, rect.Height) / disp.UnitLength);
+                new Vec(rect.Width/disp.UnitLengthX, rect.Height/disp.UnitLengthY));
             foreach (var s in Shapes.GetShapes<GeometricShape>())
                 s.Selected = s.IsIntersectedWithRect(mathrect);
             _mainRenderTarget.Changed = true;
@@ -463,7 +464,8 @@ public class GeometricPad : Addon
 
     private void RenderShapes(SKCanvas dc, SKRect rect, IEnumerable<GeometricShape> shapes)
     {
-        var unitLength = (Owner as CartesianDisplayer)!.UnitLength;
+        var unitLengthX = (Owner as CartesianDisplayer)!.UnitLengthX;
+        var unitLengthY = (Owner as CartesianDisplayer)!.UnitLengthY;
         var lt = new Vec(PixelToMathX(rect.Left), PixelToMathY(rect.Bottom));
         var rt = new Vec(PixelToMathX(rect.Right), PixelToMathY(rect.Bottom));
         var rb = new Vec(PixelToMathX(rect.Right), PixelToMathY(rect.Top));
@@ -628,7 +630,7 @@ public class GeometricPad : Addon
                 {
                     var cs = circle.Current;
                     var pf = MathToPixelSk(cs.Center);
-                    var s = new SKSize((float)(cs.Radius * unitLength), (float)(cs.Radius * unitLength));
+                    var s = new SKSize((float)(cs.Radius * unitLengthX), (float)(cs.Radius * unitLengthY));
                     if (circle.Selected)
                         dc.DrawOval(pf, s, strokePaint);
                     else
@@ -740,7 +742,8 @@ public class GeometricPad : Addon
         foreach (var geoshape in Shapes.GetShapes<GeometricShape>())
             if ((!geoshape.IsDeleted)&&(geoshape is GeoLine || geoshape is Circle))
             {
-                var dist = ((geoshape.NearestFrom(mathcursor) - mathcursor) * disp.UnitLength).GetLength();
+                var mathVec = geoshape.NearestFrom(mathcursor) - mathcursor;
+                var dist = new Vec(mathVec.X*disp.UnitLengthX,mathVec.Y*disp.UnitLengthY).GetLength();
                 if (dist < 5) shapes.Add((dist, geoshape));
             }
 
@@ -869,7 +872,7 @@ public class GeometricPad : Addon
                 continue;
             if (s is T tar)
             {
-                var dis = ((tar.NearestFrom(v) - v) * disp.UnitLength).GetLength();
+                var dis = (tar.NearestFrom(v) - v).RespectivelyMultiply(disp.UnitLength).GetLength();
                 if (dis < Setting.PointerTouchRange && dis < distance)
                 {
                     distance = dis;

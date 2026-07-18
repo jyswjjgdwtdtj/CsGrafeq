@@ -8,6 +8,9 @@ namespace CsGrafeqApplication;
 
 internal class RenderExtension
 {
+    /// <summary>
+    /// 绘制在移动过后需要绘制的区域
+    /// </summary>
     public static void RenderMovedPlace(Action<SKRect,CancellationToken> rm, Size size, Point next, Point previous,CancellationToken ct)
     {
         if(ct.IsCancellationRequested)

@@ -167,7 +167,7 @@
                     </Border>
                 </DockPanel>
                 <!--设置层-->
-                <Grid ColumnDefinitions="*,52" RowDefinitions="*,52" ZIndex="15" Name="SettingDockPanel"
+                <Grid ColumnDefinitions="*,52" RowDefinitions="52,*,52" ZIndex="15" Name="SettingDockPanel"
                       VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                     <Grid.Styles>
                         <Styles>
@@ -185,7 +185,20 @@
                             </Style>
                         </Styles>
                     </Grid.Styles>
-                    <Border Grid.Column="1" Grid.Row="1">
+                    <Border Grid.Column="1" Grid.Row="0">
+                        <Button Name="ResetAxesButton" Background="{DynamicResource MaterialPrimaryMidBrush}"
+                                Width="32" Height="32" CornerRadius="4" Click="ResetAxesButton_OnClick">
+                            <ToolTip.Tip>
+                                <TextBlock Text="{CompiledBinding MultiLanguageResources.ResetAxesText.Data}" />
+                            </ToolTip.Tip>
+                            <Path Fill="{DynamicResource MaterialPrimaryMidForegroundBrush}"
+                                  Name="ResetAxesPath"
+                                  Width="22" Height="22" Stretch="Uniform"
+                                  Data="M4.225 2.082a.5.5 0 0 1 .693.694l-.065.078L3.707 4H9a4.5 4.5 0 0 1 0 9H5a.5.5 0 1 1 0-1h4a3.5 3.5 0 1 0 0-7H3.707l1.146 1.147l.065.078a.5.5 0 0 1-.693.693l-.079-.064l-2-2a.5.5 0 0 1 0-.707l2-2z" />
+
+                        </Button>
+                    </Border>
+                    <Border Grid.Column="1" Grid.Row="2">
                         <ToggleButton Name="SettingToggle" Background="{DynamicResource MaterialPrimaryMidBrush}"
                                       Width="32" Height="32" CornerRadius="4">
                             <ToggleButton.Styles>
@@ -223,7 +236,7 @@
                             </ToggleButton.Styles>
                         </ToggleButton>
                     </Border>
-                    <Border Grid.Column="0" Grid.Row="1">
+                    <Border Grid.Column="0" Grid.Row="2">
                         <corecontrols:ExpandBox ExpandDirection="Left"
                                                 IsExpanded="{CompiledBinding #SettingToggle.IsChecked,Mode=OneWay}"
                                                 Margin="0" Padding="0" HorizontalAlignment="Right">
@@ -322,7 +335,7 @@
                             </StackPanel>
                         </corecontrols:ExpandBox>
                     </Border>
-                    <Border Grid.Column="1" Grid.Row="0">
+                    <Border Grid.Column="1" Grid.Row="1">
                         <corecontrols:ExpandBox VerticalAlignment="Bottom"
                                                 IsExpanded="{CompiledBinding #SettingToggle.IsChecked,Mode=OneWay}"
                                                 Margin="0" Padding="0" ExpandDirection="Up">

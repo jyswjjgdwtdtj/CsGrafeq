@@ -67,9 +67,10 @@ public class FunctionPad : Addon
         }
     }
 
-    private ImplicitFunction CreateAndAddFunctionCore(string exp)
+    private ImplicitFunction CreateAndAddFunctionCore(string exp,bool needPixelCheck=false)
     {
         var func = new ImplicitFunction(exp, this);
+        func.NeedPixelCheck = needPixelCheck;
         Functions.Add(func);
         Layers.Add(func.RenderTarget);
         func.RenderTarget.RenderTargetSize =
@@ -84,7 +85,7 @@ public class FunctionPad : Addon
         return func;
     }
 
-    public ImplicitFunction CreateAndAddFunction(string exp)
+    public ImplicitFunction CreateAndAddFunction(string exp,bool needCheck)
     {
         var func = CreateAndAddFunctionCore(exp);
         CommandHelper.CommandManager.Do(
@@ -162,7 +163,7 @@ public class FunctionPad : Addon
         var pixelToRender = new ConcurrentBag<SKPoint>();
         var pointColor=new SKColor(impFunc.Color).WithAlpha(impFunc.Opacity).ToUint();
         var func = impFunc.Function.Function;
-        Func<double,double,double,double,bool> msFunc =impFunc.NeedCheckPixel?impFunc.MsFunction: static (_,_,_,_ )=> true;
+        Func<double,double,double,double,bool> msFunc =impFunc.NeedPixelCheck?impFunc.MsFunction: static (_,_,_,_ )=> true;
         do
         {
             var rs = rectToCalc.ToArray();

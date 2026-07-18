@@ -5,6 +5,7 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using CsGrafeq.Keyboard;
 using CsGrafeqApplication.Core.Utils;
+using static CsGrafeqApplication.Core.Utils.TextBoxInputHelper;
 
 namespace CsGrafeqApplication.Core.Controls;
 
@@ -38,6 +39,6 @@ public partial class OneSymbolKeyButton : UserControl
 
     private void PART_Button_OnClick(object? sender, RoutedEventArgs e)
     {
-        TopLevel.GetTopLevel(this)?.Input(Button);
+        Input(Button);
     }
 }

@@ -1,13 +1,15 @@
-﻿ReactiveUI
+﻿// namespaces
+ReactiveUI
 CsGrafeq.MVVM
 System
 SkiaSharp
 #
+//Type,Name,Default Value
 uint,PrimaryColor,0xFF77CCBB
 byte,DefaultOpacity,255
 bool,EnableExpressionSimplification,false
-bool,MoveOptimization,false
-bool,ZoomOptimization,false
+bool,MoveOptimization,true
+bool,ZoomOptimization,true
 bool,MoveOptimizationUserEnabled,true
 bool,ZoomOptimizationUserEnabled,true
 bool,ShowKeyboard,true
@@ -19,3 +21,4 @@ int,ClientSizeWidth,800
 int,ClientSizeHeight,600
 SKBlendMode,CompoundBlendMode,SKBlendMode.SrcOver
 int,AddonIndex,0
+int,LineWidth,1

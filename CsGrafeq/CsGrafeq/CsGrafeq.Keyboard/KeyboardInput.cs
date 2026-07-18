@@ -1,5 +1,7 @@
 ﻿namespace CsGrafeq.Keyboard;
-
+/// <summary>
+/// 将用于公式输入
+/// </summary>
 public enum KeyboardInput
 {
 /*

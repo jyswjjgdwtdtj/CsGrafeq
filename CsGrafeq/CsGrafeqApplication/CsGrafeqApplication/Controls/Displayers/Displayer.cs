@@ -262,7 +262,7 @@ public abstract class Displayer : SKCanvasView, ICustomHitTest
     /// <summary>
     ///     强制重绘
     /// </summary>
-    protected void ForceToRender(CancellationToken ct)
+    public void ForceToRender(CancellationToken ct)
     {
         _renderClock.Cancel();
         Invalidate(ct);
